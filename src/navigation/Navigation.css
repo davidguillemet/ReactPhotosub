@@ -53,7 +53,7 @@ nav a.active {
     color: #181818;
 }
 
-nav > ul > li:has(> a.active) {
+nav > ul > li:has(a.active) {
     border-top-width: 3px;
 }
 
