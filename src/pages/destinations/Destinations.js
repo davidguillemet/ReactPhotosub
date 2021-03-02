@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Destination from './Destination';
 
 function getDestinations() {
-    return fetch(process.env.REACT_APP_API_URL + "destinations")
+    return fetch("/api/destinations")
     .then(data => {
         return data.json();
     });
