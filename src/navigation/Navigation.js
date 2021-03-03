@@ -9,6 +9,7 @@ const Navigation = () => (
             <ul>
                 <li><NavLink to="/">HOME</NavLink></li>
                 <li><NavLink to="destinations">DESTINATIONS</NavLink></li>
+                <li><NavLink to="search">SEARCH</NavLink></li>
                 <li>
                     DIVERS
                     <ul>

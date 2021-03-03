@@ -3,6 +3,7 @@ import Navigation from "./navigation";
 import './App.css';
 import Home from "./pages/home";
 import Destinations from "./pages/destinations";
+import Search from "./pages/search";
 import Finning from './pages/finning';
 import Simulation from './pages/simulation';
 
@@ -13,6 +14,7 @@ function App() {
       <Router>
         <Home path="/" />
         <Destinations path="destinations" />
+        <Search path="search" />
         <Finning path="finning" />
         <Simulation path="simulation" />
       </Router>
