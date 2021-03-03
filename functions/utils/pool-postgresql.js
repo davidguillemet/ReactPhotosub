@@ -16,7 +16,7 @@ const createUnixSocketPool = (config) => {
         connection.port = configFunctions.postgresql.port;
 
         const fs = require("fs");
-        const pathToCertificates = __dirname + "/../../gcp/postgresql/";
+        const pathToCertificates = __dirname + "/../../../gcp/postgresql/";
         connection.ssl = {
             rejectUnauthorized: false,
             ca: fs.readFileSync(pathToCertificates + "server-ca.pem"),
