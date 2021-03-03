@@ -5,11 +5,11 @@ require("dotenv").config();
 
 const express = require("express");
 const bodyParser = require("body-parser");
-const {logger/* , makeExpressLoggerMiddleware */} = require("./logger");
-const convertPathToUrl = require("./firebase");
+const {logger/* , makeExpressLoggerMiddleware */} = require("../utils/logger");
+const convertPathToUrl = require("../utils/firebase");
 
 // Get a connection pool for postgreSql
-const {pool} = require("./pool-postgresql");
+const {pool} = require("../utils/pool-postgresql");
 
 // DOC at https://googleapis.dev/nodejs/logging-winston/latest/
 // Create a middleware that will use the provided logger.

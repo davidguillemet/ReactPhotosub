@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
-const {newFile, deleteFile} = require("./storageTriggers");
-const {mainapi} = require("./expressApi");
+const {newFile, deleteFile} = require("./triggers/storageTriggers");
+const {mainapi} = require("./api/expressApi");
 
 exports.newImage = functions.storage.object().onFinalize(async (file) => {
     return newFile(file);

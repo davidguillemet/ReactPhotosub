@@ -25,7 +25,7 @@ const {parse} = require("path");
 const axios = require("axios");
 const exifr = require("exifr");
 
-const {logger} = require("./logger");
+const {logger} = require("../utils/logger");
 
 exports.deleteFile = async function(file) {
     const fileFullPath = file.name;
