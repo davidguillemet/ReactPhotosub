@@ -68,7 +68,6 @@ app.route("/locations")
 // Get all regions
 app.route("/regions")
     .get(function(req, res, next) {
-        console.log(pool);
         pool().select().table("regions").then((data) => {
             res.json(data);
         }).catch((err) => {
@@ -79,8 +78,22 @@ app.route("/regions")
         });
     });
 
-// Insert a new image
+app.route("/images")
+    .get(function(req, res, next) {
+        pool()("images").count("id as CNT").then((total) => {
+            res.json({
+                count: total[0].CNT,
+            });
+        }).catch((err) => {
+            logger.error("Failed to get count of images.", err);
+            res.status(500)
+                .send("Unable to get image count.")
+                .end();
+        });
+    });
+
 app.route("/image")
+    // Insert a new image
     .post(async function(req, res, next) {
     // {
     //     name: "DSC_6578.jpg",
@@ -102,7 +115,7 @@ app.route("/image")
             res.status(500).send(`Error while inserting image ${fileFullPath}.`).end();
         }
     })
-// Delete an image
+    // Delete an image
     .delete(async function(req, res, next) {
     // {
     //     name: "DSC_6578.jpg",
