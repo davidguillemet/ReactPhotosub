@@ -80,7 +80,7 @@ app.route("/regions")
 
 app.route("/images")
     .get(function(req, res, next) {
-        pool()("images").count("id as CNT").then((total) => {
+        pool("images").count("id as CNT").then((total) => {
             res.json({
                 count: total[0].CNT,
             });
@@ -107,8 +107,7 @@ app.route("/image")
         const newImage = req.body;
         const fileFullPath = `${newImage.path}/${newImage.name}`;
         try {
-            logger.info(`ìnserting new image ${fileFullPath}`);
-            await pool()("images").insert(newImage);
+            await pool("images").insert(newImage);
             res.status(200).send(`Successfully inserting image ${fileFullPath}.`).end();
         } catch (err) {
             logger.error(`Failed to insert image ${fileFullPath}.`, err);
@@ -124,8 +123,7 @@ app.route("/image")
         const imgeToDelete = req.body;
         const fileFullPath = `${imgeToDelete.path}/${imgeToDelete.name}`;
         try {
-            logger.info(`Deleting image ${fileFullPath}`);
-            await pool()("images").where({
+            await pool("images").where({
                 path: imgeToDelete.path,
                 name: imgeToDelete.name,
             }).delete();

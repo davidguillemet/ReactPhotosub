@@ -82,9 +82,13 @@ let _pool = null;
 // Set up a variable to hold our connection pool. It would be safe to
 // initialize this right away, but we defer its instantiation to ease
 // testing different configurations.
-exports.pool = function() {
+exports.pool = function(table) {
     if (_pool === null) {
         _pool = createPool();
     }
-    return _pool;
+    if (table !== null && table !== undefined) {
+        return _pool(table);
+    } else {
+        return _pool;
+    }
 };
