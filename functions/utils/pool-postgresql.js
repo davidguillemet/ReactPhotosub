@@ -15,14 +15,17 @@ const createUnixSocketPool = (config) => {
         connection.host = configFunctions.postgresql.host;
         connection.port = configFunctions.postgresql.port;
 
-        const fs = require("fs");
-        const pathToCertificates = __dirname + "/../../../gcp/postgresql/";
-        connection.ssl = {
-            rejectUnauthorized: false,
-            ca: fs.readFileSync(pathToCertificates + "server-ca.pem"),
-            key: fs.readFileSync(pathToCertificates + "client-key.pem"),
-            cert: fs.readFileSync(pathToCertificates + "client-cert.pem"),
-        };
+        if (configFunctions.postgresql.remote === true) {
+            // Connect to Google Cloud instance from local env
+            const fs = require("fs");
+            const pathToCertificates = __dirname + "/../../../gcp/postgresql/";
+            connection.ssl = {
+                rejectUnauthorized: false,
+                ca: fs.readFileSync(pathToCertificates + "server-ca.pem"),
+                key: fs.readFileSync(pathToCertificates + "client-key.pem"),
+                cert: fs.readFileSync(pathToCertificates + "client-cert.pem"),
+            };
+        }
     } else {
         connection.host = `/cloudsql/photosub:${configFunctions.postgresql.region}:${configFunctions.postgresql.instance}`;
     }
