@@ -1,3 +1,5 @@
+import Box from "@material-ui/core/Box";
+
 import { Router  } from "@reach/router";
 import Navigation from "./navigation";
 import './App.css';
@@ -9,16 +11,21 @@ import Simulation from './pages/simulation';
 
 function App() {
   return (
-    <div className="App">
+    <Box className="App" justifyContent="center" alignContent="center" alignItems="center">
       <Navigation></Navigation>
-      <Router>
+      <Router style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center"
+        }}
+      >
         <Home path="/" />
         <Destinations path="destinations" />
         <Search path="search" />
         <Finning path="finning" />
         <Simulation path="simulation" />
       </Router>
-    </div>
+    </Box>
   );
 }
 
