@@ -11,7 +11,7 @@ module.exports = {
     rules: {
         "quotes": ["error", "double"],
         "indent": ["error", 4],
-        "max-len": ["error", 150],
+        "max-len": ["error", 300],
         "require-jsdoc": 0,
     },
     parser: "babel-eslint",
