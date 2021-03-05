@@ -3,8 +3,8 @@ import NavLink from './Navlink';
 import logo from '../assets/images/logo.jpg';
   
 const Navigation = () => (
-    <div class="header">
-        <img src={logo} class="logo" alt="logo" />
+    <div className="header">
+        <img src={logo} className="logo" alt="logo" />
         <nav>
             <ul>
                 <li><NavLink to="/">HOME</NavLink></li>
