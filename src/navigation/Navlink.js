@@ -7,7 +7,7 @@ const NavLink = props => (
         // the object returned here is passed to the
         // anchor element's props
         return {
-          class: isCurrent ? "active" : null
+          className: isCurrent ? "active" : null
         };
       }}
     />
