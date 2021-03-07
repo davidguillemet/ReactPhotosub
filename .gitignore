@@ -14,6 +14,7 @@ build/
 .env
 .firebase/
 ui-debug.log
+static-storage/
 
 npm-debug.log*
 yarn-debug.log*
