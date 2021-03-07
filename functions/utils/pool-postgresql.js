@@ -11,11 +11,11 @@ const createUnixSocketPool = (config) => {
         database: configFunctions.postgresql.database,
     };
 
-    if (configFunctions.env === "development") {
+    if (configFunctions.env === "remote-dev" || configFunctions.env === "local-dev") {
         connection.host = configFunctions.postgresql.host;
         connection.port = configFunctions.postgresql.port;
 
-        if (configFunctions.postgresql.remote === true) {
+        if (configFunctions.env === "remote-dev") {
             // Connect to Google Cloud instance from local env
             const fs = require("fs");
             const pathToCertificates = __dirname + "/../../../gcp/postgresql/";

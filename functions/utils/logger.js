@@ -14,7 +14,7 @@ function createLogginWinston() {
         prefix: "api-photosub",
     };
 
-    if (configFunctions.env === "development") {
+    if (configFunctions.env === "remote-dev") {
         configuration = {
             projectId: "photosub",
             keyFilename: "../../gcp/photosub-5c66182af76f.json",
@@ -39,7 +39,7 @@ async function makeExpressLoggerMiddleware() {
     return await lw.express.makeMiddleware(logger, loggingWinston);
 }
 
-if (configFunctions.env === "development") {
+if (configFunctions.env === "remote-dev" || configFunctions.env === "local-dev") {
     logger.add(new transports.Console());
 } else {
     logger.add(loggingWinston);
