@@ -1,16 +1,15 @@
-import { Link } from "@reach/router";
+import { NavLink } from "react-router-dom";
 
-const NavLink = props => (
-    <Link
-      {...props}
-      getProps={({ isCurrent }) => {
-        // the object returned here is passed to the
-        // anchor element's props
-        return {
-          className: isCurrent ? "active" : null
-        };
+const NavLinkTemplate = props => (
+  <NavLink
+      exact={true}
+      to={props.to}
+      activeStyle={{
+        borderTopWidth: 4
       }}
-    />
+  >
+    {props.label}
+  </NavLink>
 );
 
-export default NavLink;
+export default NavLinkTemplate;

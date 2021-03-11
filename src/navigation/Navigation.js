@@ -4,14 +4,14 @@ import NavLink from './Navlink';
 const Navigation = () => (
     <nav>
         <ul>
-            <li><NavLink to="/">HOME</NavLink></li>
-            <li><NavLink to="destinations">DESTINATIONS</NavLink></li>
-            <li><NavLink to="search">SEARCH</NavLink></li>
+            <li><NavLink to="/" label="HOME"/></li>
+            <li><NavLink to="/destinations" label="DESTINATIONS" /></li>
+            <li><NavLink to="/search" label="SEARCH" /></li>
             <li>
                 DIVERS
                 <ul>
-                    <li><NavLink to="finning">FINNING</NavLink></li>
-                    <li><NavLink to="simulation">SIMULATION</NavLink></li>
+                    <li><NavLink to="/finning" label="FINNING" /></li>
+                    <li><NavLink to="/simulation" label="SIMULATION" /></li>
                 </ul>
             </li>
         </ul>
