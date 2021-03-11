@@ -12,9 +12,19 @@ import Typography from '@material-ui/core/Typography';
 import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
-    margin: {
+    noMargin: {
       margin: 0,//theme.spacing(1),
     },
+    root: {
+        '& > *': {
+          margin: theme.spacing(0.5),
+        },
+        width: '95%',
+        maxWidth: '700px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+    }
 }));
 
 const Search = () => {
@@ -92,16 +102,15 @@ const Search = () => {
     }
     
     return (
-        <Box style={{
-                width: '95%',
-                maxWidth: '700px'
-        }}>
+        <Box classes={{
+                root: classes.root
+            }}>
             <Typography variant="h5" component="h1">
             Saisissez un critère pour lancer une recherche
             </Typography>
             <Button variant="contained" color="primary" href="#contained-buttons">Guide de la recherche</Button>
             <TextField 
-                className={classes.margin}
+                className={classes.noMargin}
                 id="filled-search"
                 label="Recherche"
                 placeholder={`Rechercher parmi ${imageCount} images...`}
