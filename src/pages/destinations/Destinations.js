@@ -1,35 +1,40 @@
 import { useState, useEffect } from 'react';
 import Destination from './Destination';
-import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import GridList from "@material-ui/core/GridList";
 import Paper from '@material-ui/core/Paper';
 import Chip from '@material-ui/core/Chip';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        margin: 0,
         width: '100%',
+        padding: 10,
         display: 'flex',
         flexDirection: 'column',
         flexWrap: 'wrap',
-        justifyContent: 'space-around',
+        justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden',
-        '& > *': {
-            margin: theme.spacing(0.5),
-        }
     },
     gridList: {
-      width: '100%',
-      '& > *': {
-        margin: theme.spacing(0.5),
+        margin: 0,
+        width: '100%',
+        '& > *': {
+            margin: 5,
+        },
     },
     regionContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
         '& *': {
-            margin: theme.spacing(0.5),
+            margin: 5,
         }
     }
-},
 }));
 
 function getDestinations() {
@@ -39,6 +44,7 @@ function getDestinations() {
 		"location": 15,
 		"path": "2014/misool/",
 		"cover": "http://localhost:3000/static-storage/2014/misool/DSC_1425.jpg",
+        "region": 20, // TODO get the region where location is 15
 		"id": 1
 	}
     const items = [];
@@ -69,76 +75,147 @@ function getRegions() {
     });*/
 }
 
+function getRegionPath(regionId, regionMap) {
+
+    const regionList = [];
+    let parentId = regionId;
+    do {
+        const region = regionMap.get(parentId);
+        regionList.push(region);
+        parentId = region.parent;
+    } while (parentId !== null)
+
+    return regionList.reverse();
+}
+
 const Destinations = () => {
+    const ROOT_REGION_ID = -999999;
+    const ROOT_REGION = {
+        title: "Toutes les régions",
+        id: ROOT_REGION_ID,
+        parent: null
+    };
+
     const classes = useStyles();
-    const [destinations, setDestinations] = useState([]);
-    const [regions, setRegions] = useState({
-        map: {},
-        all: []
-    });
-    const [currentRegionState, setCurrentRegionState] = useState({
-        region: null,
-        subRegions: []
-    });
 
+    const [allDestinations, setAllDestinations] = useState(null);
+    const [filteredDestinations, setFilteredDestinations] = useState([]);
+
+    const [regionMap, setRegionMap] = useState(null);
+    const [regionList, setRegionList] = useState([]);
+    const [regionsByDestination, setRegionsByDestination] = useState(null);
+    const [currentRegion, setCurrentRegion] = useState(ROOT_REGION);
+    const [currentSubRegions, setCurrentSubRegions] = useState([]);
+
+    // A first effect executed only once to get regions
     useEffect(() => {
-        getDestinations().then(items => {
-            setDestinations(items);
-        });
-    }, []);
-    useEffect(() => {
+        console.log("useEffect getRegions")
         getRegions().then(items => {
-                        
+
+            items.forEach(item => {
+                if (item.parent === null) {
+                    item.parent = ROOT_REGION_ID;
+                }
+            });
+            setRegionList(items);
+
+            // Build the region lmap (region id -> region)
             const regionMap = new Map();
+            // Add the virtual root region in th emap but not in the list...
+            regionMap.set(ROOT_REGION_ID, ROOT_REGION)
             items.forEach(region => {
-                regionMap[region._id] = region;
+                regionMap.set(region.id, region);
             })
-            setRegions({
-                map: regionMap,
-                all: items
-            });
-            const childRegions = items.filter(region => region.parent === null);
-            setCurrentRegionState({
-                region: null,
-                subRegions: childRegions
-            });
-        });
+            setRegionMap(regionMap);
+
+            const rootRegions = items.filter(region => region.parent === ROOT_REGION_ID);
+            setCurrentSubRegions(rootRegions);
+        })
     }, []);
 
-    function setCurrentRegion(regionId) {
-        const childRegions = regions.all.filter(region => region.parent === regionId);
-        setCurrentRegionState({
-            region: regionId !== null ? regions.map[regionId] : null,
-            subRegions: childRegions
+    // Another effect executed only once when regions has been loaded, to get destinations
+    useEffect(() => {
+        console.log("useEffect getDestinations")
+        if (regionMap === null) {
+            // Wait for the region map to be populated
+            return;
+        }
+        getDestinations().then(destinations => {
+            setAllDestinations(destinations);
+
+            // Build the regions map by destination (destination id -> region list)
+            const regionsByDestination = new Map();
+            destinations.forEach(destination => {
+                regionsByDestination.set(destination.id, getRegionPath(destination.region, regionMap));
+            });
+            setRegionsByDestination(regionsByDestination);
         });
+    }, [regionMap]); // regions dependency to load estinations one regions have been initialized
+
+    useEffect(() => {
+        console.log("useEffect set initia filtered destination.");
+        if (regionsByDestination === null || allDestinations === null) {
+            return;
+        }
+        setFilteredDestinations(allDestinations);
+    }, [regionsByDestination, allDestinations]); // Needs regionsByDestination to update destination cards
+
+    // Another effect executed only once when 
+    
+    function onRegionClick(regionId) {
+
+        setCurrentRegion(regionMap.get(regionId));
+        const subRegions = regionList.filter(region => region.parent === regionId);
+
+        setCurrentSubRegions(subRegions);
+        
+        // filter by region
+        const resultsByRegion = (regionId === ROOT_REGION_ID) ?
+            allDestinations :
+            allDestinations.filter(destination => regionsByDestination.get(destination.id).find(destRegion => destRegion.id === regionId))
+
+        // filter by keyword
+        // TODO
+        const resultsByRegionAndKeyword = resultsByRegion;
+
+        setFilteredDestinations(resultsByRegionAndKeyword);
     }
 
-    const handleRegionClick = (region) => () => {
-        setCurrentRegion(region.id);
+    const handleRegionClick = (regionId) => () => {
+        onRegionClick(regionId);
     }
 
     function RegionPath() {
-        if (currentRegionState.region === null || currentRegionState.region === undefined) {
-            return "Toutes les régions";
-        } else {
-            return currentRegionState.region.title;
+        if (regionMap === null) {
+            return null;
         }
+        const ancestors = getRegionPath(currentRegion.id, regionMap);
+        return (
+            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} >
+                {ancestors.map((region, index, all) => {
+                    const clickable = index === all.length - 1 ? false : true;
+                    const variant = clickable ? "outlined" : "default";
+                    return (
+                        <Chip key={region.id} color="primary" label={region.title} variant={variant} clickable={clickable} onClick={handleRegionClick(region.id)} />
+                    );
+                })}
+            </Breadcrumbs>
+        )
     }
 
     return (
         <div className={classes.root}>
             <RegionPath></RegionPath>
-            <Paper variant="elevation" elevation={0} className={classes.regionContainer}>
-                {currentRegionState.subRegions.map(region => <Chip key={region.id} label={region.title} onClick={handleRegionClick(region)} />)}
+            <Paper variant="elevation" elevation={0} classes={{ root: classes.regionContainer}}>
+                {currentSubRegions.map(region => <Chip key={region.id} label={region.title} onClick={handleRegionClick(region.id)} variant="outlined" />)}
             </Paper>
-            <GridList cellHeight={180} padding={10} spacing={5} classes={{
+            <GridList component="div" classes={{
                     root: classes.gridList
                 }}>
-                {destinations.map(item => <Destination key={item.id} {...item} />)}
+                {filteredDestinations.map(item => <Destination key={item.id} destination={item} regions={regionsByDestination.get(item.id)} />)}
             </GridList>
         </div>
     )
 };
 
-//export default withWidth()(Destinations);
 export default Destinations;
