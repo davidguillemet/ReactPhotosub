@@ -75,7 +75,14 @@ function getRegions() {
     });*/
 }
 
-function getRegionPath(regionId, regionMap) {
+const ROOT_REGION_ID = -999999;
+const ROOT_REGION = {
+    title: "Toutes les régions",
+    id: ROOT_REGION_ID,
+    parent: null
+};
+
+function getRegionPath(regionId, regionMap, includeRoot) {
 
     const regionList = [];
     let parentId = regionId;
@@ -83,18 +90,12 @@ function getRegionPath(regionId, regionMap) {
         const region = regionMap.get(parentId);
         regionList.push(region);
         parentId = region.parent;
-    } while (parentId !== null)
+    } while ((includeRoot === true && parentId !== null) || (includeRoot === false && parentId !== ROOT_REGION_ID))
 
     return regionList.reverse();
 }
 
 const Destinations = () => {
-    const ROOT_REGION_ID = -999999;
-    const ROOT_REGION = {
-        title: "Toutes les régions",
-        id: ROOT_REGION_ID,
-        parent: null
-    };
 
     const classes = useStyles();
 
@@ -128,7 +129,7 @@ const Destinations = () => {
             })
             setRegionMap(regionMap);
 
-            const rootRegions = items.filter(region => region.parent === ROOT_REGION_ID);
+            const rootRegions = items.filter(region => region.parent === ROOT_REGION_ID).sort((a, b) => a.title === b.title ? 0 : a.title < b.title ? -1 : 1);
             setCurrentSubRegions(rootRegions);
         })
     }, []);
@@ -146,7 +147,7 @@ const Destinations = () => {
             // Build the regions map by destination (destination id -> region list)
             const regionsByDestination = new Map();
             destinations.forEach(destination => {
-                regionsByDestination.set(destination.id, getRegionPath(destination.region, regionMap));
+                regionsByDestination.set(destination.id, getRegionPath(destination.region, regionMap, false));
             });
             setRegionsByDestination(regionsByDestination);
         });
@@ -189,7 +190,7 @@ const Destinations = () => {
         if (regionMap === null) {
             return null;
         }
-        const ancestors = getRegionPath(currentRegion.id, regionMap);
+        const ancestors = getRegionPath(currentRegion.id, regionMap, true);
         return (
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} >
                 {ancestors.map((region, index, all) => {
