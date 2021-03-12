@@ -15,10 +15,18 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'hidden',
         height: 'auto !important',
         borderRadius: 5,
+        transition: theme.transitions.create(
+            'transform',
+            {
+                duration: duration.standard,
+                easing: easing.easeOut
+            }
+        ),
         '&:hover': {
-            boxShadow: '0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%)',
-            top: -2,
-            left: -2
+            transform: 'scale(1.02)',
+            boxShadow: '0px 3px 3px -2px rgb(0 0 0 / 40%), 0px 3px 4px 0px rgb(0 0 0 / 25%), 0px 1px 8px 0px rgb(0 0 0 / 20%)',
+            top: 0,
+            left: 0
         },
         [theme.breakpoints.only('xs')]: {
             width: 'calc(100% - 10px)',
@@ -68,12 +76,13 @@ const useStyles = makeStyles((theme) => ({
                 'transform',
                 {
                     duration: 1000,
-                    easing: easing.easeOut
+                    easing: easing.easeOut,
+                    delay: duration.standard - 100
                 }
             )
         },
         '&:hover img': {
-            transform: 'scale(1.05)'
+            transform: 'scale(1.02)'
         }
     },
     imgFullHeight: {
@@ -93,10 +102,18 @@ const useStyles = makeStyles((theme) => ({
     },
     icon: {
         color: 'white',
-    },
+    }
+}));
+
+const detailStyles = makeStyles((theme) => ({
+    regionChipOutlinedPrimary: {
+        color: '#fff',
+        border: '1px solid #fff'
+    }
 }));
 
 const DestinationDetails = ({destination, regions}) => {
+    const classes = detailStyles();
 
     return (
         <React.Fragment>
@@ -106,8 +123,13 @@ const DestinationDetails = ({destination, regions}) => {
                     <Chip size="small"
                           key={region.id}
                           label={<Typography variant="caption">{region.title}</Typography>}
+                          variant="outlined"
+                          color="primary"
                           style={{
                               marginLeft: index > 0 ? 5 : 0
+                          }}
+                          classes={{
+                              outlinedPrimary: classes.regionChipOutlinedPrimary
                           }}
                     />
                 );
