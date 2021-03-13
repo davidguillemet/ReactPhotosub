@@ -35,21 +35,24 @@ app.use((req, res, next) => {
 });
 
 // Get all Destinations
+// including the region identifier through an inner join with the locations table
+// ==> select destinations.*, locations.region from destinations inner join locations on destinations.location = locations.id
 app.route("/destinations")
     .get(function(req, res, next) {
-    // TODO: convert cover property from '2014/misool/DSC_456.jpg' to a real url
-    // See https://firebase.google.com/docs/storage/web/download-files
-        pool().select().table("destinations").then((destinations) => {
-            destinations.forEach((destination) => {
-                destination.cover = convertPathToUrl(destination.path + destination.cover);
+        // See https://firebase.google.com/docs/storage/web/download-files
+        pool().select("destinations.*", "locations.region").from("destinations").join("locations", {"destinations.location": "locations.id"})
+            .then((destinations) => {
+                destinations.forEach((destination) => {
+                    // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
+                    destination.cover = convertPathToUrl(destination.path + destination.cover);
+                });
+                res.json(destinations);
+            }).catch((err) => {
+                logger.error("Failed to load destinations.", err);
+                res.status(500)
+                    .send("Failed to load destinations.")
+                    .end();
             });
-            res.json(destinations);
-        }).catch((err) => {
-            logger.error("Failed to load destinations.", err);
-            res.status(500)
-                .send("Failed to load destinations.")
-                .end();
-        });
     });
 
 // Get all locations
