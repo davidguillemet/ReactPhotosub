@@ -44,7 +44,7 @@ app.route("/destinations")
             .then((destinations) => {
                 destinations.forEach((destination) => {
                     // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
-                    destination.cover = convertPathToUrl(destination.path + destination.cover);
+                    destination.cover = convertPathToUrl(destination.path + "/" + destination.cover);
                 });
                 res.json(destinations);
             }).catch((err) => {
@@ -53,6 +53,43 @@ app.route("/destinations")
                     .send("Failed to load destinations.")
                     .end();
             });
+    });
+
+// Get a specific destination head from identifier
+app.route("/destination/:year/:title/head")
+    .get(function(req, res, next) {
+        pool({d: "destinations"})
+            .select(
+                "d.title", "d.date", "d.cover", "d.path", "d.id",
+                "l.title as location", "l.longitude", "l.latitude", "l.link", "l.region")
+            .where("d.path", `${req.params.year}/${req.params.title}`)
+            .join("locations as l", {"d.location": "l.id"})
+            .then((destinations) => {
+                const destination = destinations[0];
+                destination.cover = convertPathToUrl(destination.path + "/" + destination.cover);
+                res.json(destination);
+            }).catch((err) => {
+                logger.error(`Failed to load destination with id = ${req.params.id}`, err);
+                res.status(500)
+                    .send("Failed to load destination.")
+                    .end();
+            });
+    });
+
+// Get images for a specific destination from identifier
+app.route("/destination/:year/:title/images")
+    .get(function(req, res, next) {
+        pool({i: "images"}).select("i.id", "i.name", "i.path", "i.title", "i.description").join("destinations", {
+            "destinations.path": pool().raw("?", [`${req.params.year}/${req.params.title}`]),
+            "i.path": "destinations.path",
+        }).then((destination) => {
+            res.json(destination);
+        }).catch((err) => {
+            logger.error(`Failed to load destination with id = ${req.params.id}`, err);
+            res.status(500)
+                .send("Failed to load destination.")
+                .end();
+        });
     });
 
 // Get all locations
@@ -82,6 +119,7 @@ app.route("/regions")
     });
 
 app.route("/images")
+    // Get number of images
     .get(function(req, res, next) {
         pool("images").count("id as CNT").then((total) => {
             res.json({
