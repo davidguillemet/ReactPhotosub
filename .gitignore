@@ -11,7 +11,6 @@ build/
 
 # misc
 .DS_Store
-.env
 .firebase/
 ui-debug.log
 static-storage/

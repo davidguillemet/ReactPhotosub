@@ -11,6 +11,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import './App.css';
 import Home from "./pages/home";
 import Destinations from "./pages/destinations";
+import Destination from "./pages/destination";
 import Search from "./pages/search";
 import Finning from './pages/finning';
 import Simulation from './pages/simulation';
@@ -20,6 +21,18 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center'
+  },
+  pageContainer: {
+    margin: 0,
+    marginTop: 30,
+    width: '100%',
+    padding: 10,
+    display: 'flex',
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
   sticky: {
     top: '-130px'
@@ -44,11 +57,7 @@ function App() {
             <img src={logo} className="logo" alt="logo" />
             <Navigation></Navigation>
           </AppBar>
-            <Box style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center"
-            }}>
+            <Box className={classes.pageContainer}>
               <Fade in={true} timeout={{
                   appear: 1000,
                   enter: 1000,
@@ -64,6 +73,9 @@ function App() {
                     </Route>
                     <Route exact strict path="/destinations">
                         <Destinations/>
+                    </Route>
+                    <Route exact strict path="/destinations/:year/:title">
+                        <Destination/>
                     </Route>
                     <Route exact strict path="/search">
                       <Search/>
