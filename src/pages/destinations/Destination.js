@@ -8,6 +8,7 @@ import { formatDate } from '../../utils/utils';
 import Typography from "@material-ui/core/Typography";
 import Chip from "@material-ui/core/Chip";
 import React from "react";
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     tileRoot: {
@@ -46,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     },
     tile: {
         position: 'relative',
-        '& > div' : {
+        '& > a > div' : {
             transition: theme.transitions.create(
                 'bottom',
                 {
@@ -55,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
                 }
             )
         },
-        '&:hover > div': {
+        '&:hover > a > div': {
             bottom: 0
         },
         '& div[class*="actionIcon"]' : {
@@ -148,6 +149,7 @@ const Destination = ({destination, regions}) => {
                 imgFullHeight: classes.imgFullHeight,
                 imgFullWidth: classes.imgFullWidth
             }}>
+            <Link to={`/destinations/${destination.path}`}>
             <img src={destination.cover} alt={destination.title} style={{
                 height: '100%',
                 width: '100%'
@@ -164,6 +166,7 @@ const Destination = ({destination, regions}) => {
                     </IconButton>
                 }
             />
+            </Link>
         </GridListTile>
     );
 }
