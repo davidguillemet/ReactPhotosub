@@ -7,6 +7,7 @@ import FavoriteIcon from '@material-ui/icons/FavoriteOutlined';
 import CloseIcon from '@material-ui/icons/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles({
     navigationButton: {
@@ -26,12 +27,28 @@ const useStyles = makeStyles({
         '&.loaded': {
             opacity: 1
         }
+    },
+    detailsOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        opacity: 0,
+        backgroundColor: 'rgba(255,255,255,0)',
+        display: 'flex',
+        transition: 'all 500ms',
+        '&.active': {
+            backgroundColor: 'rgba(255,255,255,0.6)',
+            opacity: 1
+        }
     }
 });
 
 const ExpandedView = ({ images, currentId, onClose }) => {
 
     const [currentIndex, setCurrentIndex] = useState(-1);
+    const [detailsOverlayRef, setDetailsOverlayRef] = useState(null);
     const classes = useStyles();
 
     useEffect(() => {
@@ -40,7 +57,9 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }, [currentId, images])
 
     function handleInfoClick() {
-        // TODO
+        if (detailsOverlayRef) {
+            detailsOverlayRef.classList.toggle('active');
+        }
     }
 
     function handleFavoriteClick() {
@@ -115,6 +134,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                 </Box>
             </Box>
             <Box style={{
+                    position: 'relative',
                     display: 'flex',
                     flex: 1,
                     flexDirection: 'row',
@@ -127,6 +147,20 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                 <img alt="" src={currentImage.src}
                     onLoad={onImageLoaded}
                     className={classes.mainImage}/>
+                
+                <Box className={classes.detailsOverlay} ref={setDetailsOverlayRef}>
+                    <Box style={{
+                          margin: 0,
+                          position: 'absolute',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          width: '100%',
+                          textAlign: 'center'
+                    }}>
+                    <Typography variant="h3" style={{margin: 10}}>{currentImage.title}</Typography>
+                    <Typography variant="h4" style={{marginTop: 30}}>{currentImage.description}</Typography>
+                    </Box>
+                </Box>
 
                 <IconButton
                     className={classes.navigationButton}
