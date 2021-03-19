@@ -4,6 +4,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
 import { formatDate } from '../../utils/utils';
 import dataProvider from '../../dataProvider';
+import { Gallery } from '../../components';
 
 const Destination = () => {
     const { year, title } = useParams();
@@ -32,6 +33,7 @@ const Destination = () => {
         <React.Fragment>
             <Typography variant="h2" component="h1">{destination.title}</Typography>
             <Typography variant="h3">{formatDate(new Date(destination.date))}</Typography>
+            <Gallery images={images} style={{width: '100%'}} colWidth={300} margin={5}/>
         </React.Fragment>
     );
 };

@@ -82,8 +82,12 @@ app.route("/destination/:year/:title/images")
         pool({i: "images"}).select("i.id", "i.name", "i.path", "i.title", "i.description").join("destinations", {
             "destinations.path": pool().raw("?", [`${req.params.year}/${req.params.title}`]),
             "i.path": "destinations.path",
-        }).then((destination) => {
-            res.json(destination);
+        }).then((images) => {
+            images.forEach((image) => {
+                // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
+                image.src = convertPathToUrl(image.path + "/" + image.name);
+            });
+            res.json(images);
         }).catch((err) => {
             logger.error(`Failed to load destination with id = ${req.params.id}`, err);
             res.status(500)

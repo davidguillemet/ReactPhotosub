@@ -42,6 +42,8 @@
     ]
   },
   "react-dotenv": {
-    "whitelist": ["USE_MOCK"]
+    "whitelist": [
+      "USE_MOCK"
+    ]
   }
 }
