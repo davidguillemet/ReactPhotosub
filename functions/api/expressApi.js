@@ -82,7 +82,7 @@ app.route("/destination/:year/:title/images")
         pool({i: "images"}).select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio").join("destinations", {
             "destinations.path": pool().raw("?", [`${req.params.year}/${req.params.title}`]),
             "i.path": "destinations.path",
-        }).then((images) => {
+        }).orderBy("i.name", "asc").then((images) => {
             images.forEach((image) => {
                 // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
                 image.src = convertPathToUrl(image.path + "/" + image.name);
