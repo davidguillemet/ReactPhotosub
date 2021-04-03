@@ -147,7 +147,10 @@ app.route("/image")
     //     description: "image description",
     //     tags: [ "tag1", "tag2", ...],
     //     caption: "image caption",
-    //     captionTags: [ "tag1", "tag2", ...]
+    //     captionTags: [ "tag1", "tag2", ...],
+    //     width: 600,
+    //     height: 400,
+    //     sizeRatio: 1.5
     // };
         const newImage = req.body;
         const fileFullPath = `${newImage.path}/${newImage.name}`;

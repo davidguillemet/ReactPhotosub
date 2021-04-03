@@ -24,8 +24,11 @@ const {Storage} = require("@google-cloud/storage");
 const {parse} = require("path");
 const axios = require("axios");
 const exifr = require("exifr");
+const imageSize = require("buffer-image-size");
 
 const {logger} = require("../utils/logger");
+
+const _baseApiUrl = "https://photosub.web.app";
 
 exports.deleteFile = async function(file) {
     const fileFullPath = file.name;
@@ -35,7 +38,7 @@ exports.deleteFile = async function(file) {
         path: filePathProps.dir,
     };
     try {
-        await axios.delete("/api/image", {data: fileItemProps});
+        await axios.delete(_baseApiUrl + "/api/image", {data: fileItemProps});
         logger.info(`${fileFullPath} has been removed.`);
     } catch (error) {
         logger.error(`Failed to delete image ${fileFullPath}.`, error);
@@ -102,6 +105,9 @@ exports.newFile = async function(file) {
         captionTags = Array.from(tagSet);
     }
 
+    // Get image size:
+    const dimensions = imageSize(fileContent);
+
     const filePathProps = parse(file.name);
 
     const newImageItem = {
@@ -112,13 +118,16 @@ exports.newFile = async function(file) {
         tags: imageTags,
         caption: imageCaption,
         captionTags: captionTags,
+        width: dimensions.width,
+        height: dimensions.height,
+        sizeRatio: dimensions.width / dimensions.height,
     };
 
     logger.info(`Successfuly build image details for ${file.name} in Finalize GCS trigger.`, newImageItem);
 
     // Send post request api-photosub/image to insert a new image item
     try {
-        await axios.post("/api/image", newImageItem);
+        await axios.post(_baseApiUrl + "/api/image", newImageItem);
         logger.info(`${file.name} has been inserted.`);
     } catch (error) {
         logger.error(`Failed to insert new image ${file.name}.`, error);
