@@ -128,6 +128,9 @@ const LazyImage = ({ image, margin, onClick }) => {
                     alt="alt"
                     onLoad={onLoad}
                     onError={onError}
+                    style={{
+                        height: Math.round(image.displayHeight)
+                    }}
                 />
                 <div className={classes.imageOverlay}>
                     <Typography variant="h6" align="center">{image.title}</Typography>

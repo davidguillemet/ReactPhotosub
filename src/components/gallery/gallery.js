@@ -42,11 +42,9 @@ function getTargetColumnIndex(columnHeight) {
 
 function dispatchImages(images, containerWidth, colWidth, margin) {
     
-    // The image width used to get compute the image height and then the column height
-    const normamlizedWidth = 100;
-
-    // Number of columns to dispklay depending on the standarc column width
+    // Number of columns to display depending on the standard column width
     const columnsCount = Math.floor((containerWidth - margin) / (colWidth + margin));
+    const realColumnWidth = (containerWidth - margin - columnsCount*margin) / columnsCount;
     
     // For each column, create an empty araray
     const columns = Array.from({length: columnsCount}, () => []);
@@ -56,10 +54,11 @@ function dispatchImages(images, containerWidth, colWidth, margin) {
     
     // and distribute images among columns
     images.forEach((image, index) => {
+        image.displayHeight = realColumnWidth / image.sizeRatio;
         // Take the first column where the total height is the lowest
         const targetIndex = getTargetColumnIndex(columnHeight);
         columns[targetIndex].push(image);
-        columnHeight[targetIndex] += normamlizedWidth / image.sizeRatio;
+        columnHeight[targetIndex] += image.displayHeight
     })
 
     return columns;
