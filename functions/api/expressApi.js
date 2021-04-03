@@ -79,7 +79,7 @@ app.route("/destination/:year/:title/head")
 // Get images for a specific destination from identifier
 app.route("/destination/:year/:title/images")
     .get(function(req, res, next) {
-        pool({i: "images"}).select("i.id", "i.name", "i.path", "i.title", "i.description").join("destinations", {
+        pool({i: "images"}).select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio").join("destinations", {
             "destinations.path": pool().raw("?", [`${req.params.year}/${req.params.title}`]),
             "i.path": "destinations.path",
         }).then((images) => {
