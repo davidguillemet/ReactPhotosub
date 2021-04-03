@@ -27,6 +27,44 @@ function debounce(fn, ms) {
     };
  }
 
+function getTargetColumnIndex(columnHeight) {
+
+    let minHeight = Number.MAX_VALUE;
+    let bestColumnIndex = 0;
+    columnHeight.forEach((height, index) => {
+        if (columnHeight[index] < minHeight) {
+            minHeight = columnHeight[index];
+            bestColumnIndex = index;
+        }
+    });
+    return bestColumnIndex;
+}
+
+function dispatchImages(images, containerWidth, colWidth, margin) {
+    
+    // The image width used to get compute the image height and then the column height
+    const normamlizedWidth = 100;
+
+    // Number of columns to dispklay depending on the standarc column width
+    const columnsCount = Math.floor((containerWidth - margin) / (colWidth + margin));
+    
+    // For each column, create an empty araray
+    const columns = Array.from({length: columnsCount}, () => []);
+
+    // Compute the cumulative height of each column
+    const columnHeight = Array.from({length: columnsCount}, () => 0);
+    
+    // and distribute images among columns
+    images.forEach((image, index) => {
+        // Take the first column where the total height is the lowest
+        const targetIndex = getTargetColumnIndex(columnHeight);
+        columns[targetIndex].push(image);
+        columnHeight[targetIndex] += normamlizedWidth / image.sizeRatio;
+    })
+
+    return columns;
+}
+
 const Gallery = ({ images, style, colWidth, margin }) => {
     const [containerWidth , setContainerWidth] = useState(0);
     const [expandedImage, setExpandedImage] = useState(null);
@@ -50,14 +88,7 @@ const Gallery = ({ images, style, colWidth, margin }) => {
         setExpandedImage(null);
     }
 
-    const columnsCount = Math.floor((containerWidth - margin) / (colWidth + margin));
-    // For each column, crrat an empty araray
-    const columns = Array.from({length: columnsCount}, () => []);
-    // and distribute images among columns
-
-    images.forEach((image, index) => {
-        columns[index % columnsCount].push(image);
-    })
+    const columns = dispatchImages(images, containerWidth, colWidth, margin);
 
     return (
         <React.Fragment>
