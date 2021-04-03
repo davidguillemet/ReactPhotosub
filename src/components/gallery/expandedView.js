@@ -96,6 +96,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }
 
     const currentImage = images[currentIndex];
+    const hasDetails = currentImage.title.length > 0 || currentImage.description.length > 0;
 
     return (
         <Box style={{
@@ -120,7 +121,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                         justifyContent: 'flex-start'
                     }}
                 >
-                    <IconButton onClick={handleInfoClick}><InfoIcon fontSize='large'></InfoIcon></IconButton>
+                    <IconButton onClick={handleInfoClick} disabled={hasDetails === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
                     <IconButton onClick={handleFavoriteClick}><FavoriteIcon fontSize='large'></FavoriteIcon></IconButton>
                 </Box>
                 <Box style={{
@@ -157,8 +158,8 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                           width: '100%',
                           textAlign: 'center'
                     }}>
-                    <Typography variant="h3" style={{margin: 10}}>{currentImage.title}</Typography>
-                    <Typography variant="h4" style={{marginTop: 30}}>{currentImage.description}</Typography>
+                        <Typography variant="h3" style={{margin: 10}}>{currentImage.title}</Typography>
+                        <Typography variant="h4" style={{marginTop: 30}}>{currentImage.description}</Typography>
                     </Box>
                 </Box>
 
