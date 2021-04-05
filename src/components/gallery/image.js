@@ -59,7 +59,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const LazyImage = ({ image, margin, onClick }) => {
+const LazyImage = ({ image, margin, nbColumns, onClick }) => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
     const [imageRef, setImageRef] = useState(null);
 
@@ -115,6 +115,15 @@ const LazyImage = ({ image, margin, onClick }) => {
         }
     }
 
+    // Build a CSS calculation for the image height
+    // This allow a correct layout when we resize the window while we are at not at the top of the page.
+    // If we don't use this calculation, the images at the top won't be loaded yet and the img height won't be known by the browser,
+    // that won't be able to layout correctly the top of the columns...
+    const pageContainerPadding = 20;
+    const totalMargin = 2*pageContainerPadding - (nbColumns-1)*margin;
+    const heightFormula = `calc(((100vw - ${totalMargin}px)/${nbColumns})/${image.sizeRatio})`;
+    console.log(heightFormula);
+
     return (
         <div
             className={classes.imageContainer}
@@ -129,7 +138,7 @@ const LazyImage = ({ image, margin, onClick }) => {
                     onLoad={onLoad}
                     onError={onError}
                     style={{
-                        height: Math.round(image.displayHeight)
+                        height: heightFormula
                     }}
                 />
                 <div className={classes.imageOverlay}>

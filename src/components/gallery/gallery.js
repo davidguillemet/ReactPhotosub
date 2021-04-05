@@ -110,7 +110,8 @@ const Gallery = ({ images, style, colWidth, margin }) => {
                                 <LazyImage
                                     key={image.id}
                                     image={image}
-                                    margin={index > 0 ? margin : undefined}
+                                    margin={index > 0 ? margin : 0}
+                                    nbColumns={columns.length}
                                     onClick={onImageClick}
                                 />
                             );
