@@ -6,13 +6,11 @@ import Fade from '@material-ui/core/Fade';
 import Backdrop from '@material-ui/core/Backdrop';
 import LazyImage from './image';
 import ExpandedView from './expandedView';
+import { Hidden } from '@material-ui/core';
 
 const useStyles = makeStyles({
     galleryContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-start',
+        position: 'relative'
     }
 });
 
@@ -40,30 +38,6 @@ function getTargetColumnIndex(columnHeight) {
     return bestColumnIndex;
 }
 
-function dispatchImages(images, containerWidth, colWidth, margin) {
-    
-    // Number of columns to display depending on the standard column width
-    const columnsCount = Math.floor((containerWidth - margin) / (colWidth + margin));
-    const realColumnWidth = (containerWidth - margin - columnsCount*margin) / columnsCount;
-    
-    // For each column, create an empty araray
-    const columns = Array.from({length: columnsCount}, () => []);
-
-    // Compute the cumulative height of each column
-    const columnHeight = Array.from({length: columnsCount}, () => 0);
-    
-    // and distribute images among columns
-    images.forEach((image, index) => {
-        image.displayHeight = realColumnWidth / image.sizeRatio;
-        // Take the first column where the total height is the lowest
-        const targetIndex = getTargetColumnIndex(columnHeight);
-        columns[targetIndex].push(image);
-        columnHeight[targetIndex] += image.displayHeight
-    })
-
-    return columns;
-}
-
 const Gallery = ({ images, style, colWidth, margin }) => {
     const [containerWidth , setContainerWidth] = useState(0);
     const [expandedImage, setExpandedImage] = useState(null);
@@ -87,38 +61,43 @@ const Gallery = ({ images, style, colWidth, margin }) => {
         setExpandedImage(null);
     }
 
-    const columns = dispatchImages(images, containerWidth, colWidth, margin);
+    // Number of columns to display depending on the standard column width
+    const columnsCount = Math.floor((containerWidth + margin) / (colWidth + margin));
+    const realColumnWidth = (containerWidth - (columnsCount-1)*margin) / columnsCount;
+
+    const pageContainerPadding = 10; // Page padding : TODO use a global value
+    const totalMargin = 2*pageContainerPadding + (columnsCount-1)*margin;
+    const imageWidthCalculation = `calc((100vw - ${totalMargin}px)/${columnsCount})`;
+
+    // Compute the cumulative height of each column
+    const columnTopPosition = Array.from({length: columnsCount}, () => 0);
 
     return (
         <React.Fragment>
             <Box className={classes.galleryContainer} ref={containerRef} style={style}>
-            {columns.map((column, index) => {
-                return (
-                    <div
-                        key={index}
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "flex-start",
-                            alignContent: "stretch",
-                            flex: 1,
-                            width: 0,
-                            marginLeft: index > 0 ? margin : undefined,
-                    }}>
-                        {column.map((image, index) => {
-                            return (
-                                <LazyImage
-                                    key={image.id}
-                                    image={image}
-                                    margin={index > 0 ? margin : 0}
-                                    nbColumns={columns.length}
-                                    onClick={onImageClick}
-                                />
-                            );
-                        })}
-                    </div>
-                );
-            })}
+            {
+                images.map((image, index) => {
+                    const targetColumnIndex = getTargetColumnIndex(columnTopPosition);
+                    const imageHeight = realColumnWidth / image.sizeRatio;
+                    const imageTop = columnTopPosition[targetColumnIndex] + margin;
+                    columnTopPosition[targetColumnIndex] = imageTop + imageHeight;
+                    return (
+                        <LazyImage
+                            key={image.id}
+                            image={image}
+                            onClick={onImageClick}
+                            top={imageTop}
+                            left={targetColumnIndex*(realColumnWidth+margin)}
+                            width={imageWidthCalculation}
+                        />
+                    );
+                })
+            }
+                <div style={{
+                    zIndex: -1,
+                    visibility: 'hidden',
+                    height: Math.max(...columnTopPosition)
+                }} />
             </Box>
             <Modal
                 open={expandedImage !== null}

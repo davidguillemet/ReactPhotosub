@@ -8,8 +8,8 @@ const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAA
 const useStyles = makeStyles(theme => ({
     imageContainer: {
         display: "block",
-        width: "100%",
-        position: "relative",
+        position: 'absolute',
+        transition: 'top 0.8s, left 0.8s, width 0.8s, height 0.8s',
         overflow: "hidden",
         '&:hover div[class*="imageOverlay"]': {
             opacity: 1,
@@ -59,7 +59,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const LazyImage = ({ image, margin, nbColumns, onClick }) => {
+const LazyImage = ({ image, onClick, top, left, width }) => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
     const [imageRef, setImageRef] = useState(null);
 
@@ -119,17 +119,19 @@ const LazyImage = ({ image, margin, nbColumns, onClick }) => {
     // This allow a correct layout when we resize the window while we are at not at the top of the page.
     // If we don't use this calculation, the images at the top won't be loaded yet and the img height won't be known by the browser,
     // that won't be able to layout correctly the top of the columns...
-    const pageContainerPadding = 20;
-    const totalMargin = 2*pageContainerPadding - (nbColumns-1)*margin;
-    const heightFormula = `calc(((100vw - ${totalMargin}px)/${nbColumns})/${image.sizeRatio})`;
-    console.log(heightFormula);
+    const heightFormula = `calc(var(--width)/${image.sizeRatio})`;
 
     return (
         <div
             className={classes.imageContainer}
             style={{
-                marginTop: margin
-            }}>
+                top: top,
+                left: left,
+                "--width": width,
+                maxWidth: 'var(--width)',
+                width: 'var(--width)',
+                height: heightFormula
+    }}>
                 <img
                     className={classes.lazyImage}
                     ref={setImageRef}
@@ -137,9 +139,6 @@ const LazyImage = ({ image, margin, nbColumns, onClick }) => {
                     alt="alt"
                     onLoad={onLoad}
                     onError={onError}
-                    style={{
-                        height: heightFormula
-                    }}
                 />
                 <div className={classes.imageOverlay}>
                     <Typography variant="h6" align="center">{image.title}</Typography>
