@@ -6,7 +6,6 @@ import Fade from '@material-ui/core/Fade';
 import Backdrop from '@material-ui/core/Backdrop';
 import LazyImage from './image';
 import ExpandedView from './expandedView';
-import { Hidden } from '@material-ui/core';
 
 const useStyles = makeStyles({
     galleryContainer: {

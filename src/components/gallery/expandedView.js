@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/InfoOutlined';
-import FavoriteIcon from '@material-ui/icons/FavoriteOutlined';
+import FavoriteIcon from '@material-ui/icons/FavoriteBorderOutlined';
 import CloseIcon from '@material-ui/icons/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';

@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
+import IconButton from '@material-ui/core/IconButton';
+import FavoriteIcon from '@material-ui/icons/FavoriteBorderOutlined';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
 
@@ -56,6 +59,9 @@ const useStyles = makeStyles(theme => ({
         color: "#fff",
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
         transition: 'opacity 800ms'
+    },
+    icon: {
+        color: 'white',
     }
 }));
 
@@ -151,6 +157,16 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
                 width: "100%",
                 height: "100%"
             }}/>
+            <Tooltip title="Ajouter aux favoris">
+            <IconButton className={classes.icon} style={{
+                display: "block",
+                position: "absolute",
+                bottom: 10,
+                right: 10,
+            }}>
+                <FavoriteIcon fontSize='large' />
+            </IconButton>
+            </Tooltip>
         </div>
     );
 }
