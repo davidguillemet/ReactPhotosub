@@ -6,6 +6,9 @@ import { formatDate } from '../../utils/utils';
 import dataProvider from '../../dataProvider';
 import { Gallery } from '../../components';
 
+import 'fontsource-roboto/400.css';
+import 'fontsource-roboto/100.css';
+
 const Destination = () => {
     const { year, title } = useParams();
     const [destination, setDestination] = useState(null);
@@ -31,8 +34,8 @@ const Destination = () => {
 
     return (
         <React.Fragment>
-            <Typography variant="h2" component="h1">{destination.title}</Typography>
-            <Typography variant="h3">{formatDate(new Date(destination.date))}</Typography>
+            <Typography variant="h3" style={{fontWeight: "400"}} component="h1">{destination.title}</Typography>
+            <Typography variant="h4" style={{fontWeight: "100"}}>{formatDate(new Date(destination.date))}</Typography>
             <Gallery images={images} style={{width: '100%'}} colWidth={300} margin={5}/>
         </React.Fragment>
     );
