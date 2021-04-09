@@ -24,8 +24,10 @@ const useStyles = makeStyles((theme) => ({
             }
         ),
         '&:hover': {
-            transform: 'scale(1.02)',
-            boxShadow: '0px 3px 3px -2px rgb(0 0 0 / 40%), 0px 3px 4px 0px rgb(0 0 0 / 25%), 0px 1px 8px 0px rgb(0 0 0 / 20%)',
+            transform: 'translateY(-5px)',
+            boxShadow: '5px 10px 10px 0 rgb(74 74 74 / 40%)',
+            //transform: 'scale(1.02)',
+            //boxShadow: '0px 3px 3px -2px rgb(0 0 0 / 40%), 0px 3px 4px 0px rgb(0 0 0 / 25%), 0px 1px 8px 0px rgb(0 0 0 / 20%)',
             top: 0,
             left: 0
         },
@@ -160,11 +162,6 @@ const Destination = ({destination, regions}) => {
                 }}
                 title={<Typography variant="h5">{formatDate(new Date(destination.date))}</Typography>}
                 subtitle={<DestinationDetails destination={destination} regions={regions} />}
-                actionIcon={
-                    <IconButton aria-label={`star ${destination.title}`} className={classes.icon}>
-                        <StarBorderIcon />
-                    </IconButton>
-                }
             />
             </Link>
         </GridListTile>
