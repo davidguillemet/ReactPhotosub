@@ -15,6 +15,7 @@ import Destination from "./pages/destination";
 import Search from "./pages/search";
 import Finning from './pages/finning';
 import Simulation from './pages/simulation';
+import FirebaseAuth from './components/firebase';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,60 +40,67 @@ const useStyles = makeStyles((theme) => ({
   },
   selected: {
     borderTopWidth: '3px'
+  },
+  accountIcon: {
+    color: 'white',
+    position: 'absolute',
+    top: 10,
+    right: 10
   }
 }));
 
 function App() {
-  
+
   const classes = useStyles();
 
   return (
-      <React.Fragment>
-        <CssBaseline />
-        <Router>
-          <AppBar position="sticky" classes={{
-            root: classes.root,
-            positionSticky: classes.sticky
-            }}>
-            <img src={logo} className="logo" alt="logo" />
-            <Navigation></Navigation>
-          </AppBar>
-            <Box className={classes.pageContainer}>
-              <Fade in={true} timeout={{
-                  appear: 1000,
-                  enter: 1000,
-                  exit: 1000
-                }}>
-                <Switch>
-                  {/* Nesting Route in Empty component as workaround to force Switch
+    <React.Fragment>
+      <CssBaseline />
+      <Router>
+        <AppBar position="sticky" classes={{
+          root: classes.root,
+          positionSticky: classes.sticky
+        }}>
+          <FirebaseAuth />
+          <img src={logo} className="logo" alt="logo" />
+          <Navigation></Navigation>
+        </AppBar>
+        <Box className={classes.pageContainer}>
+          <Fade in={true} timeout={{
+            appear: 1000,
+            enter: 1000,
+            exit: 1000
+          }}>
+            <Switch>
+              {/* Nesting Route in Empty component as workaround to force Switch
                     * component being rerendred when licking a navigation link
                     */}
-                  <>
-                    <Route exact strict path="/">
-                      <Home/>
-                    </Route>
-                    <Route exact strict path="/destinations">
-                        <Destinations/>
-                    </Route>
-                    <Route exact strict path="/destinations/:year/:title">
-                        <Destination/>
-                    </Route>
-                    <Route exact strict path="/search">
-                      <Search/>
-                    </Route>
-                    <Route exact strict path="/finning">
-                      <Finning/>
-                    </Route>
-                    <Route exact strict path="/simulation">
-                      <Simulation/>
-                    </Route>
-                  </>
-                </Switch>
-              </Fade>
-            </Box>
-        </Router>
-      </React.Fragment> 
-    );
+              <>
+                <Route exact strict path="/">
+                  <Home />
+                </Route>
+                <Route exact strict path="/destinations">
+                  <Destinations />
+                </Route>
+                <Route exact strict path="/destinations/:year/:title">
+                  <Destination />
+                </Route>
+                <Route exact strict path="/search">
+                  <Search />
+                </Route>
+                <Route exact strict path="/finning">
+                  <Finning />
+                </Route>
+                <Route exact strict path="/simulation">
+                  <Simulation />
+                </Route>
+              </>
+            </Switch>
+          </Fade>
+        </Box>
+      </Router>
+    </React.Fragment>
+  );
 }
 
 export default App;
