@@ -5,6 +5,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import IconButton from '@material-ui/core/IconButton';
 import FavoriteIcon from '@material-ui/icons/FavoriteBorderOutlined';
 import Tooltip from '@material-ui/core/Tooltip';
+import { FirebaseApp } from '../firebase';
 
 const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
 
@@ -64,6 +65,41 @@ const useStyles = makeStyles(theme => ({
         color: 'white',
     }
 }));
+
+const useFavoriteStyles = makeStyles(theme => ({
+    icon: {
+        color: 'white',
+    }
+}));
+
+const FavoriteButton = () => {
+    const classes = useFavoriteStyles();
+    const [user, setUser] = useState(FirebaseApp.auth().currentUser);
+
+    useEffect(() => {
+        const unregisterAuthObserver = FirebaseApp.auth().onAuthStateChanged(user => {
+            setUser(user);
+        });
+        return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
+    }, []);
+
+    if (!user) {
+        return null;
+    }
+
+    return (
+        <Tooltip title="Ajouter aux favoris">
+            <IconButton className={classes.icon} style={{
+                display: "block",
+                position: "absolute",
+                bottom: 10,
+                right: 10,
+            }}>
+                <FavoriteIcon fontSize='large' />
+            </IconButton>
+        </Tooltip>
+    );
+}
 
 const LazyImage = ({ image, onClick, top, left, width }) => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
@@ -157,16 +193,7 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
                 width: "100%",
                 height: "100%"
             }}/>
-            <Tooltip title="Ajouter aux favoris">
-            <IconButton className={classes.icon} style={{
-                display: "block",
-                position: "absolute",
-                bottom: 10,
-                right: 10,
-            }}>
-                <FavoriteIcon fontSize='large' />
-            </IconButton>
-            </Tooltip>
+            <FavoriteButton />
         </div>
     );
 }

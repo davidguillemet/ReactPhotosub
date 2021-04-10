@@ -15,7 +15,7 @@ import Destination from "./pages/destination";
 import Search from "./pages/search";
 import Finning from './pages/finning';
 import Simulation from './pages/simulation';
-import FirebaseAuth from './components/firebase';
+import { FirebaseAuth } from './components/firebase';
 
 const useStyles = makeStyles((theme) => ({
   root: {

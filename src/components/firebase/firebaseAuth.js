@@ -1,5 +1,5 @@
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import firebase from 'firebase';
+import FirebaseApp from './firebaseApp';
 import './firebaseui.css';
 import React, { useEffect, useState } from 'react';
 import Backdrop from '@material-ui/core/Backdrop';
@@ -14,62 +14,65 @@ import Paper from '@material-ui/core/Paper';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import MenuList from '@material-ui/core/MenuList';
 
-const config = {
-    apiKey: "AIzaSyALeWHQ-CKzvcG-sb7466UNzFDn_w5HQOc",
-    authDomain: "photosub.firebaseapp.com",
-    projectId: "photosub",
-    storageBucket: "photosub.appspot.com",
-    messagingSenderId: "780806748384",
-    appId: "1:780806748384:web:c2976014be05cc21a13885",
-    measurementId: "G-NNE3P3R7HH"
-};
-firebase.initializeApp(config);
-
 // Configure FirebaseUI.
 const uiConfig = {
     // Popup signin flow rather than redirect flow.
     signInFlow: 'popup',
-    // Redirect to home after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
-    signInSuccessUrl: '/',
     // We will display Google and Facebook as auth providers.
     signInOptions: [
-        firebase.auth.EmailAuthProvider.PROVIDER_ID
-    ]
+        FirebaseApp.auth.EmailAuthProvider.PROVIDER_ID
+    ],
+    callbacks: {
+        signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+            // No redirect after login
+            return false;
+        }
+    },
 };
+
+const ConnexionButtonBase = React.forwardRef(({startIcon, onClick, children}, ref) => (
+    <Button
+        variant="contained"
+        color="primary"
+        onClick={onClick}
+        startIcon={startIcon}
+        ref={ref}
+        style={{
+            position: 'absolute',
+            right: 10,
+            bottom: 10
+        }}
+    >
+        {children}
+    </Button>
+))
 
 const NotSignedInButton = ({handleSignIn}) => {
 
     return (
-        <Button
-            variant="contained"
-            color="primary"
+        <ConnexionButtonBase
             onClick={handleSignIn}
             startIcon={<AccountCircleOutlinedIcon fontSize='large'></AccountCircleOutlinedIcon>}
-            style={{
-                position: 'absolute',
-                top: 10,
-                right: 10
-            }}
         >
             Connexion
-        </Button>
+        </ConnexionButtonBase>
     );
 };
 
 const SignedInButton = ({user, handleLogout}) => {
 
-    const [open, setOpen] = React.useState(false);
+    const [menuOpen, setMenuOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
 
     const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
+        setMenuOpen((prevOpen) => !prevOpen);
     };
 
     const handleClose = (event) => {
         if (anchorRef.current && anchorRef.current.contains(event.target)) {
           return;
         }
-        setOpen(false);
+        setMenuOpen(false);
     };
 
     const logout = (event) => {
@@ -80,27 +83,20 @@ const SignedInButton = ({user, handleLogout}) => {
     function handleListKeyDown(event) {
         if (event.key === 'Tab') {
           event.preventDefault();
-          setOpen(false);
+          setMenuOpen(false);
         }
     }
     
     return (
         <React.Fragment>
-            <Button
+            <ConnexionButtonBase
                 ref={anchorRef}
-                variant="contained"
-                color="secondary"
                 onClick={handleToggle}
                 startIcon={<AccountCircleOutlinedIcon fontSize='large'></AccountCircleOutlinedIcon>}
-                style={{
-                    position: 'absolute',
-                    top: 10,
-                    right: 10
-                }}
             >
                 {user.displayName}
-            </Button>
-            <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+            </ConnexionButtonBase>
+            <Popper open={menuOpen} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
             {({ TransitionProps, placement }) => (
                 <Grow
                     {...TransitionProps}
@@ -108,7 +104,7 @@ const SignedInButton = ({user, handleLogout}) => {
                 >
                     <Paper>
                         <ClickAwayListener onClickAway={handleClose}>
-                            <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown}>
+                            <MenuList autoFocusItem={menuOpen} id="menu-list-grow" onKeyDown={handleListKeyDown}>
                                 <MenuItem onClick={logout}>Deconnexion</MenuItem>
                             </MenuList>
                         </ClickAwayListener>
@@ -128,8 +124,9 @@ const FirebaseAuth = (props) => {
 
     // Listen to the Firebase Auth state and set the local state.
     useEffect(() => {
-        const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
+        const unregisterAuthObserver = FirebaseApp.auth().onAuthStateChanged(user => {
             setUser(user);
+            setIsLogin(false);
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
     }, []);
@@ -139,7 +136,7 @@ const FirebaseAuth = (props) => {
     }
 
     function logout() {
-        firebase.auth().signOut();
+        FirebaseApp.auth().signOut();
     }
 
     function onCloseModal() {
@@ -166,7 +163,7 @@ const FirebaseAuth = (props) => {
                 }}
             >
                 <Fade in={isLogin}>
-                    <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
+                    <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={FirebaseApp.auth()} />
                 </Fade>
             </Modal>
 
