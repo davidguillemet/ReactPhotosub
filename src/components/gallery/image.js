@@ -5,6 +5,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import IconButton from '@material-ui/core/IconButton';
 import FavoriteIcon from '@material-ui/icons/FavoriteBorderOutlined';
 import Tooltip from '@material-ui/core/Tooltip';
+import Zoom from '@material-ui/core/Zoom';
 import { FirebaseApp } from '../firebase';
 
 const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
@@ -69,6 +70,13 @@ const useStyles = makeStyles(theme => ({
 const useFavoriteStyles = makeStyles(theme => ({
     icon: {
         color: 'white',
+    },
+    tooltipLabel: {
+        fontSize: 16
+    },
+    tooltipPlacementTop: {
+        backgroundColor: 'black',
+        top: 15
     }
 }));
 
@@ -88,14 +96,17 @@ const FavoriteButton = () => {
     }
 
     return (
-        <Tooltip title="Ajouter aux favoris">
+        <Tooltip title="Ajouter aux favoris" placement="top" TransitionComponent={Zoom} arrow classes={{
+            tooltip: classes.tooltipLabel,
+            tooltipPlacementTop: classes.tooltipPlacementTop
+        }}>
             <IconButton className={classes.icon} style={{
                 display: "block",
                 position: "absolute",
                 bottom: 10,
                 right: 10,
             }}>
-                <FavoriteIcon fontSize='large' />
+                <FavoriteIcon fontSize='medium' />
             </IconButton>
         </Tooltip>
     );
