@@ -8,6 +8,7 @@ import CloseIcon from '@material-ui/icons/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import Typography from '@material-ui/core/Typography';
+import { FirebaseApp } from '../firebase';
 
 const useStyles = makeStyles({
     navigationButton: {
@@ -122,7 +123,11 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                     }}
                 >
                     <IconButton onClick={handleInfoClick} disabled={hasDetails === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
-                    <IconButton onClick={handleFavoriteClick}><FavoriteIcon fontSize='large'></FavoriteIcon></IconButton>
+                    {
+                        FirebaseApp.auth().currentUser ?
+                        <IconButton onClick={handleFavoriteClick}><FavoriteIcon fontSize='large'></FavoriteIcon></IconButton> :
+                        null
+                    }
                 </Box>
                 <Box style={{
                         display: 'flex',
