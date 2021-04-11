@@ -1,10 +1,11 @@
 import { makeStyles } from '@material-ui/core/styles';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/InfoOutlined';
 import FavoriteIcon from '@material-ui/icons/FavoriteBorderOutlined';
 import CloseIcon from '@material-ui/icons/CloseOutlined';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import Typography from '@material-ui/core/Typography';
@@ -46,10 +47,70 @@ const useStyles = makeStyles({
     }
 });
 
+const Thumbnail = ({image, index, handleClick, currentIndex, setActiveThumbnail}) => {
+
+    const [left, setLeft] = useState(0);
+    const [width, setWidth] = useState(0);
+
+    function onClick() {
+        handleClick(index);
+    }
+    
+    const thumbRef = useCallback(node => {
+        if (node !== null) {
+            setLeft(node.offsetLeft);
+            setWidth(node.clientWidth);
+        }
+    }, []);
+
+    if (index === currentIndex) {
+        setActiveThumbnail(left, width);
+    }
+    
+    return (
+        <Box
+            key={image.id}
+            ref={thumbRef}
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+        }}>
+            <Box style={{
+                padding: 3,
+                backgroundColor: currentIndex === index ? 'black': null,
+                height: 66,
+                zIndex: 10
+            }}>
+                <img
+                    alt=""
+                    src={image.src}
+                    onClick={onClick}
+                    style={{
+                        height: '100%',
+                        cursor: 'pointer'
+                }} />
+            </Box>
+            { currentIndex === index && <ArrowDropUpIcon color="primary" fontSize="large" style={{position: 'relative', top: -10, zIndex: 5}}/>}
+        </Box>
+    );
+}
+
+function useClientRect() {
+    const nodeRef = useRef(null);
+    const refCallback = useCallback(node => {
+      if (node !== null) {
+        nodeRef.current = node;
+      }
+    }, []);
+    return [nodeRef, refCallback];
+}
+  
 const ExpandedView = ({ images, currentId, onClose }) => {
 
     const [currentIndex, setCurrentIndex] = useState(-1);
     const [detailsOverlayRef, setDetailsOverlayRef] = useState(null);
+    const [thumbContainerRef, thumbContainerRefCallback] = useClientRect();
     const classes = useStyles();
 
     useEffect(() => {
@@ -91,6 +152,45 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         event.target.classList.add('loaded');
     }
 
+    function handleScrollThumbsLeft() {
+        thumbContainerRef.current.scrollBy({
+            left: -thumbContainerRef.current.clientWidth,
+            behavior: 'smooth'
+        });
+    }
+
+    function handleScrollThumbsRight() {
+        thumbContainerRef.current.scrollBy({
+            left: thumbContainerRef.current.clientWidth,
+            behavior: 'smooth'
+        });
+    }
+
+    function scrollThumbnailContainer(targetScroll) {
+        thumbContainerRef.current.scrollTo({
+            left: targetScroll,
+            behavior: 'smooth'
+        });
+    }
+
+    function setActiveThumbnailPosition(thumbPosition, thumbWidth) {
+        if (thumbContainerRef === null || thumbContainerRef.current === null) {
+            return;
+        }
+
+        const thumbnailLeftVisualPosition = thumbPosition - thumbContainerRef.current.offsetLeft - thumbContainerRef.current.scrollLeft;
+        if (thumbnailLeftVisualPosition < 0) {
+            scrollThumbnailContainer(thumbPosition - thumbContainerRef.current.offsetLeft);
+            return;
+        }
+
+        const thumbnailRightVisualPosition = thumbnailLeftVisualPosition + thumbWidth;
+        if (thumbnailRightVisualPosition > thumbContainerRef.current.clientWidth) {
+            scrollThumbnailContainer(thumbContainerRef.current.scrollLeft + thumbnailRightVisualPosition - thumbContainerRef.current.clientWidth);
+            return;
+        }
+    }
+
     if (currentId === null || currentIndex < 0) {
         // Empty component if no current image
         return <div></div>;
@@ -119,9 +219,11 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                         display: 'flex',
                         flex: 1,
                         flexDirection: 'row',
-                        justifyContent: 'flex-start'
+                        justifyContent: 'flex-start',
+                        alignItems: 'center'
                     }}
                 >
+                    <Typography variant="h5" style={{marginRight: 10}}>{`${currentIndex+1} / ${images.length}`}</Typography>
                     <IconButton onClick={handleInfoClick} disabled={hasDetails === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
                     {
                         FirebaseApp.auth().currentUser ?
@@ -147,7 +249,8 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: '100%',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    padding: 10
                 }}
             >
                 <img alt="" src={currentImage.src}
@@ -184,6 +287,46 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                 }}>
                     <ArrowForwardIosRoundedIcon fontSize='large' />
                 </IconButton>
+            </Box>
+
+            <Box style={{
+                backgroundColor: '#eee',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: '#ccc',
+                borderStyle: 'solid',
+                borderRadius: 5,
+                boxShadow: '0px 3px 3px -2px rgb(0 0 0 / 40%), 0px 3px 4px 0px rgb(0 0 0 / 25%), 0px 1px 8px 0px rgb(0 0 0 / 20%)',
+            }}>
+                <Box>
+                    <IconButton onClick={handleScrollThumbsLeft} >
+                        <ArrowBackIosRoundedIcon fontSize='medium'/>
+                    </IconButton>
+                </Box>
+
+                <Box
+                    ref={thumbContainerRefCallback}
+                    style={{
+                        flex: 1,
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'flex-start',
+                        height: 80,
+                        marginTop: 15
+                }}>
+                    {
+                        images.map((image, index) => <Thumbnail image={image} index={index} handleClick={setCurrentIndex} currentIndex={currentIndex} setActiveThumbnail={setActiveThumbnailPosition} />)
+                    }
+                </Box>
+
+                <Box>
+                    <IconButton onClick={handleScrollThumbsRight} >
+                        <ArrowForwardIosRoundedIcon fontSize='medium' />
+                    </IconButton>
+                </Box>
             </Box>
         </Box>
     );
