@@ -1,6 +1,10 @@
 import { makeStyles } from '@material-ui/core/styles';
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Box from '@material-ui/core/Box';
+import Chip from '@material-ui/core/Chip';
+import Paper from '@material-ui/core/Paper';
+import Slider from '@material-ui/core/Slider';
+import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/InfoOutlined';
 import FavoriteIcon from '@material-ui/icons/FavoriteBorderOutlined';
@@ -37,7 +41,7 @@ const useStyles = makeStyles({
         bottom: 0,
         right: 0,
         opacity: 0,
-        backgroundColor: 'rgba(255,255,255,0)',
+        backgroundColor: 'rgba(255,255,255,0.6)',
         display: 'flex',
         transition: 'all 500ms',
         '&.active': {
@@ -47,29 +51,25 @@ const useStyles = makeStyles({
     }
 });
 
-const Thumbnail = ({image, index, handleClick, currentIndex, setActiveThumbnail}) => {
+const Thumbnail = ({image, index, handleClick, active}) => {
 
-    const [left, setLeft] = useState(0);
-    const [width, setWidth] = useState(0);
+    const [rect, setRect] = useState({});
 
     function onClick() {
-        handleClick(index);
+        handleClick(index, rect.left, rect.width);
     }
     
     const thumbRef = useCallback(node => {
         if (node !== null) {
-            setLeft(node.offsetLeft);
-            setWidth(node.clientWidth);
+            setRect({
+                left: node.offsetLeft,
+                width: node.clientWidth
+            });
         }
     }, []);
 
-    if (index === currentIndex) {
-        setActiveThumbnail(left, width);
-    }
-    
     return (
         <Box
-            key={image.id}
             ref={thumbRef}
             style={{
                 display: 'flex',
@@ -78,7 +78,7 @@ const Thumbnail = ({image, index, handleClick, currentIndex, setActiveThumbnail}
         }}>
             <Box style={{
                 padding: 3,
-                backgroundColor: currentIndex === index ? 'black': null,
+                backgroundColor: active === true ? 'black': null,
                 height: 66,
                 zIndex: 10
             }}>
@@ -91,7 +91,7 @@ const Thumbnail = ({image, index, handleClick, currentIndex, setActiveThumbnail}
                         cursor: 'pointer'
                 }} />
             </Box>
-            { currentIndex === index && <ArrowDropUpIcon color="primary" fontSize="large" style={{position: 'relative', top: -10, zIndex: 5}}/>}
+            { active === true && <ArrowDropUpIcon color="primary" fontSize="large" style={{position: 'relative', top: -10, zIndex: 5}}/>}
         </Box>
     );
 }
@@ -109,8 +109,9 @@ function useClientRect() {
 const ExpandedView = ({ images, currentId, onClose }) => {
 
     const [currentIndex, setCurrentIndex] = useState(-1);
-    const [detailsOverlayRef, setDetailsOverlayRef] = useState(null);
     const [thumbContainerRef, thumbContainerRefCallback] = useClientRect();
+    const [infoVisible, setInfoVisible] = useState(false);
+    const [thumbSliderValue, setThumbSliderValue] = React.useState(0);
     const classes = useStyles();
 
     useEffect(() => {
@@ -119,9 +120,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }, [currentId, images])
 
     function handleInfoClick() {
-        if (detailsOverlayRef) {
-            detailsOverlayRef.classList.toggle('active');
-        }
+        setInfoVisible(!infoVisible);
     }
 
     function handleFavoriteClick() {
@@ -157,6 +156,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             left: -thumbContainerRef.current.clientWidth,
             behavior: 'smooth'
         });
+        updateThumbSlider(thumbContainerRef.current.scrollLeft - thumbContainerRef.current.clientWidth);
     }
 
     function handleScrollThumbsRight() {
@@ -164,6 +164,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             left: thumbContainerRef.current.clientWidth,
             behavior: 'smooth'
         });
+        updateThumbSlider(thumbContainerRef.current.scrollLeft + thumbContainerRef.current.clientWidth);
     }
 
     function scrollThumbnailContainer(targetScroll) {
@@ -173,22 +174,56 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         });
     }
 
-    function setActiveThumbnailPosition(thumbPosition, thumbWidth) {
+    // TODO : move into hook and use onResize to compute
+    function getMaxScrollLeft() {
+        const lastThumb = thumbContainerRef.current.children[thumbContainerRef.current.children.length - 1];
+        const thumbContainerContentWidth = lastThumb.offsetLeft - thumbContainerRef.current.offsetLeft + lastThumb.clientWidth;
+        return thumbContainerContentWidth - thumbContainerRef.current.clientWidth;
+    }
+
+    function updateThumbSlider(scrollValue) {
+        let fixedScrollValue = scrollValue;
+        if (fixedScrollValue < 0) {
+            fixedScrollValue = 0;
+        }
+        const maxScrollLeft = getMaxScrollLeft();
+        if (fixedScrollValue > maxScrollLeft) {
+            fixedScrollValue = maxScrollLeft;
+        }
+        setThumbSliderValue(scrollValue * 100 / maxScrollLeft);
+    }
+
+    function handleThumbnailClick(index, thumbPosition, thumbWidth) {
+
+        console.log("handleThumbnailClick " + index);
+        setCurrentIndex(index);
+
         if (thumbContainerRef === null || thumbContainerRef.current === null) {
             return;
         }
 
         const thumbnailLeftVisualPosition = thumbPosition - thumbContainerRef.current.offsetLeft - thumbContainerRef.current.scrollLeft;
+        console.log("thumbnailLeftVisualPosition = " + thumbnailLeftVisualPosition);
         if (thumbnailLeftVisualPosition < 0) {
             scrollThumbnailContainer(thumbPosition - thumbContainerRef.current.offsetLeft);
             return;
         }
 
         const thumbnailRightVisualPosition = thumbnailLeftVisualPosition + thumbWidth;
+        console.log("thumbnailRightVisualPosition = " + thumbnailRightVisualPosition);
         if (thumbnailRightVisualPosition > thumbContainerRef.current.clientWidth) {
+            console.log("must scroll right...")
             scrollThumbnailContainer(thumbContainerRef.current.scrollLeft + thumbnailRightVisualPosition - thumbContainerRef.current.clientWidth);
             return;
         }
+    }
+
+    function handleThumbSliderChange(event, newSliderValue) {
+        setThumbSliderValue(newSliderValue);
+        // Update scroll
+        const maxScrollLeft = getMaxScrollLeft();
+        const scrollValue = newSliderValue * maxScrollLeft / 100;
+        scrollThumbnailContainer(scrollValue);
     }
 
     if (currentId === null || currentIndex < 0) {
@@ -223,7 +258,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                         alignItems: 'center'
                     }}
                 >
-                    <Typography variant="h5" style={{marginRight: 10}}>{`${currentIndex+1} / ${images.length}`}</Typography>
+                    <Chip label={`${currentIndex+1} / ${images.length}`} />
                     <IconButton onClick={handleInfoClick} disabled={hasDetails === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
                     {
                         FirebaseApp.auth().currentUser ?
@@ -256,20 +291,6 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                 <img alt="" src={currentImage.src}
                     onLoad={onImageLoaded}
                     className={classes.mainImage}/>
-                
-                <Box className={classes.detailsOverlay} ref={setDetailsOverlayRef}>
-                    <Box style={{
-                          margin: 0,
-                          position: 'absolute',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          width: '100%',
-                          textAlign: 'center'
-                    }}>
-                        <Typography variant="h3" style={{margin: 10}}>{currentImage.title}</Typography>
-                        <Typography variant="h4" style={{marginTop: 30}}>{currentImage.description}</Typography>
-                    </Box>
-                </Box>
 
                 <IconButton
                     className={classes.navigationButton}
@@ -289,45 +310,61 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                 </IconButton>
             </Box>
 
-            <Box style={{
-                backgroundColor: '#eee',
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                borderWidth: 1,
-                borderColor: '#ccc',
-                borderStyle: 'solid',
-                borderRadius: 5,
-                boxShadow: '0px 3px 3px -2px rgb(0 0 0 / 40%), 0px 3px 4px 0px rgb(0 0 0 / 25%), 0px 1px 8px 0px rgb(0 0 0 / 20%)',
-            }}>
-                <Box>
-                    <IconButton onClick={handleScrollThumbsLeft} >
-                        <ArrowBackIosRoundedIcon fontSize='medium'/>
-                    </IconButton>
-                </Box>
-
-                <Box
-                    ref={thumbContainerRefCallback}
-                    style={{
-                        flex: 1,
-                        overflow: 'hidden',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'flex-start',
-                        height: 80,
-                        marginTop: 15
+            <Collapse in={infoVisible && hasDetails}>
+                <Paper elevation={4} style={{
+                    marginBottom: 5,
+                    padding: 10,
+                    textAlign: 'center'
                 }}>
-                    {
-                        images.map((image, index) => <Thumbnail image={image} index={index} handleClick={setCurrentIndex} currentIndex={currentIndex} setActiveThumbnail={setActiveThumbnailPosition} />)
-                    }
-                </Box>
+                    <Typography variant="h4" style={{margin: 0}}>{currentImage.title}</Typography>
+                    <Typography variant="h5" style={{marginBottom: 0}}>{currentImage.description}</Typography>
+                </Paper>
+            </Collapse>
 
-                <Box>
-                    <IconButton onClick={handleScrollThumbsRight} >
-                        <ArrowForwardIosRoundedIcon fontSize='medium' />
-                    </IconButton>
+            <Paper elevation={4} style={{
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+                <Box style={{
+                    paddingRight: 50,
+                    paddingLeft: 50
+                }}>
+                    <Slider value={thumbSliderValue} onChange={handleThumbSliderChange} />
                 </Box>
-            </Box>
+                <Box style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center'
+                }}>
+                    <Box>
+                        <IconButton onClick={handleScrollThumbsLeft} >
+                            <ArrowBackIosRoundedIcon />
+                        </IconButton>
+                    </Box>
+
+                    <Box
+                        ref={thumbContainerRefCallback}
+                        style={{
+                            flex: 1,
+                            overflow: 'hidden',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'flex-start',
+                            height: 80,
+                            marginTop: 0
+                    }}>
+                        {
+                            images.map((image, index) => <Thumbnail key={image.id} image={image} index={index} handleClick={handleThumbnailClick} active={currentIndex === index} />)
+                        }
+                    </Box>
+
+                    <Box>
+                        <IconButton onClick={handleScrollThumbsRight} >
+                            <ArrowForwardIosRoundedIcon />
+                        </IconButton>
+                    </Box>
+                </Box>
+            </Paper>
         </Box>
     );
 };
