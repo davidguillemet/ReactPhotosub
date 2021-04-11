@@ -51,22 +51,20 @@ const useStyles = makeStyles({
     }
 });
 
-const Thumbnail = ({image, index, handleClick, active}) => {
-
-    const [rect, setRect] = useState({});
+const Thumbnail = ({image, index, handleClick, active, rectCallback}) => {
 
     function onClick() {
-        handleClick(index, rect.left, rect.width);
+        handleClick(index);
     }
     
     const thumbRef = useCallback(node => {
         if (node !== null) {
-            setRect({
+            rectCallback(index, {
                 left: node.offsetLeft,
                 width: node.clientWidth
             });
         }
-    }, []);
+    }, [index, rectCallback]);
 
     return (
         <Box
@@ -112,6 +110,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     const [thumbContainerRef, thumbContainerRefCallback] = useClientRect();
     const [infoVisible, setInfoVisible] = useState(false);
     const [thumbSliderValue, setThumbSliderValue] = React.useState(0);
+    const thumbnailsRect = useRef({});
     const classes = useStyles();
 
     useEffect(() => {
@@ -132,19 +131,13 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }
 
     function handlePreviousImage() {
-        if (currentIndex > 0) {
-            setCurrentIndex(currentIndex - 1);
-        } else {
-            setCurrentIndex(images.length - 1);
-        }
+        const newIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
+        handleThumbnailClick(newIndex);
     }
 
     function handleNextImage() {
-        if (currentIndex < images.length - 2) {
-            setCurrentIndex(currentIndex + 1);
-        } else {
-            setCurrentIndex(0);
-        }
+        const newIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
+        handleThumbnailClick(newIndex);
     }
 
     function onImageLoaded(event) {
@@ -172,6 +165,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             left: targetScroll,
             behavior: 'smooth'
         });
+        updateThumbSlider(targetScroll);
     }
 
     // TODO : move into hook and use onResize to compute
@@ -193,29 +187,32 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         setThumbSliderValue(scrollValue * 100 / maxScrollLeft);
     }
 
-    function handleThumbnailClick(index, thumbPosition, thumbWidth) {
+    function handleThumbnailScroll(index) {
 
-        console.log("handleThumbnailClick " + index);
-        setCurrentIndex(index);
+        const thumbnailRect = thumbnailsRect.current[index];
+        const thumbPosition = thumbnailRect.left;
+        const thumbWidth = thumbnailRect.width;
 
         if (thumbContainerRef === null || thumbContainerRef.current === null) {
             return;
         }
 
         const thumbnailLeftVisualPosition = thumbPosition - thumbContainerRef.current.offsetLeft - thumbContainerRef.current.scrollLeft;
-        console.log("thumbnailLeftVisualPosition = " + thumbnailLeftVisualPosition);
         if (thumbnailLeftVisualPosition < 0) {
             scrollThumbnailContainer(thumbPosition - thumbContainerRef.current.offsetLeft);
             return;
         }
 
         const thumbnailRightVisualPosition = thumbnailLeftVisualPosition + thumbWidth;
-        console.log("thumbnailRightVisualPosition = " + thumbnailRightVisualPosition);
         if (thumbnailRightVisualPosition > thumbContainerRef.current.clientWidth) {
-            console.log("must scroll right...")
             scrollThumbnailContainer(thumbContainerRef.current.scrollLeft + thumbnailRightVisualPosition - thumbContainerRef.current.clientWidth);
             return;
         }
+    }
+
+    function handleThumbnailClick(index) {
+        setCurrentIndex(index);
+        handleThumbnailScroll(index);
     }
 
     function handleThumbSliderChange(event, newSliderValue) {
@@ -224,6 +221,10 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         const maxScrollLeft = getMaxScrollLeft();
         const scrollValue = newSliderValue * maxScrollLeft / 100;
         scrollThumbnailContainer(scrollValue);
+    }
+
+    function thumbnailRectCallback(index, rect) {
+        thumbnailsRect.current[index] = rect;
     }
 
     if (currentId === null || currentIndex < 0) {
@@ -354,7 +355,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                             marginTop: 0
                     }}>
                         {
-                            images.map((image, index) => <Thumbnail key={image.id} image={image} index={index} handleClick={handleThumbnailClick} active={currentIndex === index} />)
+                            images.map((image, index) => <Thumbnail key={image.id} image={image} index={index} handleClick={handleThumbnailClick} active={currentIndex === index} rectCallback={thumbnailRectCallback} />)
                         }
                     </Box>
 
