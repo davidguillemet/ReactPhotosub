@@ -106,7 +106,7 @@ const FavoriteButton = () => {
                 bottom: 10,
                 right: 10,
             }}>
-                <FavoriteIcon fontSize='medium' />
+                <FavoriteIcon />
             </IconButton>
         </Tooltip>
     );
