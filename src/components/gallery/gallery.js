@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles'
-import React, { useState, useEffect, useRef} from 'react';
+import React, { useState, useRef} from 'react';
 import Box from '@material-ui/core/Box';
 import Modal from '@material-ui/core/Modal';
 import Fade from '@material-ui/core/Fade';
