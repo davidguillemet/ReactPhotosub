@@ -14,6 +14,7 @@ import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import Typography from '@material-ui/core/Typography';
 import { FirebaseApp } from '../firebase';
+import { resizeEffectHook } from '../../utils/utils';
 
 const useStyles = makeStyles({
     navigationButton: {
@@ -93,30 +94,59 @@ const Thumbnail = ({image, index, handleClick, active, rectCallback}) => {
         </Box>
     );
 }
-
-function useClientRect() {
-    const nodeRef = useRef(null);
-    const refCallback = useCallback(node => {
-      if (node !== null) {
-        nodeRef.current = node;
-      }
-    }, []);
-    return [nodeRef, refCallback];
-}
   
 const ExpandedView = ({ images, currentId, onClose }) => {
 
     const [currentIndex, setCurrentIndex] = useState(-1);
-    const [thumbContainerRef, thumbContainerRefCallback] = useClientRect();
+    const [currentImage, setCurrentImage] = useState(null);
     const [infoVisible, setInfoVisible] = useState(false);
-    const [thumbSliderValue, setThumbSliderValue] = React.useState(0);
+    const [thumbSliderValue, setThumbSliderValue] = useState(0);
+    const [thumbScrollLeft, setThumbScrollLeft] = useState(0);
+    const [thumbContainerWidth, setThumbContainerWidth] = useState(0);
     const thumbnailsRect = useRef({});
+    const thumbContainerRef = useRef(null);
+
+    const thumbContainerRefCallback = useCallback(element => {
+        if (element !== null) {
+            thumbContainerRef.current = element;
+            setThumbContainerWidth(thumbContainerRef.current.clientWidth);
+        }
+    }, []);
+
     const classes = useStyles();
+
+    resizeEffectHook(thumbContainerRef, handleResize);
 
     useEffect(() => {
         const currentImageIndex = images.findIndex(image => image.id === currentId);
         setCurrentIndex(currentImageIndex);
     }, [currentId, images])
+
+    useEffect(() => {
+        if (currentIndex >= 0) {
+            const currentImage = images[currentIndex];
+            setCurrentImage(currentImage);
+        }
+    }, [currentIndex, images]);
+
+    useEffect(() => {
+        let fixedScrollValue = thumbScrollLeft;
+        if (fixedScrollValue < 0) {
+            fixedScrollValue = 0;
+        }
+        const maxScrollLeft = getMaxScrollLeft();
+        if (fixedScrollValue > maxScrollLeft) {
+            fixedScrollValue = maxScrollLeft;
+        }
+        setThumbSliderValue(thumbScrollLeft * 100 / maxScrollLeft);
+    }, [thumbScrollLeft, thumbContainerWidth]);
+
+    function handleResize() {
+        // Mahe sure to synchronize the slider with the effective thumbnail scroll position that can
+        // change when resizing the window
+        setThumbContainerWidth(thumbContainerRef.current.clientWidth);
+        setThumbScrollLeft(thumbContainerRef.current.scrollLeft);
+    }
 
     function handleInfoClick() {
         setInfoVisible(!infoVisible);
@@ -149,7 +179,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             left: -thumbContainerRef.current.clientWidth,
             behavior: 'smooth'
         });
-        updateThumbSlider(thumbContainerRef.current.scrollLeft - thumbContainerRef.current.clientWidth);
+        setThumbScrollLeft(thumbContainerRef.current.scrollLeft - thumbContainerRef.current.clientWidth);
     }
 
     function handleScrollThumbsRight() {
@@ -157,7 +187,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             left: thumbContainerRef.current.clientWidth,
             behavior: 'smooth'
         });
-        updateThumbSlider(thumbContainerRef.current.scrollLeft + thumbContainerRef.current.clientWidth);
+        setThumbScrollLeft(thumbContainerRef.current.scrollLeft + thumbContainerRef.current.clientWidth);
     }
 
     function scrollThumbnailContainer(targetScroll) {
@@ -165,7 +195,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             left: targetScroll,
             behavior: 'smooth'
         });
-        updateThumbSlider(targetScroll);
+        setThumbScrollLeft(targetScroll);
     }
 
     // TODO : move into hook and use onResize to compute
@@ -173,18 +203,6 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         const lastThumb = thumbContainerRef.current.children[thumbContainerRef.current.children.length - 1];
         const thumbContainerContentWidth = lastThumb.offsetLeft - thumbContainerRef.current.offsetLeft + lastThumb.clientWidth;
         return thumbContainerContentWidth - thumbContainerRef.current.clientWidth;
-    }
-
-    function updateThumbSlider(scrollValue) {
-        let fixedScrollValue = scrollValue;
-        if (fixedScrollValue < 0) {
-            fixedScrollValue = 0;
-        }
-        const maxScrollLeft = getMaxScrollLeft();
-        if (fixedScrollValue > maxScrollLeft) {
-            fixedScrollValue = maxScrollLeft;
-        }
-        setThumbSliderValue(scrollValue * 100 / maxScrollLeft);
     }
 
     function handleThumbnailScroll(index) {
@@ -227,13 +245,12 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         thumbnailsRect.current[index] = rect;
     }
 
-    if (currentId === null || currentIndex < 0) {
-        // Empty component if no current image
-        return <div></div>;
+    function currentImageHasDetails() {
+        if (currentImage === null) {
+            return false;
+        }
+        return currentImage.title.length > 0 || currentImage.description.length > 0
     }
-
-    const currentImage = images[currentIndex];
-    const hasDetails = currentImage.title.length > 0 || currentImage.description.length > 0;
 
     return (
         <Box style={{
@@ -245,12 +262,10 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             height: '100%',
             padding: 10
         }}>
-            <Box style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start'
-                }}
-            >
+            <Paper elevation={4} style={{
+                display: 'flex',
+                flexDirection: 'row'
+            }}>
                 <Box style={{
                         display: 'flex',
                         flex: 1,
@@ -259,8 +274,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                         alignItems: 'center'
                     }}
                 >
-                    <Chip label={`${currentIndex+1} / ${images.length}`} />
-                    <IconButton onClick={handleInfoClick} disabled={hasDetails === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
+                    <IconButton onClick={handleInfoClick} disabled={currentImageHasDetails() === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
                     {
                         FirebaseApp.auth().currentUser ?
                         <IconButton onClick={handleFavoriteClick}><FavoriteIcon fontSize='large'></FavoriteIcon></IconButton> :
@@ -271,12 +285,23 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                         display: 'flex',
                         flex: 1,
                         flexDirection: 'row',
-                        justifyContent: 'flex-end'
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                >
+                    <Chip label={`${currentIndex+1} / ${images.length}`} />
+                </Box>
+                <Box style={{
+                        display: 'flex',
+                        flex: 1,
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        alignItems: 'center'
                     }}
                 >
                     <IconButton onClick={handleCloseClick}><CloseIcon fontSize='large'></CloseIcon></IconButton>
                 </Box>
-            </Box>
+            </Paper>
             <Box style={{
                     position: 'relative',
                     display: 'flex',
@@ -289,7 +314,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                     padding: 10
                 }}
             >
-                <img alt="" src={currentImage.src}
+                <img alt="" src={currentImage?.src}
                     onLoad={onImageLoaded}
                     className={classes.mainImage}/>
 
@@ -311,14 +336,14 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                 </IconButton>
             </Box>
 
-            <Collapse in={infoVisible && hasDetails}>
+            <Collapse in={infoVisible && currentImageHasDetails()}>
                 <Paper elevation={4} style={{
                     marginBottom: 5,
                     padding: 10,
                     textAlign: 'center'
                 }}>
-                    <Typography variant="h4" style={{margin: 0}}>{currentImage.title}</Typography>
-                    <Typography variant="h5" style={{marginBottom: 0}}>{currentImage.description}</Typography>
+                    <Typography variant="h4" style={{margin: 0}}>{currentImage?.title}</Typography>
+                    <Typography variant="h5" style={{marginBottom: 0}}>{currentImage?.description}</Typography>
                 </Paper>
             </Collapse>
 

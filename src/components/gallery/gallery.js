@@ -6,23 +6,13 @@ import Fade from '@material-ui/core/Fade';
 import Backdrop from '@material-ui/core/Backdrop';
 import LazyImage from './image';
 import ExpandedView from './expandedView';
+import { resizeEffectHook } from '../../utils/utils';
 
 const useStyles = makeStyles({
     galleryContainer: {
         position: 'relative'
     }
 });
-
-function debounce(fn, ms) {
-    let timer
-    return () => {
-      clearTimeout(timer)
-      timer = setTimeout(() => {
-        timer = null
-        fn.apply(this, arguments)
-      }, ms)
-    };
- }
 
 function getTargetColumnIndex(columnHeight) {
 
@@ -37,30 +27,8 @@ function getTargetColumnIndex(columnHeight) {
     return bestColumnIndex;
 }
 
-const Gallery = ({ images, style, colWidth, margin }) => {
-    const [containerWidth , setContainerWidth] = useState(0);
-    const [expandedImage, setExpandedImage] = useState(null);
-    const containerRef = useRef(null);
-    const classes = useStyles();
-
-    useEffect(() => {
-        const debouncedHandleResize = debounce(function handleResize() {
-            setContainerWidth(containerRef.current.clientWidth);
-        }, 200);
-        setContainerWidth(containerRef.current.clientWidth);
-        window.addEventListener("resize", debouncedHandleResize);
-        return () => window.removeEventListener("resize", debouncedHandleResize);
-    }, []);
-
-    function onImageClick(imageId) {
-        setExpandedImage(imageId);
-    }
-
-    function onCloseModal() {
-        setExpandedImage(null);
-    }
-
-    // Number of columns to display depending on the standard column width
+const MasonryLayout = ({images, colWidth, margin, containerWidth, onImageClick}) => {
+    
     const columnsCount = Math.floor((containerWidth + margin) / (colWidth + margin));
     const realColumnWidth = (containerWidth - (columnsCount-1)*margin) / columnsCount;
 
@@ -70,10 +38,9 @@ const Gallery = ({ images, style, colWidth, margin }) => {
 
     // Compute the cumulative height of each column
     const columnTopPosition = Array.from({length: columnsCount}, () => 0);
-
+    
     return (
         <React.Fragment>
-            <Box className={classes.galleryContainer} ref={containerRef} style={style}>
             {
                 images.map((image, index) => {
                     const targetColumnIndex = getTargetColumnIndex(columnTopPosition);
@@ -92,11 +59,43 @@ const Gallery = ({ images, style, colWidth, margin }) => {
                     );
                 })
             }
-                <div style={{
-                    zIndex: -1,
-                    visibility: 'hidden',
-                    height: Math.max(...columnTopPosition)
-                }} />
+            <div style={{
+                zIndex: -1,
+                visibility: 'hidden',
+                height: Math.max(...columnTopPosition)
+            }} />
+        </React.Fragment>
+    );
+}
+
+const Gallery = ({ images, style, colWidth, margin }) => {
+    const [expandedImage, setExpandedImage] = useState(null);
+    const containerRef = useRef(null);
+    const classes = useStyles();
+
+    const containerWidth = resizeEffectHook(containerRef);
+
+    function onImageClick(imageId) {
+        setExpandedImage(imageId);
+    }
+
+    function onCloseModal() {
+        setExpandedImage(null);
+    }
+
+    return (
+        <React.Fragment>
+            <Box className={classes.galleryContainer} ref={containerRef} style={style}>
+            {
+                containerWidth > 0 && 
+                <MasonryLayout
+                    images={images}
+                    colWidth={colWidth}
+                    margin={margin}
+                    containerWidth={containerWidth}
+                    onImageClick={onImageClick}
+                />
+            }
             </Box>
             <Modal
                 open={expandedImage !== null}
@@ -110,7 +109,7 @@ const Gallery = ({ images, style, colWidth, margin }) => {
                 }}
             >
                 <Fade in={expandedImage !== null}>
-                    <ExpandedView images={images} currentId={expandedImage} onClose={onCloseModal}></ExpandedView>
+                    <ExpandedView images={images} currentId={expandedImage} onClose={onCloseModal} />
                 </Fade>
             </Modal>
         </React.Fragment>
