@@ -17,7 +17,7 @@ import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import Typography from '@material-ui/core/Typography';
 import { FirebaseApp } from '../firebase';
-import { resizeEffectHook } from '../../utils/utils';
+import { resizeEffectHook, useEventListener } from '../../utils/utils';
 
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
@@ -166,6 +166,8 @@ const ExpandedView = ({ images, currentId, onClose }) => {
 
     resizeEffectHook(thumbContainerRef, handleResize);
 
+    useEventListener('keydown', handleKeyDown);
+
     // Make sure to clear the timeout on unmount
     useEffect(() => {
         if (!isPlaying) {
@@ -213,6 +215,26 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         // change when resizing the window
         setThumbContainerWidth(thumbContainerRef.current.clientWidth);
         setThumbScrollLeft(thumbContainerRef.current.scrollLeft);
+    }
+
+    function handleKeyDown(event) {
+        switch (event.code) { // or event.key or event.keyCode as integer
+            case "ArrowLeft":
+                handlePreviousImage();
+                break;
+            case "ArrowRight":
+                handleNextImage();
+                break;
+            case "Space":
+                if (isPlaying) {
+                    headerBarRef.current.classList.remove('hidden');
+                    clearTimeout(hideHeaderTimeout.current);
+                    handleStopClick();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     function handlePlayClick() {
@@ -465,7 +487,8 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                 <Paper elevation={4} style={{
                     marginBottom: 5,
                     padding: 10,
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    backgroundColor: '#edfeff'
                 }}>
                     <Typography variant="h4" style={{ margin: 0 }}>{currentImage?.title}</Typography>
                     <Typography variant="h5" style={{ marginBottom: 0 }}>{currentImage?.description}</Typography>
