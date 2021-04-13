@@ -6,8 +6,11 @@ import Paper from '@material-ui/core/Paper';
 import Slider from '@material-ui/core/Slider';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import InfoIcon from '@material-ui/icons/InfoOutlined';
 import FavoriteIcon from '@material-ui/icons/FavoriteBorderOutlined';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import StopIcon from '@material-ui/icons/Stop';
 import CloseIcon from '@material-ui/icons/CloseOutlined';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
@@ -55,12 +58,12 @@ const useStyles = makeStyles({
     }
 });
 
-const Thumbnail = ({image, index, handleClick, active, rectCallback}) => {
+const Thumbnail = ({ image, index, handleClick, active, rectCallback }) => {
 
     function onClick() {
         handleClick(index);
     }
-    
+
     const thumbRef = useCallback(node => {
         if (node !== null) {
             rectCallback(index, {
@@ -77,10 +80,10 @@ const Thumbnail = ({image, index, handleClick, active, rectCallback}) => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center'
-        }}>
+            }}>
             <Box style={{
                 padding: 3,
-                backgroundColor: active === true ? 'black': null,
+                backgroundColor: active === true ? 'black' : null,
                 height: 66,
                 zIndex: 10
             }}>
@@ -91,13 +94,46 @@ const Thumbnail = ({image, index, handleClick, active, rectCallback}) => {
                     style={{
                         height: '100%',
                         cursor: 'pointer'
-                }} />
+                    }} />
             </Box>
-            { active === true && <ArrowDropUpIcon color="primary" fontSize="large" style={{position: 'relative', top: -10, zIndex: 5}}/>}
+            { active === true && <ArrowDropUpIcon color="primary" fontSize="large" style={{ position: 'relative', top: -10, zIndex: 5 }} />}
         </Box>
     );
 }
-  
+
+function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
+    const [progress, setProgress] = useState(0);
+
+    React.useEffect(() => {
+        const progressStep = 5; // step is 5%
+        const stepInterval = duration * 5 / 100;
+        const timer = setInterval(() => {
+            setProgress((prevProgress) => {
+                if (prevProgress === 100) {
+                    onCompleted();
+                    return 100;
+                }
+                const newProgress = prevProgress >= 100 ? 100 : prevProgress + progressStep;
+                return newProgress;
+            });
+        }, stepInterval);
+        return () => {
+            clearInterval(timer);
+        };
+    }, [duration, onCompleted]);
+
+    return (
+        <IconButton onClick={onClick} >
+            <StopIcon fontSize='large'></StopIcon>
+            <CircularProgress variant="determinate" disableShrink={true} value={progress} style={{
+                position: "absolute",
+                margin: 'auto'
+                }}
+            />
+        </IconButton>
+    );
+}
+
 const ExpandedView = ({ images, currentId, onClose }) => {
 
     const [currentIndex, setCurrentIndex] = useState(-1);
@@ -106,6 +142,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     const [thumbSliderValue, setThumbSliderValue] = useState(0);
     const [thumbScrollLeft, setThumbScrollLeft] = useState(0);
     const [thumbContainerWidth, setThumbContainerWidth] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(false);
     const thumbnailsRect = useRef({});
     const thumbContainerRef = useRef(null);
 
@@ -151,6 +188,14 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         setThumbScrollLeft(thumbContainerRef.current.scrollLeft);
     }
 
+    function handlePlayClick() {
+        setIsPlaying(true);
+    }
+
+    function handleStopClick() {
+        setIsPlaying(false);
+    }
+
     function handleInfoClick() {
         setInfoVisible(!infoVisible);
     }
@@ -168,6 +213,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         handleThumbnailClick(newIndex);
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     function handleNextImage() {
         const newIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
         handleThumbnailClick(newIndex);
@@ -201,7 +247,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         setThumbScrollLeft(targetScroll);
     }
 
-    // TODO : move into hook and use onResize to compute
+    // TODO : move into hook and use onResize to compute?
     function getMaxScrollLeft() {
         const lastThumb = thumbContainerRef.current.children[thumbContainerRef.current.children.length - 1];
         const thumbContainerContentWidth = lastThumb.offsetLeft - thumbContainerRef.current.offsetLeft + lastThumb.clientWidth;
@@ -270,51 +316,56 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                 flexDirection: 'row'
             }}>
                 <Box style={{
-                        display: 'flex',
-                        flex: 1,
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        alignItems: 'center'
-                    }}
+                    display: 'flex',
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center'
+                }}
                 >
+                    {
+                        isPlaying ?
+                            <StopButtonWithCircularProgress onClick={handleStopClick} onCompleted={handleNextImage} duration={3000} key={currentImage?.id}/> :
+                            <IconButton onClick={handlePlayClick}><PlayArrowIcon fontSize='large'></PlayArrowIcon></IconButton>
+                    }
                     <IconButton onClick={handleInfoClick} disabled={currentImageHasDetails() === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
                     {
                         FirebaseApp.auth().currentUser ?
-                        <IconButton onClick={handleFavoriteClick}><FavoriteIcon fontSize='large'></FavoriteIcon></IconButton> :
-                        null
+                            <IconButton onClick={handleFavoriteClick}><FavoriteIcon fontSize='large'></FavoriteIcon></IconButton> :
+                            null
                     }
                 </Box>
                 <Box style={{
-                        display: 'flex',
-                        flex: 1,
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
+                    display: 'flex',
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
                 >
-                    <Chip label={`${currentIndex+1} / ${images.length}`} />
+                    <Chip label={`${currentIndex + 1} / ${images.length}`} />
                 </Box>
                 <Box style={{
-                        display: 'flex',
-                        flex: 1,
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center'
-                    }}
+                    display: 'flex',
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'flex-end',
+                    alignItems: 'center'
+                }}
                 >
                     <IconButton onClick={handleCloseClick}><CloseIcon fontSize='large'></CloseIcon></IconButton>
                 </Box>
             </Paper>
             <Box style={{
-                    position: 'relative',
-                    display: 'flex',
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                    overflow: 'hidden'
-                }}
+                position: 'relative',
+                display: 'flex',
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+                overflow: 'hidden'
+            }}
             >
                 <TransitionGroup component={null}>
                     <CSSTransition
@@ -334,31 +385,33 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                                 height: '100%',
                                 padding: 10,
                                 overflow: 'hidden'
-                        }}>
+                            }}>
                             <img alt="" src={currentImage?.src}
                                 onLoad={onImageLoaded}
                                 className={classes.mainImage
-                            }/>
+                                } />
                         </Box>
                     </CSSTransition>
                 </TransitionGroup>
 
-                <IconButton
-                    className={classes.navigationButton}
-                    onClick={handlePreviousImage}
-                    style={{
-                        left: 10
-                }}>
-                    <ArrowBackIosRoundedIcon fontSize='large' />
-                </IconButton>
-                <IconButton
-                    className={classes.navigationButton}
-                    onClick={handleNextImage}
-                    style={{
-                        right: 10
-                }}>
-                    <ArrowForwardIosRoundedIcon fontSize='large' />
-                </IconButton>
+                <Collapse in={!isPlaying}>
+                    <IconButton
+                        className={classes.navigationButton}
+                        onClick={handlePreviousImage}
+                        style={{
+                            left: 10
+                        }}>
+                        <ArrowBackIosRoundedIcon fontSize='large' />
+                    </IconButton>
+                    <IconButton
+                        className={classes.navigationButton}
+                        onClick={handleNextImage}
+                        style={{
+                            right: 10
+                        }}>
+                        <ArrowForwardIosRoundedIcon fontSize='large' />
+                    </IconButton>
+                </Collapse>
             </Box>
 
             <Collapse in={infoVisible && currentImageHasDetails()}>
@@ -367,55 +420,57 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                     padding: 10,
                     textAlign: 'center'
                 }}>
-                    <Typography variant="h4" style={{margin: 0}}>{currentImage?.title}</Typography>
-                    <Typography variant="h5" style={{marginBottom: 0}}>{currentImage?.description}</Typography>
+                    <Typography variant="h4" style={{ margin: 0 }}>{currentImage?.title}</Typography>
+                    <Typography variant="h5" style={{ marginBottom: 0 }}>{currentImage?.description}</Typography>
                 </Paper>
             </Collapse>
 
-            <Paper elevation={4} style={{
-                display: 'flex',
-                flexDirection: 'column'
-            }}>
-                <Box style={{
-                    paddingRight: 50,
-                    paddingLeft: 50
-                }}>
-                    <Slider value={thumbSliderValue} onChange={handleThumbSliderChange} />
-                </Box>
-                <Box style={{
+            <Collapse in={!isPlaying}>
+                <Paper elevation={4} style={{
                     display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center'
+                    flexDirection: 'column'
                 }}>
-                    <Box>
-                        <IconButton onClick={handleScrollThumbsLeft} >
-                            <ArrowBackIosRoundedIcon />
-                        </IconButton>
-                    </Box>
-
-                    <Box
-                        ref={thumbContainerRefCallback}
-                        style={{
-                            flex: 1,
-                            overflow: 'hidden',
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'flex-start',
-                            height: 80,
-                            marginTop: 0
+                    <Box style={{
+                        paddingRight: 50,
+                        paddingLeft: 50
                     }}>
-                        {
-                            images.map((image, index) => <Thumbnail key={image.id} image={image} index={index} handleClick={handleThumbnailClick} active={currentIndex === index} rectCallback={thumbnailRectCallback} />)
-                        }
+                        <Slider value={thumbSliderValue} onChange={handleThumbSliderChange} />
                     </Box>
+                    <Box style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center'
+                    }}>
+                        <Box>
+                            <IconButton onClick={handleScrollThumbsLeft} >
+                                <ArrowBackIosRoundedIcon />
+                            </IconButton>
+                        </Box>
 
-                    <Box>
-                        <IconButton onClick={handleScrollThumbsRight} >
-                            <ArrowForwardIosRoundedIcon />
-                        </IconButton>
+                        <Box
+                            ref={thumbContainerRefCallback}
+                            style={{
+                                flex: 1,
+                                overflow: 'hidden',
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'flex-start',
+                                height: 80,
+                                marginTop: 0
+                            }}>
+                            {
+                                images.map((image, index) => <Thumbnail key={image.id} image={image} index={index} handleClick={handleThumbnailClick} active={currentIndex === index} rectCallback={thumbnailRectCallback} />)
+                            }
+                        </Box>
+
+                        <Box>
+                            <IconButton onClick={handleScrollThumbsRight} >
+                                <ArrowForwardIosRoundedIcon />
+                            </IconButton>
+                        </Box>
                     </Box>
-                </Box>
-            </Paper>
+                </Paper>
+            </Collapse>
         </Box>
     );
 };
