@@ -16,6 +16,9 @@ import Typography from '@material-ui/core/Typography';
 import { FirebaseApp } from '../firebase';
 import { resizeEffectHook } from '../../utils/utils';
 
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import './styles.css';
+
 const useStyles = makeStyles({
     navigationButton: {
         backgroundColor: 'rgba(255,255,255,0.5)',
@@ -310,13 +313,35 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: '100%',
-                    overflow: 'hidden',
-                    padding: 10
+                    overflow: 'hidden'
                 }}
             >
-                <img alt="" src={currentImage?.src}
-                    onLoad={onImageLoaded}
-                    className={classes.mainImage}/>
+                <TransitionGroup component={null}>
+                    <CSSTransition
+                        key={currentImage?.id}
+                        timeout={500}
+                        classNames="slide"
+                    >
+                        <Box
+                            key={currentImage?.id}
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                padding: 10,
+                                overflow: 'hidden'
+                        }}>
+                            <img alt="" src={currentImage?.src}
+                                onLoad={onImageLoaded}
+                                className={classes.mainImage
+                            }/>
+                        </Box>
+                    </CSSTransition>
+                </TransitionGroup>
 
                 <IconButton
                     className={classes.navigationButton}
