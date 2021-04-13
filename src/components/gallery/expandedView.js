@@ -55,6 +55,13 @@ const useStyles = makeStyles({
             backgroundColor: 'rgba(255,255,255,0.6)',
             opacity: 1
         }
+    },
+    expandedHeader: {
+        opacity: 1,
+        transition: 'opacity 1s',
+        '&.hidden' : {
+            opacity: 0
+        }
     }
 });
 
@@ -145,6 +152,8 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const thumbnailsRect = useRef({});
     const thumbContainerRef = useRef(null);
+    const headerBarRef = useRef(null);
+    const hideHeaderTimeout = useRef(null);
 
     const thumbContainerRefCallback = useCallback(element => {
         if (element !== null) {
@@ -156,6 +165,14 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     const classes = useStyles();
 
     resizeEffectHook(thumbContainerRef, handleResize);
+
+    // Make sure to clear the timeout on unmount
+    useEffect(() => {
+        if (!isPlaying) {
+            clearTimeout(hideHeaderTimeout.current);
+        }
+        return () => clearTimeout(hideHeaderTimeout.current);
+    }, [isPlaying]);
 
     useEffect(() => {
         const currentImageIndex = images.findIndex(image => image.id === currentId);
@@ -181,6 +198,16 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         setThumbSliderValue(thumbScrollLeft * 100 / maxScrollLeft);
     }, [thumbScrollLeft, thumbContainerWidth]);
 
+    function handleMouseMove() {
+        headerBarRef.current.classList.remove('hidden');
+        clearTimeout(hideHeaderTimeout.current);
+        hideHeaderTimeout.current = setTimeout(hideHeaderBar, 3000);
+    }
+
+    function hideHeaderBar() {
+        headerBarRef.current.classList.add('hidden');
+    }
+
     function handleResize() {
         // Mahe sure to synchronize the slider with the effective thumbnail scroll position that can
         // change when resizing the window
@@ -189,6 +216,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }
 
     function handlePlayClick() {
+        hideHeaderBar();
         setInfoVisible(false);
         setIsPlaying(true);
     }
@@ -303,22 +331,31 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }
 
     return (
-        <Box style={{
-            display: 'flex',
-            flex: 1,
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            width: '100%',
-            height: '100%',
-            padding: 10
-        }}>
-            <Paper elevation={4} style={{
+        <Box
+            onMouseMove={isPlaying ? handleMouseMove : null}
+            style={{
                 display: 'flex',
-                flexDirection: 'row',
-                width: isPlaying ? "auto" : "100%",
-                position: isPlaying ? "absolute" : "relative",
-                zIndex: isPlaying ? 100 : 1 
-            }}>
+                flex: 1,
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                width: '100%',
+                height: '100%',
+                padding: 10
+            }}
+        >
+            <Paper
+                elevation={4}
+                ref={headerBarRef}
+                className={classes.expandedHeader}
+                style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    transition: 'opacity 1s',
+                    width: isPlaying ? "auto" : "100%",
+                    position: isPlaying ? "absolute" : "relative",
+                    zIndex: isPlaying ? 100 : 1 
+                }}
+            >
                 <Box style={{
                     display: 'flex',
                     flex: 1,
