@@ -218,6 +218,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }
 
     function handleKeyDown(event) {
+        console.log(event);
         switch (event.code) { // or event.key or event.keyCode as integer
             case "ArrowLeft":
                 handlePreviousImage();
@@ -225,7 +226,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             case "ArrowRight":
                 handleNextImage();
                 break;
-            case "Space":
+            case "Escape":
                 if (isPlaying) {
                     headerBarRef.current.classList.remove('hidden');
                     clearTimeout(hideHeaderTimeout.current);
