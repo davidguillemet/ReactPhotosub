@@ -189,6 +189,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }
 
     function handlePlayClick() {
+        setInfoVisible(false);
         setIsPlaying(true);
     }
 
@@ -313,7 +314,10 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         }}>
             <Paper elevation={4} style={{
                 display: 'flex',
-                flexDirection: 'row'
+                flexDirection: 'row',
+                width: isPlaying ? "auto" : "100%",
+                position: isPlaying ? "absolute" : "relative",
+                zIndex: isPlaying ? 100 : 1 
             }}>
                 <Box style={{
                     display: 'flex',
@@ -328,11 +332,17 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                             <StopButtonWithCircularProgress onClick={handleStopClick} onCompleted={handleNextImage} duration={3000} key={currentImage?.id}/> :
                             <IconButton onClick={handlePlayClick}><PlayArrowIcon fontSize='large'></PlayArrowIcon></IconButton>
                     }
-                    <IconButton onClick={handleInfoClick} disabled={currentImageHasDetails() === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
                     {
-                        FirebaseApp.auth().currentUser ?
-                            <IconButton onClick={handleFavoriteClick}><FavoriteIcon fontSize='large'></FavoriteIcon></IconButton> :
-                            null
+                        isPlaying ?
+                        null :
+                        <React.Fragment>
+                            <IconButton onClick={handleInfoClick} disabled={currentImageHasDetails() === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
+                            {
+                                FirebaseApp.auth().currentUser ?
+                                <IconButton onClick={handleFavoriteClick}><FavoriteIcon fontSize='large'></FavoriteIcon></IconButton> :
+                                null
+                            }
+                        </React.Fragment>
                     }
                 </Box>
                 <Box style={{
