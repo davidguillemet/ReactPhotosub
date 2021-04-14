@@ -14,6 +14,8 @@ import Paper from '@material-ui/core/Paper';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import MenuList from '@material-ui/core/MenuList';
 
+import { AuthContext } from '../authentication';
+
 // Configure FirebaseUI.
 const uiConfig = {
     // Popup signin flow rather than redirect flow.
@@ -116,16 +118,13 @@ const SignedInButton = ({user, handleLogout}) => {
     );
 }
 
-const FirebaseAuth = (props) => {
+const FirebaseAuth = ({ user }) => {
 
     const [isLogin, setIsLogin] = useState(false);
-    const [user, setUser] = useState(null);
-
 
     // Listen to the Firebase Auth state and set the local state.
     useEffect(() => {
-        const unregisterAuthObserver = FirebaseApp.auth().onAuthStateChanged(user => {
-            setUser(user);
+        const unregisterAuthObserver = FirebaseApp.auth().onAuthStateChanged(newUser => {
             setIsLogin(false);
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
@@ -171,4 +170,16 @@ const FirebaseAuth = (props) => {
     );
 }
 
-export default FirebaseAuth;
+const FirebaseAuthConsumer = () => {
+    return (
+        <AuthContext.Consumer>
+            { ({user}) => {
+                return (
+                    <FirebaseAuth user={user} />
+                );
+            }}
+        </AuthContext.Consumer>
+    );
+}
+
+export default FirebaseAuthConsumer;

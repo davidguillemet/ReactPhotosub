@@ -16,6 +16,7 @@ import Search from "./pages/search";
 import Finning from './pages/finning';
 import Simulation from './pages/simulation';
 import { FirebaseAuth } from './components/firebase';
+import { AuthProvider } from './components/authentication';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,7 +55,7 @@ function App() {
   const classes = useStyles();
 
   return (
-    <React.Fragment>
+    <AuthProvider>
       <CssBaseline />
       <Router>
         <AppBar position="sticky" classes={{
@@ -99,7 +100,7 @@ function App() {
           </Fade>
         </Box>
       </Router>
-    </React.Fragment>
+    </AuthProvider>
   );
 }
 
