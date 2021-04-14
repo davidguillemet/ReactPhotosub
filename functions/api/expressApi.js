@@ -4,7 +4,6 @@
 require("dotenv").config();
 
 const express = require("express");
-const bodyParser = require("body-parser");
 const {logger/* , makeExpressLoggerMiddleware */} = require("../utils/logger");
 const convertPathToUrl = require("../utils/firebase");
 
@@ -23,10 +22,10 @@ const app = express();
 // app.use(mw);
 
 // support parsing of application/json type post data
-app.use(bodyParser.json());
+app.use(express.json());
 
 // support parsing of application/x-www-form-urlencoded post data
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.urlencoded({extended: true}));
 
 // Fix the CORS Error
 app.use((req, res, next) => {
