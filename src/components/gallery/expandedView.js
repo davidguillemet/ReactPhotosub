@@ -8,7 +8,6 @@ import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import InfoIcon from '@material-ui/icons/InfoOutlined';
-import FavoriteIcon from '@material-ui/icons/FavoriteBorderOutlined';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
 import CloseIcon from '@material-ui/icons/CloseOutlined';
@@ -16,8 +15,8 @@ import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import Typography from '@material-ui/core/Typography';
-import { FirebaseApp } from '../firebase';
 import { resizeEffectHook, useEventListener } from '../../utils/utils';
+import FavoriteButton from './favoriteButton';
 
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
@@ -218,7 +217,6 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }
 
     function handleKeyDown(event) {
-        console.log(event);
         switch (event.code) { // or event.key or event.keyCode as integer
             case "ArrowLeft":
                 handlePreviousImage();
@@ -252,10 +250,6 @@ const ExpandedView = ({ images, currentId, onClose }) => {
 
     function handleInfoClick() {
         setInfoVisible(!infoVisible);
-    }
-
-    function handleFavoriteClick() {
-        // TODO
     }
 
     function handleCloseClick() {
@@ -399,11 +393,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                         null :
                         <React.Fragment>
                             <IconButton onClick={handleInfoClick} disabled={currentImageHasDetails() === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
-                            {
-                                FirebaseApp.auth().currentUser ?
-                                <IconButton onClick={handleFavoriteClick}><FavoriteIcon fontSize='large'></FavoriteIcon></IconButton> :
-                                null
-                            }
+                            <FavoriteButton fontSize='large' />
                         </React.Fragment>
                     }
                 </Box>

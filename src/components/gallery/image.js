@@ -2,11 +2,7 @@ import { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
-import IconButton from '@material-ui/core/IconButton';
-import FavoriteIcon from '@material-ui/icons/FavoriteBorderOutlined';
-import Tooltip from '@material-ui/core/Tooltip';
-import Zoom from '@material-ui/core/Zoom';
-import { FirebaseApp } from '../firebase';
+import FavoriteButton from './favoriteButton';
 
 const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
 
@@ -66,51 +62,6 @@ const useStyles = makeStyles(theme => ({
         color: 'white',
     }
 }));
-
-const useFavoriteStyles = makeStyles(theme => ({
-    icon: {
-        color: 'white',
-    },
-    tooltipLabel: {
-        fontSize: 16
-    },
-    tooltipPlacementTop: {
-        backgroundColor: 'black',
-        top: 15
-    }
-}));
-
-const FavoriteButton = () => {
-    const classes = useFavoriteStyles();
-    const [user, setUser] = useState(FirebaseApp.auth().currentUser);
-
-    useEffect(() => {
-        const unregisterAuthObserver = FirebaseApp.auth().onAuthStateChanged(user => {
-            setUser(user);
-        });
-        return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-    }, []);
-
-    if (!user) {
-        return null;
-    }
-
-    return (
-        <Tooltip title="Ajouter aux favoris" placement="top" TransitionComponent={Zoom} arrow classes={{
-            tooltip: classes.tooltipLabel,
-            tooltipPlacementTop: classes.tooltipPlacementTop
-        }}>
-            <IconButton className={classes.icon} style={{
-                display: "block",
-                position: "absolute",
-                bottom: 10,
-                right: 10,
-            }}>
-                <FavoriteIcon />
-            </IconButton>
-        </Tooltip>
-    );
-}
 
 const LazyImage = ({ image, onClick, top, left, width }) => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
@@ -204,7 +155,13 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
                 width: "100%",
                 height: "100%"
             }}/>
-            <FavoriteButton />
+            <FavoriteButton style={{
+                display: "block",
+                position: "absolute",
+                bottom: 10,
+                right: 10,
+                color: 'white'
+            }}/>
         </div>
     );
 }
