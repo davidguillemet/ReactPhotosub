@@ -132,7 +132,7 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
     return (
         <IconButton onClick={onClick} >
             <StopIcon fontSize='large'></StopIcon>
-            <CircularProgress variant="determinate" disableShrink={true} value={progress} style={{
+            <CircularProgress variant="determinate" value={progress} style={{
                 position: "absolute",
                 margin: 'auto'
                 }}
@@ -231,6 +231,8 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                     headerBarRef.current.classList.remove('hidden');
                     clearTimeout(hideHeaderTimeout.current);
                     handleStopClick();
+                } else {
+                    handleCloseClick();
                 }
                 break;
             default:
@@ -455,11 +457,13 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                                 height: '100%',
                                 padding: 10,
                                 overflow: 'hidden'
-                            }}>
-                            <img alt="" src={currentImage?.src}
+                            }}
+                        >
+                            <img
+                                alt=""
                                 onLoad={onImageLoaded}
-                                className={classes.mainImage
-                                } />
+                                src={currentImage?.src}
+                                className={classes.mainImage} />
                         </Box>
                     </CSSTransition>
                 </TransitionGroup>
