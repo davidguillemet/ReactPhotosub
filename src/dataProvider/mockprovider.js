@@ -51,6 +51,12 @@ function removeFavorite(path) {
     return Promise.resolve(Array.from(_favorites));
 }
 
+function getFavorites() {
+    return fetchhMockData('../../').then(data => {
+        return data.destination.images.filter(image => _favorites.has(`${image.path}/${image.name}`));
+    });
+}
+
 const mockProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
@@ -58,7 +64,8 @@ const mockProvider = {
     getDestinationImagesFromPath: getDestinationImagesFromPath,
     getUserData: getUserData,
     addFavorite: addFavorite,
-    removeFavorite: removeFavorite
+    removeFavorite: removeFavorite,
+    getFavorites: getFavorites
 };
 
 export default mockProvider;

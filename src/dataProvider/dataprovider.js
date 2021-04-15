@@ -17,49 +17,55 @@ function getDestinationProps(year, title, props) {
     })
 }
 
-export function getDestinations() {
+function getDestinations() {
     return axios.get("/api/destinations")
     .then(response => {
         return response.data;
     });
 }
 
-export function getRegions() {
+function getRegions() {
     return axios.get("/api/regions")
     .then(response => {
         return response.data;
     });
 }
 
-export function getDestinationDetailsFromPath(year, title) {
+function getDestinationDetailsFromPath(year, title) {
     return getDestinationProps(year, title, "head");
 }
 
-export function getDestinationImagesFromPath(year, title) {
+function getDestinationImagesFromPath(year, title) {
     return getDestinationProps(year, title, "images");
 }
 
-export function getUserData(uid) {
+function getUserData(uid) {
     return axios.get(`/api/userdata/${uid}`)
     .then(response => {
         return response.data;
     });
 }
 
-export function addFavorite(path) {
+function addFavorite(path) {
     return axios.post('/api/favorites', { path: path })
     .then(response => {
         return response.data;
     });
 }
 
-export function removeFavorite(path) {
+function removeFavorite(path) {
     return axios.delete('/api/favorites', {data: { path: path } } )
     .then(response => {
         return response.data;
     });
 }
 
+function getFavorites() {
+    return axios.get('/api/favorites')
+    .then(response => {
+        return response.data;
+    })
+}
 
 const dataProvider = {
     getDestinations: getDestinations,
@@ -68,7 +74,8 @@ const dataProvider = {
     getDestinationImagesFromPath: getDestinationImagesFromPath,
     getUserData: getUserData,
     addFavorite: addFavorite,
-    removeFavorite: removeFavorite
+    removeFavorite: removeFavorite,
+    getFavorites: getFavorites
 }
 
 export default dataProvider;

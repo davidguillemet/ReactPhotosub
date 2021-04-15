@@ -15,6 +15,7 @@ import Destination from "./pages/destination";
 import Search from "./pages/search";
 import Finning from './pages/finning';
 import Simulation from './pages/simulation';
+import MySelection from './pages/favorites';
 import { FirebaseAuth } from './components/firebase';
 import { AuthProvider } from './components/authentication';
 
@@ -73,10 +74,6 @@ function App() {
             exit: 1000
           }}>
             <Switch>
-              {/* Nesting Route in Empty component as workaround to force Switch
-                    * component being rerendred when licking a navigation link
-                    */}
-              <>
                 <Route exact strict path="/">
                   <Home />
                 </Route>
@@ -95,7 +92,9 @@ function App() {
                 <Route exact strict path="/simulation">
                   <Simulation />
                 </Route>
-              </>
+                <Route exact strict path="/my_selection">
+                  <MySelection />
+                </Route>
             </Switch>
           </Fade>
         </Box>

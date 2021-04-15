@@ -13,6 +13,7 @@ import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import MenuList from '@material-ui/core/MenuList';
+import { Link } from 'react-router-dom';
 
 import { AuthContext } from '../authentication';
 
@@ -71,6 +72,7 @@ const SignedInButton = ({user, handleLogout}) => {
     };
 
     const handleClose = (event) => {
+        console.log("handleClose")
         if (anchorRef.current && anchorRef.current.contains(event.target)) {
           return;
         }
@@ -107,14 +109,19 @@ const SignedInButton = ({user, handleLogout}) => {
                     <Paper>
                         <ClickAwayListener onClickAway={handleClose}>
                             <MenuList autoFocusItem={menuOpen} id="menu-list-grow" onKeyDown={handleListKeyDown}>
+                                <Link to="/my_selection" style={{
+                                    textDecoration: 'none'
+                                }}>
+                                    <MenuItem onClick={handleClose}>Mes favoris</MenuItem>
+                                </Link>
                                 <MenuItem onClick={logout}>Deconnexion</MenuItem>
                             </MenuList>
                         </ClickAwayListener>
                     </Paper>
                 </Grow>
             )}
-        </Popper>
-      </React.Fragment>
+            </Popper>
+        </React.Fragment>
     );
 }
 
