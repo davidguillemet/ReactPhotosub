@@ -231,7 +231,21 @@ app.route("/userdata")
 app.route("/favorites")
     // Get all favorites for the current user
     .get(async function(req, res, next) {
-        // TODO
+        try {
+            const images = await pool({i: "images"})
+                .select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio")
+                .join(pool().raw(`user_data as u ON u.uid = '${res.locals.uid}' and concat(i.path, '/', i.name) = ANY(u.favorites)`))
+                .orderBy("i.name", "asc");
+
+            images.forEach((image) => {
+                // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
+                image.src = convertPathToUrl(image.path + "/" + image.name);
+            });
+            res.json(images);
+        } catch (err) {
+            logger.error(`Failed to get favorites for user ${res.locals.uid}.`, err);
+            res.status(500).send(`Failed to get favorites for user ${res.locals.uid}.`).end();
+        }
     })
     // Add a favorite for a given user
     .post(async function(req, res, next) {
