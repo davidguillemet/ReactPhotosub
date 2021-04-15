@@ -2,7 +2,8 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
-import FavoriteIcon from '@material-ui/icons/FavoriteBorderOutlined';
+import FavoriteIconOutlined from '@material-ui/icons/FavoriteBorderOutlined';
+import FavoriteIcon from '@material-ui/icons/Favorite';
 import Zoom from '@material-ui/core/Zoom';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
@@ -20,13 +21,23 @@ const useFavoriteStyles = makeStyles(theme => ({
     }
 }));
 
-const FavoriteButton = ({fontSize = 'default', style }) => {
+const FavoriteButton = ({fontSize = 'default', style, color, path }) => {
     const classes = useFavoriteStyles();
     const authContext = useAuthContext();
 
     function handleFavoriteClick() {
         // La requête doit contenir le heaer 'Authorization: Bearer ID_TOKEN'
         console.log("add favorite");
+    }
+
+    const isInFavorites = authContext.user && authContext.data.favorites.has(path);
+    const buttonStyle = {...style};
+    let title = "Ajouter aux favoris";
+    if (isInFavorites) {
+        title = 'Retirer des favoris';
+        buttonStyle.color = 'red';
+    } else if (color) {
+        buttonStyle.color = color;
     }
 
     return (
@@ -37,7 +48,7 @@ const FavoriteButton = ({fontSize = 'default', style }) => {
                     flexDirection: 'column',
                     alignItems: 'center'
                 }}>
-                    <Typography variant="body1">Ajouter aux favoris</Typography>
+                    <Typography variant="body1">{title}</Typography>
                     {
                         authContext.user === null &&
                         <Box style={{
@@ -59,8 +70,12 @@ const FavoriteButton = ({fontSize = 'default', style }) => {
                 tooltipPlacementTop: classes.tooltipPlacementTop
             }}
         >
-            <IconButton style={style} onClick={authContext.user ? handleFavoriteClick : null}>
-                <FavoriteIcon fontSize={fontSize}/>
+            <IconButton style={buttonStyle} onClick={authContext.user ? handleFavoriteClick : null}>
+                {
+                    isInFavorites ?
+                    <FavoriteIcon fontSize={fontSize}/> :
+                    <FavoriteIconOutlined fontSize={fontSize} />
+                }
             </IconButton>
         </Tooltip>
     );

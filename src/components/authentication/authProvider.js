@@ -21,9 +21,14 @@ const AuthProvider = ({ children }) => {
                 newUser.getIdToken().then(token => {
                     return dataProvider.getUserData(newUser.uid);
                 }).then(userData => {
+                    // Transform the favorites array as a Set
+                    const dataCopy = {...userData};
+                    dataCopy.favorites = new Set(dataCopy.favorites);
+                    console.log("context onlogon");
+                    console.log(dataCopy)
                     setUserContext({
                         user: newUser,
-                        data: userData
+                        data: dataCopy
                     });
                 });
             }

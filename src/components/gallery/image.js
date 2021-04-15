@@ -155,13 +155,15 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
                 width: "100%",
                 height: "100%"
             }}/>
-            <FavoriteButton style={{
-                display: "block",
-                position: "absolute",
-                bottom: 10,
-                right: 10,
-                color: 'white'
-            }}/>
+            <FavoriteButton
+                path={`${image.path}/${image.name}`}
+                color={'white'}
+                style={{
+                    display: "block",
+                    position: "absolute",
+                    bottom: 10,
+                    right: 10
+                }}/>
         </div>
     );
 }
