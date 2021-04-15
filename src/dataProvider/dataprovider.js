@@ -46,13 +46,29 @@ export function getUserData(uid) {
     });
 }
 
+export function addFavorite(path) {
+    return axios.post('/api/favorites', { path: path })
+    .then(response => {
+        return response.data;
+    });
+}
+
+export function removeFavorite(path) {
+    return axios.delete('/api/favorites', {data: { path: path } } )
+    .then(response => {
+        return response.data;
+    });
+}
+
 
 const dataProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
     getDestinationDetailsFromPath: getDestinationDetailsFromPath,
     getDestinationImagesFromPath: getDestinationImagesFromPath,
-    getUserData: getUserData
+    getUserData: getUserData,
+    addFavorite: addFavorite,
+    removeFavorite: removeFavorite
 }
 
 export default dataProvider;

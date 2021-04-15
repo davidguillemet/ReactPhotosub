@@ -393,7 +393,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                         null :
                         <React.Fragment>
                             <IconButton onClick={handleInfoClick} disabled={currentImageHasDetails() === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
-                            <FavoriteButton fontSize='large' />
+                            <FavoriteButton fontSize='large' path={`${currentImage?.path}/${currentImage?.name}`} />
                         </React.Fragment>
                     }
                 </Box>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
@@ -8,8 +8,9 @@ import Zoom from '@material-ui/core/Zoom';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import dataProvider from '../../dataProvider';
 
-import { useAuthContext } from '../authentication';
+import { AuthContext } from '../authentication';
 
 const useFavoriteStyles = makeStyles(theme => ({
     tooltipLabel: {
@@ -21,16 +22,20 @@ const useFavoriteStyles = makeStyles(theme => ({
     }
 }));
 
-const FavoriteButton = ({fontSize = 'default', style, color, path }) => {
+const FavoriteButton = ({user, isInFavorites, updateUserContext, fontSize = 'default', style, color, path }) => {
     const classes = useFavoriteStyles();
-    const authContext = useAuthContext();
 
     function handleFavoriteClick() {
-        // La requête doit contenir le heaer 'Authorization: Bearer ID_TOKEN'
-        console.log("add favorite");
+        const updatePromise =
+            isInFavorites ?
+            dataProvider.removeFavorite :
+            dataProvider.addFavorite;
+
+        updatePromise(path).then(favorites => {
+            updateUserContext(user, favorites);
+        })
     }
 
-    const isInFavorites = authContext.user && authContext.data.favorites.has(path);
     const buttonStyle = {...style};
     let title = "Ajouter aux favoris";
     if (isInFavorites) {
@@ -50,7 +55,7 @@ const FavoriteButton = ({fontSize = 'default', style, color, path }) => {
                 }}>
                     <Typography variant="body1">{title}</Typography>
                     {
-                        authContext.user === null &&
+                        user === null &&
                         <Box style={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -70,7 +75,7 @@ const FavoriteButton = ({fontSize = 'default', style, color, path }) => {
                 tooltipPlacementTop: classes.tooltipPlacementTop
             }}
         >
-            <IconButton style={buttonStyle} onClick={authContext.user ? handleFavoriteClick : null}>
+            <IconButton style={buttonStyle} onClick={user ? handleFavoriteClick : null}>
                 {
                     isInFavorites ?
                     <FavoriteIcon fontSize={fontSize}/> :
@@ -81,4 +86,20 @@ const FavoriteButton = ({fontSize = 'default', style, color, path }) => {
     );
 }
 
-export default FavoriteButton;
+const FavoriteButtonConsumer = (props) => {
+    return (
+        <AuthContext.Consumer>
+            { ({user, data, updateUserContext}) => {
+                return (
+                    <FavoriteButton
+                        user={user}
+                        isInFavorites={data && data.favorites.has(props.path)}
+                        updateUserContext={updateUserContext}
+                        {...props} />
+                );
+            }}
+        </AuthContext.Consumer>
+    );
+}
+
+export default FavoriteButtonConsumer;

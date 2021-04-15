@@ -6,7 +6,8 @@ import dataProvider from '../../dataProvider';
 const AuthProvider = ({ children }) => {
     const [userContext, setUserContext] = useState({
         user: FirebaseApp.auth().currentUser,
-        data: null
+        data: null,
+        updateUserContext: updateUserContext
     });
 
     useEffect(() => {
@@ -21,20 +22,23 @@ const AuthProvider = ({ children }) => {
                 newUser.getIdToken().then(token => {
                     return dataProvider.getUserData(newUser.uid);
                 }).then(userData => {
-                    // Transform the favorites array as a Set
-                    const dataCopy = {...userData};
-                    dataCopy.favorites = new Set(dataCopy.favorites);
-                    console.log("context onlogon");
-                    console.log(dataCopy)
-                    setUserContext({
-                        user: newUser,
-                        data: dataCopy
-                    });
+                    updateUserContext(newUser, userData.favorites);
                 });
             }
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
     }, []);
+
+    function updateUserContext(user, favoritesArray) {
+        // Transform the favorites array as a Set
+        setUserContext({
+            user: user,
+            data: {
+                favorites: new Set(favoritesArray)
+            },
+            updateUserContext: updateUserContext
+        });
+    }
 
     return (
         <AuthContext.Provider value={userContext}>
