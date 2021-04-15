@@ -193,7 +193,7 @@ app.route("/userdata/:uid")
             let data = null;
             if (dataArray.length === 0) {
                 data = {
-                    uid: res.locals.uid,
+                    uid: req.params.uid,
                     favorites: [],
                 };
                 await pool("user_data").insert(data);
@@ -235,11 +235,27 @@ app.route("/favorites")
     })
     // Add a favorite for a given user
     .post(async function(req, res, next) {
-        // TODO
+        const newFavorite = req.body;
+        try {
+            const result = await pool()
+                .raw(`update user_data set favorites = array_cat(favorites, '{${newFavorite.path}}') where uid = '${res.locals.uid}' returning favorites`);
+            res.json(result.rows[0].favorites);
+        } catch (err) {
+            logger.error(`Failed to add ${newFavorite.path} in favorites for user ${res.locals.uid}.`, err);
+            res.status(500).send(`Failed to add ${newFavorite.path} in favorites for user ${res.locals.uid}.`).end();
+        }
     })
     // Remove a favorite for agiven user
     .delete(async function(req, res, next) {
-        // TODO
+        const removedFavorite = req.body;
+        try {
+            const result = await pool()
+                .raw(`update user_data set favorites = array_remove(favorites, '${removedFavorite.path}') where uid = '${res.locals.uid}' returning favorites`);
+            res.json(result.rows[0].favorites);
+        } catch (err) {
+            logger.error(`Failed to remove ${removedFavorite.path} in favorites for user ${res.locals.uid}.`, err);
+            res.status(500).send(`Failed to remove ${removedFavorite.path} in favorites for user ${res.locals.uid}.`).end();
+        }
     });
 
 // Search for images
