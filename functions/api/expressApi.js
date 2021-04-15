@@ -6,6 +6,7 @@ require("dotenv").config();
 const express = require("express");
 const {logger/* , makeExpressLoggerMiddleware */} = require("../utils/logger");
 const convertPathToUrl = require("../utils/firebase");
+const isAuthenticated = require("./authenticated");
 
 // Get a connection pool for postgreSql
 const {pool} = require("../utils/pool-postgresql");
@@ -20,6 +21,9 @@ const {pool} = require("../utils/pool-postgresql");
 const app = express();
 
 // app.use(mw);
+
+// Authentication required for the following routes:
+app.use("/favorites", isAuthenticated);
 
 // support parsing of application/json type post data
 app.use(express.json());
@@ -181,6 +185,62 @@ app.route("/image")
         }
     });
 
+app.route("/userdata/:uid")
+    // Get all data for a given user
+    .get(async function(req, res, next) {
+        try {
+            const dataArray = await pool("user_data").select().where("uid", req.params.uid);
+            let data = null;
+            if (dataArray.length === 0) {
+                data = {
+                    uid: res.locals.uid,
+                    favorites: [],
+                };
+                await pool("user_data").insert(data);
+            } else {
+                data = dataArray[0];
+            }
+            res.json(data);
+        } catch (err) {
+            logger.error(`Failed to load user data for uid ${req.params.uid}.`, err);
+            res.status(500)
+                .send(`Unable to load user data for uid ${req.params.uid}.`)
+                .end();
+        }
+    });
+
+app.route("/userdata")
+    .delete(async function(req, res, next) {
+    // {
+    //     uid: "xxxxxxxxxx",
+    //     displayName: "cccccccc"
+    // }
+        const userInfo = req.body;
+        try {
+            await pool("user_data").where({
+                uid: userInfo.uid,
+            }).delete();
+            res.status(200).send(`Successfully deleting data for user ${userInfo.displayName}.`).end();
+        } catch (err) {
+            logger.error(`Failed to remove data for user ${userInfo.displayName}.`, err);
+            res.status(500).send(`Error while deleting data for user ${userInfo.displayName}.`).end();
+        }
+    });
+
+// Get, Add and Delete favorites
+app.route("/favorites")
+    // Get all favorites for the current user
+    .get(async function(req, res, next) {
+        // TODO
+    })
+    // Add a favorite for a given user
+    .post(async function(req, res, next) {
+        // TODO
+    })
+    // Remove a favorite for agiven user
+    .delete(async function(req, res, next) {
+        // TODO
+    });
 
 // Search for images
 app.route("/search")
