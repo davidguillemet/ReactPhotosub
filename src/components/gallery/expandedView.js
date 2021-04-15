@@ -224,10 +224,15 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             case "ArrowRight":
                 handleNextImage();
                 break;
+            case "Space":
+                if (isPlaying) {
+                    handleStopClick();
+                } else {
+                    handlePlayClick();
+                }
+                break;
             case "Escape":
                 if (isPlaying) {
-                    headerBarRef.current.classList.remove('hidden');
-                    clearTimeout(hideHeaderTimeout.current);
                     handleStopClick();
                 } else {
                     handleCloseClick();
@@ -245,6 +250,8 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }
 
     function handleStopClick() {
+        headerBarRef.current.classList.remove('hidden');
+        clearTimeout(hideHeaderTimeout.current);
         setIsPlaying(false);
     }
 
@@ -385,7 +392,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                 >
                     {
                         isPlaying ?
-                            <StopButtonWithCircularProgress onClick={handleStopClick} onCompleted={handleNextImage} duration={3000} key={currentImage?.id}/> :
+                            <StopButtonWithCircularProgress onClick={handleStopClick} onCompleted={handleNextImage} duration={5000} key={currentImage?.id}/> :
                             <IconButton onClick={handlePlayClick}><PlayArrowIcon fontSize='large'></PlayArrowIcon></IconButton>
                     }
                     {

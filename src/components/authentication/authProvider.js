@@ -27,6 +27,7 @@ const AuthProvider = ({ children }) => {
             }
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function updateUserContext(user, favoritesArray) {

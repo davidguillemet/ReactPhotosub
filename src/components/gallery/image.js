@@ -10,6 +10,7 @@ const useStyles = makeStyles(theme => ({
     imageContainer: {
         display: "block",
         position: 'absolute',
+        opacity: 0,
         transition: 'top 0.8s, left 0.8s, width 0.8s, height 0.8s',
         overflow: "hidden",
         '&:hover div[class*="imageOverlay"]': {
@@ -20,27 +21,15 @@ const useStyles = makeStyles(theme => ({
             opacity: 0.5,
             transform: 'scale(1.1)',
             transition: 'opacity 1s, transform 4s cubic-bezier(.17,.53,.29,1.01)'
+        },
+        '&.loaded': {
+            opacity: 1,
+            transition: 'opacity 1.5s'
         }
     },
     lazyImage: {
         display: 'block',
         width: '100%',
-        opacity: 1,
-        transition: 'opacity 1s, transform 1.3s',
-        '&.loaded:not(.has-error)': {
-            animation: `$imageLoaded 2000ms ${theme.transitions.easing.easeInOut}`
-        },
-        '&.has-error': {
-            content: `url(${placeHolder})`
-        }
-    },
-    '@keyframes imageLoaded': {
-        "0%": {
-            opacity: 0
-        },
-        "100%": {
-            opacity: 1
-        }
     },
     imageOverlay: {
         display: "flex",
@@ -71,7 +60,7 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
     
     const onLoad = event => {
         if (event.target.src !== placeHolder) {
-            event.target.classList.add('loaded');
+            event.target.parentNode.classList.add('loaded');
         }
     }
     
@@ -135,26 +124,33 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
                 maxWidth: 'var(--width)',
                 width: 'var(--width)',
                 height: heightFormula
-    }}>
-                <img
-                    className={classes.lazyImage}
-                    ref={setImageRef}
-                    src={imageSrc}
-                    alt="alt"
-                    onLoad={onLoad}
-                    onError={onError}
-                />
-                <div className={classes.imageOverlay}>
-                    <Typography variant="h6" align="center">{image.title}</Typography>
-                </div>
-            <ButtonBase onClick={handleImageClick} style={{
-                display: "block",
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%"
-            }}/>
+            }}
+        >
+            <img
+                className={classes.lazyImage}
+                ref={setImageRef}
+                src={imageSrc}
+                alt="alt"
+                onLoad={onLoad}
+                onError={onError}
+            />
+
+            <div className={classes.imageOverlay}>
+                <Typography variant="h6" align="center">{image.title}</Typography>
+            </div>
+
+            <ButtonBase
+                onClick={handleImageClick}
+                style={{
+                    display: "block",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%"
+                }}
+            />
+
             <FavoriteButton
                 path={`${image.path}/${image.name}`}
                 color={'white'}
@@ -163,7 +159,8 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
                     position: "absolute",
                     bottom: 10,
                     right: 10
-                }}/>
+                }}
+            />
         </div>
     );
 }
