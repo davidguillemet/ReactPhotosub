@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
         display: "block",
         position: 'absolute',
         opacity: 0,
-        transition: 'top 0.8s, left 0.8s, width 0.8s, height 0.8s',
+        transition: 'top 0.8s, left 0.8s, opacity 1.5s',
         overflow: "hidden",
         '&:hover div[class*="imageOverlay"]': {
             opacity: 1,
@@ -23,8 +23,7 @@ const useStyles = makeStyles(theme => ({
             transition: 'opacity 1s, transform 4s cubic-bezier(.17,.53,.29,1.01)'
         },
         '&.loaded': {
-            opacity: 1,
-            transition: 'opacity 1.5s'
+            opacity: 1
         }
     },
     lazyImage: {
