@@ -33,11 +33,22 @@ function getDestinationImagesFromPath(year, title) {
     })
 }
 
+function getUserData() {
+    return Promise.resolve({
+        uid: 'fakeuid',
+        favorites: [
+            "2014/misool/DSC_1622.jpg",
+            "2014/misool/DSC_1633.jpg"
+        ]
+    });
+}
+
 const mockProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
     getDestinationDetailsFromPath: getDestinationDetailsFromPath,
-    getDestinationImagesFromPath: getDestinationImagesFromPath
+    getDestinationImagesFromPath: getDestinationImagesFromPath,
+    getUserData: getUserData
 };
 
 export default mockProvider;
