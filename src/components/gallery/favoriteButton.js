@@ -1,8 +1,12 @@
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import FavoriteIcon from '@material-ui/icons/FavoriteBorderOutlined';
 import Zoom from '@material-ui/core/Zoom';
+import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 
 import { useAuthContext } from '../authentication';
 
@@ -25,25 +29,37 @@ const FavoriteButton = ({fontSize = 'default', style }) => {
         console.log("add favorite");
     }
 
-    if (!authContext.user) {
-        return (
-            <Tooltip title="Ajouter aux favoris (connexion requise)" placement="top" TransitionComponent={Zoom} arrow classes={{
+    return (
+        <Tooltip
+            title={
+                <Box style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                }}>
+                    <Typography variant="body1">Ajouter aux favoris</Typography>
+                    {
+                        authContext.user === null &&
+                        <Box style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center'
+                        }}>
+                            <ErrorOutlineIcon style={{marginRight: 5}}></ErrorOutlineIcon>
+                            <Typography variant="caption">Connexion requise</Typography>
+                        </Box>
+                    }        
+                </Box>
+            }
+            placement="top"
+            TransitionComponent={Zoom}
+            arrow
+            classes={{
                 tooltip: classes.tooltipLabel,
                 tooltipPlacementTop: classes.tooltipPlacementTop
-            }}>
-                <IconButton style={style}>
-                    <FavoriteIcon fontSize={fontSize}/>
-                </IconButton>
-            </Tooltip>
-        );
-    }
-
-    return (
-        <Tooltip title="Ajouter aux favoris" placement="top" TransitionComponent={Zoom} arrow classes={{
-            tooltip: classes.tooltipLabel,
-            tooltipPlacementTop: classes.tooltipPlacementTop
-        }}>
-            <IconButton style={style} onClick={handleFavoriteClick}>
+            }}
+        >
+            <IconButton style={style} onClick={authContext.user ? handleFavoriteClick : null}>
                 <FavoriteIcon fontSize={fontSize}/>
             </IconButton>
         </Tooltip>
