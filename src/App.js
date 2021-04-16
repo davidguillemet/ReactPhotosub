@@ -6,6 +6,10 @@ import logo from './assets/images/logo.jpg';
 import { makeStyles } from '@material-ui/core/styles';
 import Navigation from './navigation';
 import Fade from '@material-ui/core/Fade';
+import useScrollTrigger from '@material-ui/core/useScrollTrigger';
+import Fab from '@material-ui/core/Fab';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import Zoom from '@material-ui/core/Zoom';
 
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import './App.css';
@@ -51,7 +55,56 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function App() {
+function ElevationScroll(props) {
+  const { children, window } = props;
+  // Note that you normally won't need to set the window ref as useScrollTrigger
+  // will default to window.
+  // This is only being set here because the demo is in an iframe.
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 0,
+    target: window ? window() : undefined,
+  });
+
+  return React.cloneElement(children, {
+    elevation: trigger ? 6 : 0,
+  });
+}
+
+function ScrollTop(props) {
+  const { children, window } = props;
+  const classes = useStyles();
+  // Note that you normally won't need to set the window ref as useScrollTrigger
+  // will default to window.
+  // This is only being set here because the demo is in an iframe.
+  const trigger = useScrollTrigger({
+    target: window ? window() : undefined,
+    disableHysteresis: true,
+    threshold: 100,
+  });
+
+  const handleClick = (event) => {
+    const anchor = (event.target.ownerDocument || document).querySelector('#back-to-top-anchor');
+
+    if (anchor) {
+      anchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  return (
+    <Zoom in={trigger}>
+      <div onClick={handleClick} role="presentation" style={{
+          position: 'fixed',
+          bottom: 20,
+          right: 20
+        }}>
+        {children}
+      </div>
+    </Zoom>
+  );
+}
+
+function App(props) {
 
   const classes = useStyles();
 
@@ -59,47 +112,49 @@ function App() {
     <AuthProvider>
       <CssBaseline />
       <Router>
-        <AppBar position="sticky" classes={{
-          root: classes.root,
-          positionSticky: classes.sticky
-        }}>
-          <FirebaseAuth />
-          <img src={logo} className="logo" alt="logo" />
-          <Navigation></Navigation>
-        </AppBar>
-        <Box className={classes.pageContainer}>
-          <Fade in={true} timeout={{
-            appear: 1000,
-            enter: 1000,
-            exit: 1000
+        <ElevationScroll {...props}>
+          <AppBar position="sticky" classes={{
+            root: classes.root,
+            positionSticky: classes.sticky
           }}>
+            <FirebaseAuth />
+            <img src={logo} className="logo" alt="logo" />
+            <Navigation></Navigation>
+          </AppBar>
+        </ElevationScroll>
+        <div id="back-to-top-anchor" />
+        <Box className={classes.pageContainer}>
             <Switch>
-                <Route exact strict path="/">
-                  <Home />
-                </Route>
-                <Route exact strict path="/destinations">
-                  <Destinations />
-                </Route>
-                <Route exact strict path="/destinations/:year/:title">
-                  <Destination />
-                </Route>
-                <Route exact strict path="/search">
-                  <Search />
-                </Route>
-                <Route exact strict path="/finning">
-                  <Finning />
-                </Route>
-                <Route exact strict path="/simulation">
-                  <Simulation />
-                </Route>
-                <Route exact strict path="/my_selection">
-                  <MySelection />
-                </Route>
+              <Route exact strict path="/">
+                <Home />
+              </Route>
+              <Route exact strict path="/destinations">
+                <Destinations />
+              </Route>
+              <Route exact strict path="/destinations/:year/:title">
+                <Destination />
+              </Route>
+              <Route exact strict path="/search">
+                <Search />
+              </Route>
+              <Route exact strict path="/finning">
+                <Finning />
+              </Route>
+              <Route exact strict path="/simulation">
+                <Simulation />
+              </Route>
+              <Route exact strict path="/my_selection">
+                <MySelection />
+              </Route>
             </Switch>
-          </Fade>
         </Box>
       </Router>
-    </AuthProvider>
+      <ScrollTop {...props}>
+        <Fab color="secondary" size="medium" aria-label="scroll back to top">
+          <KeyboardArrowUpIcon />
+        </Fab>
+      </ScrollTop>
+      </AuthProvider>
   );
 }
 
