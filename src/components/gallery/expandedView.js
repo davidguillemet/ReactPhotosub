@@ -64,24 +64,14 @@ const useStyles = makeStyles({
     }
 });
 
-const Thumbnail = ({ image, index, handleClick, active, rectCallback }) => {
+const Thumbnail = ({ image, index, handleClick, active, onLoadedCallback}) => {
 
     function onClick() {
         handleClick(index);
     }
 
-    const thumbRef = useCallback(node => {
-        if (node !== null) {
-            rectCallback(index, {
-                left: node.offsetLeft,
-                width: node.clientWidth
-            });
-        }
-    }, [index, rectCallback]);
-
     return (
         <Box
-            ref={thumbRef}
             style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -96,6 +86,7 @@ const Thumbnail = ({ image, index, handleClick, active, rectCallback }) => {
                 <img
                     alt=""
                     src={image.src}
+                    onLoad={onLoadedCallback}
                     onClick={onClick}
                     style={{
                         height: '100%',
@@ -146,26 +137,58 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     const [currentImage, setCurrentImage] = useState(null);
     const [infoVisible, setInfoVisible] = useState(false);
     const [thumbSliderValue, setThumbSliderValue] = useState(0);
-    const [thumbScrollLeft, setThumbScrollLeft] = useState(0);
-    const [thumbContainerWidth, setThumbContainerWidth] = useState(0);
+    const [thumbContainerProps, setThumbContainerProps] = useState({
+        width: 0,
+        scrollLeft: 0,
+        maxScrollLeft: 0
+    });
     const [isPlaying, setIsPlaying] = useState(false);
-    const thumbnailsRect = useRef({});
+    const [thumnailScrollActivated, setThumbnailScrollActivated] = useState(false);
     const thumbContainerRef = useRef(null);
     const headerBarRef = useRef(null);
     const hideHeaderTimeout = useRef(null);
 
+    const [allThumbnailsLoaded, setAllThumbnailsLoaded] = useState(false);
+    const numberOfLoadedThumbnails = useRef(0);
+
+    // HandleResize is a callback to be used as dependency in thumbContainerRefCallback
+    const handleResize = useCallback(() => {
+        // Mahe sure to synchronize the slider with the effective thumbnail scroll position that can
+        // change when resizing the window
+        const lastThumbRect = getThumbnailRectAt(thumbContainerRef.current.children.length - 1);
+        setThumbContainerProps({
+            width: thumbContainerRef.current.clientWidth,
+            scrollLeft: thumbContainerRef.current.scrollLeft,
+            maxScrollLeft: lastThumbRect.left + lastThumbRect.width - thumbContainerRef.current.clientWidth
+        });
+    }, [])
+
     const thumbContainerRefCallback = useCallback(element => {
         if (element !== null) {
             thumbContainerRef.current = element;
-            setThumbContainerWidth(thumbContainerRef.current.clientWidth);
         }
     }, []);
+          
+    const onThumbnailLoadedCallback = useCallback(() => {
+        numberOfLoadedThumbnails.current++;
+        if (numberOfLoadedThumbnails.current === images.length) {
+            setAllThumbnailsLoaded(true);
+        }
+    }, [images]);
 
     const classes = useStyles();
 
     resizeEffectHook(thumbContainerRef, handleResize);
 
     useEventListener('keydown', handleKeyDown);
+
+    useEffect(() => {
+        if (allThumbnailsLoaded === false) {
+            return;
+        }
+        handleResize();
+
+    }, [handleResize, allThumbnailsLoaded])
 
     // Make sure to clear the timeout on unmount
     useEffect(() => {
@@ -188,16 +211,41 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }, [currentIndex, images]);
 
     useEffect(() => {
-        let fixedScrollValue = thumbScrollLeft;
+
+        if (allThumbnailsLoaded === false) {
+            return;
+        }
+
+        // hide thumbnail slider if not needed
+        const lastThumbnailRect = getThumbnailRectAt(thumbContainerRef.current.children.length - 1);
+        const lastThumbnailRightPosition = lastThumbnailRect.left + lastThumbnailRect.width;
+
+        if (thumbContainerProps.width === 0 ||
+            lastThumbnailRightPosition <= thumbContainerProps.width) {
+            setThumbSliderValue(0);
+            setThumbnailScrollActivated(false);
+            return;
+        }
+        
+        setThumbnailScrollActivated(true);
+
+        let fixedScrollValue = thumbContainerProps.scrollLeft;
         if (fixedScrollValue < 0) {
             fixedScrollValue = 0;
         }
-        const maxScrollLeft = getMaxScrollLeft();
-        if (fixedScrollValue > maxScrollLeft) {
-            fixedScrollValue = maxScrollLeft;
+        if (fixedScrollValue > thumbContainerProps.maxScrollLeft) {
+            fixedScrollValue = thumbContainerProps.maxScrollLeft;
         }
-        setThumbSliderValue(thumbScrollLeft * 100 / maxScrollLeft);
-    }, [thumbScrollLeft, thumbContainerWidth]);
+        const newSliderScrollValue = thumbContainerProps.scrollLeft * 100 / thumbContainerProps.maxScrollLeft;
+        setThumbSliderValue(newSliderScrollValue);
+    }, [thumbContainerProps, allThumbnailsLoaded]);
+
+    function updateThumbContainerProps(newProps) {
+        setThumbContainerProps({
+            ...thumbContainerProps, // Initialize with previous props
+            ...newProps             // And override with new ones
+        })
+    }
 
     function handleMouseMove() {
         headerBarRef.current.classList.remove('hidden');
@@ -207,13 +255,6 @@ const ExpandedView = ({ images, currentId, onClose }) => {
 
     function hideHeaderBar() {
         headerBarRef.current.classList.add('hidden');
-    }
-
-    function handleResize() {
-        // Mahe sure to synchronize the slider with the effective thumbnail scroll position that can
-        // change when resizing the window
-        setThumbContainerWidth(thumbContainerRef.current.clientWidth);
-        setThumbScrollLeft(thumbContainerRef.current.scrollLeft);
     }
 
     function handleKeyDown(event) {
@@ -268,7 +309,6 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         handleThumbnailClick(newIndex);
     }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     function handleNextImage() {
         const newIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
         handleThumbnailClick(newIndex);
@@ -278,20 +318,24 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         event.target.classList.add('loaded');
     }
 
-    function handleScrollThumbsLeft() {
+    function handleThumbnailsScrollLeft() {
         thumbContainerRef.current.scrollBy({
             left: -thumbContainerRef.current.clientWidth,
             behavior: 'smooth'
         });
-        setThumbScrollLeft(thumbContainerRef.current.scrollLeft - thumbContainerRef.current.clientWidth);
+        updateThumbContainerProps({
+            scrollLeft: thumbContainerRef.current.scrollLeft - thumbContainerRef.current.clientWidth
+        });
     }
 
-    function handleScrollThumbsRight() {
+    function handleThumbnailsScrollRight() {
         thumbContainerRef.current.scrollBy({
             left: thumbContainerRef.current.clientWidth,
             behavior: 'smooth'
         });
-        setThumbScrollLeft(thumbContainerRef.current.scrollLeft + thumbContainerRef.current.clientWidth);
+        updateThumbContainerProps({
+            scrollLeft: thumbContainerRef.current.scrollLeft + thumbContainerRef.current.clientWidth
+        });
     }
 
     function scrollThumbnailContainer(targetScroll) {
@@ -299,33 +343,34 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             left: targetScroll,
             behavior: 'smooth'
         });
-        setThumbScrollLeft(targetScroll);
+        updateThumbContainerProps({
+            scrollLeft: targetScroll,
+        });
     }
 
-    // TODO : move into hook and use onResize to compute?
-    function getMaxScrollLeft() {
-        const lastThumb = thumbContainerRef.current.children[thumbContainerRef.current.children.length - 1];
-        const thumbContainerContentWidth = lastThumb.offsetLeft - thumbContainerRef.current.offsetLeft + lastThumb.clientWidth;
-        return thumbContainerContentWidth - thumbContainerRef.current.clientWidth;
+    function getThumbnailRectAt(index) {
+        const thumbnail = thumbContainerRef.current.children[index];
+        return {
+            left: thumbnail.offsetLeft - thumbContainerRef.current.offsetLeft,
+            width: thumbnail.clientWidth
+        };
     }
 
     function handleThumbnailScroll(index) {
 
-        const thumbnailRect = thumbnailsRect.current[index];
-        const thumbPosition = thumbnailRect.left;
-        const thumbWidth = thumbnailRect.width;
+        const thumbnailRect = getThumbnailRectAt(index);
 
         if (thumbContainerRef === null || thumbContainerRef.current === null) {
             return;
         }
 
-        const thumbnailLeftVisualPosition = thumbPosition - thumbContainerRef.current.offsetLeft - thumbContainerRef.current.scrollLeft;
+        const thumbnailLeftVisualPosition = thumbnailRect.left - thumbContainerRef.current.scrollLeft;
         if (thumbnailLeftVisualPosition < 0) {
-            scrollThumbnailContainer(thumbPosition - thumbContainerRef.current.offsetLeft);
+            scrollThumbnailContainer(thumbnailRect.left);
             return;
         }
 
-        const thumbnailRightVisualPosition = thumbnailLeftVisualPosition + thumbWidth;
+        const thumbnailRightVisualPosition = thumbnailLeftVisualPosition + thumbnailRect.width;
         if (thumbnailRightVisualPosition > thumbContainerRef.current.clientWidth) {
             scrollThumbnailContainer(thumbContainerRef.current.scrollLeft + thumbnailRightVisualPosition - thumbContainerRef.current.clientWidth);
             return;
@@ -339,14 +384,8 @@ const ExpandedView = ({ images, currentId, onClose }) => {
 
     function handleThumbSliderChange(event, newSliderValue) {
         setThumbSliderValue(newSliderValue);
-        // Update scroll
-        const maxScrollLeft = getMaxScrollLeft();
-        const scrollValue = newSliderValue * maxScrollLeft / 100;
+        const scrollValue = newSliderValue * thumbContainerProps.maxScrollLeft / 100;
         scrollThumbnailContainer(scrollValue);
-    }
-
-    function thumbnailRectCallback(index, rect) {
-        thumbnailsRect.current[index] = rect;
     }
 
     function currentImageHasDetails() {
@@ -355,6 +394,8 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         }
         return currentImage.title.length > 0 || currentImage.description.length > 0
     }
+
+    const thumbnailScollButtonWidth = 50;
 
     return (
         <Box
@@ -502,19 +543,26 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                     display: 'flex',
                     flexDirection: 'column'
                 }}>
-                    <Box style={{
-                        paddingRight: 50,
-                        paddingLeft: 50
-                    }}>
-                        <Slider value={thumbSliderValue} onChange={handleThumbSliderChange} />
-                    </Box>
+
+                    <Slider
+                        value={thumbSliderValue}
+                        onChange={handleThumbSliderChange}
+                        disabled={!thumnailScrollActivated}
+                        style={{
+                            marginRight: thumbnailScollButtonWidth+3,
+                            marginLeft: thumbnailScollButtonWidth+3,
+                            width: 'auto'
+                        }}
+                    />
+
                     <Box style={{
                         display: 'flex',
                         flexDirection: 'row',
-                        alignItems: 'center'
+                        alignItems: 'flex-start'
                     }}>
-                        <Box>
-                            <IconButton onClick={handleScrollThumbsLeft} >
+
+                        <Box style={{width: thumbnailScollButtonWidth}}>
+                            <IconButton onClick={handleThumbnailsScrollLeft} disabled={!thumnailScrollActivated}>
                                 <ArrowBackIosRoundedIcon />
                             </IconButton>
                         </Box>
@@ -529,18 +577,30 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                                 alignItems: 'flex-start',
                                 height: 80,
                                 marginTop: 0
-                            }}>
+                            }}
+                        >
                             {
-                                images.map((image, index) => <Thumbnail key={image.id} image={image} index={index} handleClick={handleThumbnailClick} active={currentIndex === index} rectCallback={thumbnailRectCallback} />)
+                                images.map((image, index) => 
+                                    <Thumbnail
+                                        key={image.id}
+                                        image={image}
+                                        index={index}
+                                        handleClick={handleThumbnailClick}
+                                        active={currentIndex === index}
+                                        onLoadedCallback={onThumbnailLoadedCallback}
+                                    />
+                                )
                             }
                         </Box>
 
-                        <Box>
-                            <IconButton onClick={handleScrollThumbsRight} >
+                        <Box style={{width: thumbnailScollButtonWidth}}>
+                            <IconButton onClick={handleThumbnailsScrollRight} disabled={!thumnailScrollActivated}>
                                 <ArrowForwardIosRoundedIcon />
                             </IconButton>
                         </Box>
+
                     </Box>
+
                 </Paper>
             </Collapse>
         </Box>
