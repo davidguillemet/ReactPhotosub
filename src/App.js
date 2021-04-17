@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
@@ -6,7 +6,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import CloseIcon from '@material-ui/icons/Close';
-import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import logo from './assets/images/logo.jpg';
 import { makeStyles } from '@material-ui/core/styles';
@@ -22,19 +21,9 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 
-import HomeIcon from '@material-ui/icons/Home';
-import LanguageIcon from '@material-ui/icons/Language';
-import SearchIcon from '@material-ui/icons/Search';
-
 import { BrowserRouter as Router, Switch, Route, NavLink } from "react-router-dom";
+import { routes, useMenuStyles } from './navigation/routes';
 import './App.css';
-import Home from "./pages/home";
-import Destinations from "./pages/destinations";
-import Destination from "./pages/destination";
-import Search from "./pages/search";
-import Finning from './pages/finning';
-import Simulation from './pages/simulation';
-import MySelection from './pages/favorites';
 import { FirebaseAuth } from './components/firebase';
 import { AuthProvider } from './components/authentication';
 
@@ -83,8 +72,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
+    ...theme.mixins.toolbar
   },
   content: {
     flexGrow: 1,
@@ -104,12 +92,7 @@ const useStyles = makeStyles((theme) => ({
   },
   drawerPaper: {
     display: 'flex',
-    alignItems: 'flex-start',
     width: 'inherit'
-  },
-  link: {
-    textDecoration: 'none',
-    color: theme.palette.text.primary
   }
 }));
 
@@ -149,6 +132,7 @@ function App(props) {
 
   const [open, setOpen] = React.useState(false);
   const classes = useStyles();
+  const menuClasses = useMenuStyles();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -157,6 +141,22 @@ function App(props) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  function isLinkActive(match, location) {
+    if (match === null) {
+      return false;
+    }
+
+    if (match.url === "/" || match.url === "") {
+      return location.pathname === "/";
+    }
+
+    if (location.pathname.indexOf(match.url) === 0) {
+      return true;
+    }
+
+    return false;    
+  }
 
   return (
     <div style={{display: 'flex'}}>
@@ -209,48 +209,21 @@ function App(props) {
             </div>
             <Divider variant="middle" />
             <img src={logo} className="logo" alt="logo" />
-            <List style={{width: '100%'}}>
-
-              <NavLink to="/" className={classes.link}>
-                <ListItem button>
-                  <ListItemIcon>
-                    <HomeIcon/>
-                  </ListItemIcon>
-                  <ListItemText primary="Home" />
-                </ListItem>
-              </NavLink>
-              <NavLink to="/destinations" className={classes.link}>
-                <ListItem button>
-                  <ListItemIcon>
-                    <LanguageIcon/>
-                  </ListItemIcon>
-                  <ListItemText primary="Destinations" />
-                </ListItem>
-              </NavLink>
-              <NavLink to="/search" className={classes.link}>
-                <ListItem button>
-                  <ListItemIcon>
-                    <SearchIcon/>
-                  </ListItemIcon>
-                  <ListItemText primary="Recherche" />
-                </ListItem>
-              </NavLink>
-              <NavLink to="/finning" className={classes.link}>
-                <ListItem button>
-                  <ListItemIcon>
-                    <HomeIcon/>
-                  </ListItemIcon>
-                  <ListItemText primary="Le Finning" />
-                </ListItem>
-              </NavLink>
-              <NavLink to="/simulation" className={classes.link}>
-                <ListItem button>
-                  <ListItemIcon>
-                    <HomeIcon/>
-                  </ListItemIcon>
-                  <ListItemText primary="Simulation" />
-                </ListItem>
-              </NavLink>
+            <List style={{width: '100%', marginTop: 30, marginBottom: 30}}>
+            {
+              routes.filter(route => route.sidebar).map((route, index) => {
+                return (
+                  <NavLink key={index} to={route.path} className={menuClasses.link} isActive={isLinkActive}>
+                    <ListItem button>
+                      <ListItemIcon>
+                        {route.icon}
+                      </ListItemIcon>
+                      <ListItemText primary={route.label} />
+                    </ListItem>
+                  </NavLink>
+                );
+              })
+            }
             </List>
           </Drawer>
           </nav>
@@ -259,27 +232,15 @@ function App(props) {
           <div className={classes.drawerHeader} />
           <Container className={classes.pageContainer} maxWidth={false}>
             <Switch>
-              <Route exact strict path="/">
-                <Home />
-              </Route>
-              <Route exact strict path="/destinations">
-                <Destinations />
-              </Route>
-              <Route exact strict path="/destinations/:year/:title">
-                <Destination />
-              </Route>
-              <Route exact strict path="/search">
-                <Search />
-              </Route>
-              <Route exact strict path="/finning">
-                <Finning />
-              </Route>
-              <Route exact strict path="/simulation">
-                <Simulation />
-              </Route>
-              <Route exact strict path="/my_selection">
-                <MySelection />
-              </Route>
+            {
+              routes.map((route, index) => {
+                return (
+                  <Route key={index} exact strict path={route.path}>
+                    {route.component}
+                  </Route>
+                );
+              })
+            }
             </Switch>
           </Container>
         </main>
@@ -291,8 +252,9 @@ function App(props) {
           <KeyboardArrowUpIcon />
         </Fab>
       </ScrollTop>
-      </AuthProvider>
-      </div>
+
+    </AuthProvider>
+    </div>
   );
 }
 

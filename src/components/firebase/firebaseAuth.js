@@ -10,7 +10,6 @@ import Chip from '@material-ui/core/Chip';
 import IconButton from '@material-ui/core/IconButton';
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import FavoriteIcon from '@material-ui/icons/Favorite';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import Typography from '@material-ui/core/Typography';
@@ -23,13 +22,7 @@ import { NavLink } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { AuthContext } from '../authentication';
-
-const useStyles = makeStyles((theme) => ({
-    link: {
-        textDecoration: 'none',
-        color: theme.palette.text.primary
-    }
-}));
+import { routes, useMenuStyles } from '../../navigation/routes';
 
 // Configure FirebaseUI.
 const uiConfig = {
@@ -73,7 +66,7 @@ const NotSignedInButton = ({handleSignIn}) => {
 
 const SignedInButton = ({user, handleLogout}) => {
 
-    const classes = useStyles();
+    const menuClasses = useMenuStyles();
 
     const [menuOpen, setMenuOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
@@ -83,7 +76,6 @@ const SignedInButton = ({user, handleLogout}) => {
     };
 
     const handleClose = (event) => {
-        console.log("handleClose")
         if (anchorRef.current && anchorRef.current.contains(event.target)) {
           return;
         }
@@ -128,14 +120,20 @@ const SignedInButton = ({user, handleLogout}) => {
                     <Paper>
                         <ClickAwayListener onClickAway={handleClose}>
                             <MenuList autoFocusItem={menuOpen} id="menu-list-grow" onKeyDown={handleListKeyDown}>
-                                <NavLink to="/my_selection" className={classes.link}>
-                                    <MenuItem onClick={handleClose}>
-                                        <ListItemIcon>
-                                            <FavoriteIcon fontSize="small" />
-                                        </ListItemIcon>
-                                        <Typography variant="inherit">Mes favoris</Typography>
-                                    </MenuItem>
-                                </NavLink>
+                                {
+                                    routes.filter(route => route.private).map((route, index) => {
+                                        return (
+                                            <NavLink key={index} to={route.path} className={menuClasses.link}>
+                                                <MenuItem onClick={handleClose}>
+                                                    <ListItemIcon>
+                                                        {route.icon}
+                                                    </ListItemIcon>
+                                                    <Typography variant="inherit">{route.label}</Typography>
+                                                </MenuItem>
+                                            </NavLink>
+                                        );
+                                    })
+                                }
                                 <MenuItem onClick={logout}>
                                     <ListItemIcon>
                                         <ExitToAppIcon fontSize="small" />
