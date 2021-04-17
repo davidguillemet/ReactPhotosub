@@ -111,7 +111,7 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
     // This allow a correct layout when we resize the window while we are at not at the top of the page.
     // If we don't use this calculation, the images at the top won't be loaded yet and the img height won't be known by the browser,
     // that won't be able to layout correctly the top of the columns...
-    const heightFormula = `calc(var(--width)/${image.sizeRatio})`;
+    const imageHeight = width / image.sizeRatio;
 
     return (
         <div
@@ -119,10 +119,9 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
             style={{
                 top: top,
                 left: left,
-                "--width": width,
-                maxWidth: 'var(--width)',
-                width: 'var(--width)',
-                height: heightFormula
+                maxWidth: width,
+                width: width,
+                height: imageHeight
             }}
         >
             <img

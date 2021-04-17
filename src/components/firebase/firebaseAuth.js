@@ -2,20 +2,34 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import FirebaseApp from './firebaseApp';
 import './firebaseui.css';
 import React, { useEffect, useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import Backdrop from '@material-ui/core/Backdrop';
 import Modal from '@material-ui/core/Modal';
 import Fade from '@material-ui/core/Fade';
-import Button from '@material-ui/core/Button';
+import Chip from '@material-ui/core/Chip';
+import IconButton from '@material-ui/core/IconButton';
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import FavoriteIcon from '@material-ui/icons/Favorite';
 import MenuItem from '@material-ui/core/MenuItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import Typography from '@material-ui/core/Typography';
 import Popper from '@material-ui/core/Popper';
 import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import MenuList from '@material-ui/core/MenuList';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { AuthContext } from '../authentication';
+
+const useStyles = makeStyles((theme) => ({
+    link: {
+        textDecoration: 'none',
+        color: theme.palette.text.primary
+    }
+}));
 
 // Configure FirebaseUI.
 const uiConfig = {
@@ -33,36 +47,33 @@ const uiConfig = {
     },
 };
 
-const ConnexionButtonBase = React.forwardRef(({startIcon, onClick, children}, ref) => (
-    <Button
+const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => (
+    <IconButton
         variant="contained"
-        color="primary"
         onClick={onClick}
-        startIcon={startIcon}
         ref={ref}
         style={{
             position: 'absolute',
+            top: '50%',
+            transform: 'translateY(-50%)',
             right: 10,
-            bottom: 10
+            color: 'white'
         }}
     >
-        {children}
-    </Button>
+        <AccountCircleOutlinedIcon />
+    </IconButton>
 ))
 
 const NotSignedInButton = ({handleSignIn}) => {
 
     return (
-        <ConnexionButtonBase
-            onClick={handleSignIn}
-            startIcon={<AccountCircleOutlinedIcon fontSize='large'></AccountCircleOutlinedIcon>}
-        >
-            Connexion
-        </ConnexionButtonBase>
+        <ConnexionButtonBase onClick={handleSignIn} />
     );
 };
 
 const SignedInButton = ({user, handleLogout}) => {
+
+    const classes = useStyles();
 
     const [menuOpen, setMenuOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
@@ -93,13 +104,21 @@ const SignedInButton = ({user, handleLogout}) => {
     
     return (
         <React.Fragment>
-            <ConnexionButtonBase
+
+            <Chip
                 ref={anchorRef}
+                avatar={<AccountCircleOutlinedIcon />}
+                label={user.displayName}
                 onClick={handleToggle}
-                startIcon={<AccountCircleOutlinedIcon fontSize='large'></AccountCircleOutlinedIcon>}
-            >
-                {user.displayName}
-            </ConnexionButtonBase>
+                deleteIcon={<MoreVertIcon />}
+                onDelete={handleToggle}
+                style={{
+                    position: 'absolute',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    right: 20
+                }}
+            />
             <Popper open={menuOpen} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
             {({ TransitionProps, placement }) => (
                 <Grow
@@ -109,12 +128,20 @@ const SignedInButton = ({user, handleLogout}) => {
                     <Paper>
                         <ClickAwayListener onClickAway={handleClose}>
                             <MenuList autoFocusItem={menuOpen} id="menu-list-grow" onKeyDown={handleListKeyDown}>
-                                <Link to="/my_selection" style={{
-                                    textDecoration: 'none'
-                                }}>
-                                    <MenuItem onClick={handleClose}>Mes favoris</MenuItem>
-                                </Link>
-                                <MenuItem onClick={logout}>Deconnexion</MenuItem>
+                                <NavLink to="/my_selection" className={classes.link}>
+                                    <MenuItem onClick={handleClose}>
+                                        <ListItemIcon>
+                                            <FavoriteIcon fontSize="small" />
+                                        </ListItemIcon>
+                                        <Typography variant="inherit">Mes favoris</Typography>
+                                    </MenuItem>
+                                </NavLink>
+                                <MenuItem onClick={logout}>
+                                    <ListItemIcon>
+                                        <ExitToAppIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <Typography variant="inherit">Déconnexion</Typography>
+                                </MenuItem>
                             </MenuList>
                         </ClickAwayListener>
                     </Paper>

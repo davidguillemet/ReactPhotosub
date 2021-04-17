@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles'
-import React, { useState, useRef} from 'react';
+import React, { useState, useRef, useEffect, useCallback} from 'react';
 import Box from '@material-ui/core/Box';
 import Modal from '@material-ui/core/Modal';
 import Fade from '@material-ui/core/Fade';
@@ -32,9 +32,8 @@ const MasonryLayout = ({images, colWidth, margin, containerWidth, onImageClick})
     const columnsCount = Math.floor((containerWidth + margin) / (colWidth + margin));
     const realColumnWidth = (containerWidth - (columnsCount-1)*margin) / columnsCount;
 
-    const pageContainerPadding = 10; // Page padding : TODO use a global value
-    const totalMargin = 2*pageContainerPadding + (columnsCount-1)*margin;
-    const imageWidthCalculation = `calc((100vw - ${totalMargin}px)/${columnsCount})`;
+    const totalMargin = (columnsCount-1)*margin;
+    const imageWidth = (containerWidth - totalMargin) / columnsCount;
 
     // Compute the cumulative height of each column
     const columnTopPosition = Array.from({length: columnsCount}, () => 0);
@@ -54,7 +53,7 @@ const MasonryLayout = ({images, colWidth, margin, containerWidth, onImageClick})
                             onClick={onImageClick}
                             top={imageTop}
                             left={targetColumnIndex*(realColumnWidth+margin)}
-                            width={imageWidthCalculation}
+                            width={imageWidth}
                         />
                     );
                 })
@@ -69,11 +68,19 @@ const MasonryLayout = ({images, colWidth, margin, containerWidth, onImageClick})
 }
 
 const Gallery = ({ images, style, colWidth, margin }) => {
-    const [expandedImage, setExpandedImage] = useState(null);
-    const containerRef = useRef(null);
     const classes = useStyles();
+    const [expandedImage, setExpandedImage] = useState(null);
+    const [containerWidth, setContainerWidth] = useState(0);
 
-    const containerWidth = resizeEffectHook(containerRef);
+    const containerRefCallback = useCallback(element => {
+        if (element !== null) {
+            setContainerWidth(element.clientWidth);
+            const resizeObserver = new ResizeObserver(() => {
+                setContainerWidth(element.clientWidth);
+            });
+            resizeObserver.observe(element);
+        }
+    }, []);
 
     function onImageClick(imageId) {
         setExpandedImage(imageId);
@@ -85,7 +92,7 @@ const Gallery = ({ images, style, colWidth, margin }) => {
 
     return (
         <React.Fragment>
-            <Box className={classes.galleryContainer} ref={containerRef} style={style}>
+            <Box className={classes.galleryContainer} ref={containerRefCallback} style={style}>
             {
                 containerWidth > 0 && 
                 <MasonryLayout
