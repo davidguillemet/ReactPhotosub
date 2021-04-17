@@ -67,6 +67,13 @@ function getFavorites() {
     })
 }
 
+function getImageCount() {
+    return axios.get('/api/images')
+    .then(response => {
+        return response.data;
+    })
+}
+
 const dataProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
@@ -75,7 +82,8 @@ const dataProvider = {
     getUserData: getUserData,
     addFavorite: addFavorite,
     removeFavorite: removeFavorite,
-    getFavorites: getFavorites
+    getFavorites: getFavorites,
+    getImageCount: getImageCount
 }
 
 export default dataProvider;

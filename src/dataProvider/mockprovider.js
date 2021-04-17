@@ -57,6 +57,10 @@ function getFavorites() {
     });
 }
 
+function getImageCount() {
+    return Promise.resolve(86);
+}
+
 const mockProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
@@ -65,7 +69,8 @@ const mockProvider = {
     getUserData: getUserData,
     addFavorite: addFavorite,
     removeFavorite: removeFavorite,
-    getFavorites: getFavorites
+    getFavorites: getFavorites,
+    getImageCount: getImageCount
 };
 
 export default mockProvider;
