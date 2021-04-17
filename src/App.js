@@ -26,6 +26,7 @@ import { routes, useMenuStyles } from './navigation/routes';
 import './App.css';
 import { FirebaseAuth } from './components/firebase';
 import { AuthProvider } from './components/authentication';
+import Footer from './template/footer';
 
 const drawerWidth = 240;
 
@@ -36,7 +37,6 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
     flexDirection: 'column',
     flexWrap: 'wrap',
-    justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden'
   },
@@ -75,13 +75,17 @@ const useStyles = makeStyles((theme) => ({
     ...theme.mixins.toolbar
   },
   content: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh',
     flexGrow: 1,
-    padding: theme.spacing(3),
+    //padding: theme.spacing(3),
+    paddingBottom: 0,
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: -drawerWidth,
+    marginLeft: -drawerWidth
   },
   contentShift: {
     transition: theme.transitions.create('margin', {
@@ -226,8 +230,9 @@ function App(props) {
             }
             </List>
           </Drawer>
-          </nav>
-          <main className={clsx(classes.content, {[classes.contentShift]: open,})}>
+        </nav>
+
+        <main className={clsx(classes.content, {[classes.contentShift]: open,})}>
           <div id="back-to-top-anchor" />
           <div className={classes.drawerHeader} />
           <Container className={classes.pageContainer} maxWidth={false}>
@@ -243,6 +248,7 @@ function App(props) {
             }
             </Switch>
           </Container>
+          <Footer />
         </main>
 
       </Router>
