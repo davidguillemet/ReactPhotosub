@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const express = require("express");
 const {logger/* , makeExpressLoggerMiddleware */} = require("../utils/logger");
-const convertPathToUrl = require("../utils/firebase");
+const {convertPathToUrl, bucket} = require("../utils/firebase");
 const isAuthenticated = require("./authenticated");
 
 // Get a connection pool for postgreSql
@@ -270,6 +270,25 @@ app.route("/favorites")
             logger.error(`Failed to remove ${removedFavorite.path} in favorites for user ${res.locals.uid}.`, err);
             res.status(500).send(`Failed to remove ${removedFavorite.path} in favorites for user ${res.locals.uid}.`).end();
         }
+    });
+
+app.route("/interiors")
+    .get(async function(req, res, next) {
+        // Get all files under the "interiors" folder in the current bucket
+        bucket.getFiles({
+            prefix: "interiors/",
+            delimiter: "/",
+        }).then((filesResponse) => {
+            const [files] = filesResponse;
+            res.json(files
+                .filter((file) => file.metadata.contentType.startsWith("image/"))
+                .map((file) => file.publicUrl()));
+        }).catch((err) => {
+            logger.error("Failed to load interiors.", err);
+            res.status(500)
+                .send("Failed to load interiors.")
+                .end();
+        });
     });
 
 // Search for images

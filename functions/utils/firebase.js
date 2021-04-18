@@ -24,4 +24,7 @@ function convertPathToUrl(imagePath) {
     }
 }
 
-module.exports = convertPathToUrl;
+module.exports = {
+    convertPathToUrl,
+    bucket,
+};
