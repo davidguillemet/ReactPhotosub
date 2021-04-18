@@ -988,5 +988,19 @@
                 "src": "/static-storage/2014/misool/DSC_2029-Modifier.jpg"
             }
         ]
-    }
+    },
+    "interiors": [
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/bedroom-01.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/bedroom-02.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/kidsroom-01.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-01.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-02.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-03.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-04.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-05.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-06.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/office-01.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/office-02.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/outside-01.jpg"
+    ]
 }

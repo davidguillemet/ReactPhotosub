@@ -74,6 +74,13 @@ function getImageCount() {
     })
 }
 
+function getInteriors() {
+    return axios.get('/Api/interiors')
+    .then(response => {
+        return response.data;
+    });
+}
+
 const dataProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
@@ -83,7 +90,8 @@ const dataProvider = {
     addFavorite: addFavorite,
     removeFavorite: removeFavorite,
     getFavorites: getFavorites,
-    getImageCount: getImageCount
+    getImageCount: getImageCount,
+    getInteriors: getInteriors
 }
 
 export default dataProvider;

@@ -2,7 +2,6 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import FirebaseApp from './firebaseApp';
 import './firebaseui.css';
 import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Backdrop from '@material-ui/core/Backdrop';
 import Modal from '@material-ui/core/Modal';
 import Fade from '@material-ui/core/Fade';

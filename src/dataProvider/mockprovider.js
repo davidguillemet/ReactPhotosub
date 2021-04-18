@@ -61,6 +61,12 @@ function getImageCount() {
     return Promise.resolve(86);
 }
 
+function getInteriors() {
+    return fetchhMockData('../../').then(data => {
+        return data.interiors;
+    });
+}
+
 const mockProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
@@ -70,7 +76,8 @@ const mockProvider = {
     addFavorite: addFavorite,
     removeFavorite: removeFavorite,
     getFavorites: getFavorites,
-    getImageCount: getImageCount
+    getImageCount: getImageCount,
+    getInteriors: getInteriors
 };
 
 export default mockProvider;
