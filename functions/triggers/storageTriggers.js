@@ -31,6 +31,9 @@ const {logger} = require("../utils/logger");
 const _baseApiUrl = "https://photosub.web.app";
 
 exports.deleteFile = async function(file) {
+    if (ignoreFile(file)) {
+        return;
+    }
     const fileFullPath = file.name;
     const filePathProps = parse(fileFullPath);
     const fileItemProps = {
@@ -46,10 +49,8 @@ exports.deleteFile = async function(file) {
 };
 
 exports.newFile = async function(file) {
-    const contentType = file.contentType; // File content type
-    // Exit if this is triggered on a file that is not an image.
-    if (!contentType.startsWith("image/")) {
-        return console.log(`${file.name} is not an image.`);
+    if (ignoreFile(file)) {
+        return;
     }
 
     const storage = new Storage();
@@ -166,4 +167,27 @@ function extractGroups(inputString, tags, regex) {
     while ((match = regex.exec(inputString)) !== null) {
         tags.push(match[1].trim().toLowerCase());
     }
+}
+
+function ignoreFile(file) {
+    const contentType = file.contentType; // File content type
+    // Exit if this is triggered on a file that is not an image.
+    if (!contentType.startsWith("image/")) {
+        logger.info(`${file.name} is not an image.`);
+        return true;
+    }
+
+    // Does not process images from homeslideshow
+    if (file.name.startsWith("homeslideshow")) {
+        logger.info(`Home slideshow image ${file.name} is not processed.`);
+        return true;
+    }
+
+    // Does not process interior images
+    if (file.name.startsWith("interiors")) {
+        logger.info(`Interior image ${file.name} is not processed.`);
+        return true;
+    }
+
+    return false;
 }

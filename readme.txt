@@ -14,3 +14,10 @@ npm run-script build
 
 # Deploy the Firebase application
 firebase deploy
+firebase deploy --only functions:newImage
+firebase deploy --only functions:deleteImage
+firebase deploy --only functions:newImage,functions:deleteImage
+
+# test des meta tags open graph (og:title, og:description, og:image)
+# see https://codeburst.io/og-tags-882fd6c7a94e
+==> https://developers.facebook.com/tools/debug/
