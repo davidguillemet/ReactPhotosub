@@ -5,6 +5,7 @@ import Typography from '@material-ui/core/Typography';
 import { formatDate } from '../../utils/utils';
 import dataProvider from '../../dataProvider';
 import { Gallery } from '../../components';
+import PageTitle from '../../template/pageTitle';
 
 import 'fontsource-roboto/400.css';
 import 'fontsource-roboto/100.css';
@@ -34,7 +35,7 @@ const Destination = () => {
 
     return (
         <React.Fragment>
-            <Typography variant="h3" style={{fontWeight: "400"}} component="h1">{destination.title}</Typography>
+            <PageTitle>{destination.title}</PageTitle>
             <Typography variant="h4" style={{fontWeight: "100"}}>{formatDate(new Date(destination.date))}</Typography>
             <Gallery images={images} style={{width: '100%'}} colWidth={300} margin={5}/>
         </React.Fragment>

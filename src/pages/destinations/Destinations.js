@@ -7,6 +7,7 @@ import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { makeStyles } from '@material-ui/core/styles';
 import dataProvider from '../../dataProvider';
+import PageTitle from '../../template/pageTitle';
 
 const useStyles = makeStyles((theme) => ({
     gridList: {
@@ -155,6 +156,7 @@ const Destinations = () => {
 
     return (
         <React.Fragment>
+            <PageTitle>Toutes Les Destinations</PageTitle>
             <RegionPath></RegionPath>
             <Paper variant="elevation" elevation={0} classes={{ root: classes.regionContainer}}>
                 {currentSubRegions.map(region => <Chip key={region.id} label={region.title} onClick={handleRegionClick(region.id)} variant="outlined" />)}

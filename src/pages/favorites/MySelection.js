@@ -4,7 +4,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { AuthContext } from '../../components/authentication';
 import dataProvider from '../../dataProvider';
 import Gallery from '../../components/gallery';
-import { Typography } from '@material-ui/core';
+import PageTitle from '../../template/pageTitle';
 
 const MySelectionContent= ({user, images}) => {
     if (user === null) {
@@ -41,7 +41,7 @@ const MySelection = ({user, favorites, updateUserContext}) => {
 
     return (
         <React.Fragment>
-            <Typography variant="h2">Ma Sélection</Typography>
+            <PageTitle>Ma Sélection</PageTitle>
             <MySelectionContent user={user} images={images} ></MySelectionContent>
         </React.Fragment>
     );

@@ -5,7 +5,6 @@ import Switch from "@material-ui/core/Switch";
 import Box from "@material-ui/core/Box";
 import SearchIcon from '@material-ui/icons/Search';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Typography from '@material-ui/core/Typography';
 import axios from 'axios';
 
 import Paper from '@material-ui/core/Paper';
@@ -15,6 +14,7 @@ import Divider from '@material-ui/core/Divider';
 import HelpIcon from '@material-ui/icons/Help';
 import WarningIcon from '@material-ui/icons/Warning';
 
+import PageTitle from '../../template/pageTitle';
 import dataProvider from '../../dataProvider';
 
 const useStyles = makeStyles((theme) => ({
@@ -162,7 +162,7 @@ const Search = () => {
     
     return (
         <React.Fragment>
-            <Typography variant="h2">Recherche</Typography>
+            <PageTitle>Recherche</PageTitle>
             <Box classes={{
                     root: classes.root
                 }}>

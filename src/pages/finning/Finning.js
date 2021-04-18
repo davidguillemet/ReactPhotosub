@@ -1,10 +1,10 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
+import PageTitle from '../../template/pageTitle';
 
 const Finning = () => {
     return (
         <React.Fragment>
-            <Typography variant="h2">Le Finning, Késako ?</Typography>
+            <PageTitle>Le Finning, Késako ?</PageTitle>
         </React.Fragment>
     );
 };
