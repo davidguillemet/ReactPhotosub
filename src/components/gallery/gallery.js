@@ -1,12 +1,11 @@
 import { makeStyles } from '@material-ui/core/styles'
-import React, { useState, useRef, useEffect, useCallback} from 'react';
+import React, { useState, useCallback} from 'react';
 import Box from '@material-ui/core/Box';
 import Modal from '@material-ui/core/Modal';
 import Fade from '@material-ui/core/Fade';
 import Backdrop from '@material-ui/core/Backdrop';
 import LazyImage from './image';
 import ExpandedView from './expandedView';
-import { resizeEffectHook } from '../../utils/utils';
 
 const useStyles = makeStyles({
     galleryContainer: {
