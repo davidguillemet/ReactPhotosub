@@ -11,7 +11,7 @@ import { resizeEffectHook } from '../../utils/utils';
 
 const thumbnailScollButtonWidth = 50;
 
-const ImageSlider = ({images, currentIndex, onThumbnailClick}) => {
+const ImageSlider = ({images, currentIndex, onThumbnailClick, style}) => {
 
     const [thumbSliderValue, setThumbSliderValue] = useState(0);
     const [thumbContainerProps, setThumbContainerProps] = useState({
@@ -21,19 +21,11 @@ const ImageSlider = ({images, currentIndex, onThumbnailClick}) => {
     });
     const [thumnailScrollActivated, setThumbnailScrollActivated] = useState(false);
 
-    const thumbContainerRef = useRef(null);
-
     const [allThumbnailsLoaded, setAllThumbnailsLoaded] = useState(false);
     const numberOfLoadedThumbnails = useRef(0);
 
-    const thumbContainerRefCallback = useCallback(element => {
-        if (element !== null) {
-            thumbContainerRef.current = element;
-        }
-    }, []);
-    
     const getThumbnailRectAt = useCallback((index) => {
-        if (thumbContainerRef.current === null || index === -1) {
+        if (!allThumbnailsLoaded) {
             return null;
         }
         const thumbnail = thumbContainerRef.current.children[index];
@@ -41,8 +33,29 @@ const ImageSlider = ({images, currentIndex, onThumbnailClick}) => {
             left: thumbnail.offsetLeft - thumbContainerRef.current.offsetLeft,
             width: thumbnail.clientWidth
         };
-    }, []);
+    }, [allThumbnailsLoaded]);
 
+    const thumbContainerRef = useRef(null);
+    const thumbContainerRefCallback = useCallback(element => {
+        if (element !== null) {
+            thumbContainerRef.current = element;
+            setThumbContainerProps(prevState => { return { ...prevState, width: element.clientWidth } });
+            const resizeObserver = new ResizeObserver(() => {
+                // Mahe sure to synchronize the slider with the effective thumbnail scroll position that can
+                // change when resizing the window
+                const lastThumbRect = getThumbnailRectAt(thumbContainerRef.current.children.length - 1);
+                if (lastThumbRect !== null) {
+                    setThumbContainerProps({
+                        width: thumbContainerRef.current.clientWidth,
+                        scrollLeft: thumbContainerRef.current.scrollLeft,
+                        maxScrollLeft: lastThumbRect.left + lastThumbRect.width - thumbContainerRef.current.clientWidth
+                    });
+                }
+            });
+            resizeObserver.observe(element);
+        }
+    }, [getThumbnailRectAt]);
+    
     // HandleResize is a callback to be used as dependency in thumbContainerRefCallback
     const handleResize = useCallback(() => {
         // Mahe sure to synchronize the slider with the effective thumbnail scroll position that can
@@ -54,15 +67,6 @@ const ImageSlider = ({images, currentIndex, onThumbnailClick}) => {
             maxScrollLeft: lastThumbRect.left + lastThumbRect.width - thumbContainerRef.current.clientWidth
         });
     }, [getThumbnailRectAt])
-
-    /*
-    const updateThumbContainerProps = useCallback((newProps, oldProps) => {
-        setThumbContainerProps({
-            ...oldProps,            // Initialize with previous props
-            ...newProps             // And override with new ones
-        })
-    }, []);
-    */
 
     const scrollThumbnailContainer = useCallback((targetScroll) => {
         thumbContainerRef.current.scrollTo({
@@ -100,7 +104,9 @@ const ImageSlider = ({images, currentIndex, onThumbnailClick}) => {
 
     useEffect(() => {
         // Simulate click handle each time th ecurrent index changes
-        handleThumbnailClick(currentIndex);
+        if (currentIndex >= 0) {
+            handleThumbnailClick(currentIndex);
+        }
     }, [currentIndex, handleThumbnailClick]);
 
     useEffect(() => {
@@ -214,8 +220,9 @@ const ImageSlider = ({images, currentIndex, onThumbnailClick}) => {
 
     return (
         <Paper elevation={4} style={{
+            ...style,
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
         }}>
 
             <Slider

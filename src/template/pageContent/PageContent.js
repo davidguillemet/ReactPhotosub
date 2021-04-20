@@ -17,8 +17,7 @@ const useStyles = makeStyles((theme) => ({
       flex: 1,
       flexDirection: 'column',
       flexWrap: 'wrap',
-      alignItems: 'center',
-      overflow: 'hidden'
+      alignItems: 'center'
     }
 }));  
 
