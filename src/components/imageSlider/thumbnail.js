@@ -1,7 +1,16 @@
 import Box from '@material-ui/core/Box';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 
-const Thumbnail = ({ image, index, handleClick, active, onLoadedCallback}) => {
+const Thumbnail = ({
+    image,
+    index,
+    handleClick,
+    active,
+    onLoadedCallback,
+    imageHeight,
+    imageBorderWidth = 3,
+    imageBorderColor = "#000",
+    imageBorderRadius = 3}) => {
 
     function onClick() {
         handleClick(index);
@@ -15,10 +24,11 @@ const Thumbnail = ({ image, index, handleClick, active, onLoadedCallback}) => {
                 alignItems: 'center'
             }}>
             <Box style={{
-                padding: 3,
-                backgroundColor: active === true ? 'black' : null,
-                height: 66,
-                zIndex: 10
+                padding: imageBorderWidth,
+                backgroundColor: active === true ? imageBorderColor : null,
+                height: imageHeight + 2*imageBorderWidth,
+                zIndex: 10,
+                borderRadius: imageBorderRadius
             }}>
                 <img
                     alt=""
@@ -26,8 +36,9 @@ const Thumbnail = ({ image, index, handleClick, active, onLoadedCallback}) => {
                     onLoad={onLoadedCallback}
                     onClick={onClick}
                     style={{
-                        height: '100%',
-                        cursor: 'pointer'
+                        height: imageHeight,
+                        cursor: 'pointer',
+                        borderRadius: imageBorderRadius >= 2 ? imageBorderRadius-2 : 0
                     }} />
             </Box>
             { active === true && <ArrowDropUpIcon color="primary" fontSize="large" style={{ position: 'relative', top: -10, zIndex: 5 }} />}

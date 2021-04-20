@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Slider from '@material-ui/core/Slider';
@@ -11,7 +12,27 @@ import { resizeEffectHook } from '../../utils/utils';
 
 const thumbnailScollButtonWidth = 50;
 
-const ImageSlider = ({images, currentIndex, onThumbnailClick, style}) => {
+const useStyles = makeStyles({
+    sliderScrollButton: {
+        width: thumbnailScollButtonWidth,
+        position: 'relative',
+        top: '50%',
+        transform: 'translateY(-70%)'
+    }
+});
+
+const ImageSlider = ({
+    images,
+    currentIndex,
+    onThumbnailClick,
+    style,
+    imageHeight = 60,
+    imageBorderWidth = 3,
+    indicatorHeight = 14,
+    imageBorderColor = "#000",
+    imageBorderRadius = 3}) => {
+
+    const classes = useStyles();
 
     const [thumbSliderValue, setThumbSliderValue] = useState(0);
     const [thumbContainerProps, setThumbContainerProps] = useState({
@@ -242,7 +263,7 @@ const ImageSlider = ({images, currentIndex, onThumbnailClick, style}) => {
                 alignItems: 'flex-start'
             }}>
 
-                <Box style={{width: thumbnailScollButtonWidth}}>
+                <Box className={classes.sliderScrollButton}>
                     <IconButton onClick={handleThumbnailsScrollLeft} disabled={!thumnailScrollActivated}>
                         <ArrowBackIosRoundedIcon />
                     </IconButton>
@@ -256,7 +277,7 @@ const ImageSlider = ({images, currentIndex, onThumbnailClick, style}) => {
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'flex-start',
-                        height: 80,
+                        height: imageHeight + 2*imageBorderWidth + indicatorHeight,
                         marginTop: 0
                     }}
                 >
@@ -269,12 +290,16 @@ const ImageSlider = ({images, currentIndex, onThumbnailClick, style}) => {
                                 handleClick={handleThumbnailClick}
                                 active={currentIndex === index}
                                 onLoadedCallback={onThumbnailLoadedCallback}
+                                imageHeight={imageHeight}
+                                imageBorderWidth={imageBorderWidth}
+                                imageBorderColor={imageBorderColor}
+                                imageBorderRadius={imageBorderRadius}
                             />
                         )
                     }
                 </Box>
 
-                <Box style={{width: thumbnailScollButtonWidth}}>
+                <Box className={classes.sliderScrollButton}>
                     <IconButton onClick={handleThumbnailsScrollRight} disabled={!thumnailScrollActivated}>
                         <ArrowForwardIosRoundedIcon />
                     </IconButton>

@@ -34,6 +34,9 @@ const Simulation = () => {
                 style={{
                     width: '100%'
                 }}
+                imageHeight={60}
+                imageBorderWidth={3}
+                imageBorderRadius={5}
             />
         </React.Fragment>
     );
