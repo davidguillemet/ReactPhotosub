@@ -7,8 +7,7 @@ import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import Thumbnail from './thumbnail';
-
-import { resizeEffectHook } from '../../utils/utils';
+import './style.css';
 
 const thumbnailScollButtonWidth = 50;
 
@@ -56,39 +55,44 @@ const ImageSlider = ({
         };
     }, [allThumbnailsLoaded]);
 
+    // HandleResize is a callback to be used as dependency in thumbContainerRefCallback
+    const handleResize = useCallback(() => {
+        // Mahe sure to synchronize the slider with the effective thumbnail scroll position that can
+        // change when resizing the window
+        const lastThumbRect = getThumbnailRectAt(thumbContainerRef.current.children.length - 1);
+        if (lastThumbRect !== null) {
+            setThumbContainerProps({
+                width: thumbContainerRef.current.clientWidth,
+                scrollLeft: thumbContainerRef.current.scrollLeft,
+                maxScrollLeft: lastThumbRect.left + lastThumbRect.width - thumbContainerRef.current.clientWidth
+            });
+        }
+    }, [getThumbnailRectAt])
+
     const thumbContainerRef = useRef(null);
     const thumbContainerRefCallback = useCallback(element => {
+        const scrollHandler = (event) => {
+            handleResize();
+        };
+        
         if (element !== null) {
             thumbContainerRef.current = element;
             setThumbContainerProps(prevState => { return { ...prevState, width: element.clientWidth } });
             const resizeObserver = new ResizeObserver(() => {
                 // Mahe sure to synchronize the slider with the effective thumbnail scroll position that can
                 // change when resizing the window
-                const lastThumbRect = getThumbnailRectAt(thumbContainerRef.current.children.length - 1);
-                if (lastThumbRect !== null) {
-                    setThumbContainerProps({
-                        width: thumbContainerRef.current.clientWidth,
-                        scrollLeft: thumbContainerRef.current.scrollLeft,
-                        maxScrollLeft: lastThumbRect.left + lastThumbRect.width - thumbContainerRef.current.clientWidth
-                    });
-                }
+                handleResize();
             });
             resizeObserver.observe(element);
-        }
-    }, [getThumbnailRectAt]);
-    
-    // HandleResize is a callback to be used as dependency in thumbContainerRefCallback
-    const handleResize = useCallback(() => {
-        // Mahe sure to synchronize the slider with the effective thumbnail scroll position that can
-        // change when resizing the window
-        const lastThumbRect = getThumbnailRectAt(thumbContainerRef.current.children.length - 1);
-        setThumbContainerProps({
-            width: thumbContainerRef.current.clientWidth,
-            scrollLeft: thumbContainerRef.current.scrollLeft,
-            maxScrollLeft: lastThumbRect.left + lastThumbRect.width - thumbContainerRef.current.clientWidth
-        });
-    }, [getThumbnailRectAt])
 
+            // Add scroll event:
+            element.addEventListener('scroll', scrollHandler);
+        }
+
+        return () => element.removeEventListener('scroll', scrollHandler);
+
+    }, [handleResize]);
+    
     const scrollThumbnailContainer = useCallback((targetScroll) => {
         thumbContainerRef.current.scrollTo({
             left: targetScroll,
@@ -205,8 +209,6 @@ const ImageSlider = ({
         }
     }, [images]);
 
-    resizeEffectHook(thumbContainerRef, handleResize);
-
     function handleThumbSliderChange(event, newSliderValue) {
         setThumbSliderValue(newSliderValue);
         const scrollValue = newSliderValue * thumbContainerProps.maxScrollLeft / 100;
@@ -271,9 +273,11 @@ const ImageSlider = ({
 
                 <Box
                     ref={thumbContainerRefCallback}
+                    className="hideScroll" 
                     style={{
                         flex: 1,
-                        overflow: 'hidden',
+                        overflowY: 'hidden',
+                        overflowX: 'auto',
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'flex-start',
