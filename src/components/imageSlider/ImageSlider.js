@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
@@ -10,13 +10,12 @@ import Thumbnail from './thumbnail';
 import './style.css';
 
 const thumbnailScollButtonWidth = 50;
+const thumbnailScollButtonHeight = thumbnailScollButtonWidth;
 
 const useStyles = makeStyles({
     sliderScrollButton: {
         width: thumbnailScollButtonWidth,
-        position: 'relative',
-        top: '50%',
-        transform: 'translateY(-70%)'
+        position: 'relative'
     }
 });
 
@@ -32,6 +31,10 @@ const ImageSlider = ({
     imageBorderRadius = 3}) => {
 
     const classes = useStyles();
+    
+    const scrollButtonTopPosition = useMemo(() => {
+        return (imageHeight + imageBorderWidth*2 - thumbnailScollButtonHeight) / 2;
+    }, [imageHeight, imageBorderWidth]);
 
     const [thumbSliderValue, setThumbSliderValue] = useState(0);
     const [thumbContainerProps, setThumbContainerProps] = useState({
@@ -265,7 +268,7 @@ const ImageSlider = ({
                 alignItems: 'flex-start'
             }}>
 
-                <Box className={classes.sliderScrollButton}>
+                <Box className={classes.sliderScrollButton} style={{top: scrollButtonTopPosition}}>
                     <IconButton onClick={handleThumbnailsScrollLeft} disabled={!thumnailScrollActivated}>
                         <ArrowBackIosRoundedIcon />
                     </IconButton>
@@ -303,7 +306,7 @@ const ImageSlider = ({
                     }
                 </Box>
 
-                <Box className={classes.sliderScrollButton}>
+                <Box className={classes.sliderScrollButton} style={{top: scrollButtonTopPosition}}>
                     <IconButton onClick={handleThumbnailsScrollRight} disabled={!thumnailScrollActivated}>
                         <ArrowForwardIosRoundedIcon />
                     </IconButton>
