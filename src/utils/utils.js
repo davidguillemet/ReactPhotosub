@@ -70,3 +70,16 @@ export function useEventListener(eventName, handler){
 	  [eventName] // Re-run if eventName changes
 	);
   };
+
+function chr4() {
+	return Math.random().toString(16).slice(-4);
+}
+
+export function uniqueID() {
+
+    return chr4() + chr4() +
+      '-' + chr4() +
+      '-' + chr4() +
+      '-' + chr4() +
+      '-' + chr4() + chr4() + chr4();
+}
