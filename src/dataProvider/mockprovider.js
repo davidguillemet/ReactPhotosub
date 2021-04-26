@@ -34,10 +34,12 @@ function getDestinationImagesFromPath(year, title) {
 }
 
 const _favorites = new Set();
+const _simulations = [];
 
 function getUserData() {
     return Promise.resolve({
-        favorites: _favorites
+        favorites: _favorites,
+        simulations: _simulations
     });
 }
 
@@ -55,6 +57,35 @@ function getFavorites() {
     return fetchhMockData('../../').then(data => {
         return data.destination.images.filter(image => _favorites.has(`${image.path}/${image.name}`));
     });
+}
+
+function addSimulationIndex(simulations) {
+    simulations.forEach((simulation, index) => {
+        simulation.index = index;
+    });
+    return simulations;
+}
+
+function getSimulations() {
+    return Promise.resolve(addSimulationIndex(_simulations));
+}
+
+function addSimulation(newSimulation) {
+    _simulations.push(newSimulation);
+    return Promise.resolve(addSimulationIndex(_simulations));
+}
+
+function updateSimulation(simulation) {
+    if (simulation.index === undefined) {
+        throw new Error("The simulation to update must contains an index")
+    }
+    _simulations.splice(simulation.index, 1, simulation);
+    return Promise.resolve(addSimulationIndex(_simulations));
+}
+
+function removeSimulation(simulationIndex) {
+    _simulations.splice(simulationIndex, 1);
+    return Promise.resolve(addSimulationIndex(_simulations));
 }
 
 function getImageCount() {
@@ -76,6 +107,10 @@ const mockProvider = {
     addFavorite: addFavorite,
     removeFavorite: removeFavorite,
     getFavorites: getFavorites,
+    getSimulations: getSimulations,
+    addSimulation: addSimulation,
+    updateSimulation: updateSimulation,
+    removeSimulation: removeSimulation,
     getImageCount: getImageCount,
     getInteriors: getInteriors
 };

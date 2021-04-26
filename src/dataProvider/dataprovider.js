@@ -67,6 +67,44 @@ function getFavorites() {
     })
 }
 
+function addSimulationIndex(simulations) {
+    simulations.forEach((simulation, index) => {
+        simulation.index = index;
+    });
+    return simulations;
+}
+
+function getSimulations() {
+    return axios.get('/api/simulations')
+    .then(response => {
+        // we generate an index property that corresponds to the index in the db json array
+        // this index we allow to identify any simulation for deletion or update
+        return addSimulationIndex(response.data.simulations);
+    });
+}
+
+function addSimulation(newSimulation) {
+    return axios.post('/api/simulations', newSimulation)
+    .then(response => {
+        return addSimulationIndex(response.data);
+    });
+}
+
+function updateSimulation(simulation) {
+    // Here, simulation should contain an index property
+    return axios.post('/api/simulations', simulation)
+    .then(response => {
+        return addSimulationIndex(response.data);
+    });
+}
+
+function removeSimulation(simulationIndex) {
+    return axios.delete('/api/simulations', {data: { index: simulationIndex } })
+    .then(response => {
+        return addSimulationIndex(response.data);
+    });
+}
+
 function getImageCount() {
     return axios.get('/api/images')
     .then(response => {
@@ -75,7 +113,7 @@ function getImageCount() {
 }
 
 function getInteriors() {
-    return axios.get('/Api/interiors')
+    return axios.get('/api/interiors')
     .then(response => {
         return response.data;
     });
@@ -90,6 +128,10 @@ const dataProvider = {
     addFavorite: addFavorite,
     removeFavorite: removeFavorite,
     getFavorites: getFavorites,
+    getSimulations: getSimulations,
+    addSimulation: addSimulation,
+    updateSimulation: updateSimulation,
+    removeSimulation: removeSimulation,
     getImageCount: getImageCount,
     getInteriors: getInteriors
 }
