@@ -125,15 +125,19 @@ const ImageSlider = ({
         }
     }, [scrollThumbnailContainer, getThumbnailRectAt]);
 
-    const handleThumbnailClick = useCallback((index) => {
-        onThumbnailClick(index);
+    const handleThumbnailClick = useCallback((index, ignoreClickCallback) => {
+        if (ignoreClickCallback !== true) {
+            // ignoreClickCallback is true when called the current index changed from the parent
+            // In this case, we don't need to notify the parent from the click...
+            onThumbnailClick(index); 
+        }
         handleThumbnailScroll(index);
     }, [handleThumbnailScroll, onThumbnailClick]);
 
     useEffect(() => {
         // Simulate click handle each time th ecurrent index changes
         if (currentIndex >= 0) {
-            handleThumbnailClick(currentIndex);
+            handleThumbnailClick(currentIndex, true);
         }
     }, [currentIndex, handleThumbnailClick]);
 
