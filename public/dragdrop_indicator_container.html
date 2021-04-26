@@ -218,7 +218,7 @@ $(document).ready(function() {
 		ACTIVE_IMAGE: 10 ,
 		LOCK_OVERLAY: 100
 	};
-	let _deviceType = 'desktop';
+	let _deviceType = null;
 	let _indicatorsTimer = null;
 
 	const features = [
@@ -1301,6 +1301,11 @@ $(document).ready(function() {
 	let _buttonTimer = null;  // Timer to collapse the toolbar buttons
 	
 	function initDeviceType(deviceType) {
+
+		if (_deviceType !== null) {
+			// Already initialized
+			return;
+		}
 
 		_deviceType = deviceType;
 
