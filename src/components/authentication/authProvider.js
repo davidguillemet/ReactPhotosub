@@ -22,7 +22,7 @@ const AuthProvider = ({ children }) => {
                 newUser.getIdToken().then(token => {
                     return dataProvider.getUserData(newUser.uid);
                 }).then(userData => {
-                    updateUserContext(newUser, userData.favorites);
+                    updateUserContext(newUser, userData);
                 });
             }
         });
@@ -30,12 +30,12 @@ const AuthProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    function updateUserContext(user, favoritesArray) {
+    function updateUserContext(user, userData) {
         // Transform the favorites array as a Set
         setUserContext({
             user: user,
             data: {
-                favorites: new Set(favoritesArray)
+                favorites: new Set(userData.favorites),
             },
             updateUserContext: updateUserContext
         });
