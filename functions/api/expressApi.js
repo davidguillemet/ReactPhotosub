@@ -24,6 +24,7 @@ const app = express();
 
 // Authentication required for the following routes:
 app.use("/favorites", isAuthenticated);
+app.use("/simulations", isAuthenticated);
 
 // support parsing of application/json type post data
 app.use(express.json());
@@ -189,12 +190,17 @@ app.route("/userdata/:uid")
     // Get all data for a given user
     .get(async function(req, res, next) {
         try {
-            const dataArray = await pool("user_data").select().where("uid", req.params.uid);
+            // get only favorite identifiers for the current user
+            // -> we will fetch simulations on demand
+            const dataArray = await pool("user_data").select("favorites").where("uid", req.params.uid);
             let data = null;
             if (dataArray.length === 0) {
+                // No entry for current user yet.
+                // insert an empty one
                 data = {
                     uid: req.params.uid,
-                    favorites: [],
+                    favorites: [], // favorites is an array field that we initialize with an empty array
+                    simulations: "[]", // simulations is a jsonb field taht we initialize with an empty array
                 };
                 await pool("user_data").insert(data);
             } else {
@@ -252,14 +258,14 @@ app.route("/favorites")
         const newFavorite = req.body;
         try {
             const result = await pool()
-                .raw(`update user_data set favorites = array_cat(favorites, '{${newFavorite.path}}') where uid = '${res.locals.uid}' returning favorites`);
+                .raw(`update user_data set favorites = array_append(favorites, '${newFavorite.path}') where uid = '${res.locals.uid}' returning favorites`);
             res.json(result.rows[0].favorites);
         } catch (err) {
             logger.error(`Failed to add ${newFavorite.path} in favorites for user ${res.locals.uid}.`, err);
             res.status(500).send(`Failed to add ${newFavorite.path} in favorites for user ${res.locals.uid}.`).end();
         }
     })
-    // Remove a favorite for agiven user
+    // Remove a favorite for a given user
     .delete(async function(req, res, next) {
         const removedFavorite = req.body;
         try {
@@ -269,6 +275,58 @@ app.route("/favorites")
         } catch (err) {
             logger.error(`Failed to remove ${removedFavorite.path} in favorites for user ${res.locals.uid}.`, err);
             res.status(500).send(`Failed to remove ${removedFavorite.path} in favorites for user ${res.locals.uid}.`).end();
+        }
+    });
+
+app.route("/simulations")
+    // get all simulations
+    .get(async function(req, res, next) {
+        try {
+            const dataArray = await pool("user_data").select("simulations").where("uid", res.locals.uid);
+            let data = [];
+            if (dataArray.length > 0) {
+                data = dataArray[0];
+            }
+            res.json(data);
+        } catch (err) {
+            logger.error(`Failed to load simulations for uid ${req.params.uid}.`, err);
+            res.status(500)
+                .send(`Unable to load simulations for uid ${req.params.uid}.`)
+                .end();
+        }
+    })
+    // Add or update a simulation for the authenticated user
+    .post(async function(req, res, next) {
+        const newSimulation = req.body;
+        const newSimulationString = JSON.stringify(newSimulation);
+        try {
+            let result = null;
+            if (newSimulation.index === null || newSimulation.index === undefined) {
+                // Add a simulation
+                result = await pool()
+                    .raw(`update user_data set simulations = simulations::jsonb || '${newSimulationString}'::jsonb where uid = '${res.locals.uid}' returning simulations`);
+                res.json(result.rows[0].simulations);
+            } else {
+                // Update a simulation from its index
+                result = await pool()
+                    .raw(`update user_data set simulations = jsonb_set(simulations, '{${newSimulation.index}}', '${newSimulationString}', false) where uid = '${res.locals.uid}' returning simulations`);
+            }
+            res.json(result.rows[0].simulations);
+        } catch (err) {
+            logger.error(`Failed to add a new simulation for user ${res.locals.uid}.`, err);
+            res.status(500).send(`Failed to add a new simulation for user ${res.locals.uid}.`).end();
+        }
+    })
+    // Remove a simulation for the authenticated user
+    .delete(async function(req, res, next) {
+        const deleteData = req.body;
+        try {
+            const result = await pool()
+                .raw(`update user_data set simulations = simulations - ${deleteData.index}' where uid = '${res.locals.uid}' returning simulations`);
+            res.json(result.rows[0].simulations);
+        } catch (err) {
+            logger.error(`Failed to remove simulation #${deleteData.index} for user ${res.locals.uid}.`, err);
+            res.status(500).send(`Failed to remove simulation #${deleteData.index} for user ${res.locals.uid}.`).end();
         }
     });
 
