@@ -4,21 +4,28 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import MenuList from '@material-ui/core/MenuList';
 import Divider from '@material-ui/core/Divider';
 
 const useStyle = makeStyles((theme) => ({
     buttonLabel: {
         textTransform: 'none',
+    },
+    dirtyIcon: {
+        marginLeft: theme.spacing(1)
     }
 }));
 
 const SimulationSplitButtonItem = ({simulation, index, selected, onClick}) => {
+
+    const classes = useStyle();
 
     const handleMenuItemClick = useCallback(() => {
         onClick(index)
@@ -32,6 +39,12 @@ const SimulationSplitButtonItem = ({simulation, index, selected, onClick}) => {
             onClick={handleMenuItemClick}
         >
             {simulation.name}
+            {
+                simulation.isDirty &&
+                <ListItemIcon className={classes.dirtyIcon}>
+                    <ErrorOutlineIcon fontSize="small" />
+                </ListItemIcon>            
+            }
         </MenuItem>
     );
 };
@@ -81,7 +94,15 @@ const SimulationSplitButton = ({simulations, currentIndex, dirty, onSelectionCha
             return "Pas de simulation enregistrée";
         }
 
-        return simulations[selectedIndex].name + (dirty ? " *" : "")
+        return simulations[selectedIndex].name;
+    }
+
+    function getEndIcon() {
+        if (simulations.length === 0 || selectedIndex < 0 || dirty === false) {
+            return null;
+        }
+
+        return <ErrorOutlineIcon fontSize="small"/>
     }
 
     const splitButtonDisabled = simulations.length === 0 || (simulations.length === 1 && selectedIndex < 0);
@@ -96,6 +117,7 @@ const SimulationSplitButton = ({simulations, currentIndex, dirty, onSelectionCha
                             label: classes.buttonLabel
                         }}
                         disabled={splitButtonDisabled}
+                        endIcon={getEndIcon()}
                     >
                         {getCurrentSimulationCaption()}
                     </Button>

@@ -546,6 +546,13 @@ $(document).ready(function() {
 			case "import":
 				importProject(message.data, message.clearBefore, message.source);
 				break;
+			case "clear":
+				removeAll(ActionContext.FROM_MESSAGE);
+				sendMessage({
+					action: "reset",
+					data: getEmptyProject(false)
+				});
+				break;
 			}
 		}
 	};
@@ -619,7 +626,7 @@ $(document).ready(function() {
 	const initialImageWidth = 300;
 	const handleSize = 10;
 	const borderProperties = [];
-	borderProperties['border-color'] = 'white';
+	borderProperties['border-color'] = '#FFFFFF';
 	borderProperties['border-width'] = 2;
 	const activeColor = "#66f542";
 	const inactiveColor = "#666"
@@ -773,7 +780,7 @@ $(document).ready(function() {
 		}
 	}
 	
-	function removeAll() {
+	function removeAll(actionContext) {
 		let index = 0;
 		const isCompositeAction = _actions.isCompositeAction();
 
@@ -789,7 +796,7 @@ $(document).ready(function() {
 		}
 
 		if (!isCompositeAction) {
-			_actions.endCompositeAction(true);
+			_actions.endCompositeAction(actionContext != ActionContext.FROM_MESSAGE);
 		}
 
 		sendUpdateMessage(0);
@@ -818,8 +825,8 @@ $(document).ready(function() {
 		$(containerSelector).remove();
 	}
 
-	function exportProject(target) {
-		const project = {
+	function getEmptyProject(isLocked) {
+		return {
 			// V 2.0 = Adding border size + color
 			// V 3.0 = Adding image height
 			// V 4.0 = adding lock inforation
@@ -831,8 +838,11 @@ $(document).ready(function() {
 				color: borderProperties["border-color"],
 				width: borderProperties["border-width"]
 			},
-			locked: isLocked()
+			locked: isLocked
 		};
+	}
+	function exportProject(target) {
+		const project = getEmptyProject(isLocked());
 		const imageCount = getImageCount();
 		for (let imageIndex = 0; project.images.length < imageCount; imageIndex++) {
 			const containerElement = $(getContainerSelector(imageIndex));
@@ -1448,7 +1458,8 @@ $(document).ready(function() {
     });
 
 	sendMessage({
-		action: 'ready'
+		action: 'ready',
+		project: getEmptyProject(false /* Not locked */) 
 	})
 });
 </script>

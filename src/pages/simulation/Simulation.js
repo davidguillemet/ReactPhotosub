@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
@@ -12,7 +12,9 @@ import Select from '@material-ui/core/Select';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 
-import {unstable_batchedUpdates} from 'react-dom'
+import { Prompt } from "react-router-dom";
+
+import {unstable_batchedUpdates} from 'react-dom';
 
 import BorderInput from './BorderInput';
 import PageTitle from '../../template/pageTitle';
@@ -39,6 +41,7 @@ const borderColors = [
 
 const defaultBorderColor = borderColors[0];
 
+/*
 const localStorageKey = "photosub_simulation";
 
 function getLocalSimulation() {
@@ -56,6 +59,7 @@ function saveLocalSimulation(simulationData, isDirty, name) {
     simulationData.isDirty = isDirty;
     localStorage.setItem(localStorageKey, JSON.stringify(simulationData));
 }
+*/
 
 const useStyle = makeStyles((theme) => ({
     paper: {
@@ -126,6 +130,9 @@ const Simulation = ({ user }) => {
     const [isDirty, setIsDirty] = useState(false);
     const [currentSimulationIndex, setCurrentSimulationIndex] = useState(-1);
 
+    const sandBoxSimulation = useRef(null);
+    const simulationTemplate = useRef(null);
+
     const [feedback, setFeedback] = useState({
         severity: "success",
         message: null,
@@ -146,8 +153,15 @@ const Simulation = ({ user }) => {
         });
     }, []);
 
-    const displaySimulation = useCallback((simulationData) => {
+    const displaySimulation = useCallback((simulationIndex) => {
+
+        const simulationData =
+            simulationIndex >= 0 && simulations.length > 0 ?
+            simulations[simulationIndex] :
+            sandBoxSimulation.current;
+
         if (simulationData === null) {
+            sendMessage({ action: "clear" });
             return;
         }
 
@@ -163,7 +177,7 @@ const Simulation = ({ user }) => {
         } else {
             // TODO: how to manage a missing interior...
         }
-    }, [sendMessage, interiors]);
+    }, [sendMessage, interiors, simulations]);
 
     const iFrameRefCallback = useCallback((node) => {
         if (node !== null) {
@@ -195,6 +209,8 @@ const Simulation = ({ user }) => {
         switch (message.action) {
             case "ready":
             {
+                sandBoxSimulation.current = message.project;
+                simulationTemplate.current = message.project;
                 setFrameIsReady(true);
                 break;
             }
@@ -206,18 +222,30 @@ const Simulation = ({ user }) => {
                 }
                 break;
             }
+            case "reset":
+            {
+                const newSimulationData = message.data;
+                newSimulationData.background = interiors[currentInteriorIndex].src;
+                sandBoxSimulation.current = newSimulationData;
+                break;
+            }
             case "export":
             {
                 // Add the background url
-                message.data["background"] = interiors[currentInteriorIndex].src;
+                const newSimulationData = message.data;
+                newSimulationData.background = interiors[currentInteriorIndex].src;
     
                 if (message.target === 'save') {
                     // Save in local storage
-                    let name = null;
-                    if (currentSimulationIndex >= 0) {
-                        name = simulations[currentSimulationIndex].name;
+                    if (simulations.length > 0 && currentSimulationIndex >= 0) {
+                        const prevSimulation = simulations[currentSimulationIndex];
+                        newSimulationData.isDirty = true;
+                        newSimulationData.name = prevSimulation.name;
+                        newSimulationData.index = prevSimulation.index;
+                        simulations[currentSimulationIndex] = newSimulationData;
+                    } else {
+                        sandBoxSimulation.current = newSimulationData;
                     }
-                    saveLocalSimulation(message.data, true /* isDirty */, name);
                 } else {
                     /* Keep export feature ??
                     wixWindow.openLightbox("SimulationExport", message.data).then(fileUrl => {
@@ -269,7 +297,12 @@ const Simulation = ({ user }) => {
     useEffect(() => {
         if (user !== null) {
             dataProvider.getSimulations().then(res => {
-                setSimulations(res);
+                unstable_batchedUpdates(() => {
+                    setSimulations(res);
+                    if (res.length > 0) {
+                        setCurrentSimulationIndex(0);
+                    }
+                });
             })
         } else {
             setSimulations([]);
@@ -312,25 +345,10 @@ const Simulation = ({ user }) => {
             return;
         }
 
-        let currentSimulation = getLocalSimulation();
-        if (currentSimulation !== null) {
-            if (currentSimulation.name !== null && simulations.length > 0) {
-                // The locally stored simulation has a name
-                // -> find the corresponding user simulation
-                const simulationIndex = simulations.findIndex(simulation => simulation.name === currentSimulation.name);
-                if (simulationIndex !== -1) {
-                    unstable_batchedUpdates(() => {
-                        setCurrentSimulationIndex(simulationIndex);
-                        setIsDirty(currentSimulation.isDirty);
-                    });
-                }
-            }
-        }
-
-        displaySimulation(currentSimulation);
+        displaySimulation(currentSimulationIndex);
         setPageReady(true);
 
-    }, [frameIsReady, interiors, simulations, displaySimulation])
+    }, [frameIsReady, interiors, simulations, pageReady, currentSimulationIndex, displaySimulation])
 
     const onSave = useCallback((name) => {
         // if name is undefined, just save the current simulation without modifying the name
@@ -345,7 +363,7 @@ const Simulation = ({ user }) => {
                 return;
             }
             // get the data from the local storage
-            const projectData = getLocalSimulation();
+            const projectData = sandBoxSimulation.current;
             if (projectData === null) {
                 console.error("The local storage deos not contain any data...");
                 displayFeedback("error", "The local storage deos not contain any data...");
@@ -353,11 +371,10 @@ const Simulation = ({ user }) => {
             }
 
             // Update the project name and set isDirty as false (it will be saved)
-            saveLocalSimulation(projectData, false /* not dirty */, name);
+            projectData.name = name;
 
             dataProvider.addSimulation(projectData).then(res => {
                 // Res contains the new simulations
-                // TODO update simulations
                 unstable_batchedUpdates(() => {
                     setIsDirty(false);
                     setSimulations(res);
@@ -371,24 +388,39 @@ const Simulation = ({ user }) => {
             })
         } else {
             // Save the current simulation
-            const simulationToUpdate = simulations[currentSimulationIndex];
-            if (simulationToUpdate === undefined) {
-                console.error("The simulation to update must contain a valid index");
-                displayFeedback("error", "The simulation to update must contain a valid index");
-            }
-            const projectData = getLocalSimulation();
-            projectData.index = simulationToUpdate.index;
-            saveLocalSimulation(projectData, false /* not dirty */); // Keep same name
-            dataProvider.updateSimulation(projectData).then(res => {
+            const simulationToSave = simulations[currentSimulationIndex];
+
+            let apiPromise =
+                simulationToSave.index === undefined ?
+                dataProvider.addSimulation :  // No index property => new simulation to save
+                dataProvider.updateSimulation; // valid index property => update simulation
+
+            apiPromise(simulationToSave).then(res => {
                 unstable_batchedUpdates(() => {
                     setIsDirty(false);
                     setSimulations(res);
-                    displayFeedback("success", `The simulation '${projectData.name}' has been saved.`);
+                    displayFeedback("success", `The simulation '${simulationToSave.name}' has been saved.`);
                 });
             });
         }
 
     }, [currentSimulationIndex, simulations, displayFeedback]);
+
+    const onAdd = useCallback((name) => {
+        const newSimulation = JSON.parse(JSON.stringify(simulationTemplate.current));
+        newSimulation.name = name;
+        simulations.push(newSimulation);
+        unstable_batchedUpdates(() => {
+            setSimulations([...simulations]);
+            setCurrentSimulationIndex(simulations.length - 1);
+            displayFeedback("success", `The simulation '${name}' has been added.`);
+        });
+        sendMessage({
+            action: "import",
+            clearBefore: true,
+            data: newSimulation
+        });
+    }, [simulations, displayFeedback, sendMessage]);
 
     const onDelete = useCallback(() => {
         if (currentSimulationIndex < 0) {
@@ -406,13 +438,9 @@ const Simulation = ({ user }) => {
 
         dataProvider.removeSimulation(simulationToRemove.index).then(res => {
             const newSimulationIndex = (res && res.length > 0) ? 0 : -1;
-            if (newSimulationIndex >= 0) {
-                // Load the first user simulation
-                const simulationData = res[newSimulationIndex];
-                saveLocalSimulation(simulationData, false);
-            } else {
+            if (newSimulationIndex < 0) {
                 // Back to an empty simulation
-                // TODO
+                sendMessage({ action: "clear" });
             }
             unstable_batchedUpdates(() => {
                 setIsDirty(false);
@@ -422,17 +450,17 @@ const Simulation = ({ user }) => {
             });
         });
 
-    }, [currentSimulationIndex, simulations, displayFeedback]);
+    }, [currentSimulationIndex, simulations, displayFeedback, sendMessage]);
 
     const onInteriorClick = useCallback((interiorIndex) => {
-        const projectData = getLocalSimulation();
+        const projectData = currentSimulationIndex >= 0 ? simulations[currentSimulationIndex] : sandBoxSimulation.current;
         projectData.background = interiors[interiorIndex].src;
-        saveLocalSimulation(projectData, true /* is dirty */); // Keep same name
+        projectData.isDirty = true;
         unstable_batchedUpdates(() => {
             setIsDirty(true);
             setCurrentInteriorIndex(interiorIndex);
         })
-    }, [interiors]);
+    }, [interiors, currentSimulationIndex, simulations]);
     
     function handleChangeInsertNewImage(event) {
         setInsertNewImage(event.target.checked);
@@ -447,6 +475,16 @@ const Simulation = ({ user }) => {
 
     const baseUrl = window.location.origin;
 
+    const promptMessage = useMemo(() => {
+        let message = "Vous avez des modifications en cours sur cette page qui vont être perdues.\n"
+                    + "Cliquez sur OK pour confirmer la navigation.\n"
+                    + "Cliquez sur Annuler pour rester sur cette page et sauvagarder vos modifications";
+        if (user === null) {
+            message += " (connexion requise)";
+        }
+        return message;
+    }, [user]);
+
     return (
         <React.Fragment>
 
@@ -457,9 +495,12 @@ const Simulation = ({ user }) => {
                     currentIndex={currentSimulationIndex}
                     dirty={isDirty}
                     onSave={onSave}
+                    onAdd={onAdd}
                     onDelete={onDelete}
                 />
             }
+
+            <Prompt when={isDirty} message={promptMessage} />
 
             <FeedbackMessage severity={feedback.severity} message={feedback.message} key={feedback.key}/>
 

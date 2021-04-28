@@ -62,6 +62,7 @@ function getFavorites() {
 function addSimulationIndex(simulations) {
     simulations.forEach((simulation, index) => {
         simulation.index = index;
+        delete simulation['isDirty'];
     });
     return simulations;
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {unstable_batchedUpdates} from 'react-dom'
 
 import Button from '@material-ui/core/Button';
@@ -24,15 +24,15 @@ export default function SimulationNameDialog({ open, action = "save", defaultVal
         setActionName(action);
     }, [action]);
 
-    const onNameChanged = (event) => {
+    const onNameChanged = useCallback((event) => {
         unstable_batchedUpdates(() => {
             const newName = event.target.value;
-            if (!validation(newName)) {
+            if (!validation(newName, actionName)) {
                 setHasError(true);
             }
             setName(newName);
         });
-    };
+    }, [actionName, validation]);
 
     const handleClose = () => {
         setIsOpen(false);
@@ -41,12 +41,13 @@ export default function SimulationNameDialog({ open, action = "save", defaultVal
 
     const handleValidate = () => {
         setIsOpen(false);
+        onOpenChanged(false);
         if (onValidate) {
             onValidate(name);
         }
     };
 
-    const getDialogDetails = () => {
+    const getDialogDetails = useCallback(() => {
         if (actionName === "save") {
             return {
                 title: "Sauvegarder",
@@ -57,12 +58,17 @@ export default function SimulationNameDialog({ open, action = "save", defaultVal
                 title: "Renommer",
                 desc: "Renommez votre simulation."
             };
+        } else if (actionName === "new") {
+            return {
+                title: "Nouvelle simulation",
+                desc: "Saisissez un nom pour votre nouvelle simulation."
+            };
         }
         return {
             title: "Unknown action",
             desc: "Unknown action"
         };
-    }
+    }, [actionName]);
 
     const dialogDetails = getDialogDetails();
 

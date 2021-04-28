@@ -9,6 +9,8 @@ import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined'
 import Tooltip from '@material-ui/core/Tooltip';
 import Zoom from '@material-ui/core/Zoom';
 
+import {unstable_batchedUpdates} from 'react-dom';
+
 import SimulationSplitButton from './SimulationSplitButton';
 import SimulationNameDialog from './SimulationNameDlg';
 
@@ -59,9 +61,10 @@ const ButtonWithTooltip = ({tooltip, onClick, disabled, children}) => {
     );
 }
 
-const SimulationToolBar = ({simulations, currentIndex, dirty, onSave, onDelete}) => {
+const SimulationToolBar = ({simulations, currentIndex, dirty, onSave, onAdd, onDelete}) => {
     const [currentSimulationIndex, setCurrentSimulationIndex] = useState(currentIndex);
     const [isDirty, setIsDirty] = useState(dirty);
+    const [action, setAction] = useState("save");
     const [nameDlgOpen, setNameDlgOpen] = useState(false);
 
     useEffect(() => {
@@ -81,23 +84,39 @@ const SimulationToolBar = ({simulations, currentIndex, dirty, onSave, onDelete})
 
     }, [simulations, currentSimulationIndex]);
 
-    const validateSimulationName = useCallback(name => {
-        const sameNameIndex = simulations.findIndex(simulation => simulation.name && simulation.name.toLower() === name);
+    const validateSimulationName = useCallback((name, action) => {
+        const sameNameIndex = simulations.findIndex(simulation => simulation.name && simulation.name.toLowerCase() === name);
         if (sameNameIndex < 0) {
             return true;
         }
-        if (currentIndex === -1) {
-            // new simulation has the same name as an existing one
+
+        // Here, the simulation with index sameNameIndex has the same name
+
+        if (action === "save") {
+            if (currentIndex === -1) {
+                // new simulation has the same name as an existing one
+                return false;
+            }
+            // The name is valid only if the simulation with the same name is the same
+            return (currentIndex === sameNameIndex);
+        } else if (action === "new") {
+            // For a new simulation we cannot enter the same name as another one
             return false;
+        } else if (action === "rename") {
+            // Ok only if the 
+            return (currentIndex === sameNameIndex);
         }
-        // The name is valid only if the simulation with the same name is the same
-        return (currentIndex === sameNameIndex);
+
+        throw new Error(`Unknown action name '${action}'.`);
 
     }, [simulations, currentIndex]);
 
     const handleSave = () => {
         if (currentIndex === - 1) {
-            setNameDlgOpen(true);
+            unstable_batchedUpdates(() => {
+                setAction("save");
+                setNameDlgOpen(true);
+            });
         } else {
             onSave();
         }
@@ -107,6 +126,14 @@ const SimulationToolBar = ({simulations, currentIndex, dirty, onSave, onDelete})
         if (onDelete) {
             onDelete();
         }
+    }
+
+    const handleAdd = () => {
+        // Open dialog to enter a name
+        unstable_batchedUpdates(() => {
+            setAction("new");
+            setNameDlgOpen(true);
+        });
     }
 
     const simulationName = getSimulationName();
@@ -119,11 +146,11 @@ const SimulationToolBar = ({simulations, currentIndex, dirty, onSave, onDelete})
         }}>
             <SimulationNameDialog
                 open={nameDlgOpen}
-                action="save"
+                action={action}
                 defaultValue=""
                 validation={validateSimulationName}
                 onOpenChanged={setNameDlgOpen}
-                onValidate={onSave}
+                onValidate={action === "save" ? onSave : onAdd}
             />
             <Toolbar variant="dense">
                 <ButtonWithTooltip tooltip={`Sauvegarder ${simulationName}`} onClick={handleSave} disabled={currentIndex >= 0 && isDirty === false}>
@@ -134,7 +161,7 @@ const SimulationToolBar = ({simulations, currentIndex, dirty, onSave, onDelete})
                     <DeleteOutlineOutlinedIcon />
                 </ButtonWithTooltip>
 
-                <ButtonWithTooltip tooltip="Ajouter une simulation" onClick={null /* TODO */} disabled={currentIndex === -1}>
+                <ButtonWithTooltip tooltip="Ajouter une simulation" onClick={handleAdd} disabled={currentIndex === -1}>
                     <AddOutlinedIcon />
                 </ButtonWithTooltip>
 
