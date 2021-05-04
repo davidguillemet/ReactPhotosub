@@ -42,7 +42,7 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 
-const SimulationImage = ({image, selected, border, dispatch, onClick, simulationIndex}) => {
+const SimulationImage = ({image, selected, border, dispatch, onClick, simulationIndex, locked}) => {
 
     const classes = useStyle();
 
@@ -95,6 +95,8 @@ const SimulationImage = ({image, selected, border, dispatch, onClick, simulation
             className={classes.container}
             onDragStop={onDragStop}
             onResizeStop={onResizeStop}
+            disableDragging={locked}
+            enableResizing={!locked}
         >
             <img 
                 draggable="false"
@@ -106,7 +108,13 @@ const SimulationImage = ({image, selected, border, dispatch, onClick, simulation
                 }}
             />
             
-            <ButtonGroup variant="contained" color="secondary" aria-label="outlined primary button group" className={clsx(classes.buttonGroup, selected && classes.visibleButtonGroup)} >
+            <ButtonGroup
+                variant="contained"
+                color="secondary"
+                aria-label="outlined primary button group"
+                className={clsx(classes.buttonGroup, selected && classes.visibleButtonGroup)}
+                disabled={locked}
+            >
                 <Button
                     className={selected ? classes.selectdCheck : classes.notSelectdCheck}
                     onClick={handleClick}

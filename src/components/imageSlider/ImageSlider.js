@@ -28,7 +28,8 @@ const ImageSlider = ({
     imageBorderWidth = 3,
     indicatorHeight = 14,
     imageBorderColor = "#000",
-    imageBorderRadius = 3}) => {
+    imageBorderRadius = 3,
+    disabled}) => {
 
     const classes = useStyles();
     
@@ -126,13 +127,18 @@ const ImageSlider = ({
     }, [scrollThumbnailContainer, getThumbnailRectAt]);
 
     const handleThumbnailClick = useCallback((index, ignoreClickCallback) => {
+        if (disabled) {
+            // display a feedback?
+            return;
+        }
+
         if (ignoreClickCallback !== true) {
             // ignoreClickCallback is true when called the current index changed from the parent
             // In this case, we don't need to notify the parent from the click...
             onThumbnailClick(index); 
         }
         handleThumbnailScroll(index);
-    }, [handleThumbnailScroll, onThumbnailClick]);
+    }, [handleThumbnailScroll, onThumbnailClick, disabled]);
 
     useEffect(() => {
         // Simulate click handle each time th ecurrent index changes
@@ -305,6 +311,7 @@ const ImageSlider = ({
                                 imageBorderWidth={imageBorderWidth}
                                 imageBorderColor={imageBorderColor}
                                 imageBorderRadius={imageBorderRadius}
+                                disabled={disabled}
                             />
                         )
                     }

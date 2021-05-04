@@ -10,7 +10,8 @@ const Thumbnail = ({
     imageHeight,
     imageBorderWidth = 3,
     imageBorderColor = "#000",
-    imageBorderRadius = 3}) => {
+    imageBorderRadius = 3,
+    disabled}) => {
 
     function onClick() {
         handleClick(index);
@@ -38,7 +39,8 @@ const Thumbnail = ({
                     style={{
                         height: imageHeight,
                         cursor: 'pointer',
-                        borderRadius: imageBorderRadius >= 2 ? imageBorderRadius-2 : 0
+                        borderRadius: imageBorderRadius >= 2 ? imageBorderRadius-2 : 0,
+                        opacity: disabled ? 0.7 : 1
                     }} />
             </Box>
             { active === true && <ArrowDropUpIcon color="primary" fontSize="large" style={{ position: 'relative', top: -10, zIndex: 5 }} />}

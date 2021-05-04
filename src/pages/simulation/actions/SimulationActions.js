@@ -1,16 +1,18 @@
 import {
+    // Actions for a single image
+    ACTION_UPDATE_IMAGE_SRC,
+    ACTION_MOVE_IMAGE,
+    ACTION_RESIZE_AND_MOVE_IMAGE,
     // Actions for a single simulation
     ACTION_RESIZE,
     ACTION_BACKGROUND,
     ACTION_DELETE_IMAGE,
     ACTION_ADD_IMAGE,
-    ACTION_UPDATE_IMAGE_SRC,
-    ACTION_MOVE_IMAGE,
-    ACTION_RESIZE_AND_MOVE_IMAGE,
     ACTION_BORDER_WIDTH,
     ACTION_BORDER_COLOR,
     ACTION_SET_SIMULATION_DBINDEX,
     ACTION_SET_SIMULATION_DIRTY,
+    ACTION_TOGGLE_LOCK,
     // Actions on simulations' array
     ACTION_LOAD_SIMULATIONS,
     ACTION_SET_CURRENT_SIMULATION_INDEX,
@@ -151,5 +153,12 @@ export function setSimulationDirty(dirty, simulationIndex) {
         type: ACTION_SET_SIMULATION_DIRTY,
         simulationIndex: simulationIndex,
         dirty: dirty
+    };
+}
+
+export function toggleLock(simulationIndex) {
+    return {
+        type: ACTION_TOGGLE_LOCK,
+        simulationIndex: simulationIndex
     };
 }

@@ -17,7 +17,6 @@ import { uniqueID } from '../../utils/utils';
 import simulationsReducer from './actions/SimulationReducer';
 import {
     initSimulations,
-    setCurrentSimulationIndex,
     addSimulation,
     deleteSimulation,
     setSimulationDbIndex,
@@ -135,10 +134,6 @@ const SimulationManager = ({ user }) => {
 
     }, [state, dispatch, displayFeedback]);
 
-    const onSelectionChange = useCallback((index) => {
-        dispatch(setCurrentSimulationIndex(index));
-    }, []);
-
     const promptMessage = useMemo(() => {
         let message = "Des modifications sont en cours.\n"
                     + "Cliquez sur OK pour confirmer la navigation et perdre vos modifications.\n"
@@ -161,7 +156,7 @@ const SimulationManager = ({ user }) => {
                     onSave={onSave}
                     onAdd={onAdd}
                     onDelete={onDelete}
-                    onSelectionChange={onSelectionChange}
+                    dispatch={dispatch}
                 />
             }
 

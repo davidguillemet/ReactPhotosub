@@ -15,6 +15,7 @@ export const ACTION_BORDER_WIDTH = 'simulation:borderWidth';
 export const ACTION_BORDER_COLOR = 'simulation:borderColor';
 export const ACTION_SET_SIMULATION_DBINDEX = 'simulation:setDbIndex';
 export const ACTION_SET_SIMULATION_DIRTY = 'simulation:setDirty';
+export const ACTION_TOGGLE_LOCK = 'simulation:toggleLock';
 
 // Actions on simulations' array
 export const ACTION_LOAD_SIMULATIONS = 'simulations:load';
@@ -168,6 +169,12 @@ function simulationReducer(state, action) {
             return {
                 ...state,
                 [TRANSIENT_PROPERTY_IS_DIRTY]: action.dirty
+            }
+        case ACTION_TOGGLE_LOCK:
+            return {
+                ...state,
+                isLocked: !state.isLocked,
+                [TRANSIENT_PROPERTY_IS_DIRTY]: true
             }
         default:
             if (action.imageId !== undefined) {

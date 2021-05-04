@@ -46,6 +46,7 @@ const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispa
                                 selected={seletedImage === image.id}
                                 onClick={onImageClick}
                                 simulationIndex={simulationIndex}
+                                locked={simulation.isLocked}
                             />
                 })
             }

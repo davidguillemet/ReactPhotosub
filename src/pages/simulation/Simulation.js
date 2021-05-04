@@ -139,6 +139,7 @@ const Simulation = ({simulations, simulationIndex, dispatch}) => {
                 imageHeight={120}
                 imageBorderWidth={3}
                 imageBorderRadius={5}
+                disabled={simulation.isLocked}
             />
             <VerticalSpacing factor={3} />
             <Typography variant="h4" style={{fontWeight: "100"}}>2. Insérez des images</Typography>
@@ -153,6 +154,7 @@ const Simulation = ({simulations, simulationIndex, dispatch}) => {
                 imageHeight={120}
                 imageBorderWidth={3}
                 imageBorderRadius={5}
+                disabled={simulation.isLocked}
             />
 
             <VerticalSpacing factor={3} />

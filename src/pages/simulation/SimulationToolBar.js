@@ -6,6 +6,8 @@ import IconButton from '@material-ui/core/IconButton';
 import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import LockOpenOutlinedIcon from '@material-ui/icons/LockOpenOutlined';
 import Tooltip from '@material-ui/core/Tooltip';
 import Zoom from '@material-ui/core/Zoom';
 
@@ -16,6 +18,10 @@ import SimulationNameDialog from './SimulationNameDlg';
 import {isFromDb, isDirty} from '../../dataProvider';
 
 import {simulationHasName} from './actions/SimulationReducer';
+import {
+    setCurrentSimulationIndex,
+    toggleLock
+} from './actions/SimulationActions';
 
 const useTooltipButtonStyles = makeStyles((theme) => ({
     tooltipLabel: {
@@ -34,7 +40,7 @@ const useTooltipButtonStyles = makeStyles((theme) => ({
   }));
 
 
-const ButtonWithTooltip = ({tooltip, onClick, disabled, children}) => {
+const ButtonWithTooltip = ({tooltip, onClick, disabled, children, style}) => {
 
     const classes = useTooltipButtonStyles();
 
@@ -57,6 +63,7 @@ const ButtonWithTooltip = ({tooltip, onClick, disabled, children}) => {
                 aria-label="menu"
                 onClick={onClick}
                 disabled={disabled}
+                style={style}
             >
                 {children}
             </IconButton>
@@ -64,7 +71,7 @@ const ButtonWithTooltip = ({tooltip, onClick, disabled, children}) => {
     );
 }
 
-const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, onSelectionChange}) => {
+const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, dispatch}) => {
     const [action, setAction] = useState("save");
     const [nameDlgOpen, setNameDlgOpen] = useState(false);
 
@@ -102,6 +109,14 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
         });
     }
 
+    const onSelectionChange = (index) => {
+        dispatch(setCurrentSimulationIndex(index));
+    }
+
+    const handleToggleLock = () => {
+        dispatch(toggleLock(currentIndex));
+    }
+
     return (
         <Paper style={{
             position: "fixed",
@@ -122,12 +137,18 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     <SaveOutlinedIcon />
                 </ButtonWithTooltip>
 
-                <ButtonWithTooltip tooltip={`Supprimer "${simulation.name}"`} onClick={handleDelete} disabled={simulations.length === 1 && isFromDb(simulations[0]) === false}>
-                    <DeleteOutlineOutlinedIcon />
-                </ButtonWithTooltip>
-
                 <ButtonWithTooltip tooltip="Ajouter une simulation" onClick={handleAdd} >
                     <AddOutlinedIcon />
+                </ButtonWithTooltip>
+
+                <ButtonWithTooltip
+                    tooltip={simulation.isLocked ? `Déverrouiller "${simulation.name}"`: `Verrouiller "${simulation.name}"`}
+                    onClick={handleToggleLock} >
+                    {
+                        simulation.isLocked ?
+                        <LockOpenOutlinedIcon /> :
+                        <LockOutlinedIcon />
+                    }
                 </ButtonWithTooltip>
 
                 <SimulationSplitButton
@@ -135,6 +156,19 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     currentIndex={currentIndex}
                     onSelectionChange={onSelectionChange}
                 />
+
+                <ButtonWithTooltip
+                    tooltip={`Supprimer "${simulation.name}"`}
+                    onClick={handleDelete}
+                    disabled={simulations.length === 1 && isFromDb(simulations[0]) === false}
+                    style={{
+                        marginLeft: 0,
+                        marginRight: -12
+                    }}
+                >
+                    <DeleteOutlineOutlinedIcon />
+                </ButtonWithTooltip>
+
             </Toolbar>
         </Paper>
     );
