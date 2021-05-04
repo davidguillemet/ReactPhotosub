@@ -3,7 +3,7 @@ import Destinations from "../pages/destinations";
 import Destination from "../pages/destination";
 import Search from "../pages/search";
 import Finning from "../pages/finning";
-import Simulation from "../pages/simulation";
+import SimulationManager from "../pages/simulation";
 import MySelection from "../pages/favorites";
 
 import HomeIcon from '@material-ui/icons/Home';
@@ -46,7 +46,7 @@ export const routes = [
     {
         label: "Simulation",
         path: "/simulation",
-        component: <Simulation/>,
+        component: <SimulationManager/>,
         icon: <HomeIcon />, // TODO
         sidebar: true
     },

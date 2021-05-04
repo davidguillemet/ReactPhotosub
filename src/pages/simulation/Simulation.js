@@ -1,36 +1,24 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
-import LockIcon from '@material-ui/icons/Lock';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
-
-import { Prompt } from "react-router-dom";
-
 import {unstable_batchedUpdates} from 'react-dom';
 
 import BorderInput from './BorderInput';
-import PageTitle from '../../template/pageTitle';
 import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import ImageSlider from '../../components/imageSlider';
 import dataProvider from '../../dataProvider';
-import SimulationToolBar from './SimulationToolBar';
+import SimulationDisplay from './SimulationDisplay';
 
-import { AuthContext } from '../../components/authentication';
-import { uniqueID } from '../../utils/utils';
+import {setBackground, resize, borderWidth, borderColor, addImage, setImage} from './actions/SimulationActions';
+
+import { useResizeObserver } from '../../components/hooks';
 
 import 'fontsource-roboto/100.css';
-
-const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
-
-const defaultBorderWidth = 2;
 
 const borderColors = [
     "#FFFFFF",
@@ -38,28 +26,6 @@ const borderColors = [
     "#999999",
     "#8B4513",
 ];
-
-const defaultBorderColor = borderColors[0];
-
-/*
-const localStorageKey = "photosub_simulation";
-
-function getLocalSimulation() {
-    const localSimulationString = localStorage.getItem(localStorageKey);
-    if (localSimulationString === null) {
-        return null;
-    }
-    return JSON.parse(localSimulationString);
-}
-
-function saveLocalSimulation(simulationData, isDirty, name) {
-    if (name !== null && name !== undefined) {
-        simulationData.name = name;
-    }
-    simulationData.isDirty = isDirty;
-    localStorage.setItem(localStorageKey, JSON.stringify(simulationData));
-}
-*/
 
 const useStyle = makeStyles((theme) => ({
     paper: {
@@ -69,245 +35,53 @@ const useStyle = makeStyles((theme) => ({
     }
 }));
 
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
-const FeedbackMessage = ({severity, message}) => {
-
-    const [feedback, setFeedback] = useState({
-        severity: "success",
-        message: null,
-        open: false
-    });
-
-    useEffect(() => {
-        setFeedback({
-            severity: severity,
-            message: message,
-            open: message !== null
-        });
-    }, [severity, message]);
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setFeedback(prevFeedBack => {
-            return {
-                ...prevFeedBack,
-                open: false
-            }
-        });
-    };
-
-    return (
-        <Snackbar open={feedback.open} autoHideDuration={6000} onClose={handleClose}>
-            <Alert onClose={handleClose} severity={feedback.severity}>
-            {feedback.message}
-            </Alert>
-      </Snackbar>
-    );
-};
-
-const Simulation = ({ user }) => {
+const Simulation = ({simulations, simulationIndex, dispatch}) => {
 
     const classes = useStyle();
 
-    const [pageReady, setPageReady] = useState(false);
-    const [frameIsReady, setFrameIsReady] = useState(false);
-
-    const [simulations, setSimulations] = useState(null);
     const [interiors, setInteriors] = useState(null);
     const [images, setImages] = useState([]);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
 
-    const [insertNewImage, setInsertNewImage] = useState(false);
-    const [borderWidth, setBorderWidth] = useState(defaultBorderWidth);
-    const [borderColor, setBorderColor] = useState(defaultBorderColor);
-    const [imageCount, setImageCount] = useState(0);
-    const [isLocked, setIsLocked] = useState(false);
-    const [isDirty, setIsDirty] = useState(false);
-    const [currentSimulationIndex, setCurrentSimulationIndex] = useState(-1);
+    const [currentImageId, setCurrentImageId] = useState(null);
 
-    const sandBoxSimulation = useRef(null);
-    const simulationTemplate = useRef(null);
+    const simulation = useMemo(() => simulations[simulationIndex], [simulations, simulationIndex]);
 
-    const [feedback, setFeedback] = useState({
-        severity: "success",
-        message: null,
-        key: uniqueID()
-    })
+    const handleResize = useCallback(({width, height}) => {
+        dispatch(resize(width, simulationIndex));
+    }, [simulationIndex, dispatch]);
 
-    const iFrameRef = useRef(null);
+    const resizeObserver = useResizeObserver(handleResize);
 
-    const sendMessage = useCallback((msg) => {
-        iFrameRef.current.contentWindow.postMessage(msg, "*");
-    }, []);
-
-    const displayFeedback = useCallback((severity, message) => {
-        setFeedback({
-            severity: severity,
-            message: message,
-            key: uniqueID()
-        });
-    }, []);
-
-    const displaySimulation = useCallback((simulationIndex) => {
-
-        const simulationData =
-            simulationIndex >= 0 && simulations.length > 0 ?
-            simulations[simulationIndex] :
-            sandBoxSimulation.current;
-
-        if (simulationData === null) {
-            sendMessage({ action: "clear" });
+    useEffect(() => {
+        if (interiors === null) {
             return;
         }
-
-        sendMessage({
-            action: 'import',
-            data: simulationData,
-            clearBefore: false,
-            source: 'save'
-        });
-        const interiorIndex = interiors.findIndex(interior => interior.src === simulationData.background);
-        if (interiorIndex !== -1) {
-            setCurrentInteriorIndex(interiorIndex);
-        } else {
-            // TODO: how to manage a missing interior...
-        }
-    }, [sendMessage, interiors, simulations]);
-
-    const iFrameRefCallback = useCallback((node) => {
-        if (node !== null) {
-            iFrameRef.current = node;
-        }
-    }, []);
+        dispatch(setBackground(interiors[0].src, false /* Don't replace if not null */, simulationIndex));
+        setCurrentInteriorIndex(interiors.findIndex(interior => interior.src === simulation.background));
+    }, [simulation, simulationIndex, interiors, dispatch])
 
     const handleBorderWidthChange = useCallback((newBorderWidth) => {
-        setBorderWidth(newBorderWidth);
-        sendMessage({
-            action: 'border',
-            property: 'border-width',
-            value: newBorderWidth
-        });
-    }, [sendMessage]);
+        dispatch(borderWidth(newBorderWidth, simulationIndex));
+    }, [dispatch, simulationIndex]);
 
     const handleBorderColorChange = useCallback((event) => {
         const newBorderColor = event.target.value;
-        setBorderColor(newBorderColor);
-        sendMessage({
-            action: 'border',
-            property: 'border-color',
-            value: newBorderColor
+        dispatch(borderColor(newBorderColor, simulationIndex));
+    }, [dispatch, simulationIndex]);
+
+    const handleSetCurrentImageId = useCallback((id) => {
+        setCurrentImageId(prevCurrentId => {
+            return prevCurrentId === id ? null : id;
         });
-    }, [sendMessage]);
+    }, [])
 
-    const handleMessageEvent = useCallback((messageEvent) => {
-        const message = messageEvent.data;
-        switch (message.action) {
-            case "ready":
-            {
-                sandBoxSimulation.current = message.project;
-                simulationTemplate.current = message.project;
-                setFrameIsReady(true);
-                break;
-            }
-            case "update":
-            {
-                setImageCount(message.count);
-                if (message.count === 0) {
-                    setInsertNewImage(false);
-                }
-                break;
-            }
-            case "reset":
-            {
-                const newSimulationData = message.data;
-                newSimulationData.background = interiors[currentInteriorIndex].src;
-                sandBoxSimulation.current = newSimulationData;
-                break;
-            }
-            case "export":
-            {
-                // Add the background url
-                const newSimulationData = message.data;
-                newSimulationData.background = interiors[currentInteriorIndex].src;
-    
-                if (message.target === 'save') {
-                    // Save in local storage
-                    if (simulations.length > 0 && currentSimulationIndex >= 0) {
-                        const prevSimulation = simulations[currentSimulationIndex];
-                        newSimulationData.isDirty = true;
-                        newSimulationData.name = prevSimulation.name;
-                        newSimulationData.index = prevSimulation.index;
-                        simulations[currentSimulationIndex] = newSimulationData;
-                    } else {
-                        sandBoxSimulation.current = newSimulationData;
-                    }
-                } else {
-                    /* Keep export feature ??
-                    wixWindow.openLightbox("SimulationExport", message.data).then(fileUrl => {
-                        wixLocation.to(fileUrl);
-                    });
-                    */
-                }
-                setIsDirty(true);
-                break;
-            }
-            case "border":
-            {
-                if (message.property === 'border-width')
-                {
-                    setBorderWidth(message.value);
-                } else if (message.property === 'border-color') {
-                    setBorderColor(message.value);
-                }
-                break;
-            }
-            case 'lock':
-            {
-                setIsLocked(message.isLocked);
-                break;
-            }
-            default:
-                console.error("Unknown message :");
-                console.log(message);
-        }
-    }, [simulations, currentSimulationIndex, interiors, currentInteriorIndex]);
-
-    useEffect(() => {
-        if (frameIsReady) {
-            sendMessage({
-                action: 'device',
-                device: 'desktop' // TODO 'mobile'
-            });
-        }
-    }, [frameIsReady, sendMessage]);
-
-    useEffect(() => {
-        window.addEventListener("message", handleMessageEvent)
-        // clean up
-        return () => window.removeEventListener("message", handleMessageEvent)
-    }, [handleMessageEvent]);
-
-    // load simulations if connected
-    // -> simulations won't be null after this hook execution
-    useEffect(() => {
-        if (user !== null) {
-            dataProvider.getSimulations().then(res => {
-                unstable_batchedUpdates(() => {
-                    setSimulations(res);
-                    if (res.length > 0) {
-                        setCurrentSimulationIndex(0);
-                    }
-                });
-            })
-        } else {
-            setSimulations([]);
-        }
-    }, [user]);
+    const onInteriorClick = useCallback((interiorIndex) => {
+        unstable_batchedUpdates(() => {
+            setCurrentInteriorIndex(interiorIndex);
+            dispatch(setBackground(interiors[interiorIndex].src, true /* Replace */, simulationIndex));
+        });
+    }, [interiors, dispatch, simulationIndex]);
 
     // Load interiors
     useEffect(() => {
@@ -336,177 +110,24 @@ const Simulation = ({ user }) => {
         })
     }, []);
 
-    // Load possible simulation from local storage and merge with user simulations if needed
-    useEffect(() => {
-        if (pageReady === true ||      // The page is already initialized (don(t display the simulation twice)
-            frameIsReady ===  false || // Wait for the iFrame being loaded and ready
-            interiors === null ||      // Wait for the interiors to be loaded (need to update the selected interior)
-            simulations === null) {    // Wait for the possible user simulations being loaded (!= null)
-            return;
-        }
+    const onSelectImage = useCallback((index) => {
 
-        displaySimulation(currentSimulationIndex);
-        setPageReady(true);
-
-    }, [frameIsReady, interiors, simulations, pageReady, currentSimulationIndex, displaySimulation])
-
-    const onSave = useCallback((name) => {
-        // if name is undefined, just save the current simulation without modifying the name
-        // if name is defined, eiher save a new simulation (currentSimulationIndex = -1),
-        // or just update the current one (currentSimulationIndex != -1)
-        if (currentSimulationIndex === -1) {
-            // The name must be defined
-            if (!name) {
-                console.error("The current index is -1 -> a name must de defined");
-                displayFeedback("error", "The current index is -1 -> a name must de defined");
-                // TODO : show error message
-                return;
-            }
-            // get the data from the local storage
-            const projectData = sandBoxSimulation.current;
-            if (projectData === null) {
-                console.error("The local storage deos not contain any data...");
-                displayFeedback("error", "The local storage deos not contain any data...");
-                return;
-            }
-
-            // Update the project name and set isDirty as false (it will be saved)
-            projectData.name = name;
-
-            dataProvider.addSimulation(projectData).then(res => {
-                // Res contains the new simulations
-                unstable_batchedUpdates(() => {
-                    setIsDirty(false);
-                    setSimulations(res);
-                    setCurrentSimulationIndex(res.findIndex(simulation => simulation.name === name));
-                    displayFeedback("success", `The simulation '${name}' has been saved.`);
-                });
-            }).catch (err => {
-                console.error("error while saving the simulation:");
-                console.error(err);
-                displayFeedback("error", "Error while saving the simulation...");
-            })
+        const imageSrc = images[index].src;
+        if (currentImageId === null) {
+            dispatch(addImage(imageSrc, resizeObserver.width, simulationIndex));
         } else {
-            // Save the current simulation
-            const simulationToSave = simulations[currentSimulationIndex];
-
-            let apiPromise =
-                simulationToSave.index === undefined ?
-                dataProvider.addSimulation :  // No index property => new simulation to save
-                dataProvider.updateSimulation; // valid index property => update simulation
-
-            apiPromise(simulationToSave).then(res => {
-                unstable_batchedUpdates(() => {
-                    setIsDirty(false);
-                    setSimulations(res);
-                    displayFeedback("success", `The simulation '${simulationToSave.name}' has been saved.`);
-                });
-            });
+            // Update image :
+            // - How to know the index ??
+            // - How to update the image in the reducer ??
+            dispatch(setImage(imageSrc, currentImageId, simulationIndex));
         }
 
-    }, [currentSimulationIndex, simulations, displayFeedback]);
-
-    const onAdd = useCallback((name) => {
-        const newSimulation = JSON.parse(JSON.stringify(simulationTemplate.current));
-        newSimulation.name = name;
-        simulations.push(newSimulation);
-        unstable_batchedUpdates(() => {
-            setSimulations([...simulations]);
-            setCurrentSimulationIndex(simulations.length - 1);
-            displayFeedback("success", `The simulation '${name}' has been added.`);
-        });
-        sendMessage({
-            action: "import",
-            clearBefore: true,
-            data: newSimulation
-        });
-    }, [simulations, displayFeedback, sendMessage]);
-
-    const onDelete = useCallback(() => {
-        if (currentSimulationIndex < 0) {
-            // Must not happen...
-            displayFeedback("error", "The current simulation index is not valid.");
-            return;
-        }
-
-        const simulationToRemove = simulations[currentSimulationIndex];
-        const simulationIndex = simulationToRemove.index;
-
-        if (simulationIndex === null || simulationIndex === undefined) {
-            displayFeedback("error", `The simulation '${simulationToRemove.name}' shall contain an index and cannot be removed.`);
-        }
-
-        dataProvider.removeSimulation(simulationToRemove.index).then(res => {
-            const newSimulationIndex = (res && res.length > 0) ? 0 : -1;
-            if (newSimulationIndex < 0) {
-                // Back to an empty simulation
-                sendMessage({ action: "clear" });
-            }
-            unstable_batchedUpdates(() => {
-                setIsDirty(false);
-                setSimulations(res);
-                setCurrentSimulationIndex(newSimulationIndex);
-                displayFeedback("success", `The simulation '${simulationToRemove.name}' has been removed.`);
-            });
-        });
-
-    }, [currentSimulationIndex, simulations, displayFeedback, sendMessage]);
-
-    const onInteriorClick = useCallback((interiorIndex) => {
-        const projectData = currentSimulationIndex >= 0 ? simulations[currentSimulationIndex] : sandBoxSimulation.current;
-        projectData.background = interiors[interiorIndex].src;
-        projectData.isDirty = true;
-        unstable_batchedUpdates(() => {
-            setIsDirty(true);
-            setCurrentInteriorIndex(interiorIndex);
-        })
-    }, [interiors, currentSimulationIndex, simulations]);
-    
-    function handleChangeInsertNewImage(event) {
-        setInsertNewImage(event.target.checked);
-    }
-
-    function selectImage(index) {
-        sendMessage({
-            action: insertNewImage === true ? "add" : "set",
-            image: images[index].src
-        });
-    }
-
-    const baseUrl = window.location.origin;
-
-    const promptMessage = useMemo(() => {
-        let message = "Vous avez des modifications en cours sur cette page qui vont être perdues.\n"
-                    + "Cliquez sur OK pour confirmer la navigation.\n"
-                    + "Cliquez sur Annuler pour rester sur cette page et sauvagarder vos modifications";
-        if (user === null) {
-            message += " (connexion requise)";
-        }
-        return message;
-    }, [user]);
+    }, [images, currentImageId, dispatch, simulationIndex, resizeObserver.width]);
 
     return (
         <React.Fragment>
 
-            {
-                user && pageReady &&
-                <SimulationToolBar
-                    simulations={simulations}
-                    currentIndex={currentSimulationIndex}
-                    dirty={isDirty}
-                    onSave={onSave}
-                    onAdd={onAdd}
-                    onDelete={onDelete}
-                />
-            }
-
-            <Prompt when={isDirty} message={promptMessage} />
-
-            <FeedbackMessage severity={feedback.severity} message={feedback.message} key={feedback.key}/>
-
-            <PageTitle>Simulation</PageTitle>
-            <VerticalSpacing factor={3} />
-            <Typography variant="h4" style={{fontWeight: "100"}}>1. Sélectionnez une ambiance d'intérieur</Typography>
+            <Typography variant="h4" style={{fontWeight: "100"}}>1. Sélectionnez une ambiance</Typography>
             <ImageSlider
                 images={interiors ?? []}
                 currentIndex={currentInteriorIndex}
@@ -520,11 +141,11 @@ const Simulation = ({ user }) => {
                 imageBorderRadius={5}
             />
             <VerticalSpacing factor={3} />
-            <Typography variant="h4" style={{fontWeight: "100"}}>2. Sélectionnez une image</Typography>
+            <Typography variant="h4" style={{fontWeight: "100"}}>2. Insérez des images</Typography>
             <ImageSlider
                 images={images}
                 currentIndex={-1}
-                onThumbnailClick={selectImage}
+                onThumbnailClick={onSelectImage}
                 style={{
                     maxWidth: 1200,
                     width: '100%'
@@ -533,20 +154,8 @@ const Simulation = ({ user }) => {
                 imageBorderWidth={3}
                 imageBorderRadius={5}
             />
-            <VerticalSpacing factor={1} />
-            <FormControlLabel
-                control={
-                    <Switch
-                        checked={insertNewImage}
-                        onChange={handleChangeInsertNewImage}
-                        name="insertNewImage"
-                        color="primary"
-                        disabled={imageCount === 0}
-                />}
-                label="Insérer une nouvelle image"
-            />
 
-            <VerticalSpacing factor={2} />
+            <VerticalSpacing factor={3} />
 
             <Box style={{
                 display: 'flex',
@@ -554,10 +163,10 @@ const Simulation = ({ user }) => {
                 <Typography variant="h5" style={{fontWeight: "100"}}>Epaisseur du cadre</Typography>
                 <HorizontalSpacing factor={2} />
                 <BorderInput
-                    value={borderWidth}
+                    value={simulation.border.width}
                     onChange={handleBorderWidthChange}
                     width={200}
-                    disabled={isLocked}
+                    disabled={simulation.isLocked}
                 />
             </Box>
 
@@ -572,9 +181,9 @@ const Simulation = ({ user }) => {
                     <Select
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        value={borderColor}
+                        value={simulation.border.color}
                         onChange={handleBorderColorChange}
-                        disabled={isLocked}
+                        disabled={simulation.isLocked}
                     >
                         {
                             borderColors.map((color, index) => {
@@ -601,59 +210,19 @@ const Simulation = ({ user }) => {
 
             <VerticalSpacing factor={3} />
 
-            <Box style={{
-                width: '100%',
-                maxWidth: 1200,
-                position: 'relative'
-            }}>
-                <img
-                    alt=""
-                    border="0"
-                    src={currentInteriorIndex >= 0 ? interiors[currentInteriorIndex].src : placeHolder}
-                    style={{
-                        width: '100%'
-                    }}
-                />
-                <iframe
-                    ref={iFrameRefCallback}
-                    title="Simulation Frame"
-                    frameBorder="0"
-                    scrolling="no"
-                    src={`${baseUrl}/dragdrop_indicator_container.html`}
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%'
-                    }}>
-                </iframe>
-                { 
-                    isLocked && <LockIcon fontSize='large' style={{
-                        position: "absolute",
-                        top: 10,
-                        left: 10
-                    }}/>
-                }
-            </Box>
+            {
+                /* Wait for the background being initialized for new simulation */
+                <SimulationDisplay
+                    ref={resizeObserver.ref}
+                    simulations={simulations}
+                    simulationIndex={simulationIndex}
+                    dispatch={dispatch}
+                    onImageClick={handleSetCurrentImageId}
+                    seletedImage={currentImageId}/>
+            }
+
         </React.Fragment>
     );
 };
 
-const SimulationConsumer = (props) => {
-    return (
-        <AuthContext.Consumer>
-            { ({user, data, updateUserContext}) => {
-                return (
-                    <Simulation
-                        user={user}
-                        updateUserContext={updateUserContext}
-                        {...props}
-                    />
-                );
-            }}
-        </AuthContext.Consumer>
-    );
-}
-
-export default SimulationConsumer;
+export default Simulation;

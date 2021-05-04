@@ -1,6 +1,13 @@
 import axios from 'axios';
 import { FirebaseApp } from '../components/firebase';
 
+import {
+    TRANSIENT_PROPERTY_DB_INDEX,
+    deleteTransientProperties,
+    setDbIndex,
+    getDbIndex,
+} from './common';
+
 // Add a request interceptor
 axios.interceptors.request.use(async function (config) {
     if (FirebaseApp.auth().currentUser) {
@@ -67,9 +74,9 @@ function getFavorites() {
     })
 }
 
-function addSimulationIndex(simulations) {
+function _addSimulationDbIndex(simulations) {
     simulations.forEach((simulation, index) => {
-        simulation.index = index;
+        setDbIndex(simulation, index);
     });
     return simulations;
 }
@@ -79,29 +86,32 @@ function getSimulations() {
     .then(response => {
         // we generate an index property that corresponds to the index in the db json array
         // this index we allow to identify any simulation for deletion or update
-        return addSimulationIndex(response.data.simulations);
+        return _addSimulationDbIndex(response.data.simulations);
     });
 }
 
 function addSimulation(newSimulation) {
+    deleteTransientProperties(newSimulation);
     return axios.post('/api/simulations', newSimulation)
     .then(response => {
-        return addSimulationIndex(response.data);
+        return _addSimulationDbIndex(response.data);
     });
 }
 
 function updateSimulation(simulation) {
+    // Delete transient properties but keep dbindex
+    deleteTransientProperties(simulation, [TRANSIENT_PROPERTY_DB_INDEX]);
     // Here, simulation should contain an index property
     return axios.post('/api/simulations', simulation)
     .then(response => {
-        return addSimulationIndex(response.data);
+        return _addSimulationDbIndex(response.data);
     });
 }
 
-function removeSimulation(simulationIndex) {
-    return axios.delete('/api/simulations', {data: { index: simulationIndex } })
+function removeSimulation(simulation) {
+    return axios.delete('/api/simulations', {data: { index: getDbIndex(simulation) } })
     .then(response => {
-        return addSimulationIndex(response.data);
+        return _addSimulationDbIndex(response.data);
     });
 }
 

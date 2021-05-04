@@ -301,7 +301,7 @@ app.route("/simulations")
         const newSimulationString = JSON.stringify(newSimulation);
         try {
             let result = null;
-            if (newSimulation.index === null || newSimulation.index === undefined) {
+            if (newSimulation.dbindex === null || newSimulation.dbindex === undefined) {
                 // Add a simulation
                 result = await pool()
                     .raw(`update user_data set simulations = simulations::jsonb || '${newSimulationString}'::jsonb where uid = '${res.locals.uid}' returning simulations`);
@@ -309,7 +309,7 @@ app.route("/simulations")
             } else {
                 // Update a simulation from its index
                 result = await pool()
-                    .raw(`update user_data set simulations = jsonb_set(simulations, '{${newSimulation.index}}', '${newSimulationString}', false) where uid = '${res.locals.uid}' returning simulations`);
+                    .raw(`update user_data set simulations = jsonb_set(simulations, '{${newSimulation.dbindex}}', '${newSimulationString}', false) where uid = '${res.locals.uid}' returning simulations`);
             }
             res.json(result.rows[0].simulations);
         } catch (err) {
@@ -322,11 +322,11 @@ app.route("/simulations")
         const deleteData = req.body;
         try {
             const result = await pool()
-                .raw(`update user_data set simulations = simulations - ${deleteData.index}' where uid = '${res.locals.uid}' returning simulations`);
+                .raw(`update user_data set simulations = simulations - ${deleteData.dbindex}' where uid = '${res.locals.uid}' returning simulations`);
             res.json(result.rows[0].simulations);
         } catch (err) {
-            logger.error(`Failed to remove simulation #${deleteData.index} for user ${res.locals.uid}.`, err);
-            res.status(500).send(`Failed to remove simulation #${deleteData.index} for user ${res.locals.uid}.`).end();
+            logger.error(`Failed to remove simulation #${deleteData.dbindex} for user ${res.locals.uid}.`, err);
+            res.status(500).send(`Failed to remove simulation #${deleteData.dbindex} for user ${res.locals.uid}.`).end();
         }
     });
 

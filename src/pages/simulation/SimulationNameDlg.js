@@ -29,19 +29,21 @@ export default function SimulationNameDialog({ open, action = "save", defaultVal
             const newName = event.target.value;
             if (!validation(newName, actionName)) {
                 setHasError(true);
+            } else {
+                setHasError(false);
             }
             setName(newName);
         });
     }, [actionName, validation]);
 
     const handleClose = () => {
+        setName("");
         setIsOpen(false);
         onOpenChanged(false);
     };
 
     const handleValidate = () => {
-        setIsOpen(false);
-        onOpenChanged(false);
+        handleClose();
         if (onValidate) {
             onValidate(name);
         }

@@ -1,3 +1,3 @@
-import Simulation from './Simulation';
+import SimulationManager from './SimulationManager';
 
-export default Simulation;
+export default SimulationManager;

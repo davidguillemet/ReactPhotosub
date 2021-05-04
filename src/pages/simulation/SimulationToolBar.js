@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
@@ -13,6 +13,9 @@ import {unstable_batchedUpdates} from 'react-dom';
 
 import SimulationSplitButton from './SimulationSplitButton';
 import SimulationNameDialog from './SimulationNameDlg';
+import {isFromDb, isDirty} from '../../dataProvider';
+
+import {simulationHasName} from './actions/SimulationReducer';
 
 const useTooltipButtonStyles = makeStyles((theme) => ({
     tooltipLabel: {
@@ -61,58 +64,21 @@ const ButtonWithTooltip = ({tooltip, onClick, disabled, children}) => {
     );
 }
 
-const SimulationToolBar = ({simulations, currentIndex, dirty, onSave, onAdd, onDelete}) => {
-    const [currentSimulationIndex, setCurrentSimulationIndex] = useState(currentIndex);
-    const [isDirty, setIsDirty] = useState(dirty);
+const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, onSelectionChange}) => {
     const [action, setAction] = useState("save");
     const [nameDlgOpen, setNameDlgOpen] = useState(false);
 
-    useEffect(() => {
-        setIsDirty(dirty);
-    }, [dirty]);
-
-    useEffect(() => {
-        setCurrentSimulationIndex(currentIndex);
-    }, [currentIndex])
-
-    const getSimulationName = useCallback(() => {
-        if (simulations.length === 0 || currentSimulationIndex < 0) {
-            return "la simulation courante";
-        }
-
-        return `"${simulations[currentSimulationIndex].name}"`;
-
-    }, [simulations, currentSimulationIndex]);
+    const simulation = useMemo(() => simulations[currentIndex], [simulations, currentIndex]);
 
     const validateSimulationName = useCallback((name, action) => {
-        const sameNameIndex = simulations.findIndex(simulation => simulation.name && simulation.name.toLowerCase() === name);
-        if (sameNameIndex < 0) {
-            return true;
-        }
-
-        // Here, the simulation with index sameNameIndex has the same name
-
-        if (action === "save") {
-            if (currentIndex === -1) {
-                // new simulation has the same name as an existing one
-                return false;
-            }
-            // The name is valid only if the simulation with the same name is the same
-            return (currentIndex === sameNameIndex);
-        } else if (action === "new") {
-            // For a new simulation we cannot enter the same name as another one
-            return false;
-        } else if (action === "rename") {
-            // Ok only if the 
-            return (currentIndex === sameNameIndex);
-        }
-
-        throw new Error(`Unknown action name '${action}'.`);
-
+        const sameNameIndex = simulations.findIndex((simulation, index) => {
+            return (action === "new" || index !== currentIndex) && (simulation.name.toLowerCase() === name.toLowerCase())
+        });
+        return (sameNameIndex < 0)
     }, [simulations, currentIndex]);
 
     const handleSave = () => {
-        if (currentIndex === - 1) {
+        if (!simulationHasName(simulations[currentIndex])) {
             unstable_batchedUpdates(() => {
                 setAction("save");
                 setNameDlgOpen(true);
@@ -136,8 +102,6 @@ const SimulationToolBar = ({simulations, currentIndex, dirty, onSave, onAdd, onD
         });
     }
 
-    const simulationName = getSimulationName();
-
     return (
         <Paper style={{
             position: "fixed",
@@ -152,24 +116,24 @@ const SimulationToolBar = ({simulations, currentIndex, dirty, onSave, onAdd, onD
                 onOpenChanged={setNameDlgOpen}
                 onValidate={action === "save" ? onSave : onAdd}
             />
+
             <Toolbar variant="dense">
-                <ButtonWithTooltip tooltip={`Sauvegarder ${simulationName}`} onClick={handleSave} disabled={currentIndex >= 0 && isDirty === false}>
+                <ButtonWithTooltip tooltip={`Sauvegarder "${simulation.name}"`} onClick={handleSave} disabled={isDirty(simulation) === false}>
                     <SaveOutlinedIcon />
                 </ButtonWithTooltip>
 
-                <ButtonWithTooltip tooltip={`Supprimer ${simulationName}`} onClick={handleDelete} disabled={simulations.length === 0}>
+                <ButtonWithTooltip tooltip={`Supprimer "${simulation.name}"`} onClick={handleDelete} disabled={simulations.length === 1 && isFromDb(simulations[0]) === false}>
                     <DeleteOutlineOutlinedIcon />
                 </ButtonWithTooltip>
 
-                <ButtonWithTooltip tooltip="Ajouter une simulation" onClick={handleAdd} disabled={currentIndex === -1}>
+                <ButtonWithTooltip tooltip="Ajouter une simulation" onClick={handleAdd} >
                     <AddOutlinedIcon />
                 </ButtonWithTooltip>
 
                 <SimulationSplitButton
                     simulations={simulations}
-                    currentIndex={currentSimulationIndex}
-                    dirty={isDirty}
-                    onSelectionChange={setCurrentSimulationIndex}
+                    currentIndex={currentIndex}
+                    onSelectionChange={onSelectionChange}
                 />
             </Toolbar>
         </Paper>

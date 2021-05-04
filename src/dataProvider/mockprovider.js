@@ -1,3 +1,10 @@
+import {
+    TRANSIENT_PROPERTY_DB_INDEX,
+    deleteTransientProperties,
+    setDbIndex,
+    getDbIndex,
+} from './common';
+
 function fetchhMockData(path) {
 	return fetch(path + 'mockData.json', {
 		headers : { 
@@ -61,8 +68,7 @@ function getFavorites() {
 
 function addSimulationIndex(simulations) {
     simulations.forEach((simulation, index) => {
-        simulation.index = index;
-        delete simulation['isDirty'];
+        setDbIndex(simulation, index);
     });
     return simulations;
 }
@@ -72,20 +78,23 @@ function getSimulations() {
 }
 
 function addSimulation(newSimulation) {
+    deleteTransientProperties(newSimulation);
     _simulations.push(newSimulation);
     return Promise.resolve(addSimulationIndex(_simulations));
 }
 
 function updateSimulation(simulation) {
-    if (simulation.index === undefined) {
+    // Delete transient properties but keep dbindex
+    deleteTransientProperties(simulation, [TRANSIENT_PROPERTY_DB_INDEX]);
+    if (getDbIndex(simulation) === undefined) {
         throw new Error("The simulation to update must contains an index")
     }
-    _simulations.splice(simulation.index, 1, simulation);
+    _simulations.splice(getDbIndex(simulation), 1, simulation);
     return Promise.resolve(addSimulationIndex(_simulations));
 }
 
-function removeSimulation(simulationIndex) {
-    _simulations.splice(simulationIndex, 1);
+function removeSimulation(simulationToRemove) {
+    _simulations.splice(getDbIndex(simulationToRemove), 1);
     return Promise.resolve(addSimulationIndex(_simulations));
 }
 
