@@ -170,7 +170,7 @@ const SimulationManager = ({ user }) => {
 
             {
                 state &&
-                <Simulation simulations={state.simulations} simulationIndex={state.currentIndex} dispatch={dispatch} />
+                <Simulation simulations={state.simulations} simulationIndex={state.currentIndex} user={user} dispatch={dispatch} />
             }
 
         </React.Fragment>

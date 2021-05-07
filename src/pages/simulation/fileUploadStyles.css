@@ -1,0 +1,14 @@
+.fileProgress-enter {
+    opacity: 0;
+}
+.fileProgress-enter-active {
+    opacity: 1;
+    transition: opacity 500ms ease-in;
+}
+.fileProgress-exit {
+    opacity: 1;
+}
+.fileProgress-exit-active {
+    opacity: 0;
+    transition: opacity 500ms ease-in;
+}

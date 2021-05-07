@@ -108,6 +108,18 @@ function getInteriors() {
     });
 }
 
+function getUploadedInteriors() {
+    return fetchhMockData('../../').then(data => {
+        return data.uploadedInteriors;
+    });
+}
+
+function removeUploadedInterior(fileName) {
+    return fetchhMockData('../../').then(data => {
+        return data.uploadedInteriors.filter(interior => interior.endsWith(fileName) === false);
+    });
+}
+
 const mockProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
@@ -122,7 +134,9 @@ const mockProvider = {
     updateSimulation: updateSimulation,
     removeSimulation: removeSimulation,
     getImageCount: getImageCount,
-    getInteriors: getInteriors
+    getInteriors: getInteriors,
+    getUploadedInteriors: getUploadedInteriors,
+    removeUploadedInterior: removeUploadedInterior
 };
 
 export default mockProvider;

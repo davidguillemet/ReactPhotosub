@@ -25,6 +25,7 @@ const app = express();
 // Authentication required for the following routes:
 app.use("/favorites", isAuthenticated);
 app.use("/simulations", isAuthenticated);
+app.use("/uploadedInteriors", isAuthenticated);
 
 // support parsing of application/json type post data
 app.use(express.json());
@@ -348,6 +349,42 @@ app.route("/interiors")
                 .end();
         });
     });
+
+app.route("/uploadedInteriors")
+    .get(async function(req, res, next) {
+        // Get all uploaded files under the "userUpload/<uid>/interiors" folder in the current bucket
+        bucket.getFiles({
+            prefix: `userUpload/${res.locals.uid}/interiors/`,
+            delimiter: "/",
+        }).then((filesResponse) => {
+            const [files] = filesResponse;
+            res.json(files
+                .filter((file) => file.metadata.contentType.startsWith("image/"))
+                .map((file) => file.publicUrl()));
+        }).catch((err) => {
+            logger.error("Failed to load user interiors.", err);
+            res.status(500)
+                .send("Failed to load user interiors.")
+                .end();
+        });
+    })
+    // Remove an uploaded interior
+    .delete(async function(req, res, next) {
+        const deleteData = req.body;
+        const fileToDelete = deleteData.fileName;
+        bucket.deleteFiles({
+            prefix: `userUpload/${res.locals.uid}/interiors/${fileToDelete}`,
+            delimiter: "/",
+        }).then((filesResponse) => {
+            res.status(200).send(`Successfully deleting image ${fileToDelete}.`).end();
+        }).catch((err) => {
+            logger.error(`Failed to delete the file ${fileToDelete}.`, err);
+            res.status(500)
+                .send(`Failed to delete the file ${fileToDelete}.`)
+                .end();
+        });
+    });
+
 
 // Search for images
 app.route("/search")

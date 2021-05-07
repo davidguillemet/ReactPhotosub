@@ -1,5 +1,7 @@
+import { Fab } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
+import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 
 const Thumbnail = ({
     image,
@@ -11,10 +13,15 @@ const Thumbnail = ({
     imageBorderWidth = 3,
     imageBorderColor = "#000",
     imageBorderRadius = 3,
-    disabled}) => {
+    disabled,
+    onDelete}) => {
 
     function onClick() {
         handleClick(index);
+    }
+
+    function handleDelete() {
+        onDelete(image.src);
     }
 
     return (
@@ -25,6 +32,7 @@ const Thumbnail = ({
                 alignItems: 'center'
             }}>
             <Box style={{
+                position: 'relative',
                 padding: imageBorderWidth,
                 backgroundColor: active === true ? imageBorderColor : null,
                 height: imageHeight + 2*imageBorderWidth,
@@ -41,9 +49,37 @@ const Thumbnail = ({
                         cursor: 'pointer',
                         borderRadius: imageBorderRadius >= 2 ? imageBorderRadius-2 : 0,
                         opacity: disabled ? 0.7 : 1
-                    }} />
+                    }}
+                />
+                {
+                    image.uploaded &&
+                    <Fab
+                        size="small"
+                        color="secondary"
+                        disabled={image.deletable}
+                        onClick={handleDelete}
+                        style={{
+                            position: 'absolute',
+                            top: 5,
+                            right: 5
+                        }}
+                    >
+                        <DeleteOutlineOutlinedIcon />
+                    </Fab>
+                }
             </Box>
-            { active === true && <ArrowDropUpIcon color="primary" fontSize="large" style={{ position: 'relative', top: -10, zIndex: 5 }} />}
+            {
+                active === true &&
+                <ArrowDropUpIcon
+                    color="primary"
+                    fontSize="large"
+                    style={{
+                        position: 'relative',
+                        top: -10,
+                        zIndex: 5
+                    }}
+                />
+            }
         </Box>
     );
 };

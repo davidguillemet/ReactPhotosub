@@ -29,7 +29,8 @@ const ImageSlider = ({
     indicatorHeight = 14,
     imageBorderColor = "#000",
     imageBorderRadius = 3,
-    disabled}) => {
+    disabled,
+    onDeleteUploaded}) => {
 
     const classes = useStyles();
     
@@ -61,7 +62,7 @@ const ImageSlider = ({
 
     // HandleResize is a callback to be used as dependency in thumbContainerRefCallback
     const handleResize = useCallback(() => {
-        // Mahe sure to synchronize the slider with the effective thumbnail scroll position that can
+        // Make sure to synchronize the slider with the effective thumbnail scroll position that can
         // change when resizing the window
         const lastThumbRect = getThumbnailRectAt(thumbContainerRef.current.children.length - 1);
         if (lastThumbRect !== null) {
@@ -312,6 +313,7 @@ const ImageSlider = ({
                                 imageBorderColor={imageBorderColor}
                                 imageBorderRadius={imageBorderRadius}
                                 disabled={disabled}
+                                onDelete={onDeleteUploaded}
                             />
                         )
                     }

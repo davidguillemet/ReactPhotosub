@@ -13,6 +13,9 @@ import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import ImageSlider from '../../components/imageSlider';
 import dataProvider from '../../dataProvider';
 import SimulationDisplay from './SimulationDisplay';
+import FileUpload from './FileUpload';
+
+import { uniqueID } from '../../utils/utils';
 
 import {setBackground, resize, borderWidth, borderColor, addImage, setImage} from './actions/SimulationActions';
 
@@ -35,7 +38,7 @@ const useStyle = makeStyles((theme) => ({
     }
 }));
 
-const Simulation = ({simulations, simulationIndex, dispatch}) => {
+const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     const classes = useStyle();
 
@@ -52,6 +55,35 @@ const Simulation = ({simulations, simulationIndex, dispatch}) => {
     }, [simulationIndex, dispatch]);
 
     const resizeObserver = useResizeObserver(handleResize);
+
+    const userInteriorIsUsed = useCallback((userInteriorUrl) => {
+        // Check is any simulation contains the current background
+        return simulations.findIndex((simulation) => simulation.background === userInteriorUrl) === -1;
+    }, [simulations]);
+
+    useEffect(() => {
+        if (simulations === null || interiors === null) {
+            return;
+        }
+        let modified = false;
+        for (let i = 0; i < interiors.length; i++) {
+            const interior = interiors[i];
+            if (!interior.uploaded) {
+                // we browsed all uploaded interiors
+                break;
+            }
+            const prevDeletable = interior.deletable;
+            if (userInteriorIsUsed(interior.src)) {
+                interior.deletable = false;
+            } else {
+                interior.deletable = true;
+            }
+            modified = modified || (prevDeletable !== interior.deletable);
+        }
+        if (modified === true) {
+            setInteriors([ ...interiors ]);
+        }
+    }, [userInteriorIsUsed, simulations, interiors]);
 
     useEffect(() => {
         if (interiors === null) {
@@ -83,20 +115,49 @@ const Simulation = ({simulations, simulationIndex, dispatch}) => {
         });
     }, [interiors, dispatch, simulationIndex]);
 
+    const buildImageFromUrl = useCallback((url, uploaded) => {
+        return {
+            src: url,
+            id: uniqueID(),
+            uploaded: uploaded,
+            deletable: !userInteriorIsUsed(url)
+        }
+    }, [userInteriorIsUsed]);
+
+    const buildImagesFromUrls = useCallback((urls, uploaded) => {
+        return urls.map((url) => buildImageFromUrl(url, uploaded));
+    }, [buildImageFromUrl]);
+
+    const onDeleteUploaded = useCallback((fileUrl) => {
+        // Extract the file name from the src
+        const fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+        dataProvider.removeUploadedInterior(fileName).then(() => {
+            setInteriors(prevInteriors => {
+                return prevInteriors.filter(interior => interior.src !== fileUrl);
+            });
+        }).catch(err => {
+            // TODO
+        });
+    }, []);
+
     // Load interiors
     useEffect(() => {
-        dataProvider.getInteriors().then(interiors => {
+        if (interiors !== null) {
+            return;
+        }
+        Promise.all([
+            dataProvider.getUploadedInteriors(),
+            dataProvider.getInteriors()
+        ]).then(values => {
+            const userInteriors = values[0];
+            const interiors = values[1];
             unstable_batchedUpdates(() => {
-                setInteriors(interiors.map((interior, index) => {
-                    return {
-                        src: interior,
-                        id: index
-                    }
-                }));
+                const allInteriors = buildImagesFromUrls(userInteriors, true).concat(buildImagesFromUrls(interiors, false));
+                setInteriors(allInteriors);
                 setCurrentInteriorIndex(0);
             });
         })
-    }, []);
+    }, [buildImagesFromUrls, interiors]);
 
     // Load image selection = home slideshow ?
     useEffect(() => {
@@ -104,7 +165,7 @@ const Simulation = ({simulations, simulationIndex, dispatch}) => {
             setImages(interiors.map((interior, index) => {
                 return {
                     src: interior,
-                    id: index
+                    id: uniqueID()
                 }
             }));
         })
@@ -124,6 +185,19 @@ const Simulation = ({simulations, simulationIndex, dispatch}) => {
 
     }, [images, currentImageId, dispatch, simulationIndex, resizeObserver.width]);
 
+    const onFileUploaded = useCallback((fileName, downloadUrl) => {
+        // the download url looks like the following, including a doanlowd token:
+        // https://firebasestorage.googleapis.com/v0/b/photosub.appspot.com/o/userUpload%2FO30yfAqRCnS99zc1VoKMjIt9IEg1%2Finteriors%2FDSC_1388-Modifier.jpg?alt=media&token=796f88e2-d1b2-4827-b0f5-da9008e778bb
+        // While we just need the following:
+        // https://storage.googleapis.com/photosub.appspot.com/userUpload%2FO30yfAqRCnS99zc1VoKMjIt9IEg1%2Finteriors%2FDSC_1388-Modifier.jpg
+        const fileSrc = `https://storage.googleapis.com/photosub.appspot.com/userUpload/${user.uid}/interiors/${fileName}`;
+        // Add the new uploaded image to the interiors' array
+        setInteriors(prevInteriors => [
+            buildImageFromUrl(fileSrc, true),
+            ...prevInteriors
+        ]);
+    }, [buildImageFromUrl, user]);
+
     return (
         <React.Fragment>
 
@@ -140,8 +214,20 @@ const Simulation = ({simulations, simulationIndex, dispatch}) => {
                 imageBorderWidth={3}
                 imageBorderRadius={5}
                 disabled={simulation.isLocked}
+                onDeleteUploaded={onDeleteUploaded}
             />
+
+            {
+                user &&
+                <FileUpload
+                    caption="Chargez vos propres images"
+                    user={user}
+                    onFileUploaded={onFileUploaded}
+                />
+            }
+
             <VerticalSpacing factor={3} />
+
             <Typography variant="h4" style={{fontWeight: "100"}}>2. Insérez des images</Typography>
             <ImageSlider
                 images={images}

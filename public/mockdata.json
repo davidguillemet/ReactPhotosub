@@ -1002,5 +1002,10 @@
         "https://storage.googleapis.com/photosub.appspot.com/interiors/office-01.jpg",
         "https://storage.googleapis.com/photosub.appspot.com/interiors/office-02.jpg",
         "https://storage.googleapis.com/photosub.appspot.com/interiors/outside-01.jpg"
+    ],
+    "uploadedInteriors": [
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/office-01.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/office-02.jpg",
+        "https://storage.googleapis.com/photosub.appspot.com/interiors/outside-01.jpg"
     ]
 }

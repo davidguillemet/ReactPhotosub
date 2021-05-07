@@ -129,6 +129,17 @@ function getInteriors() {
     });
 }
 
+function getUploadedInteriors() {
+    return axios.get('/api/uploadedInteriors')
+    .then(response => {
+        return response.data;
+    });
+}
+
+function removeUploadedInterior(fileName) {
+    return axios.delete('/api/uploadedInteriors', {data: { fileName: fileName } })
+}
+
 const dataProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
@@ -143,7 +154,9 @@ const dataProvider = {
     updateSimulation: updateSimulation,
     removeSimulation: removeSimulation,
     getImageCount: getImageCount,
-    getInteriors: getInteriors
+    getInteriors: getInteriors,
+    getUploadedInteriors: getUploadedInteriors,
+    removeUploadedInterior: removeUploadedInterior
 }
 
 export default dataProvider;
