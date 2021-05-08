@@ -199,8 +199,13 @@ function simulationReducer(state, action) {
 export default function simulationsReducer(state, action) {
     switch (action.type) {
         case ACTION_LOAD_SIMULATIONS:
+            const simulations =
+                action.simulations.length > 0 ?
+                action.simulations :
+                [_initSimulation(null, null)];
+
             return {
-                simulations: action.simulations,
+                simulations: simulations,
                 currentIndex: 0
             }
         case ACTION_SET_CURRENT_SIMULATION_INDEX:
@@ -243,7 +248,12 @@ export default function simulationsReducer(state, action) {
                     simulation; // returns the simulation untouched; it has not been saved in db
                 });
             } else {
-                newSimulations = [ ...state.simulations ]
+                newSimulations = [ ...state.simulations ];
+            }
+
+            if (newSimulations.length === 0) {
+                newSimulations.push(_initSimulation(null, null));
+                newIndex = 0;
             }
 
             return {

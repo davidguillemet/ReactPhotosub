@@ -53,11 +53,7 @@ const SimulationManager = ({ user }) => {
     useEffect(() => {
         if (user !== null) {
             dataProvider.getSimulations().then(res => {
-                if (res.length > 0) {
-                    dispatch(initSimulations(res));
-                } else {
-                    dispatch(addSimulation());
-                }
+                dispatch(initSimulations(res));
             })
         } else {
             dispatch(addSimulation());
