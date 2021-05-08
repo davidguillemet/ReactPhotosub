@@ -27,6 +27,7 @@
   "scripts": {
     "start": "react-dotenv && react-scripts start",
     "build": "react-scripts build && cp .env.build.js build/env.js && rm build/mockdata.json",
+    "build4deploy": "react-scripts build && cp .env.build.js build/env.js && rm build/mockdata.json && rm -rf build/static-storage",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
