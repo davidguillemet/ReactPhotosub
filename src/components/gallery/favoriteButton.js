@@ -22,7 +22,7 @@ const useFavoriteStyles = makeStyles(theme => ({
     }
 }));
 
-const FavoriteButton = ({user, isInFavorites, updateUserContext, fontSize = 'default', style, color, path }) => {
+const FavoriteButton = ({user, isInFavorites, updateUserFavorites, fontSize = 'default', style, color, path }) => {
     const classes = useFavoriteStyles();
 
     function handleFavoriteClick() {
@@ -32,7 +32,7 @@ const FavoriteButton = ({user, isInFavorites, updateUserContext, fontSize = 'def
             dataProvider.addFavorite;
 
         updatePromise(path).then(favorites => {
-            updateUserContext(user, favorites);
+            updateUserFavorites(favorites);
         })
     }
 
@@ -89,12 +89,12 @@ const FavoriteButton = ({user, isInFavorites, updateUserContext, fontSize = 'def
 const FavoriteButtonConsumer = (props) => {
     return (
         <AuthContext.Consumer>
-            { ({user, data, updateUserContext}) => {
+            { ({user, data, updateUserFavorites}) => {
                 return (
                     <FavoriteButton
                         user={user}
                         isInFavorites={data && data.favorites.has(props.path)}
-                        updateUserContext={updateUserContext}
+                        updateUserFavorites={updateUserFavorites}
                         {...props} />
                 );
             }}

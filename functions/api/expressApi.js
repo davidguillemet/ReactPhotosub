@@ -201,7 +201,7 @@ app.route("/userdata/:uid")
                 data = {
                     uid: req.params.uid,
                     favorites: [], // favorites is an array field that we initialize with an empty array
-                    simulations: "[]", // simulations is a jsonb field taht we initialize with an empty array
+                    simulations: "[]", // simulations is a jsonb field that we initialize with an empty array
                 };
                 await pool("user_data").insert(data);
             } else {
