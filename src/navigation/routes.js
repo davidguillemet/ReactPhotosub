@@ -1,17 +1,18 @@
-import Home from "../pages/home";
-import Destinations from "../pages/destinations";
-import Destination from "../pages/destination";
-import Search from "../pages/search";
-import Finning from "../pages/finning";
-import SimulationManager from "../pages/simulation";
-import MySelection from "../pages/favorites";
-
 import HomeIcon from '@material-ui/icons/Home';
 import LanguageIcon from '@material-ui/icons/Language';
 import SearchIcon from '@material-ui/icons/Search';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 
 import { makeStyles } from '@material-ui/core/styles';
+
+import { lazy } from 'react';
+const Home = lazy(() => import("../pages/home"));
+const Destinations = lazy(() => import("../pages/destinations"));
+const Destination = lazy(() => import("../pages/destination"));
+const Search = lazy(() => import("../pages/search"));
+const Finning = lazy(() => import("../pages/finning"));
+const SimulationManager = lazy(() => import("../pages/simulation"));
+const MySelection = lazy(() => import("../pages/favorites"));
 
 export const routes = [
     // Main Meu in Sidebar : sidebar = true

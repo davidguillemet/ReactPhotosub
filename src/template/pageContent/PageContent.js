@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import { Switch, Route } from "react-router-dom";
@@ -26,17 +28,19 @@ const PageContent = () => {
 
     return (
         <Container className={classes.pageContainer} classes={{root: classes.pageContainerRoot}} maxWidth={false}>
-            <Switch>
-            {
-                routes.map((route, index) => {
-                    return (
-                    <Route key={index} exact strict path={route.path}>
-                        {route.component}
-                    </Route>
-                    );
-                })
-            }
-            </Switch>
+            <Suspense fallback={<CircularProgress />}>
+                <Switch>
+                {
+                    routes.map((route, index) => {
+                        return (
+                        <Route key={index} exact strict path={route.path}>
+                            {route.component}
+                        </Route>
+                        );
+                    })
+                }
+                </Switch>
+            </Suspense>
         </Container>
     );
 };
