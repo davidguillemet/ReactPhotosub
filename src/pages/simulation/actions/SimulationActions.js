@@ -56,11 +56,10 @@ export function deleteSimulation(index, currentSimulations) {
 //////////////////////////////////////////
 // Action for a specific simulation
 //////////////////////////////////////////
-export function setBackground(background, replace, simulationIndex) {
+export function setBackground(background, simulationIndex) {
     return {
         type: ACTION_BACKGROUND,
         background: background,
-        replace: replace,
         simulationIndex: simulationIndex
     };
 }

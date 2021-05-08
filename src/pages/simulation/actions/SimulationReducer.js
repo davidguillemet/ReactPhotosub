@@ -121,9 +121,6 @@ function simulationReducer(state, action) {
         case ACTION_RESIZE:
             return scaleSimulation(state, action.containerWidth);
         case ACTION_BACKGROUND:
-            if (state.background !== null && action.replace === false) {
-                return state;
-            }
             return {
                 ...state,
                 background: action.background,

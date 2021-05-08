@@ -56,8 +56,24 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         if (interiors === null) {
             return;
         }
-        dispatch(setBackground(interiors[0].src, false /* Don't replace if not null */, simulationIndex));
-        setCurrentInteriorIndex(interiors.findIndex(interior => interior.src === simulation.background));
+        let interiorIndex = 0;
+        let initBackground = true;
+        if (simulation.background !== null) {
+            interiorIndex = interiors.findIndex(interior => interior.src === simulation.background);
+            if (interiorIndex === -1) {
+                // Background not found
+                interiorIndex = 0;
+            } else {
+                initBackground = false;
+            }
+        }
+
+        unstable_batchedUpdates(() => {
+            setCurrentInteriorIndex(interiorIndex);
+            if (initBackground) {
+                dispatch(setBackground(interiors[interiorIndex].src, simulationIndex));
+            }
+        });
     }, [simulation, simulationIndex, interiors, dispatch])
 
     const handleBorderWidthChange = useCallback((newBorderWidth) => {
@@ -78,7 +94,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     const onInteriorClick = useCallback((interiorIndex) => {
         unstable_batchedUpdates(() => {
             setCurrentInteriorIndex(interiorIndex);
-            dispatch(setBackground(interiors[interiorIndex].src, true /* Replace */, simulationIndex));
+            dispatch(setBackground(interiors[interiorIndex].src, simulationIndex));
         });
     }, [interiors, dispatch, simulationIndex]);
 
