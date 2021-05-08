@@ -8,3 +8,18 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
+
+.thumbnail-enter {
+  opacity: 0;
+}
+.thumbnail-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+.thumbnail-exit {
+  opacity: 1;
+}
+.thumbnail-exit-active {
+  opacity: 0;
+  transition: opacity 500ms ease-in;
+}

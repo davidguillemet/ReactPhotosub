@@ -6,6 +6,9 @@ import Slider from '@material-ui/core/Slider';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
+
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+
 import Thumbnail from './thumbnail';
 import './style.css';
 
@@ -299,24 +302,34 @@ const ImageSlider = ({
                         marginTop: 0
                     }}
                 >
+                    <TransitionGroup component={null}>
                     {
-                        images.map((image, index) => 
-                            <Thumbnail
-                                key={image.id}
-                                image={image}
-                                index={index}
-                                handleClick={handleThumbnailClick}
-                                active={currentIndex === index}
-                                onLoadedCallback={onThumbnailLoadedCallback}
-                                imageHeight={imageHeight}
-                                imageBorderWidth={imageBorderWidth}
-                                imageBorderColor={imageBorderColor}
-                                imageBorderRadius={imageBorderRadius}
-                                disabled={disabled}
-                                onDelete={onDeleteUploaded}
-                            />
-                        )
+                        images.map((image, index) => { 
+                            return (
+                                <CSSTransition
+                                    key={image.id}
+                                    timeout={500}
+                                    classNames="thumbnail"
+                                >                
+                                    <Thumbnail
+                                        key={image.id}
+                                        image={image}
+                                        index={index}
+                                        handleClick={handleThumbnailClick}
+                                        active={currentIndex === index}
+                                        onLoadedCallback={onThumbnailLoadedCallback}
+                                        imageHeight={imageHeight}
+                                        imageBorderWidth={imageBorderWidth}
+                                        imageBorderColor={imageBorderColor}
+                                        imageBorderRadius={imageBorderRadius}
+                                        disabled={disabled}
+                                        onDelete={onDeleteUploaded}
+                                    />
+                                </CSSTransition>
+                            );
+                        })
                     }
+                    </TransitionGroup>
                 </Box>
 
                 <Box className={classes.sliderScrollButton} style={{top: scrollButtonTopPosition}}>
