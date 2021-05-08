@@ -43,7 +43,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     const classes = useStyle();
 
     const [interiors, setInteriors] = useState(null);
-    const [images, setImages] = useState([]);
+    const [images, setImages] = useState(null);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
 
     const [currentImageId, setCurrentImageId] = useState(null);
@@ -120,13 +120,9 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
             src: url,
             id: uniqueID(),
             uploaded: uploaded,
-            deletable: !userInteriorIsUsed(url)
+            deletable: true
         }
-    }, [userInteriorIsUsed]);
-
-    const buildImagesFromUrls = useCallback((urls, uploaded) => {
-        return urls.map((url) => buildImageFromUrl(url, uploaded));
-    }, [buildImageFromUrl]);
+    }, []);
 
     const onDeleteUploaded = useCallback((fileUrl) => {
         // Extract the file name from the src
@@ -142,9 +138,11 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     // Load interiors
     useEffect(() => {
-        if (interiors !== null) {
-            return;
-        }
+
+        const buildImagesFromUrls = (urls, uploaded) => {
+            return urls.map((url) => buildImageFromUrl(url, uploaded));
+        };
+    
         Promise.all([
             dataProvider.getUploadedInteriors(),
             dataProvider.getInteriors()
@@ -157,7 +155,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 setCurrentInteriorIndex(0);
             });
         })
-    }, [buildImagesFromUrls, interiors]);
+    }, [buildImageFromUrl]);
 
     // Load image selection = home slideshow ?
     useEffect(() => {
@@ -203,7 +201,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
             <Typography variant="h4" style={{fontWeight: "100"}}>1. Sélectionnez une ambiance</Typography>
             <ImageSlider
-                images={interiors ?? []}
+                images={interiors}
                 currentIndex={currentInteriorIndex}
                 onThumbnailClick={onInteriorClick}
                 style={{
