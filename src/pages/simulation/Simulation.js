@@ -21,8 +21,6 @@ import {setBackground, resize, borderWidth, borderColor, addImage, setImage} fro
 
 import { useResizeObserver } from '../../components/hooks';
 
-import 'fontsource-roboto/100.css';
-
 const borderColors = [
     "#FFFFFF",
     "#000000",
@@ -43,6 +41,8 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     const classes = useStyle();
 
     const [interiors, setInteriors] = useState(null);
+    const [userInteriors, setUserInteriors] = useState(null);
+    const [allInteriors, setAllInteriors] = useState(null);
     const [images, setImages] = useState(null);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
 
@@ -61,17 +61,14 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         return simulations.findIndex((simulation) => simulation.background === userInteriorUrl) === -1;
     }, [simulations]);
 
+    // Check the "deletable" property of the uploaded interiors
     useEffect(() => {
-        if (simulations === null || interiors === null) {
+        if (simulations === null || userInteriors === null || interiors == null) {
             return;
         }
         let modified = false;
-        for (let i = 0; i < interiors.length; i++) {
-            const interior = interiors[i];
-            if (!interior.uploaded) {
-                // we browsed all uploaded interiors
-                break;
-            }
+        for (let i = 0; i < userInteriors.length; i++) {
+            const interior = userInteriors[i];
             const prevDeletable = interior.deletable;
             if (userInteriorIsUsed(interior.src)) {
                 interior.deletable = false;
@@ -81,17 +78,17 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
             modified = modified || (prevDeletable !== interior.deletable);
         }
         if (modified === true) {
-            setInteriors([ ...interiors ]);
+            setAllInteriors([ ...userInteriors, ...interiors ]);
         }
-    }, [userInteriorIsUsed, simulations, interiors]);
+    }, [userInteriorIsUsed, simulations, userInteriors, interiors]);
 
     useEffect(() => {
-        if (interiors === null) {
+        if (allInteriors === null) {
             return;
         }
-        dispatch(setBackground(interiors[0].src, false /* Don't replace if not null */, simulationIndex));
-        setCurrentInteriorIndex(interiors.findIndex(interior => interior.src === simulation.background));
-    }, [simulation, simulationIndex, interiors, dispatch])
+        dispatch(setBackground(allInteriors[0].src, false /* Don't replace if not null */, simulationIndex));
+        setCurrentInteriorIndex(allInteriors.findIndex(interior => interior.src === simulation.background));
+    }, [simulation, simulationIndex, allInteriors, dispatch])
 
     const handleBorderWidthChange = useCallback((newBorderWidth) => {
         dispatch(borderWidth(newBorderWidth, simulationIndex));
@@ -111,9 +108,9 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     const onInteriorClick = useCallback((interiorIndex) => {
         unstable_batchedUpdates(() => {
             setCurrentInteriorIndex(interiorIndex);
-            dispatch(setBackground(interiors[interiorIndex].src, true /* Replace */, simulationIndex));
+            dispatch(setBackground(allInteriors[interiorIndex].src, true /* Replace */, simulationIndex));
         });
-    }, [interiors, dispatch, simulationIndex]);
+    }, [allInteriors, dispatch, simulationIndex]);
 
     const buildImageFromUrl = useCallback((url, uploaded) => {
         return {
@@ -128,7 +125,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         // Extract the file name from the src
         const fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
         dataProvider.removeUploadedInterior(fileName).then(() => {
-            setInteriors(prevInteriors => {
+            setUserInteriors(prevInteriors => {
                 return prevInteriors.filter(interior => interior.src !== fileUrl);
             });
         }).catch(err => {
@@ -136,31 +133,50 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         });
     }, []);
 
+    const buildImagesFromUrls = useCallback((urls, uploaded) => {
+        return urls.map((url) => buildImageFromUrl(url, uploaded));
+    }, [buildImageFromUrl]);
+
+    // Update the collection containing all interiors
+    useEffect(() => {
+        if (interiors === null || userInteriors === null) {
+            return;
+        }
+        unstable_batchedUpdates(() => {
+            setAllInteriors([...userInteriors, ...interiors]);
+            setCurrentInteriorIndex(0);
+        });
+    }, [interiors, userInteriors]);
+
     // Load interiors
     useEffect(() => {
-
-        const buildImagesFromUrls = (urls, uploaded) => {
-            return urls.map((url) => buildImageFromUrl(url, uploaded));
-        };
-    
-        Promise.all([
-            dataProvider.getUploadedInteriors(),
-            dataProvider.getInteriors()
-        ]).then(values => {
-            const userInteriors = values[0];
-            const interiors = values[1];
+        dataProvider.getInteriors().then(values => {
             unstable_batchedUpdates(() => {
-                const allInteriors = buildImagesFromUrls(userInteriors, true).concat(buildImagesFromUrls(interiors, false));
-                setInteriors(allInteriors);
-                setCurrentInteriorIndex(0);
+                const defaultInteriors = buildImagesFromUrls(values, false);
+                setInteriors(defaultInteriors);
             });
         })
-    }, [buildImageFromUrl]);
+    }, [buildImagesFromUrls]);
+
+    // Load user uploaded interiors
+    useEffect(() => {
+        const loadPromise =
+            user === null ?
+            Promise.resolve([]) :
+            dataProvider.getUploadedInteriors();
+        
+        loadPromise.then(values => {
+            unstable_batchedUpdates(() => {
+                const userInteriors = buildImagesFromUrls(values, true);
+                setUserInteriors(userInteriors);
+            });
+        })
+    }, [user, buildImagesFromUrls]);
 
     // Load image selection = home slideshow ?
     useEffect(() => {
         dataProvider.getInteriors().then(interiors => {
-            setImages(interiors.map((interior, index) => {
+            setImages(interiors.map(interior => {
                 return {
                     src: interior,
                     id: uniqueID()
@@ -190,7 +206,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         // https://storage.googleapis.com/photosub.appspot.com/userUpload%2FO30yfAqRCnS99zc1VoKMjIt9IEg1%2Finteriors%2FDSC_1388-Modifier.jpg
         const fileSrc = `https://storage.googleapis.com/photosub.appspot.com/userUpload/${user.uid}/interiors/${fileName}`;
         // Add the new uploaded image to the interiors' array
-        setInteriors(prevInteriors => [
+        setUserInteriors(prevInteriors => [
             buildImageFromUrl(fileSrc, true),
             ...prevInteriors
         ]);
@@ -201,7 +217,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
             <Typography variant="h4" style={{fontWeight: "100"}}>1. Sélectionnez une ambiance</Typography>
             <ImageSlider
-                images={interiors}
+                images={allInteriors}
                 currentIndex={currentInteriorIndex}
                 onThumbnailClick={onInteriorClick}
                 style={{
