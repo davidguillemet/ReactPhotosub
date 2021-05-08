@@ -10,6 +10,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import { Typography } from '@material-ui/core';
+import { uniqueID } from '../../utils/utils';
 
 import { FirebaseApp } from '../../components/firebase';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -110,6 +111,9 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
         for (let i = 0; i < files.length; i++) {
             _files.push(files[i]);
         }
+        // Reset the iput value to be able to upload the same file again
+        // For example after having removed it
+        event.target.value = "";
         setUploadFiles(_files);
     }
 
@@ -146,14 +150,15 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
                 <TransitionGroup component={null}>
                 {
                     uploadFiles.map((file) => {
+                        const key = uniqueID();
                         return (
                             <CSSTransition
-                                key={file.name}
+                                key={key}
                                 timeout={500}
                                 classNames="fileProgress"
                             >                
                                 <FileProgress
-                                    key={file.name}
+                                    key={key}
                                     file={file}
                                     onCancel={onCancel}
                                     onFileUploaded={onFileUploaded}
