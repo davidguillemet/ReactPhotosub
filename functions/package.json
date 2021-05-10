@@ -26,6 +26,7 @@
     "firebase-functions": "^3.11.0",
     "knex": "^0.21.18",
     "pg": "^8.5.1",
+    "sharp": "^0.28.1",
     "winston": "^3.3.3"
   },
   "devDependencies": {
