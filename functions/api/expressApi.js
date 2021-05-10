@@ -331,11 +331,11 @@ app.route("/simulations")
         }
     });
 
-app.route("/interiors")
+app.route("/bucket/:folder")
     .get(async function(req, res, next) {
-        // Get all files under the "interiors" folder in the current bucket
+        // Get images from a bucket folder
         bucket.getFiles({
-            prefix: "interiors/",
+            prefix: `${req.params.folder}/`,
             delimiter: "/",
         }).then((filesResponse) => {
             const [files] = filesResponse;
@@ -343,9 +343,9 @@ app.route("/interiors")
                 .filter((file) => file.metadata.contentType.startsWith("image/"))
                 .map((file) => file.publicUrl()));
         }).catch((err) => {
-            logger.error("Failed to load interiors.", err);
+            logger.error(`Failed to load images from ${req.params.folder}`, err);
             res.status(500)
-                .send("Failed to load interiors.")
+                .send(`Failed to load images from ${req.params.folder}`)
                 .end();
         });
     });
