@@ -16,10 +16,17 @@ const useFavoriteStyles = makeStyles(theme => ({
     tooltipLabel: {
         fontSize: 16
     },
+    tooltipPlacementBottom: {
+        backgroundColor: 'black',
+        bottom: 15
+    },
     tooltipPlacementTop: {
         backgroundColor: 'black',
         top: 15
-    }
+    },
+    arrow: {
+        color: 'black',
+    },
 }));
 
 const FavoriteButton = ({user, isInFavorites, updateUserFavorites, fontSize = 'default', style, color, path }) => {
@@ -67,12 +74,14 @@ const FavoriteButton = ({user, isInFavorites, updateUserFavorites, fontSize = 'd
                     }        
                 </Box>
             }
-            placement="top"
+            placement="bottom"
             TransitionComponent={Zoom}
             arrow
             classes={{
                 tooltip: classes.tooltipLabel,
-                tooltipPlacementTop: classes.tooltipPlacementTop
+                tooltipPlacementBottom: classes.tooltipPlacementBottom,
+                tooltipPlacementTop: classes.tooltipPlacementTop,
+                arrow: classes.arrow
             }}
         >
             <IconButton style={buttonStyle} onClick={user ? handleFavoriteClick : null}>

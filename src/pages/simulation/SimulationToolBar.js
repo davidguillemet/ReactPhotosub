@@ -84,17 +84,28 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
             />
 
             <Toolbar variant="dense">
-                <TooltipIconButton tooltip={`Sauvegarder "${simulation.name}"`} onClick={handleSave} disabled={isDirty(simulation) === false}>
+                <TooltipIconButton
+                    tooltip={`Sauvegarder "${simulation.name}"`}
+                    onClick={handleSave}
+                    disabled={isDirty(simulation) === false}
+                    edge="start"
+                >
                     <SaveOutlinedIcon />
                 </TooltipIconButton>
 
-                <TooltipIconButton tooltip="Ajouter une simulation" onClick={handleAdd} >
+                <TooltipIconButton
+                    tooltip="Ajouter une simulation"
+                    onClick={handleAdd}
+                    edge="start"
+                >
                     <AddOutlinedIcon />
                 </TooltipIconButton>
 
                 <TooltipIconButton
                     tooltip={simulation.isLocked ? `Déverrouiller "${simulation.name}"`: `Verrouiller "${simulation.name}"`}
-                    onClick={handleToggleLock} >
+                    onClick={handleToggleLock}
+                    edge="start"
+                >
                     {
                         simulation.isLocked ?
                         <LockOpenOutlinedIcon /> :
@@ -116,6 +127,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                         marginLeft: 0,
                         marginRight: -12
                     }}
+                    edge="start"
                 >
                     <DeleteOutlineOutlinedIcon />
                 </TooltipIconButton>

@@ -9,6 +9,10 @@ const useTooltipButtonStyles = makeStyles((theme) => ({
     },
     tooltipPlacementBottom: {
         backgroundColor: 'black',
+        bottom: 15
+    },
+    tooltipPlacementTop: {
+        backgroundColor: 'black',
         top: 15
     },
     arrow: {
@@ -20,7 +24,7 @@ const useTooltipButtonStyles = makeStyles((theme) => ({
   }));
 
 
-const TooltipIconButton = ({tooltip, onClick, disabled, children, style}) => {
+const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style, edge = "false"}) => {
 
     const classes = useTooltipButtonStyles();
 
@@ -33,11 +37,12 @@ const TooltipIconButton = ({tooltip, onClick, disabled, children, style}) => {
             classes={{
                 tooltip: classes.tooltipLabel,
                 tooltipPlacementBottom: classes.tooltipPlacementBottom,
+                tooltipPlacementTop: classes.tooltipPlacementTop,
                 arrow: classes.arrow
             }}
         >
             <IconButton
-                edge="start"
+                edge={edge}
                 className={classes.menuButton}
                 color="inherit"
                 aria-label="menu"

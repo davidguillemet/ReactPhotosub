@@ -19,6 +19,9 @@ import { useEventListener } from '../../utils/utils';
 import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
 
+import TooltipIconButton from '../../components/tooltipIconButton';
+import { HorizontalSpacing } from '../../template/spacing';
+
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 
@@ -87,14 +90,17 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
     }, [duration, onCompleted]);
 
     return (
-        <IconButton onClick={onClick} >
+        <TooltipIconButton
+            tooltip={"Arrêter le diaporama"}
+            onClick={onClick}
+        >
             <StopIcon fontSize='large'></StopIcon>
             <CircularProgress variant="determinate" value={progress} style={{
                 position: "absolute",
                 margin: 'auto'
                 }}
             />
-        </IconButton>
+        </TooltipIconButton>
     );
 }
 
@@ -263,21 +269,35 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                     {
                         isPlaying ?
                             <StopButtonWithCircularProgress onClick={handleStopClick} onCompleted={handleNextImage} duration={5000} key={currentImage?.id}/> :
-                            <IconButton onClick={handlePlayClick}><PlayArrowIcon fontSize='large'></PlayArrowIcon></IconButton>
+                            <TooltipIconButton
+                                tooltip="Lancer le diaporama"
+                                onClick={handlePlayClick}
+                            >
+                                <PlayArrowIcon fontSize='large'></PlayArrowIcon>
+                            </TooltipIconButton>
                     }
                     {
                         isPlaying ?
                         null :
                         <React.Fragment>
-                            <IconButton onClick={handleInfoClick} disabled={currentImageHasDetails() === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
+                            <TooltipIconButton
+                                tooltip={infoVisible ? "Cacher les détails" : "Afficher les détails"}
+                                onClick={handleInfoClick}
+                                disabled={currentImageHasDetails() === false}
+                            >
+                                <InfoIcon fontSize='large'></InfoIcon>
+                            </TooltipIconButton>
                             <FavoriteButton fontSize='large' path={`${currentImage?.path}/${currentImage?.name}`} />
-                            <IconButton onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}>
+                            <TooltipIconButton
+                                tooltip={fullScreen ? "Réduire" : "Plein écran"}
+                                onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}
+                            >
                             {   
                                 fullScreen ?
                                 <FullscreenExitIcon fontSize='large' /> :
                                 <FullscreenIcon fontSize='large' />
                             }
-                            </IconButton>
+                            </TooltipIconButton>
                         </React.Fragment>
                     }
                 </Box>
@@ -299,7 +319,15 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                     alignItems: 'center'
                 }}
                 >
-                    <IconButton onClick={handleCloseClick}><CloseIcon fontSize='large'></CloseIcon></IconButton>
+                    {
+                        isPlaying ?
+                        <HorizontalSpacing></HorizontalSpacing> :
+                        <TooltipIconButton
+                            tooltip="Fermer la visionneuse"
+                            onClick={handleCloseClick}>
+                            <CloseIcon fontSize='large'></CloseIcon>
+                        </TooltipIconButton>
+                    }
                 </Box>
             </Paper>
             <Box style={{
