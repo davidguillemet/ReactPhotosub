@@ -8,6 +8,7 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { makeStyles } from '@material-ui/core/styles';
 import dataProvider from '../../dataProvider';
 import PageTitle from '../../template/pageTitle';
+import { getMediumThumbSrc } from '../../utils/utils';
 
 const useStyles = makeStyles((theme) => ({
     gridList: {
@@ -93,7 +94,12 @@ const Destinations = () => {
             return;
         }
         dataProvider.getDestinations().then(destinations => {
-            setAllDestinations(destinations);
+            setAllDestinations(destinations.map(dest => {
+                return {
+                    ...dest,
+                    cover: getMediumThumbSrc(dest.cover)
+                }
+            }));
 
             // Build the regions map by destination (destination id -> region list)
             const regionsByDestination = new Map();

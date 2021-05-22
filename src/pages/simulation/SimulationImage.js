@@ -10,6 +10,7 @@ import { green, grey } from '@material-ui/core/colors';
 import { useEffect } from 'react';
 
 import {moveImage, resizeAndMoveImage, deleteImage} from './actions/SimulationActions';
+import { getThumbnailSrc } from '../../utils/utils';
 
 const useStyle = makeStyles((theme) => ({
     container: {
@@ -32,7 +33,6 @@ const useStyle = makeStyles((theme) => ({
     buttonGroup: {
         display: 'none',
         position: 'absolute',
-        top: 0,
         left: '50%',
         transform: 'translateX(-50%)',
     },
@@ -101,7 +101,7 @@ const SimulationImage = ({image, selected, border, dispatch, onClick, simulation
             <img 
                 draggable="false"
                 alt=""
-                src={image.src}
+                src={getThumbnailSrc(image, width)}
                 style={{
                     width: '100%',
                     display: 'block'

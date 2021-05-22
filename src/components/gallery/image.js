@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import FavoriteButton from './favoriteButton';
+import { getThumbnailSrc } from '../../utils/utils';
 
 const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
 
@@ -79,8 +80,7 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
                             // when image is visible in the viewport + rootMargin
                             if (!didCancel &&
                                 (entry.intersectionRatio > 0 || entry.isIntersecting)) {
-                                    console.log("Load image " + image.src);
-                                setImageSrc(image.src)
+                                setImageSrc(getThumbnailSrc(image, width))
                             }
                         })
                     }
@@ -88,7 +88,7 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
                 observer.observe(imageRef)
             } else {
                 // Old browsers fallback
-                setImageSrc(image.src)
+                setImageSrc(getThumbnailSrc(image, width))
             }
         }
 
@@ -99,7 +99,7 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
                 observer.unobserve(imageRef)
             }
         }
-    }, [imageRef, imageSrc, image]);
+    }, [imageRef, imageSrc, image, width]);
 
     function handleImageClick() {
         if (onClick) {
