@@ -85,10 +85,10 @@ const useImageLoader = (user, simulations) => {
 
     // Load image selection = home slideshow ?
     useEffect(() => {
-        dataProvider.getInteriors().then(interiors => {
-            setImages(interiors.map(interior => {
+        dataProvider.getImageDefaultSelection().then(selection => {
+            setImages(selection.map(imageSrc => {
                 return {
-                    src: interior,
+                    src: imageSrc,
                     id: uniqueID()
                 }
             }));

@@ -989,23 +989,46 @@
             }
         ]
     },
+    "homeslideshow": [
+        "/static-storage/homeslideshow/DSC_2264.jpg",
+        "/static-storage/homeslideshow/DSC_2592.jpg",
+        "/static-storage/homeslideshow/DSC_2679.jpg",
+        "/static-storage/homeslideshow/DSC_2683.jpg",
+        "/static-storage/homeslideshow/DSC_2780.jpg",
+        "/static-storage/homeslideshow/DSC_2857-Modifier.jpg",
+        "/static-storage/homeslideshow/DSC_3038.jpg",
+        "/static-storage/homeslideshow/DSC_3138-Modifier.jpg",
+        "/static-storage/homeslideshow/DSC_3271.jpg",
+        "/static-storage/homeslideshow/DSC_4976.jpg",
+        "/static-storage/homeslideshow/DSC_5529.jpg",
+        "/static-storage/homeslideshow/DSC_5654.jpg",
+        "/static-storage/homeslideshow/DSC_5683.jpg",
+        "/static-storage/homeslideshow/DSC_6836-Modifier.jpg",
+        "/static-storage/homeslideshow/DSC_6943-Modifier.jpg",
+        "/static-storage/homeslideshow/DSC_7313.jpg",
+        "/static-storage/homeslideshow/DSC_7452.jpg",
+        "/static-storage/homeslideshow/DSC_7497.jpg",
+        "/static-storage/homeslideshow/DSC_8030.jpg",
+        "/static-storage/homeslideshow/DSC_8070.jpg",
+        "/static-storage/homeslideshow/DSC_9345.jpg"
+    ],
     "interiors": [
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/bedroom-01.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/bedroom-02.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/kidsroom-01.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-01.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-02.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-03.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-04.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-05.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/livingroom-06.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/office-01.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/office-02.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/outside-01.jpg"
+        "/static-storage/interiors/bedroom-01.jpg",
+        "/static-storage/interiors/bedroom-02.jpg",
+        "/static-storage/interiors/kidsroom-01.jpg",
+        "/static-storage/interiors/livingroom-01.jpg",
+        "/static-storage/interiors/livingroom-02.jpg",
+        "/static-storage/interiors/livingroom-03.jpg",
+        "/static-storage/interiors/livingroom-04.jpg",
+        "/static-storage/interiors/livingroom-05.jpg",
+        "/static-storage/interiors/livingroom-06.jpg",
+        "/static-storage/interiors/office-01.jpg",
+        "/static-storage/interiors/office-02.jpg",
+        "/static-storage/interiors/outside-01.jpg"
     ],
     "uploadedInteriors": [
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/office-01.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/office-02.jpg",
-        "https://storage.googleapis.com/photosub.appspot.com/interiors/outside-01.jpg"
+        "/static-storage/interiors/office-01.jpg",
+        "/static-storage/interiors/office-02.jpg",
+        "/static-storage/interiors/outside-01.jpg"
     ]
 }

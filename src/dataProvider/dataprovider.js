@@ -123,10 +123,7 @@ function getImageCount() {
 }
 
 function getInteriors() {
-    return axios.get('/api/interiors')
-    .then(response => {
-        return response.data;
-    });
+    return _getBucketContent('interiors');
 }
 
 function getUploadedInteriors() {
@@ -138,6 +135,17 @@ function getUploadedInteriors() {
 
 function removeUploadedInterior(fileName) {
     return axios.delete('/api/uploadedInteriors', {data: { fileName: fileName } })
+}
+
+function getImageDefaultSelection() {
+    return _getBucketContent('homeslideshow');
+}
+
+function _getBucketContent(folder) {
+    return axios.get(`/bucket/${folder}`)
+    .then(response => {
+        return response.data;
+    });
 }
 
 const dataProvider = {
@@ -156,7 +164,8 @@ const dataProvider = {
     getImageCount: getImageCount,
     getInteriors: getInteriors,
     getUploadedInteriors: getUploadedInteriors,
-    removeUploadedInterior: removeUploadedInterior
+    removeUploadedInterior: removeUploadedInterior,
+    getImageDefaultSelection: getImageDefaultSelection
 }
 
 export default dataProvider;

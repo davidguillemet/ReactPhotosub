@@ -103,9 +103,7 @@ function getImageCount() {
 }
 
 function getInteriors() {
-    return fetchhMockData('../../').then(data => {
-        return data.interiors;
-    });
+    return _getBucketContent('interiors');
 }
 
 function getUploadedInteriors() {
@@ -118,6 +116,16 @@ function removeUploadedInterior(fileName) {
     return fetchhMockData('../../').then(data => {
         return data.uploadedInteriors.filter(interior => interior.endsWith(fileName) === false);
     });
+}
+
+function getImageDefaultSelection() {
+    return _getBucketContent('homeslideshow');
+}
+
+function _getBucketContent(folder) {
+    return fetchhMockData('../../').then(data => {
+        return data[folder];
+    });    
 }
 
 const mockProvider = {
@@ -136,7 +144,8 @@ const mockProvider = {
     getImageCount: getImageCount,
     getInteriors: getInteriors,
     getUploadedInteriors: getUploadedInteriors,
-    removeUploadedInterior: removeUploadedInterior
+    removeUploadedInterior: removeUploadedInterior,
+    getImageDefaultSelection: getImageDefaultSelection
 };
 
 export default mockProvider;

@@ -39,7 +39,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     const classes = useStyle();
 
-    const [ interiors, images, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations);
+    const [interiors, images, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
 
     const [currentImageId, setCurrentImageId] = useState(null);
