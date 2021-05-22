@@ -46,11 +46,13 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     const simulation = useMemo(() => simulations[simulationIndex], [simulations, simulationIndex]);
 
-    const handleResize = useCallback(({width, height}) => {
-        dispatch(resize(width, simulationIndex));
-    }, [simulationIndex, dispatch]);
+    const resizeObserver = useResizeObserver();
 
-    const resizeObserver = useResizeObserver(handleResize);
+    useEffect(() => {
+        if (resizeObserver.width > 0) {
+            dispatch(resize(resizeObserver.width, simulationIndex));
+        }
+    }, [resizeObserver.width, simulationIndex, dispatch]);
 
     useEffect(() => {
         if (interiors === null) {

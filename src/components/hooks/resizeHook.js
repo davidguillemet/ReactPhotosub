@@ -3,17 +3,14 @@ import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observe
 
 const ResizeObserver = window.ResizeObserver || ResizeObserverPolyfill;
 
-export default function useResizeObserver(handleResize) {
+export default function useResizeObserver() {
   const [size, setSize] = useState({ width: 0, height: 0 });
   const resizeObserver = useRef(null);
 
   const onResize = useCallback(entries => {
     const { width, height } = entries[0].contentRect;
     setSize({ width, height });
-    if (handleResize) {
-        handleResize({ width, height })
-    }
-  }, [handleResize]);
+  }, []);
 
   const ref = useCallback(
     node => {
