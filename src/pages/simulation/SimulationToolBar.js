@@ -1,15 +1,11 @@
 import React, { useCallback, useState, useMemo } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
 import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import LockOpenOutlinedIcon from '@material-ui/icons/LockOpenOutlined';
-import Tooltip from '@material-ui/core/Tooltip';
-import Zoom from '@material-ui/core/Zoom';
 
 import {unstable_batchedUpdates} from 'react-dom';
 
@@ -17,59 +13,14 @@ import SimulationSplitButton from './SimulationSplitButton';
 import SimulationNameDialog from './SimulationNameDlg';
 import {isFromDb, isDirty} from '../../dataProvider';
 
+import TooltipIconButton from '../../components/tooltipIconButton';
+
 import {simulationHasName} from './actions/SimulationReducer';
 import {
     setCurrentSimulationIndex,
     toggleLock
 } from './actions/SimulationActions';
 
-const useTooltipButtonStyles = makeStyles((theme) => ({
-    tooltipLabel: {
-        fontSize: 16
-    },
-    tooltipPlacementBottom: {
-        backgroundColor: 'black',
-        top: 15
-    },
-    arrow: {
-        color: 'black',
-    },
-    menuButton: {
-        marginRight: theme.spacing(0),
-      },
-  }));
-
-
-const ButtonWithTooltip = ({tooltip, onClick, disabled, children, style}) => {
-
-    const classes = useTooltipButtonStyles();
-
-    return (
-        <Tooltip
-            title={tooltip}
-            placement="bottom"
-            TransitionComponent={Zoom}
-            arrow
-            classes={{
-                tooltip: classes.tooltipLabel,
-                tooltipPlacementBottom: classes.tooltipPlacementBottom,
-                arrow: classes.arrow
-            }}
-        >
-            <IconButton
-                edge="start"
-                className={classes.menuButton}
-                color="inherit"
-                aria-label="menu"
-                onClick={onClick}
-                disabled={disabled}
-                style={style}
-            >
-                {children}
-            </IconButton>
-        </Tooltip>
-    );
-}
 
 const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, dispatch}) => {
     const [action, setAction] = useState("save");
@@ -133,15 +84,15 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
             />
 
             <Toolbar variant="dense">
-                <ButtonWithTooltip tooltip={`Sauvegarder "${simulation.name}"`} onClick={handleSave} disabled={isDirty(simulation) === false}>
+                <TooltipIconButton tooltip={`Sauvegarder "${simulation.name}"`} onClick={handleSave} disabled={isDirty(simulation) === false}>
                     <SaveOutlinedIcon />
-                </ButtonWithTooltip>
+                </TooltipIconButton>
 
-                <ButtonWithTooltip tooltip="Ajouter une simulation" onClick={handleAdd} >
+                <TooltipIconButton tooltip="Ajouter une simulation" onClick={handleAdd} >
                     <AddOutlinedIcon />
-                </ButtonWithTooltip>
+                </TooltipIconButton>
 
-                <ButtonWithTooltip
+                <TooltipIconButton
                     tooltip={simulation.isLocked ? `Déverrouiller "${simulation.name}"`: `Verrouiller "${simulation.name}"`}
                     onClick={handleToggleLock} >
                     {
@@ -149,7 +100,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                         <LockOpenOutlinedIcon /> :
                         <LockOutlinedIcon />
                     }
-                </ButtonWithTooltip>
+                </TooltipIconButton>
 
                 <SimulationSplitButton
                     simulations={simulations}
@@ -157,7 +108,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     onSelectionChange={onSelectionChange}
                 />
 
-                <ButtonWithTooltip
+                <TooltipIconButton
                     tooltip={`Supprimer "${simulation.name}"`}
                     onClick={handleDelete}
                     disabled={simulations.length === 1 && isFromDb(simulations[0]) === false}
@@ -167,7 +118,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     }}
                 >
                     <DeleteOutlineOutlinedIcon />
-                </ButtonWithTooltip>
+                </TooltipIconButton>
 
             </Toolbar>
         </Paper>
