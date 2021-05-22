@@ -78,27 +78,45 @@ const ImageSlider = ({
     }, [getThumbnailRectAt])
 
     const thumbContainerRef = useRef(null);
-    const thumbContainerRefCallback = useCallback(element => {
-        const scrollHandler = (event) => {
-            handleResize();
-        };
-        
+    const resizeObserver = useRef(null);
+
+    const thumbContainerRefCallback = useCallback(element => {        
         if (element !== null) {
             thumbContainerRef.current = element;
             setThumbContainerProps(prevState => { return { ...prevState, width: element.clientWidth } });
-            const resizeObserver = new ResizeObserver(() => {
+
+            if (resizeObserver.current) {
+                resizeObserver.current.disconnect();
+            }
+
+            resizeObserver.current = new ResizeObserver(() => {
                 // Mahe sure to synchronize the slider with the effective thumbnail scroll position that can
                 // change when resizing the window
                 handleResize();
             });
-            resizeObserver.observe(element);
 
-            // Add scroll event:
-            element.addEventListener('scroll', scrollHandler);
+            resizeObserver.current.observe(element);
         }
 
-        return () => element.removeEventListener('scroll', scrollHandler);
+    }, [handleResize]);
 
+    useEffect(() => () => {
+        if (resizeObserver.current !== null) {
+            resizeObserver.current.disconnect();
+        }
+    }, []);
+
+    useEffect(() => {
+        if (thumbContainerRef.current === null) {
+            return;
+        }
+
+        const scrollHandler = (event) => {
+            handleResize();
+        };
+            // Add scroll event:
+        thumbContainerRef.current.addEventListener('scroll', scrollHandler);
+        return () => thumbContainerRef.current.removeEventListener('scroll', scrollHandler);
     }, [handleResize]);
     
     const scrollThumbnailContainer = useCallback((targetScroll) => {

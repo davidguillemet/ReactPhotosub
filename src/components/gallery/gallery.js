@@ -6,6 +6,7 @@ import Fade from '@material-ui/core/Fade';
 import Backdrop from '@material-ui/core/Backdrop';
 import LazyImage from './image';
 import ExpandedView from './expandedView';
+import { useResizeObserver } from '../../components/hooks';
 
 const useStyles = makeStyles({
     galleryContainer: {
@@ -69,17 +70,8 @@ const MasonryLayout = ({images, colWidth, margin, containerWidth, onImageClick})
 const Gallery = ({ images, style, colWidth, margin }) => {
     const classes = useStyles();
     const [expandedImage, setExpandedImage] = useState(null);
-    const [containerWidth, setContainerWidth] = useState(0);
 
-    const containerRefCallback = useCallback(element => {
-        if (element !== null) {
-            setContainerWidth(element.clientWidth);
-            const resizeObserver = new ResizeObserver(() => {
-                setContainerWidth(element.clientWidth);
-            });
-            resizeObserver.observe(element);
-        }
-    }, []);
+    const resizeObserver = useResizeObserver();
 
     function onImageClick(imageId) {
         setExpandedImage(imageId);
@@ -91,14 +83,14 @@ const Gallery = ({ images, style, colWidth, margin }) => {
 
     return (
         <React.Fragment>
-            <Box className={classes.galleryContainer} ref={containerRefCallback} style={style}>
+            <Box className={classes.galleryContainer} ref={resizeObserver.ref} style={style}>
             {
-                containerWidth > 0 && 
+                resizeObserver.width > 0 && 
                 <MasonryLayout
                     images={images}
                     colWidth={colWidth}
                     margin={margin}
-                    containerWidth={containerWidth}
+                    containerWidth={resizeObserver.width}
                     onImageClick={onImageClick}
                 />
             }
@@ -115,7 +107,10 @@ const Gallery = ({ images, style, colWidth, margin }) => {
                 }}
             >
                 <Fade in={expandedImage !== null}>
-                    <ExpandedView images={images} currentId={expandedImage} onClose={onCloseModal} />
+                    { /* Empty wrapper node to avoid error "The modal content node does not accept focus" */ }
+                    <>
+                        <ExpandedView images={images} currentId={expandedImage} onClose={onCloseModal} />
+                    </>
                 </Fade>
             </Modal>
         </React.Fragment>

@@ -24,7 +24,7 @@ const useTooltipButtonStyles = makeStyles((theme) => ({
   }));
 
 
-const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style, edge = "false"}) => {
+const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style, edge = false}) => {
 
     const classes = useTooltipButtonStyles();
 
@@ -41,6 +41,7 @@ const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style,
                 arrow: classes.arrow
             }}
         >
+            <span>
             <IconButton
                 edge={edge}
                 className={classes.menuButton}
@@ -52,6 +53,7 @@ const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style,
             >
                 {children}
             </IconButton>
+            </span>
         </Tooltip>
     );
 }

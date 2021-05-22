@@ -71,10 +71,13 @@ const useStyles = makeStyles({
 function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
     const [progress, setProgress] = useState(0);
 
+    const timerRef = useRef(null);
+
     React.useEffect(() => {
         const progressStep = 5; // step is 5%
         const stepInterval = duration * 5 / 100;
-        const timer = setInterval(() => {
+        // TODO : clear the timer on stop click
+        timerRef.current = setInterval(() => {
             setProgress((prevProgress) => {
                 if (prevProgress === 100) {
                     onCompleted();
@@ -85,14 +88,19 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
             });
         }, stepInterval);
         return () => {
-            clearInterval(timer);
+            clearInterval(timerRef.current);
         };
     }, [duration, onCompleted]);
+
+    const handleClick = () => {
+        clearInterval(timerRef.current);
+        onClick();
+    }
 
     return (
         <TooltipIconButton
             tooltip={"Arrêter le diaporama"}
-            onClick={onClick}
+            onClick={handleClick}
         >
             <StopIcon fontSize='large'></StopIcon>
             <CircularProgress variant="determinate" value={progress} style={{
@@ -104,7 +112,7 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
     );
 }
 
-const ExpandedView = ({ images, currentId, onClose }) => {
+const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
 
     const [currentIndex, setCurrentIndex] = useState(-1);
     const [currentImage, setCurrentImage] = useState(null);
@@ -234,6 +242,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
 
     return (
         <Box
+            ref={ref}
             onMouseMove={(isPlaying || fullScreen) ? handleMouseMove : null}
             style={{
                 display: 'flex',
@@ -283,7 +292,6 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                             <TooltipIconButton
                                 tooltip={infoVisible ? "Cacher les détails" : "Afficher les détails"}
                                 onClick={handleInfoClick}
-                                disabled={currentImageHasDetails() === false}
                             >
                                 <InfoIcon fontSize='large'></InfoIcon>
                             </TooltipIconButton>
@@ -391,15 +399,24 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                 </Collapse>
             </Box>
 
-            <Collapse in={infoVisible && currentImageHasDetails()}>
+            <Collapse in={infoVisible}>
                 <Paper elevation={4} style={{
                     marginBottom: 5,
                     padding: 10,
                     textAlign: 'center',
                     backgroundColor: '#edfeff'
                 }}>
-                    <Typography variant="h4" style={{ margin: 0 }}>{currentImage?.title}</Typography>
-                    <Typography variant="h5" style={{ marginBottom: 0 }}>{currentImage?.description}</Typography>
+                    {
+                        currentImageHasDetails() ?
+                        <React.Fragment>
+                            <Typography variant="h4" style={{ margin: 0 }}>{currentImage?.title}</Typography>
+                            <Typography variant="h5" style={{ marginBottom: 0 }}>{currentImage?.description}</Typography>
+                        </React.Fragment> :
+                        <React.Fragment>
+                            <Typography variant="h4" style={{ margin: 0 }}>...</Typography>
+                            <Typography variant="h5" style={{ marginBottom: 0 }}>...</Typography>
+                        </React.Fragment>
+                    }
                 </Paper>
             </Collapse>
 
@@ -412,6 +429,6 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             </Collapse>
         </Box>
     );
-};
+});
 
 export default ExpandedView;
