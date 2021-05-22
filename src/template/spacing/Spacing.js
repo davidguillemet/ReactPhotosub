@@ -1,6 +1,6 @@
 import { withTheme } from '@material-ui/core/styles';
 
-const Spacing = ({direction, factor, theme}) => {
+const Spacing = ({direction, factor = 2, theme}) => {
     const propName = direction === 'vertical' ? 'height' : 'width';
     return (
         <div style={{
