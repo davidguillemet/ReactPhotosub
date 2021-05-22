@@ -8,6 +8,8 @@ import IconButton from '@material-ui/core/IconButton';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import InfoIcon from '@material-ui/icons/InfoOutlined';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import StopIcon from '@material-ui/icons/Stop';
 import CloseIcon from '@material-ui/icons/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
@@ -102,6 +104,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     const [currentImage, setCurrentImage] = useState(null);
     const [infoVisible, setInfoVisible] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [fullScreen, setFullScreen] = useState(false);
     const headerBarRef = useRef(null);
     const hideHeaderTimeout = useRef(null);
           
@@ -157,6 +160,8 @@ const ExpandedView = ({ images, currentId, onClose }) => {
             case "Escape":
                 if (isPlaying) {
                     handleStopClick();
+                } else if (fullScreen) {
+                    handleClickExitFullScreen();
                 } else {
                     handleCloseClick();
                 }
@@ -166,6 +171,21 @@ const ExpandedView = ({ images, currentId, onClose }) => {
         }
     }
 
+    function cancelHideHeaderBar() {
+        headerBarRef.current.classList.remove('hidden');
+        clearTimeout(hideHeaderTimeout.current);
+    }
+
+    function handleClickFullScreen() {
+        hideHeaderBar();
+        setFullScreen(true);
+    }
+
+    function handleClickExitFullScreen() {
+        cancelHideHeaderBar();
+        setFullScreen(false);
+    }
+
     function handlePlayClick() {
         hideHeaderBar();
         setInfoVisible(false);
@@ -173,8 +193,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
     }
 
     function handleStopClick() {
-        headerBarRef.current.classList.remove('hidden');
-        clearTimeout(hideHeaderTimeout.current);
+        cancelHideHeaderBar();
         setIsPlaying(false);
     }
 
@@ -209,7 +228,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
 
     return (
         <Box
-            onMouseMove={isPlaying ? handleMouseMove : null}
+            onMouseMove={(isPlaying || fullScreen) ? handleMouseMove : null}
             style={{
                 display: 'flex',
                 flex: 1,
@@ -228,9 +247,9 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                     display: 'flex',
                     flexDirection: 'row',
                     transition: 'opacity 1s',
-                    width: isPlaying ? "auto" : "100%",
-                    position: isPlaying ? "absolute" : "relative",
-                    zIndex: isPlaying ? 100 : 1 
+                    width: (isPlaying || fullScreen) ? "auto" : "100%",
+                    position: (isPlaying || fullScreen) ? "absolute" : "relative",
+                    zIndex: (isPlaying || fullScreen) ? 100 : 1 
                 }}
             >
                 <Box style={{
@@ -252,6 +271,13 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                         <React.Fragment>
                             <IconButton onClick={handleInfoClick} disabled={currentImageHasDetails() === false}><InfoIcon fontSize='large'></InfoIcon></IconButton>
                             <FavoriteButton fontSize='large' path={`${currentImage?.path}/${currentImage?.name}`} />
+                            <IconButton onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}>
+                            {   
+                                fullScreen ?
+                                <FullscreenExitIcon fontSize='large' /> :
+                                <FullscreenIcon fontSize='large' />
+                            }
+                            </IconButton>
                         </React.Fragment>
                     }
                 </Box>
@@ -298,6 +324,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                             style={{
                                 display: 'flex',
                                 justifyContent: 'center',
+                                alignItems: 'center',
                                 position: 'absolute',
                                 top: 0,
                                 left: 0,
@@ -348,7 +375,7 @@ const ExpandedView = ({ images, currentId, onClose }) => {
                 </Paper>
             </Collapse>
 
-            <Collapse in={!isPlaying}>
+            <Collapse in={!isPlaying && !fullScreen}>
                 <ImageSlider
                     images={images}
                     currentIndex={currentIndex}
