@@ -1,36 +1,15 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
 import FavoriteIconOutlined from '@material-ui/icons/FavoriteBorderOutlined';
 import FavoriteIcon from '@material-ui/icons/Favorite';
-import Zoom from '@material-ui/core/Zoom';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import dataProvider from '../../dataProvider';
 
+import TooltipIconButton from '../tooltipIconButton';
 import { AuthContext } from '../authentication';
 
-const useFavoriteStyles = makeStyles(theme => ({
-    tooltipLabel: {
-        fontSize: 16
-    },
-    tooltipPlacementBottom: {
-        backgroundColor: 'black',
-        bottom: 15
-    },
-    tooltipPlacementTop: {
-        backgroundColor: 'black',
-        top: 15
-    },
-    arrow: {
-        color: 'black',
-    },
-}));
-
 const FavoriteButton = ({user, isInFavorites, updateUserFavorites, fontSize = 'default', style, color, path }) => {
-    const classes = useFavoriteStyles();
 
     function handleFavoriteClick() {
         const updatePromise =
@@ -53,8 +32,8 @@ const FavoriteButton = ({user, isInFavorites, updateUserFavorites, fontSize = 'd
     }
 
     return (
-        <Tooltip
-            title={
+        <TooltipIconButton
+            tooltip={
                 <Box style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -74,24 +53,15 @@ const FavoriteButton = ({user, isInFavorites, updateUserFavorites, fontSize = 'd
                     }        
                 </Box>
             }
-            placement="bottom"
-            TransitionComponent={Zoom}
-            arrow
-            classes={{
-                tooltip: classes.tooltipLabel,
-                tooltipPlacementBottom: classes.tooltipPlacementBottom,
-                tooltipPlacementTop: classes.tooltipPlacementTop,
-                arrow: classes.arrow
-            }}
+            onClick={user ? handleFavoriteClick : null}
+            style={buttonStyle}
         >
-            <IconButton style={buttonStyle} onClick={user ? handleFavoriteClick : null}>
-                {
-                    isInFavorites ?
-                    <FavoriteIcon fontSize={fontSize}/> :
-                    <FavoriteIconOutlined fontSize={fontSize} />
-                }
-            </IconButton>
-        </Tooltip>
+            {
+                isInFavorites ?
+                <FavoriteIcon fontSize={fontSize}/> :
+                <FavoriteIconOutlined fontSize={fontSize} />
+            }
+        </TooltipIconButton>
     );
 }
 
