@@ -159,7 +159,7 @@ export function getThumbnailSrc(image, width) {
 }
 
 export function clearThumbnailSrc(image) {
-    for (let sizeSpec in _thumbnailSpecs) {
+    for (let sizeSpec of _thumbnailSpecs) {
         delete image[sizeSpec.propertyName];
     }
     return image;
