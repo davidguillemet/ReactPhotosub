@@ -1,6 +1,8 @@
 import { uniqueID } from '../../../utils/utils';
 import { TRANSIENT_PROPERTY_IS_DIRTY, TRANSIENT_PROPERTY_DB_INDEX, getDbIndex, isFromDb } from '../../../dataProvider';
 
+import { clearThumbnailSrc } from '../../../utils/utils';
+
 // Actions for a single image
 export const ACTION_UPDATE_IMAGE_SRC = 'image:set';
 export const ACTION_MOVE_IMAGE = 'image:move';
@@ -97,10 +99,15 @@ function imageReducer(state, action) {
     switch (action.type) {
         case ACTION_UPDATE_IMAGE_SRC:
             return {
-                ...state,
+                ...clearThumbnailSrc(state),
                 src: action.src
             };
         case ACTION_MOVE_IMAGE:
+            if (action.position.top === state.position.top &&
+                action.position.left === state.position.left) {
+                // No change: it might happen when we just click on the image
+                return state;
+            }
             return {
                 ...state,
                 position: action.position

@@ -111,7 +111,20 @@ export function isBlurrySrc(src) {
 
 const _thumbsSubFolder = 'thumbs';
 
-function _getThumbSrc(src, size) {
+const _thumbnailSpecs = [
+    {
+        maxSize: 256,
+        propertyName: "smallSrc",
+        fileSuffix: "s"
+    },
+    {
+        maxSize: 512,
+        propertyName: "mediumSrc",
+        fileSuffix: "m"
+    }
+];
+
+function _getThumbSrc(src, fileSuffix) {
     // src is like https://<host>/folder1/folder2/DSC_2264.jpg
     // we want a new path to the blurry version as https://<host>/folder1/folder2/thumbs/DSC_2264_[s|m].jpg
     const dotPosition = src.lastIndexOf(".");
@@ -120,7 +133,7 @@ function _getThumbSrc(src, size) {
     const fileDir = src.substring(0, lastSlashPosition);
     const fileName = src.substring(lastSlashPosition + 1, dotPosition);
     const fileExtension = src.substring(dotPosition);
-    return `${fileDir}/${_thumbsSubFolder}/${fileName}_${size}${fileExtension}`;
+    return `${fileDir}/${_thumbsSubFolder}/${fileName}_${fileSuffix}${fileExtension}`;
 }
 
 export function getMediumThumbSrc(src) {
@@ -132,17 +145,22 @@ export function getSmallThumbSrc(src) {
 }
 
 export function getThumbnailSrc(image, width) {
-    if (width > 512) {
-        return image.src;
-    }
-    if (width > 256) {
-        if (!image.mediumSrc) {
-            image.mediumSrc = getMediumThumbSrc(image.src);
+    
+    for (const sizeSpec of _thumbnailSpecs) {
+        if (sizeSpec.maxSize >= width) {
+            if (!image[sizeSpec.propertyName]) {
+                image[sizeSpec.propertyName] = _getThumbSrc(image.src, sizeSpec.fileSuffix)
+            }
+            return image[sizeSpec.propertyName];
         }
-        return image.mediumSrc;
     }
-    if (!image.smallSrc) {
-        image.smallSrc = getSmallThumbSrc(image.src);
+
+    return image.src;
+}
+
+export function clearThumbnailSrc(image) {
+    for (let sizeSpec in _thumbnailSpecs) {
+        delete image[sizeSpec.propertyName];
     }
-    return image.smallSrc;
+    return image;
 }
