@@ -5,6 +5,7 @@ import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import Skeleton from '@material-ui/lab/Skeleton';
+import Fade from '@material-ui/core/Fade';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { useResizeObserver } from '../../components/hooks';
@@ -138,9 +139,12 @@ const ImageSlider = ({
                 alignItems: 'center'
             }}>
 
+                { /* TODO : remove on mobile device */ }
+                <Fade in={thumnailScrollActivation.scrollLeft}>
                 <IconButton onClick={handleThumbnailsScrollLeft} disabled={!thumnailScrollActivation.scrollLeft}>
-                    <ArrowBackIosRoundedIcon />
+                    <ArrowBackIosRoundedIcon fontSize="large"/>
                 </IconButton>
+                </Fade>
 
                 {
                     images === null ?
@@ -199,9 +203,12 @@ const ImageSlider = ({
                     </Box>
                 }
 
+                { /* TODO : remove on mobile device */ }
+                <Fade in={thumnailScrollActivation.scrollRight}>
                 <IconButton onClick={handleThumbnailsScrollRight} disabled={!thumnailScrollActivation.scrollRight}>
-                    <ArrowForwardIosRoundedIcon />
+                    <ArrowForwardIosRoundedIcon fontSize="large"/>
                 </IconButton>
+                </Fade>
 
             </Box>
 
