@@ -77,7 +77,6 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
             <SimulationNameDialog
                 open={nameDlgOpen}
                 action={action}
-                defaultValue=""
                 validation={validateSimulationName}
                 onOpenChanged={setNameDlgOpen}
                 onValidate={action === "save" ? onSave : onAdd}

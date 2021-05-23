@@ -10,7 +10,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 // action = "save" or "rename"
-export default function SimulationNameDialog({ open, action = "save", defaultValue = "", validation, onOpenChanged, onValidate }) {
+export default function SimulationNameDialog({ open, action = "save", validation, onOpenChanged, onValidate }) {
     const [isOpen, setIsOpen] = useState(open);
     const [actionName, setActionName] = useState(action);
     const [hasError, setHasError] = useState(false);
@@ -81,14 +81,13 @@ export default function SimulationNameDialog({ open, action = "save", defaultVal
                 <DialogContent>
                     <DialogContentText>{dialogDetails.desc}</DialogContentText>
                     <TextField
-                        defaultValue={defaultValue}
                         value={name}
                         onChange={onNameChanged}
                         autoFocus
                         margin="dense"
                         id="name"
                         label="Nom de la simulation"
-                        type="email"
+                        type="text"
                         fullWidth
                         error={hasError}
                         helperText={hasError ? "Ce nom existe déjà" : ""}
