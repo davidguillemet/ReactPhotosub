@@ -36,11 +36,11 @@ const ImageSlider = ({
     disabled,
     onDeleteUploaded}) => {
     
-    const [thumnailScrollActivated, setThumbnailScrollActivated] = useState(false);
-    const [maxThumbRight, setMaxThumbRight] = useState(0);
+    const [thumnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
+    const [lastThumbRight, setLastThumbRight] = useState(0);
     const numberOfLoadedThumbnails = useRef(0);
 
-    const resizeObserver = useResizeObserver();
+    const resizeObserver = useResizeObserver(true);
     
     const scrollToThumbnail = useCallback((index) => {
 
@@ -95,18 +95,19 @@ const ImageSlider = ({
     }, [currentIndex, handleThumbnailClick]);
 
     useEffect(() => {
-        if (maxThumbRight <= resizeObserver.width) {
-            setThumbnailScrollActivated(false);
-        } else {
-            setThumbnailScrollActivated(true);
-        }
-    }, [resizeObserver.width, maxThumbRight]);
+        setThumbnailScrollActivation(prevState => {
+            return {
+                scrollLeft: resizeObserver.scrollLeft > 0,
+                scrollRight: lastThumbRight > resizeObserver.width + resizeObserver.scrollLeft
+            }
+        });
+    }, [resizeObserver.width, resizeObserver.scrollLeft, lastThumbRight]);
 
     const onThumbnailLoadedCallback = useCallback(() => {
         numberOfLoadedThumbnails.current++;
         if (numberOfLoadedThumbnails.current === images.length) {
             const lastThumbRect = getThumbnailRectAt(resizeObserver.element, images.length - 1);
-            setMaxThumbRight(lastThumbRect.left + lastThumbRect.width);
+            setLastThumbRight(lastThumbRect.left + lastThumbRect.width);
         }
     }, [images, resizeObserver.element]);
 
@@ -137,7 +138,7 @@ const ImageSlider = ({
                 alignItems: 'center'
             }}>
 
-                <IconButton onClick={handleThumbnailsScrollLeft} disabled={!thumnailScrollActivated}>
+                <IconButton onClick={handleThumbnailsScrollLeft} disabled={!thumnailScrollActivation.scrollLeft}>
                     <ArrowBackIosRoundedIcon />
                 </IconButton>
 
@@ -198,7 +199,7 @@ const ImageSlider = ({
                     </Box>
                 }
 
-                <IconButton onClick={handleThumbnailsScrollRight} disabled={!thumnailScrollActivated}>
+                <IconButton onClick={handleThumbnailsScrollRight} disabled={!thumnailScrollActivation.scrollRight}>
                     <ArrowForwardIosRoundedIcon />
                 </IconButton>
 
