@@ -32,9 +32,7 @@ const useStyle = makeStyles((theme) => ({
     },
     buttonGroup: {
         display: 'none',
-        position: 'absolute',
-        left: '50%',
-        transform: 'translateX(-50%)',
+        position: 'absolute'
     },
     visibleButtonGroup: {
         display: 'block'
