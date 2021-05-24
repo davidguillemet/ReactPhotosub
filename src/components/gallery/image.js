@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme => ({
 const LazyImage = ({ image, onClick, top, left, width }) => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
     const [imageRef, setImageRef] = useState(null);
-
+    const intersectionObserver = useRef(null);
     const classes = useStyles();
     
     const onLoad = event => {
@@ -69,34 +69,37 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
     }
 
     useEffect(() => {
-        let observer
         let didCancel = false
 
-        if (imageRef && imageSrc === placeHolder) {
+        const updatedSrc = getThumbnailSrc(image, width);
+        if (imageRef && (imageSrc === placeHolder || imageSrc !== updatedSrc)) {
             if (IntersectionObserver) {
-                observer = new IntersectionObserver(
+                if (intersectionObserver.current !== null) {
+                    intersectionObserver.current.unobserve(imageRef)
+                }
+                intersectionObserver.current = new IntersectionObserver(
                     entries => {
                         entries.forEach(entry => {
                             // when image is visible in the viewport + rootMargin
                             if (!didCancel &&
                                 (entry.intersectionRatio > 0 || entry.isIntersecting)) {
-                                setImageSrc(getThumbnailSrc(image, width))
+                                setImageSrc(updatedSrc)
                             }
                         })
                     }
                 )
-                observer.observe(imageRef)
+                intersectionObserver.current.observe(imageRef)
             } else {
                 // Old browsers fallback
-                setImageSrc(getThumbnailSrc(image, width))
+                setImageSrc(updatedSrc)
             }
         }
 
         return () => {
             didCancel = true
             // on component unmount, we remove the listner
-            if (observer && observer.unobserve) {
-                observer.unobserve(imageRef)
+            if (intersectionObserver.current && intersectionObserver.current.unobserve) {
+                intersectionObserver.current.unobserve(imageRef)
             }
         }
     }, [imageRef, imageSrc, image, width]);

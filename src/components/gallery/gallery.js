@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@material-ui/core/Box';
 import Modal from '@material-ui/core/Modal';
 import Fade from '@material-ui/core/Fade';
@@ -27,14 +27,8 @@ function getTargetColumnIndex(columnHeight) {
     return bestColumnIndex;
 }
 
-const MasonryLayout = ({images, colWidth, margin, containerWidth, onImageClick}) => {
+const MasonryLayout = ({images, imageWidth, columnsCount, margin, onImageClick}) => {
     
-    const columnsCount = Math.floor((containerWidth + margin) / (colWidth + margin));
-    const realColumnWidth = (containerWidth - (columnsCount-1)*margin) / columnsCount;
-
-    const totalMargin = (columnsCount-1)*margin;
-    const imageWidth = (containerWidth - totalMargin) / columnsCount;
-
     // Compute the cumulative height of each column
     const columnTopPosition = Array.from({length: columnsCount}, () => 0);
     
@@ -43,7 +37,7 @@ const MasonryLayout = ({images, colWidth, margin, containerWidth, onImageClick})
             {
                 images.map((image, index) => {
                     const targetColumnIndex = getTargetColumnIndex(columnTopPosition);
-                    const imageHeight = realColumnWidth / image.sizeRatio;
+                    const imageHeight = imageWidth / image.sizeRatio;
                     const imageTop = columnTopPosition[targetColumnIndex] + margin;
                     columnTopPosition[targetColumnIndex] = imageTop + imageHeight;
                     return (
@@ -52,7 +46,7 @@ const MasonryLayout = ({images, colWidth, margin, containerWidth, onImageClick})
                             image={image}
                             onClick={onImageClick}
                             top={imageTop}
-                            left={targetColumnIndex*(realColumnWidth+margin)}
+                            left={targetColumnIndex*(imageWidth+margin)}
                             width={imageWidth}
                         />
                     );
@@ -70,6 +64,10 @@ const MasonryLayout = ({images, colWidth, margin, containerWidth, onImageClick})
 const Gallery = ({ images, style, colWidth, margin }) => {
     const classes = useStyles();
     const [expandedImage, setExpandedImage] = useState(null);
+    const [masonryProps, setMasonryProps] = useState({
+        imageWidth: colWidth,
+        columnsCount: 0
+    });
 
     const resizeObserver = useResizeObserver();
 
@@ -81,16 +79,27 @@ const Gallery = ({ images, style, colWidth, margin }) => {
         setExpandedImage(null);
     }
 
+    useEffect(() => {
+        const containerWidth = resizeObserver.width;
+        const columnsCount = Math.floor((containerWidth + margin) / (colWidth + margin));
+        const totalMargin = (columnsCount-1)*margin;
+        const imageWidth = Math.round((containerWidth - totalMargin) / columnsCount);
+        setMasonryProps({
+            imageWidth,
+            columnsCount
+        });
+    }, [resizeObserver.width, colWidth, margin])
+
     return (
         <React.Fragment>
             <Box className={classes.galleryContainer} ref={resizeObserver.ref} style={style}>
             {
-                resizeObserver.width > 0 && 
+                masonryProps.columnsCount > 0 && 
                 <MasonryLayout
                     images={images}
-                    colWidth={colWidth}
+                    imageWidth={masonryProps.imageWidth}
+                    columnsCount={masonryProps.columnsCount}
                     margin={margin}
-                    containerWidth={resizeObserver.width}
                     onImageClick={onImageClick}
                 />
             }
