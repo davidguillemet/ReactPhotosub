@@ -8,20 +8,31 @@ const {logger} = require("../utils/logger");
 const ACTION_CREATE = "create";
 const ACTION_DELETE = "delete";
 
+/**
+ * These sizes are redefined in React app utils.js
+ */
 const _sizes = [
     {
+        suffix: "xs",
+        width: 150,
+    },
+    {
         suffix: "s",
-        width: 256,
+        width: 300,
     },
     {
         suffix: "m",
-        width: 512,
+        width: 600,
+    },
+    {
+        suffix: "l",
+        width: 1200,
     },
 ];
 
 function createThumbnail(fileContent, bucket, width, tempResizedFilePath, resizedFilePathInBucket) {
     return sharp(fileContent)
-        .resize(width, null)
+        .resize(width, null, {withoutEnlargement: true}) // No enlargement if the image size is less than specified thumbnail
         .toFile(tempResizedFilePath)
         .then(() => {
             return bucket.upload(tempResizedFilePath, {

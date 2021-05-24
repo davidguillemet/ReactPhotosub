@@ -15,7 +15,7 @@ import CloseIcon from '@material-ui/icons/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import Typography from '@material-ui/core/Typography';
-import { useEventListener } from '../../utils/utils';
+import { useEventListener, getThumbnailSrc, THUMB_LARGEST } from '../../utils/utils';
 import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
 
@@ -373,7 +373,7 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                             <img
                                 alt=""
                                 onLoad={onImageLoaded}
-                                src={currentImage?.src}
+                                src={currentImage ? getThumbnailSrc(currentImage, THUMB_LARGEST) : null}
                                 className={classes.mainImage} />
                         </Box>
                     </CSSTransition>

@@ -109,18 +109,35 @@ export function isBlurrySrc(src) {
     return src.includes(_blurrySubFolder);
 }
 
+const THUMB_XS = 150;
+const THUMB_S  = 300;
+const THUMB_M = 600;
+const THUMB_L = 1200;
+export const THUMB_LARGEST = THUMB_L;
+export const THUMB_ORIGINAL = THUMB_L + 1;
+
 const _thumbsSubFolder = 'thumbs';
 
 const _thumbnailSpecs = [
     {
-        maxSize: 256,
+        maxSize: THUMB_XS,
+        propertyName: "extraSmallSrc",
+        fileSuffix: "xs"
+    },
+    {
+        maxSize: THUMB_S,
         propertyName: "smallSrc",
         fileSuffix: "s"
     },
     {
-        maxSize: 512,
+        maxSize: THUMB_M,
         propertyName: "mediumSrc",
         fileSuffix: "m"
+    },
+    {
+        maxSize: THUMB_L,
+        propertyName: "largeSrc",
+        fileSuffix: "l"
     }
 ];
 
@@ -136,18 +153,15 @@ function _getThumbSrc(src, fileSuffix) {
     return `${fileDir}/${_thumbsSubFolder}/${fileName}_${fileSuffix}${fileExtension}`;
 }
 
-export function getMediumThumbSrc(src) {
-    return _getThumbSrc(src, "m");
-}
-
-export function getSmallThumbSrc(src) {
-    return _getThumbSrc(src, "s");
-}
-
 export function getThumbnailSrc(image, width) {
     
     for (const sizeSpec of _thumbnailSpecs) {
         if (sizeSpec.maxSize >= width) {
+            if (typeof image === 'string') {
+                // image is a strign and not an image object
+                // -> just return the converted url
+                return _getThumbSrc(image, sizeSpec.fileSuffix);
+            }
             if (!image[sizeSpec.propertyName]) {
                 image[sizeSpec.propertyName] = _getThumbSrc(image.src, sizeSpec.fileSuffix)
             }
