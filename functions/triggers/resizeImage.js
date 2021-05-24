@@ -4,6 +4,10 @@ const {Storage} = require("@google-cloud/storage");
 const os = require("os");
 const {logger} = require("../utils/logger");
 
+
+const ACTION_CREATE = "create";
+const ACTION_DELETE = "delete";
+
 const _sizes = [
     {
         suffix: "s",
@@ -15,27 +19,7 @@ const _sizes = [
     },
 ];
 
-module.exports = function resizeImage(file, fileContent, thumbsFolder) {
-    const filePathProps = path.parse(file.name);
-    const fileNameWithoutExtension = filePathProps.name;
-    const fileExtension = filePathProps.ext;
-
-    const storage = new Storage();
-    const bucket = storage.bucket(file.bucket);
-
-    const promises = _sizes.map((sizeSpec) => {
-        const resizedFileName = `${fileNameWithoutExtension}_${sizeSpec.suffix}${fileExtension}`;
-        const tempResizedFilePath = path.join(os.tmpdir(), resizedFileName);
-
-        const fileDir = filePathProps.dir;
-        const resizedFilePathInBucket = `${fileDir}/${thumbsFolder}/${resizedFileName}`;
-        return singleResize(fileContent, bucket, sizeSpec.width, tempResizedFilePath, resizedFilePathInBucket);
-    });
-
-    return Promise.all(promises);
-};
-
-function singleResize(fileContent, bucket, width, tempResizedFilePath, resizedFilePathInBucket) {
+function createThumbnail(fileContent, bucket, width, tempResizedFilePath, resizedFilePathInBucket) {
     return sharp(fileContent)
         .resize(width, null)
         .toFile(tempResizedFilePath)
@@ -47,3 +31,52 @@ function singleResize(fileContent, bucket, width, tempResizedFilePath, resizedFi
             logger.error(`Failed to create resized file ${resizedFilePathInBucket}.`, error);
         });
 }
+
+function deleteThumbnail(bucket, thumbnailPathInBucket) {
+    const bucketFile = bucket.file(thumbnailPathInBucket);
+    return bucketFile.exists().then((data) => {
+        const exists = data[0];
+        if (exists) {
+            return bucketFile.delete();
+        } else {
+            logger.info(`Thumbnail ${thumbnailPathInBucket} does not exist.`);
+            return Promise.resolve();
+        }
+    });
+}
+
+function processThumbnails(action, file, thumbsFolder, actionParams) {
+    const filePathProps = path.parse(file.name);
+    const fileNameWithoutExtension = filePathProps.name;
+    const fileExtension = filePathProps.ext;
+
+    const storage = new Storage();
+    const bucket = storage.bucket(file.bucket);
+
+    const promises = _sizes.map((sizeSpec) => {
+        const thumbnailFileName = `${fileNameWithoutExtension}_${sizeSpec.suffix}${fileExtension}`;
+
+        const fileDir = filePathProps.dir;
+        const thumbnailPathInBucket = `${fileDir}/${thumbsFolder}/${thumbnailFileName}`;
+
+        if (action === ACTION_CREATE) {
+            const tempResizedFilePath = path.join(os.tmpdir(), thumbnailFileName);
+            return createThumbnail(actionParams.fileContent, bucket, sizeSpec.width, tempResizedFilePath, thumbnailPathInBucket);
+        } else if (action === ACTION_DELETE) {
+            return deleteThumbnail(bucket, thumbnailPathInBucket);
+        }
+    });
+
+    return Promise.all(promises);
+}
+
+exports.createThumbnails = function(file, fileContent, thumbsFolder) {
+    const params = {
+        fileContent: fileContent,
+    };
+    return processThumbnails(ACTION_CREATE, file, thumbsFolder, params);
+};
+
+exports.deleteThumbnails = function(file, thumbsFolder) {
+    return processThumbnails(ACTION_DELETE, file, thumbsFolder);
+};

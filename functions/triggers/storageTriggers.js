@@ -16,7 +16,9 @@
 // file.name = "2014/misool/DSC_1378.jpg" ==> filepath
 // file.eventType = "google.storage.object.finalize"
 
-// File API: https://googleapis.dev/nodejs/storage/latest/File.html
+// File API:
+// - https://googleapis.dev/nodejs/storage/latest/File.html
+// - https://googleapis.dev/nodejs/storage/latest/Bucket.html
 // Trigger Sample: https://firebase.google.com/docs/functions/gcp-storage-events
 
 const {Storage} = require("@google-cloud/storage");
@@ -26,8 +28,8 @@ const axios = require("axios");
 
 const {logger} = require("../utils/logger");
 const extractExif = require("./extractExif");
-const blurImage = require("./blurImage");
-const resizeImage = require("./resizeImage");
+const {blurImage, deleteBlurryImage} = require("./blurImage");
+const {createThumbnails, deleteThumbnails} = require("./resizeImage");
 
 const _baseApiUrl = "https://photosub.web.app";
 const _blurryFolder = "blurry";
@@ -48,7 +50,11 @@ exports.deleteFile = function(file) {
     }
 
     if (mustBlurImage(file)) {
-        // TODO : remove blurry versions of the current image
+        promises.push(deleteBlurryImage(file, _blurryFolder));
+    }
+
+    if (mustResizeImage(file)) {
+        promises.push(deleteThumbnails(file, _thumbsFolder));
     }
 
     if (promises.length > 0) {
@@ -87,7 +93,7 @@ exports.newFile = function(file) {
         }
         if (mustResizeImage(file)) {
             // Create thumbnails for the current image
-            promises.push(resizeImage(file, fileContent, _thumbsFolder));
+            promises.push(createThumbnails(file, fileContent, _thumbsFolder));
         }
         return Promise.all(promises);
     }).catch((error) => {
@@ -112,8 +118,7 @@ function mustResizeImage(file) {
 function mustBlurImage(file) {
     // Blur only the images from home slideshow that are not already blurry
     return isAnImage(file) === true &&
-           isInHomeSlideshow(file) === true && isBlurryImage(file) === false &&
-           isInteriorImage(file) === false;
+           isInHomeSlideshow(file) === true && isBlurryImage(file) === false && isResizedImage(file) === false;
 }
 
 function isAnImage(file) {

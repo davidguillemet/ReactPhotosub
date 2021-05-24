@@ -6,9 +6,15 @@ const {logger} = require("../utils/logger");
 const functions = require("firebase-functions");
 const configFunctions = functions.config();
 
-module.exports = function blurImage(file, fileContent, blurryFolder) {
-    const filePathProps = path.parse(file.name);
+function _getBlurryFilePath(filePathProps, blurryFolder) {
+    const fileDir = filePathProps.dir;
     const fileName = filePathProps.base;
+    const blurryFilePathInBucket = `${fileDir}/${blurryFolder}/${fileName}`;
+    return blurryFilePathInBucket;
+}
+
+exports.blurImage = function(file, fileContent, blurryFolder) {
+    const filePathProps = path.parse(file.name);
     const fileNameWithoutExtension = filePathProps.name;
     const fileExtension = filePathProps.ext;
     const tempBlurryFileName = `${fileNameWithoutExtension}_blurry${fileExtension}`;
@@ -18,8 +24,7 @@ module.exports = function blurImage(file, fileContent, blurryFolder) {
         .blur(parseFloat(configFunctions.blur.sigma))
         .toFile(tempBlurryFilePath)
         .then(() => {
-            const fileDir = filePathProps.dir;
-            const blurryFilePathInBucket = `${fileDir}/${blurryFolder}/${fileName}`;
+            const blurryFilePathInBucket = _getBlurryFilePath(filePathProps, blurryFolder);
 
             const storage = new Storage();
             const bucket = storage.bucket(file.bucket);
@@ -29,4 +34,23 @@ module.exports = function blurImage(file, fileContent, blurryFolder) {
         }).catch((error) => {
             logger.error(`Failed to create blurry version of ${file.name}.`, error);
         });
+};
+
+exports.deleteBlurryImage = function(file, blurryFolder) {
+    const filePathProps = path.parse(file.name);
+    const blurryFilePathInBucket = _getBlurryFilePath(filePathProps, blurryFolder);
+
+    const storage = new Storage();
+    const bucket = storage.bucket(file.bucket);
+
+    const bucketFile = bucket.file(blurryFilePathInBucket);
+    return bucketFile.exists().then((data) => {
+        const exists = data[0];
+        if (exists) {
+            return bucketFile.delete();
+        } else {
+            logger.info(`Blurry image ${blurryFilePathInBucket} does not exist.`);
+            return Promise.resolve();
+        }
+    });
 };
