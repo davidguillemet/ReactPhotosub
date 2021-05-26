@@ -177,7 +177,7 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
 
     const onCancel = useCallback((canceledFile) => {
         setUploadFiles(prevFiles => {
-            return prevFiles.filter(file => file.name !== canceledFile.name);
+            return prevFiles.filter(file => file !== canceledFile);
         });
     }, []);
 
