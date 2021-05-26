@@ -2,7 +2,7 @@ import { Fab } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
-import { getThumbnailSrc } from '../../utils/utils';
+import { getThumbnailSrc, THUMB_S } from '../../utils/utils';
 
 const Thumbnail = ({
     image,
@@ -42,7 +42,7 @@ const Thumbnail = ({
             }}>
                 <img
                     alt=""
-                    src={getThumbnailSrc(image, imageHeight * image.sizeRatio)}
+                    src={getThumbnailSrc(image, imageHeight * image.sizeRatio, THUMB_S)}
                     onLoad={onLoadedCallback}
                     onClick={onClick}
                     style={{

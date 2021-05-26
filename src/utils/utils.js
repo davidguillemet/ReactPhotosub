@@ -109,10 +109,10 @@ export function isBlurrySrc(src) {
     return src.includes(_blurrySubFolder);
 }
 
-const THUMB_XS = 150;
-const THUMB_S  = 300;
-const THUMB_M = 600;
-const THUMB_L = 1200;
+export const THUMB_XS = 150;
+export const THUMB_S  = 300;
+export const THUMB_M = 600;
+export const THUMB_L = 1200;
 export const THUMB_LARGEST = THUMB_L;
 export const THUMB_ORIGINAL = THUMB_L + 1;
 
@@ -153,19 +153,30 @@ function _getThumbSrc(src, fileSuffix) {
     return `${fileDir}/${_thumbsSubFolder}/${fileName}_${fileSuffix}${fileExtension}`;
 }
 
-export function getThumbnailSrc(image, width) {
+function getThumbnailFromSpec(image, sizeSpec) {
+    if (typeof image === 'string') {
+        // image is a strign and not an image object
+        // -> just return the converted url
+        return _getThumbSrc(image, sizeSpec.fileSuffix);
+    }
+    if (!image[sizeSpec.propertyName]) {
+        image[sizeSpec.propertyName] = _getThumbSrc(image.src, sizeSpec.fileSuffix)
+    }
+    return image[sizeSpec.propertyName];
+}
+
+export function getThumbnailSrc(image, width, defaultSize) {
     
     for (const sizeSpec of _thumbnailSpecs) {
         if (sizeSpec.maxSize >= width) {
-            if (typeof image === 'string') {
-                // image is a strign and not an image object
-                // -> just return the converted url
-                return _getThumbSrc(image, sizeSpec.fileSuffix);
-            }
-            if (!image[sizeSpec.propertyName]) {
-                image[sizeSpec.propertyName] = _getThumbSrc(image.src, sizeSpec.fileSuffix)
-            }
-            return image[sizeSpec.propertyName];
+            return getThumbnailFromSpec(image, sizeSpec);
+        }
+    }
+
+    if (defaultSize !== undefined && defaultSize !== null) {
+        const sizeSpec = _thumbnailSpecs.find(spec => spec.maxSize === defaultSize);
+        if (sizeSpec !== undefined) {
+            return getThumbnailFromSpec(image, sizeSpec);
         }
     }
 

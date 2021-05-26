@@ -72,10 +72,10 @@ const Home = () => {
     useEffect(() => {
         dataProvider.getImageDefaultSelection().then(images => {
             unstable_batchedUpdates(() => {
-                setImages(shuffleArray(images).map(imageSrc => {
+                setImages(shuffleArray(images).map(image => {
                     return {
-                        src: imageSrc,
-                        blurrySrc: getBlurrySrc(imageSrc),
+                        ...image,
+                        blurrySrc: getBlurrySrc(image.src),
                         id: uniqueID()
                     }
                 }));

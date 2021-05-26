@@ -142,10 +142,14 @@ function getImageDefaultSelection() {
 }
 
 function _getBucketContent(folder) {
-    return axios.get(`/bucket/${folder}`)
+    return axios.get(`/api/bucket/${folder}`)
     .then(response => {
         return response.data;
     });
+}
+
+function waitForThumbnails(fileName) {
+    return axios.get(`/api/thumbstatus/${fileName}`);
 }
 
 const dataProvider = {
@@ -165,7 +169,8 @@ const dataProvider = {
     getInteriors: getInteriors,
     getUploadedInteriors: getUploadedInteriors,
     removeUploadedInterior: removeUploadedInterior,
-    getImageDefaultSelection: getImageDefaultSelection
+    getImageDefaultSelection: getImageDefaultSelection,
+    waitForThumbnails: waitForThumbnails
 }
 
 export default dataProvider;

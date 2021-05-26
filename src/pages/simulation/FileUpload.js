@@ -15,6 +15,9 @@ import { uniqueID } from '../../utils/utils';
 import { FirebaseApp } from '../../components/firebase';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './fileUploadStyles.css';
+// don't use the mocck provider here
+import dataProvider from '../../dataProvider/dataprovider';
+
 
 const useStyle = makeStyles((theme) => ({
     input: {
@@ -22,8 +25,58 @@ const useStyle = makeStyles((theme) => ({
     },
 }));
 
+const STEP_UPLOAD = "upload";
+const STEP_THUMBAILS = "thumbnail";
+
+const UploadProgress = ({progress}) => {
+    return (
+        <Box style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center'
+        }}>
+            <CircularProgress variant="determinate" thickness={15} value={progress} size={30}/>
+            <HorizontalSpacing factor={1} />
+            <Typography
+                variant="caption"
+                style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: 200
+                }}>
+                Chargement du fichier...
+            </Typography>
+        </Box>
+    );
+};
+
+const ThumbnailGeneration = () => {
+    return (
+        <Box style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center'
+        }}>
+            <CircularProgress thickness={15} size={30} />
+            <HorizontalSpacing factor={1} />
+            <Typography
+                variant="caption"
+                style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: 200
+                }}>
+                Création des vignettes...
+            </Typography>
+        </Box>
+    );
+}
+
 const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
 
+    const [step, setStep] = useState(STEP_UPLOAD);
     const [progress, setProgress] = useState(0);
     const uploadTaskRef = useRef(null);
 
@@ -50,10 +103,11 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
             () => {
                 // Handle successful uploads on complete
                 // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-                uploadTaskRef.current.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                    onFileUploaded(file.name, downloadURL);
+                setStep(STEP_THUMBAILS);
+                dataProvider.waitForThumbnails(file.name).then(() => {
+                    onFileUploaded(file.name);
+                    onCancel(file);
                 });
-                onCancel(file);
             }
         );
 
@@ -84,7 +138,11 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
                 <Typography style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>{file.name}</Typography>
                 <HorizontalSpacing factor={2} />
                 <div style={{ flex: 1}} />
-                <CircularProgress variant="determinate" thickness={15} value={progress} size={30}/>
+                {
+                    step === STEP_UPLOAD ?
+                    <UploadProgress progress={progress} /> :
+                    <ThumbnailGeneration />
+                }
                 <HorizontalSpacing factor={2} />
             </Paper>
         </Box>
@@ -118,7 +176,9 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
     }
 
     const onCancel = useCallback((canceledFile) => {
-        setUploadFiles(prevFiles => prevFiles.filter(file => file !== canceledFile));
+        setUploadFiles(prevFiles => {
+            return prevFiles.filter(file => file.name !== canceledFile.name);
+        });
     }, []);
 
     return (
@@ -150,15 +210,14 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
                 <TransitionGroup component={null}>
                 {
                     uploadFiles.map((file) => {
-                        const key = uniqueID();
                         return (
                             <CSSTransition
-                                key={key}
-                                timeout={500}
+                                key={file.name}
+                                timeout={200}
                                 classNames="fileProgress"
                             >                
                                 <FileProgress
-                                    key={key}
+                                    key={file.name}
                                     file={file}
                                     onCancel={onCancel}
                                     onFileUploaded={onFileUploaded}

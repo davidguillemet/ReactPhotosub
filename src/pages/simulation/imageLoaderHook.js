@@ -14,28 +14,28 @@ const useImageLoader = (user, simulations) => {
         return simulations.findIndex((simulation) => simulation.background === userInteriorUrl) === -1;
     }, [simulations]);
 
-    const buildImageFromUrl = useCallback((url, uploaded) => {
+    const buildImage = useCallback((image, uploaded) => {
         return {
-            src: url,
+            ...image,
             id: uniqueID(),
             uploaded: uploaded,
             deletable: true
         }
     }, []);
 
-    const buildImagesFromUrls = useCallback((urls, uploaded) => {
-        return urls.map((url) => buildImageFromUrl(url, uploaded));
-    }, [buildImageFromUrl]);
+    const buildImages = useCallback((images, uploaded) => {
+        return images.map((image) => buildImage(image, uploaded));
+    }, [buildImage]);
 
     // Load interiors
     useEffect(() => {
-        dataProvider.getInteriors().then(values => {
+        dataProvider.getInteriors().then(images => {
             unstable_batchedUpdates(() => {
-                const defaultInteriors = buildImagesFromUrls(values, false);
+                const defaultInteriors = buildImages(images, false);
                 setInteriors(defaultInteriors);
             });
         })
-    }, [buildImagesFromUrls]);
+    }, [buildImages]);
 
     // Load user uploaded interiors
     useEffect(() => {
@@ -44,13 +44,13 @@ const useImageLoader = (user, simulations) => {
             Promise.resolve([]) :
             dataProvider.getUploadedInteriors();
         
-        loadPromise.then(values => {
+        loadPromise.then(images => {
             unstable_batchedUpdates(() => {
-                const userInteriors = buildImagesFromUrls(values, true);
+                const userInteriors = buildImages(images, true);
                 setUserInteriors(userInteriors);
             });
         })
-    }, [user, buildImagesFromUrls]);
+    }, [user, buildImages]);
 
     // Update the collection containing all interiors 
     useEffect(() => {
@@ -85,10 +85,10 @@ const useImageLoader = (user, simulations) => {
 
     // Load image selection = home slideshow ?
     useEffect(() => {
-        dataProvider.getImageDefaultSelection().then(selection => {
-            setImages(selection.map(imageSrc => {
+        dataProvider.getImageDefaultSelection().then(images => {
+            setImages(images.map(image => {
                 return {
-                    src: imageSrc,
+                    ...image,
                     id: uniqueID()
                 }
             }));
@@ -98,10 +98,10 @@ const useImageLoader = (user, simulations) => {
     const addUploadedInterior = useCallback((fileSrc) => {
         // Add the new uploaded image to the user interiors' array
         setUserInteriors(prevInteriors => [
-           buildImageFromUrl(fileSrc, true),
+           buildImage({src: fileSrc}, true),
            ...prevInteriors
         ]);
-    }, [buildImageFromUrl]);
+    }, [buildImage]);
 
     const deleteUploadedInterior = useCallback((fileUrl) => {
         setUserInteriors(prevInteriors => {
