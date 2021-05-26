@@ -1,4 +1,5 @@
 const sharp = require("sharp");
+const imageSize = require("buffer-image-size");
 const path = require("path");
 const {Storage} = require("@google-cloud/storage");
 const os = require("os");
@@ -29,6 +30,8 @@ const _sizes = [
         width: 1200,
     },
 ];
+
+exports.thumbnailSizes = _sizes;
 
 function createThumbnail(fileContent, bucket, width, tempResizedFilePath, resizedFilePathInBucket) {
     return sharp(fileContent)
@@ -90,4 +93,17 @@ exports.createThumbnails = function(file, fileContent, thumbsFolder) {
 
 exports.deleteThumbnails = function(file, thumbsFolder) {
     return processThumbnails(ACTION_DELETE, file, thumbsFolder);
+};
+
+exports.addSizeRatio = function(file, filecontent) {
+    const dimensions = imageSize(filecontent);
+
+    const storage = new Storage();
+    const bucket = storage.bucket(file.bucket);
+    const bucketFile = bucket.file(file.name);
+    return bucketFile.setMetadata({
+        metadata: {
+            sizeRatio: dimensions.width / dimensions.height,
+        },
+    });
 };

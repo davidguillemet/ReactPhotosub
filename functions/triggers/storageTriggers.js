@@ -29,7 +29,7 @@ const axios = require("axios");
 const {logger} = require("../utils/logger");
 const extractExif = require("./extractExif");
 const {blurImage, deleteBlurryImage} = require("./blurImage");
-const {createThumbnails, deleteThumbnails} = require("./resizeImage");
+const {createThumbnails, deleteThumbnails, addSizeRatio} = require("./resizeImage");
 
 const _baseApiUrl = "https://photosub.web.app";
 const _blurryFolder = "blurry";
@@ -94,6 +94,10 @@ exports.newFile = function(file) {
         if (mustResizeImage(file)) {
             // Create thumbnails for the current image
             promises.push(createThumbnails(file, fileContent, _thumbsFolder));
+            if (isInteriorImage(file) || isInHomeSlideshow(file)) {
+                // Add sizeRatio property in metadata
+                promises.push(addSizeRatio(file, fileContent));
+            }
         }
         return Promise.all(promises);
     }).catch((error) => {
