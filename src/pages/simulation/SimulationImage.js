@@ -14,7 +14,7 @@ import { getThumbnailSrc } from '../../utils/utils';
 
 const useStyle = makeStyles((theme) => ({
     container: {
-        '&:hover [class*="buttonGroup"]': {
+        '&:hover div[class*="MuiButtonGroup"]': {
             display: 'block'
         }
     },
