@@ -6,6 +6,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import CollectionsIcon from '@material-ui/icons/Collections';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import SearchIcon from '@material-ui/icons/Search';
+
 import {unstable_batchedUpdates} from 'react-dom';
 
 import BorderInput from './BorderInput';
@@ -18,7 +24,7 @@ import FileUpload from './FileUpload';
 import {setBackground, resize, borderWidth, borderColor, addImage, setImage} from './actions/SimulationActions';
 
 import { useResizeObserver } from '../../components/hooks';
-import useImageLoader from './imageLoaderHook';
+import useImageLoader, {LIST_HOME_SLIDESHOW, LIST_FAVORITES, LIST_SEARCH} from './imageLoaderHook';
 
 const borderColors = [
     "#FFFFFF",
@@ -39,7 +45,8 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     const classes = useStyle();
 
-    const [interiors, images, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations);
+    const [listType, setListType] = useState(LIST_HOME_SLIDESHOW);
+    const [interiors, images, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
 
     const [currentImageId, setCurrentImageId] = useState(null);
@@ -134,6 +141,10 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         });
     }, [deleteUploadedInterior]);
 
+    const handleListType = (event, newListType) => {
+        setListType(newListType);
+    }
+
     return (
         <React.Fragment>
 
@@ -165,6 +176,19 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
             <VerticalSpacing factor={3} />
 
             <Typography variant="h4" style={{fontWeight: "100"}}>2. Insérez des images</Typography>
+            <VerticalSpacing factor={1} />
+            <ToggleButtonGroup exclusive value={listType} onChange={handleListType} >
+                <ToggleButton value={LIST_HOME_SLIDESHOW} >
+                    <CollectionsIcon />
+                </ToggleButton>
+                <ToggleButton value={LIST_FAVORITES} >
+                    <FavoriteIcon />
+                </ToggleButton>
+                <ToggleButton value={LIST_SEARCH} >
+                    <SearchIcon />
+                </ToggleButton>
+            </ToggleButtonGroup>
+            <VerticalSpacing factor={1} />
             <ImageSlider
                 images={images}
                 currentIndex={-1}

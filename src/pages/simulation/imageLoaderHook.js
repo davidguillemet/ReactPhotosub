@@ -3,7 +3,11 @@ import {unstable_batchedUpdates} from 'react-dom';
 import dataProvider from '../../dataProvider';
 import { uniqueID } from '../../utils/utils';
 
-const useImageLoader = (user, simulations) => {
+export const LIST_HOME_SLIDESHOW = "slideshow";
+export const LIST_FAVORITES = "favorites";
+export const LIST_SEARCH = "search";
+
+const useImageLoader = (user, simulations, listType) => {
     const [interiors, setInteriors] = useState(null);
     const [userInteriors, setUserInteriors] = useState(null);
     const [allInteriors, setAllInteriors] = useState(null);
@@ -85,7 +89,12 @@ const useImageLoader = (user, simulations) => {
 
     // Load image selection = home slideshow ?
     useEffect(() => {
-        dataProvider.getImageDefaultSelection().then(images => {
+        const promise =
+            listType === LIST_HOME_SLIDESHOW ? dataProvider.getImageDefaultSelection() :
+            listType === LIST_FAVORITES ? dataProvider.getFavorites() : 
+            Promise.resolve([]); // initialize the search with an empty list
+
+        promise.then(images => {
             setImages(images.map(image => {
                 return {
                     ...image,
@@ -93,7 +102,7 @@ const useImageLoader = (user, simulations) => {
                 }
             }));
         })
-    }, []);
+    }, [listType]);
 
     const addUploadedInterior = useCallback((fileSrc) => {
         // Add the new uploaded image to the user interiors' array
