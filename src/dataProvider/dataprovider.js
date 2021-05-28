@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FirebaseApp } from '../components/firebase';
+import { firebaseAuth } from '../components/firebase';
 
 import {
     TRANSIENT_PROPERTY_DB_INDEX,
@@ -10,8 +10,8 @@ import {
 
 // Add a request interceptor
 axios.interceptors.request.use(async function (config) {
-    if (FirebaseApp.auth().currentUser) {
-        const token = await FirebaseApp.auth().currentUser.getIdToken(false);
+    if (firebaseAuth().currentUser) {
+        const token = await firebaseAuth().currentUser.getIdToken(false);
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;

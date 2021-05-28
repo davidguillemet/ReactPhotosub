@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AuthContext from './authContext';
-import { FirebaseApp } from '../firebase';
+import { firebaseAuth } from '../firebase';
 import dataProvider from '../../dataProvider';
 
 const AuthProvider = ({ children }) => {
@@ -33,14 +33,14 @@ const AuthProvider = ({ children }) => {
     }, []);
 
     const [userContext, setUserContext] = useState({
-        user: FirebaseApp.auth().currentUser,
+        user: firebaseAuth().currentUser,
         data: null,
         updateUserContext: updateUserContext,
         updateUserFavorites: updateUserFavorites
     });
 
     useEffect(() => {
-        const unregisterAuthObserver = FirebaseApp.auth().onAuthStateChanged(newUser => {
+        const unregisterAuthObserver = firebaseAuth().onAuthStateChanged(newUser => {
 
             if (newUser === null) {
                 updateUserContext(null, null);

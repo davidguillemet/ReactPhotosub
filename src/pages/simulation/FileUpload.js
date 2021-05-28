@@ -10,9 +10,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import { Typography } from '@material-ui/core';
-import { uniqueID } from '../../utils/utils';
 
-import { FirebaseApp } from '../../components/firebase';
+import { firebaseStorage } from '../../components/firebase';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './fileUploadStyles.css';
 // don't use the mocck provider here
@@ -158,7 +157,7 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
 
     useEffect(() => {
         if (userUploadRef.current === null) {
-            const storageRef = FirebaseApp.storage().ref();
+            const storageRef = firebaseStorage().ref();
             userUploadRef.current = storageRef.child(`userUpload/${user.uid}/interiors`);
         }
     }, [user]);

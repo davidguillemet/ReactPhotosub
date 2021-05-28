@@ -1,5 +1,5 @@
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import FirebaseApp from './firebaseApp';
+import {firebaseAuth} from './firebase';
 import './firebaseui.css';
 import React, { useEffect, useState } from 'react';
 import Backdrop from '@material-ui/core/Backdrop';
@@ -29,7 +29,7 @@ const uiConfig = {
     signInFlow: 'popup',
     // We will display Google and Facebook as auth providers.
     signInOptions: [
-        FirebaseApp.auth.EmailAuthProvider.PROVIDER_ID
+        firebaseAuth.EmailAuthProvider.PROVIDER_ID
     ],
     callbacks: {
         signInSuccessWithAuthResult: function (authResult, redirectUrl) {
@@ -155,7 +155,7 @@ const FirebaseAuth = ({ user }) => {
 
     // Listen to the Firebase Auth state and set the local state.
     useEffect(() => {
-        const unregisterAuthObserver = FirebaseApp.auth().onAuthStateChanged(newUser => {
+        const unregisterAuthObserver = firebaseAuth().onAuthStateChanged(newUser => {
             setIsLogin(false);
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
@@ -166,7 +166,7 @@ const FirebaseAuth = ({ user }) => {
     }
 
     function logout() {
-        FirebaseApp.auth().signOut();
+        firebaseAuth().signOut();
     }
 
     function onCloseModal() {
@@ -193,7 +193,7 @@ const FirebaseAuth = ({ user }) => {
                 }}
             >
                 <Fade in={isLogin}>
-                    <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={FirebaseApp.auth()} />
+                    <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseAuth()} />
                 </Fade>
             </Modal>
 

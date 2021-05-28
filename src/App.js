@@ -18,7 +18,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 
 import { BrowserRouter as Router, NavLink } from "react-router-dom";
 import { routes, useMenuStyles } from './navigation/routes';
-import { FirebaseAuth } from './components/firebase';
+import { FirebaseSignin } from './components/firebase';
 import { AuthProvider } from './components/authentication';
 import Footer from './template/footer';
 import ScrollTop from './template/scrollTop';
@@ -144,7 +144,7 @@ function App(props) {
             >
               <MenuIcon />
             </IconButton>
-            <FirebaseAuth />
+            <FirebaseSignin />
           </Toolbar>
         </AppBar>
 

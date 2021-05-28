@@ -1,7 +1,8 @@
-import FirebaseAuth from './firebaseAuth';
-import FirebaseApp from './firebaseApp';
+import FirebaseSignin from './firebaseAuth';
+import {firebaseAuth, firebaseStorage} from './firebase';
 
 export {
-    FirebaseAuth,
-    FirebaseApp
+    FirebaseSignin,
+    firebaseAuth,
+    firebaseStorage
 }
