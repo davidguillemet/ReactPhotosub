@@ -29,7 +29,6 @@ module.exports = function(config) {
                     // Add a simulation
                     result = await config.pool()
                         .raw(`update user_data set simulations = simulations::jsonb || '${newSimulationString}'::jsonb where uid = '${res.locals.uid}' returning simulations`);
-                    res.json(result.rows[0].simulations);
                 } else {
                     // Update a simulation from its index
                     result = await config.pool()
@@ -46,11 +45,11 @@ module.exports = function(config) {
             const deleteData = req.body;
             try {
                 const result = await config.pool()
-                    .raw(`update user_data set simulations = simulations - ${deleteData.dbindex}' where uid = '${res.locals.uid}' returning simulations`);
+                    .raw(`update user_data set simulations = simulations - ${deleteData.index} where uid = '${res.locals.uid}' returning simulations`);
                 res.json(result.rows[0].simulations);
             } catch (err) {
-                config.logger.error(`Failed to remove simulation #${deleteData.dbindex} for user ${res.locals.uid}.`, err);
-                res.status(500).send(`Failed to remove simulation #${deleteData.dbindex} for user ${res.locals.uid}.`).end();
+                config.logger.error(`Failed to remove simulation #${deleteData.index} for user ${res.locals.uid}.`, err);
+                res.status(500).send(`Failed to remove simulation #${deleteData.index} for user ${res.locals.uid}.`).end();
             }
         });
 };
