@@ -11,6 +11,7 @@ import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import CollectionsIcon from '@material-ui/icons/Collections';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import SearchIcon from '@material-ui/icons/Search';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import {unstable_batchedUpdates} from 'react-dom';
 
@@ -178,15 +179,21 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
             <Typography variant="h4" style={{fontWeight: "100"}}>2. Insérez des images</Typography>
             <VerticalSpacing factor={1} />
             <ToggleButtonGroup exclusive value={listType} onChange={handleListType} >
+                <Tooltip title="Présélection">
                 <ToggleButton value={LIST_HOME_SLIDESHOW} >
                     <CollectionsIcon />
                 </ToggleButton>
+                </Tooltip>
+                <Tooltip title="Favoris">
                 <ToggleButton value={LIST_FAVORITES} >
                     <FavoriteIcon />
                 </ToggleButton>
+                </Tooltip>
+                <Tooltip title="Recherche">
                 <ToggleButton value={LIST_SEARCH} >
                     <SearchIcon />
                 </ToggleButton>
+                </Tooltip>
             </ToggleButtonGroup>
             <VerticalSpacing factor={2} />
             <ImageSlider
