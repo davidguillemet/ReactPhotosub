@@ -89,6 +89,11 @@ const ImageSlider = ({
     }, [scrollToThumbnail, onThumbnailClick, disabled]);
 
     useEffect(() => {
+        numberOfLoadedThumbnails.current = 0;
+        setLastThumbRight(0);
+    }, [images]);
+
+    useEffect(() => {
         // Simulate click handle each time the current index changes
         if (currentIndex >= 0) {
             handleThumbnailClick(currentIndex, true);
@@ -96,11 +101,9 @@ const ImageSlider = ({
     }, [currentIndex, handleThumbnailClick]);
 
     useEffect(() => {
-        setThumbnailScrollActivation(prevState => {
-            return {
-                scrollLeft: resizeObserver.scrollLeft > 0,
-                scrollRight: lastThumbRight > resizeObserver.width + resizeObserver.scrollLeft
-            }
+        setThumbnailScrollActivation({
+            scrollLeft: resizeObserver.scrollLeft > 0,
+            scrollRight: lastThumbRight > resizeObserver.width + resizeObserver.scrollLeft
         });
     }, [resizeObserver.width, resizeObserver.scrollLeft, lastThumbRight]);
 

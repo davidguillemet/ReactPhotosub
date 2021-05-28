@@ -188,7 +188,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     <SearchIcon />
                 </ToggleButton>
             </ToggleButtonGroup>
-            <VerticalSpacing factor={1} />
+            <VerticalSpacing factor={2} />
             <ImageSlider
                 images={images}
                 currentIndex={-1}
