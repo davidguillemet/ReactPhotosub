@@ -13,6 +13,12 @@ const useImageLoader = (user, simulations, listType) => {
     const [allInteriors, setAllInteriors] = useState(null);
     const [images, setImages] = useState(null);
 
+    const [imagesBySource, setImagesBySource] = useState({
+        [LIST_HOME_SLIDESHOW]: null,
+        [LIST_FAVORITES]: null,
+        [LIST_SEARCH]: null,
+    });
+
     const userInteriorIsUsed = useCallback((userInteriorUrl) => {
         // Check is any simulation contains the current background
         return simulations.findIndex((simulation) => simulation.background === userInteriorUrl) === -1;
@@ -87,22 +93,38 @@ const useImageLoader = (user, simulations, listType) => {
         }
     }, [userInteriorIsUsed, simulations, userInteriors, interiors]);
 
-    // Load image selection = home slideshow ?
+    // Load images from current source (homeslideshow, favorites, search)
     useEffect(() => {
+        setImages(null);
+
+        if (imagesBySource[listType] !== null) {
+            setImages(imagesBySource[listType]);
+            return;
+        }
+
         const promise =
             listType === LIST_HOME_SLIDESHOW ? dataProvider.getImageDefaultSelection() :
             listType === LIST_FAVORITES ? dataProvider.getFavorites() : 
             Promise.resolve([]); // initialize the search with an empty list
 
         promise.then(images => {
-            setImages(images.map(image => {
+            const newImages = images.map(image => {
                 return {
                     ...image,
                     id: uniqueID()
                 }
-            }));
+            });
+            unstable_batchedUpdates(() => {
+                setImagesBySource(prevImagesBySource => {
+                    return {
+                        ...prevImagesBySource,
+                        [listType]: newImages
+                    };
+                })
+                setImages(newImages);
+            });
         })
-    }, [listType]);
+    }, [listType, imagesBySource]);
 
     const addUploadedInterior = useCallback((fileSrc) => {
         // Add the new uploaded image to the user interiors' array
