@@ -4,8 +4,8 @@ import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
-import Skeleton from '@material-ui/lab/Skeleton';
 import Fade from '@material-ui/core/Fade';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { useResizeObserver } from '../../components/hooks';
@@ -152,16 +152,21 @@ const ImageSlider = ({
 
                 {
                     images === null ?
-                    <Skeleton
-                        variant="rect"
-                        animation="wave"
+                    <Box
                         style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
                             width: '100%',
                             height: imageHeight + 2*imageBorderWidth,
                             marginTop: indicatorHeight,
                             marginBottom: indicatorHeight
                         }}
-                    /> :
+                    >
+                        <CircularProgress />
+                    </Box>
+                    :
                     <Box
                         ref={resizeObserver.ref}
                         className="hideScroll" 
