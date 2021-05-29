@@ -13,6 +13,8 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import SearchIcon from '@material-ui/icons/Search';
 import Tooltip from '@material-ui/core/Tooltip';
 
+import Alert from '@material-ui/lab/Alert';
+
 import {unstable_batchedUpdates} from 'react-dom';
 
 import BorderInput from './BorderInput';
@@ -41,6 +43,30 @@ const useStyle = makeStyles((theme) => ({
         flexWrap: 'wrap',
     }
 }));
+
+const EmptySimulationImages = ({type, images}) => {
+    if (images === null) {
+        // to avoid blinking component display when transitionning
+        return null;
+    }
+
+    if (type === LIST_FAVORITES) {
+        return (
+            <Box style={{
+                display: 'flex',
+                flexDirection: 'row',
+                width: '100%',
+                height: '100%',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}>
+                <Alert severity="warning" elevation={4} variant="filled">Votre liste de favoris est vide.</Alert>
+            </Box>
+        );
+    }
+
+    return null;
+}
 
 const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
@@ -179,21 +205,24 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
             <Typography variant="h4" style={{fontWeight: "100"}}>2. Insérez des images</Typography>
             <VerticalSpacing factor={1} />
             <ToggleButtonGroup exclusive value={listType} onChange={handleListType} >
-                <Tooltip title="Présélection">
                 <ToggleButton value={LIST_HOME_SLIDESHOW} >
-                    <CollectionsIcon />
+                    <Tooltip title="Présélection">
+                        <CollectionsIcon />
+                    </Tooltip>
                 </ToggleButton>
-                </Tooltip>
-                <Tooltip title="Favoris">
-                <ToggleButton value={LIST_FAVORITES} >
-                    <FavoriteIcon />
-                </ToggleButton>
-                </Tooltip>
-                <Tooltip title="Recherche">
+                {
+                    user &&
+                    <ToggleButton value={LIST_FAVORITES} >
+                        <Tooltip title="Favoris">
+                            <FavoriteIcon />
+                        </Tooltip>
+                    </ToggleButton>
+                }
                 <ToggleButton value={LIST_SEARCH} >
-                    <SearchIcon />
+                    <Tooltip title="Recherche">
+                        <SearchIcon />
+                    </Tooltip>
                 </ToggleButton>
-                </Tooltip>
             </ToggleButtonGroup>
             <VerticalSpacing factor={2} />
             <ImageSlider
@@ -208,6 +237,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 imageBorderWidth={3}
                 imageBorderRadius={5}
                 disabled={simulation.isLocked}
+                emptyComponent={<EmptySimulationImages type={listType} images={images} />}
             />
 
             <VerticalSpacing factor={3} />

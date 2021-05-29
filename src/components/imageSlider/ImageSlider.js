@@ -35,7 +35,8 @@ const ImageSlider = ({
     imageBorderColor = "#000",
     imageBorderRadius = 3,
     disabled,
-    onDeleteUploaded}) => {
+    onDeleteUploaded,
+    emptyComponent = null}) => {
     
     const [thumnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
     const [lastThumbRight, setLastThumbRight] = useState(0);
@@ -175,34 +176,38 @@ const ImageSlider = ({
                             marginTop: indicatorHeight
                         }}
                     >
-                        <TransitionGroup component={null}>
                         {
-                            images.map((image, index) => { 
-                                return (
-                                    <CSSTransition
-                                        key={image.id}
-                                        timeout={500}
-                                        classNames="thumbnail"
-                                    >                
-                                        <Thumbnail
+                            images.length === 0 && emptyComponent !== null ?
+                            emptyComponent :
+                            <TransitionGroup component={null}>
+                            {
+                                images.map((image, index) => { 
+                                    return (
+                                        <CSSTransition
                                             key={image.id}
-                                            image={image}
-                                            index={index}
-                                            handleClick={handleThumbnailClick}
-                                            active={currentIndex === index}
-                                            onLoadedCallback={onThumbnailLoadedCallback}
-                                            imageHeight={imageHeight}
-                                            imageBorderWidth={imageBorderWidth}
-                                            imageBorderColor={imageBorderColor}
-                                            imageBorderRadius={imageBorderRadius}
-                                            disabled={disabled}
-                                            onDelete={onDeleteUploaded}
-                                        />
-                                    </CSSTransition>
-                                );
-                            })
+                                            timeout={500}
+                                            classNames="thumbnail"
+                                        >                
+                                            <Thumbnail
+                                                key={image.id}
+                                                image={image}
+                                                index={index}
+                                                handleClick={handleThumbnailClick}
+                                                active={currentIndex === index}
+                                                onLoadedCallback={onThumbnailLoadedCallback}
+                                                imageHeight={imageHeight}
+                                                imageBorderWidth={imageBorderWidth}
+                                                imageBorderColor={imageBorderColor}
+                                                imageBorderRadius={imageBorderRadius}
+                                                disabled={disabled}
+                                                onDelete={onDeleteUploaded}
+                                            />
+                                        </CSSTransition>
+                                    );
+                                })
+                            }
+                            </TransitionGroup>
                         }
-                        </TransitionGroup>
                     </Box>
                 }
 
