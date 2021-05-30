@@ -176,6 +176,15 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         <React.Fragment>
 
             <Typography variant="h4" style={{fontWeight: "100"}}>1. Sélectionnez une ambiance</Typography>
+            {
+                user &&
+                <FileUpload
+                    caption="Ajoutez des ambiances"
+                    user={user}
+                    onFileUploaded={onFileUploaded}
+                />
+            }
+            <VerticalSpacing factor={2} />
             <ImageSlider
                 images={interiors}
                 currentIndex={currentInteriorIndex}
@@ -190,15 +199,6 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 disabled={simulation.isLocked}
                 onDeleteUploaded={onDeleteUploaded}
             />
-
-            {
-                user &&
-                <FileUpload
-                    caption="Chargez vos propres images"
-                    user={user}
-                    onFileUploaded={onFileUploaded}
-                />
-            }
 
             <VerticalSpacing factor={3} />
 

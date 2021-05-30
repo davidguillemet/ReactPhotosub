@@ -193,8 +193,7 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
             />
             <label htmlFor="contained-button-file">
                 <Button
-                    variant="contained"
-                    color="primary"
+                    variant="outlined"
                     component="span"
                     startIcon={<CloudUploadOutlinedIcon />}
                     disabled={uploadFiles.length > 0}
