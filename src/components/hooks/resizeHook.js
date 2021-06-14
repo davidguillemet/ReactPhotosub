@@ -28,10 +28,11 @@ export default function useResizeObserver(watchScroll) {
         resizeObserver.current.observe(node);
 
         if (watchScroll === true) {
+          node.removeEventListener('scroll', onScroll);
           node.addEventListener('scroll', onScroll);
-          if (element.current !== null) {
-            element.current.removeEventListener('scroll', onScroll);
-          }
+          // Don't remove scroll handler for element.current
+          // otherwse it won't be added again when switching simulation image source
+          // It should just be removed in the cleaning hook below
         }
         element.current = node;
       }
