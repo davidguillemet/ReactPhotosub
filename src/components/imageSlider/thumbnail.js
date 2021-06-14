@@ -25,6 +25,12 @@ const Thumbnail = ({
         onDelete(image.src);
     }
 
+    function handleLoaded() {
+        if (onLoadedCallback) {
+            onLoadedCallback(image.id);
+        }
+    }
+
     return (
         <Box
             style={{
@@ -43,7 +49,7 @@ const Thumbnail = ({
                 <img
                     alt=""
                     src={getThumbnailSrc(image, imageHeight * image.sizeRatio, THUMB_S)}
-                    onLoad={onLoadedCallback}
+                    onLoad={handleLoaded}
                     onClick={onClick}
                     style={{
                         height: imageHeight,

@@ -40,7 +40,7 @@ const ImageSlider = ({
     
     const [thumnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
     const [lastThumbRight, setLastThumbRight] = useState(0);
-    const numberOfLoadedThumbnails = useRef(0);
+    const loadedThumbnails = useRef(new Set());
 
     const resizeObserver = useResizeObserver(true);
     
@@ -90,7 +90,17 @@ const ImageSlider = ({
     }, [scrollToThumbnail, onThumbnailClick, disabled]);
 
     useEffect(() => {
-        numberOfLoadedThumbnails.current = 0;
+        // The number of loaded thumbnails must be initialized
+        // with the number of common images between previous and new images
+        // based on their id property
+        if (images !== null) {
+            const newImageIdentifires = new Set(images.map(image => image.id));
+            loadedThumbnails.current.forEach(loadedImageId => {
+                if (newImageIdentifires.has(loadedImageId) === false) {
+                    loadedThumbnails.current.delete(loadedImageId);
+                }
+            });
+        }
         setLastThumbRight(0);
     }, [images]);
 
@@ -108,9 +118,9 @@ const ImageSlider = ({
         });
     }, [resizeObserver.width, resizeObserver.scrollLeft, lastThumbRight]);
 
-    const onThumbnailLoadedCallback = useCallback(() => {
-        numberOfLoadedThumbnails.current++;
-        if (numberOfLoadedThumbnails.current === images.length) {
+    const onThumbnailLoadedCallback = useCallback((id) => {
+        loadedThumbnails.current.add(id);
+        if (loadedThumbnails.current.size === images.length) {
             const lastThumbRect = getThumbnailRectAt(resizeObserver.element, images.length - 1);
             setLastThumbRight(lastThumbRect.left + lastThumbRect.width);
         }
