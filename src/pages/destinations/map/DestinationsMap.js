@@ -72,8 +72,8 @@ const DestinationsMap = ({destinations}) => {
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
-        // This key is restricted, then no need to hide it...
-        googleMapsApiKey: "AIzaSyARUChK3iBQYU9ojkBBfyx8MA_zfpXd4gg"
+        // The google ma^API keys are restricted (IP and HTTP referrer)
+        googleMapsApiKey: process.env.REACT_APP_GMAP_API_KEY
     })
 
     const [map, setMap] = React.useState(null)

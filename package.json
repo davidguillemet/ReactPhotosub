@@ -26,8 +26,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && cp .env.build.js build/env.js",
-    "build4deploy": "react-scripts build && cp .env.build.js build/env.js && rm build/mockdata.json && rm -rf build/static-storage",
+    "build": "react-scripts build",
+    "build4deploy": "mv .env.production.local .env.tmp && react-scripts build && rm build/mockdata.json && rm -rf build/static-storage && mv .env.tmp .env.production.local",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
