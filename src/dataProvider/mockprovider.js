@@ -17,25 +17,31 @@ function fetchhMockData(path) {
 }
 
 function getDestinations() {
-    return fetchhMockData('').then(data => {
+    return fetchhMockData('/').then(data => {
         return data.destinations;
     })
 }
 
 function getRegions() {
-    return fetchhMockData('').then(data => {
+    return fetchhMockData('/').then(data => {
         return data.regions;
     })
 }
 
+function getLocations() {
+    return fetchhMockData('/').then(data => {
+        return data.locations;
+    })
+}
+
 function getDestinationDetailsFromPath(year, title) {
-    return fetchhMockData('../../').then(data => {
+    return fetchhMockData('/').then(data => {
         return data.destination.head;
     })
 }
 
 function getDestinationImagesFromPath(year, title) {
-    return fetchhMockData('../../').then(data => {
+    return fetchhMockData('/').then(data => {
         return data.destination.images;
     })
 }
@@ -61,7 +67,7 @@ function removeFavorite(path) {
 }
 
 function getFavorites() {
-    return fetchhMockData('../../').then(data => {
+    return fetchhMockData('/').then(data => {
         return data.destination.images.filter(image => _favorites.has(`${image.path}/${image.name}`));
     });
 }
@@ -107,13 +113,13 @@ function getInteriors() {
 }
 
 function getUploadedInteriors() {
-    return fetchhMockData('../../').then(data => {
+    return fetchhMockData('/').then(data => {
         return data.uploadedInteriors;
     });
 }
 
 function removeUploadedInterior(fileName) {
-    return fetchhMockData('../../').then(data => {
+    return fetchhMockData('/').then(data => {
         return data.uploadedInteriors.filter(interior => interior.endsWith(fileName) === false);
     });
 }
@@ -123,7 +129,7 @@ function getImageDefaultSelection() {
 }
 
 function _getBucketContent(folder) {
-    return fetchhMockData('../../').then(data => {
+    return fetchhMockData('/').then(data => {
         return data[folder];
     });    
 }
@@ -131,6 +137,7 @@ function _getBucketContent(folder) {
 const mockProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
+    getLocations: getLocations,
     getDestinationDetailsFromPath: getDestinationDetailsFromPath,
     getDestinationImagesFromPath: getDestinationImagesFromPath,
     getUserData: getUserData,

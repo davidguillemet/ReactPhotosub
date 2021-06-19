@@ -208,6 +208,192 @@
             "id": 23
         }
     ],
+    "locations": [
+        {
+            "latitude": -30.221258,
+            "longitude": 30.79418,
+            "link": "https://www.facebook.com/africanwatersports.co.za/",
+            "title": "African Watersports",
+            "id": 1,
+            "region": 15
+        },
+        {
+            "latitude": -8.604663,
+            "longitude": 122.47783,
+            "link": "https://www.ankermi-happydive.com/",
+            "title": "Ankermi Happy Dive",
+            "id": 2,
+            "region": 13
+        },
+        {
+            "latitude": 13.726597,
+            "longitude": 120.88364,
+            "link": "",
+            "title": "Aquaventure Reef Club Dive Resort",
+            "id": 3,
+            "region": 14
+        },
+        {
+            "latitude": 25.044235,
+            "longitude": -77.35519,
+            "link": "",
+            "title": "Bahamas",
+            "id": 4,
+            "region": 8
+        },
+        {
+            "latitude": -0.44982666,
+            "longitude": 130.69212,
+            "link": "https://rajaampatbiodiversity.com/fr/",
+            "title": "Biodiversity Eco Resort",
+            "id": 5,
+            "region": 20
+        },
+        {
+            "latitude": -0.50002,
+            "longitude": 130.66576,
+            "link": "https://www.stayrajaampat.com/accommodation/corepen-homestay/",
+            "title": "Corepen Homestay",
+            "id": 6,
+            "region": 20
+        },
+        {
+            "latitude": 7.339584,
+            "longitude": 134.45943,
+            "link": "https://fishnfins.com/",
+            "title": "Fish'n Fins",
+            "id": 7,
+            "region": 18
+        },
+        {
+            "latitude": -8.355274,
+            "longitude": 116.07614,
+            "link": "https://giliairdivers.com/",
+            "title": "Gili Air Divers",
+            "id": 8,
+            "region": 13
+        },
+        {
+            "latitude": 27.225653,
+            "longitude": 33.843113,
+            "link": "",
+            "title": "Hurghada",
+            "id": 9,
+            "region": 17
+        },
+        {
+            "latitude": -8.268649,
+            "longitude": 124.401344,
+            "link": "http://www.alor-diving-kepa.com/",
+            "title": "La Petite Kepa",
+            "id": 10,
+            "region": 13
+        },
+        {
+            "latitude": -0.886764,
+            "longitude": 131.24973,
+            "link": "http://www.lambodiveandcruise.com/",
+            "title": "Lambo liveaboard",
+            "id": 11,
+            "region": 20
+        },
+        {
+            "latitude": 15.870437,
+            "longitude": -61.582153,
+            "link": "https://www.pisquettes.com/",
+            "title": "Les Pisquettes",
+            "id": 12,
+            "region": 8
+        },
+        {
+            "latitude": -8.273894,
+            "longitude": 115.59001,
+            "link": "http://www.libertydiveresort.com/",
+            "title": "Liberty Dive Resort",
+            "id": 13,
+            "region": 13
+        },
+        {
+            "latitude": -4.555761,
+            "longitude": 129.91895,
+            "link": "",
+            "title": "Mer de Banda",
+            "id": 14,
+            "region": 13
+        },
+        {
+            "latitude": -2.031179,
+            "longitude": 130.5127,
+            "link": "",
+            "title": "Misool",
+            "id": 15,
+            "region": 20
+        },
+        {
+            "latitude": 38.53544,
+            "longitude": -28.529032,
+            "link": "http://pico-sport.com/",
+            "title": "Pico Sport",
+            "id": 16,
+            "region": 11
+        },
+        {
+            "latitude": 13.690423,
+            "longitude": 120.89019,
+            "link": "http://www.planetdive.com.ph/",
+            "title": "Planet Dive",
+            "id": 17,
+            "region": 14
+        },
+        {
+            "latitude": -26.840418,
+            "longitude": 32.88721,
+            "link": "",
+            "title": "Ponta Do Ouro",
+            "id": 18,
+            "region": 6
+        },
+        {
+            "latitude": -31.59648,
+            "longitude": 29.515413,
+            "link": "",
+            "title": "Port Saint Johns",
+            "id": 19,
+            "region": 15
+        },
+        {
+            "latitude": -31.622824,
+            "longitude": 29.54977,
+            "link": "",
+            "title": "Port St Johns",
+            "id": 20,
+            "region": 15
+        },
+        {
+            "latitude": 19.60423,
+            "longitude": 37.23249,
+            "link": "https://www.redseaexplorers.com/",
+            "title": "Red Sea Explorers",
+            "id": 21,
+            "region": 19
+        },
+        {
+            "latitude": -0.894652,
+            "longitude": 131.25256,
+            "link": "https://temandivesandcruises.com/dive/raja-ampat/",
+            "title": "Teman liveaboard",
+            "id": 22,
+            "region": 20
+        },
+        {
+            "latitude": 12.556462,
+            "longitude": 122.25141,
+            "link": "http://the-three-p.com/",
+            "title": "The Three P Holiday",
+            "id": 23,
+            "region": 14
+        }
+    ],
     "destination": {
         "head": {
             "title": "Misool",

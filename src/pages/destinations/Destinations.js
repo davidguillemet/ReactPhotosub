@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import Destination from './Destination';
-import GridList from "@material-ui/core/GridList";
-import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import TabContext from '@material-ui/lab/TabContext';
+import TabPanel from '@material-ui/lab/TabPanel';
+import AppsIcon from '@material-ui/icons/Apps';
+import PublicIcon from '@material-ui/icons/Public';
 import Chip from '@material-ui/core/Chip';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { makeStyles } from '@material-ui/core/styles';
+
 import dataProvider from '../../dataProvider';
 import PageTitle from '../../template/pageTitle';
-import { getThumbnailSrc } from '../../utils/utils';
+import { VerticalSpacing } from '../../template/spacing';
+import DestinationsGrid from './grid/DestinationsGrid';
+import DestinationsMap from './map/DestinationsMap';
 
 const useStyles = makeStyles((theme) => ({
-    gridList: {
-        margin: 0,
-        width: '100%',
-        '& > *': {
-            margin: 5,
-        },
-    },
     regionContainer: {
         display: 'flex',
         flexDirection: 'row',
@@ -26,6 +26,10 @@ const useStyles = makeStyles((theme) => ({
         '& *': {
             margin: 5,
         }
+    },
+    tabPanel: {
+        padding: 0,
+        width: '100%'
     }
 }));
 
@@ -35,6 +39,9 @@ const ROOT_REGION = {
     id: ROOT_REGION_ID,
     parent: null
 };
+
+const VIEW_GRID = 'grid';
+const VIEW_MAP = 'map';
 
 function getRegionPath(regionId, regionMap, includeRoot) {
 
@@ -55,13 +62,14 @@ const Destinations = () => {
 
     const [allDestinations, setAllDestinations] = useState(null);
     const [filteredDestinations, setFilteredDestinations] = useState([]);
+    const [destinationsView, setDestinationsView] = useState(VIEW_GRID);
 
     const [regionMap, setRegionMap] = useState(null);
     const [regionList, setRegionList] = useState([]);
     const [regionsByDestination, setRegionsByDestination] = useState(null);
     const [currentRegion, setCurrentRegion] = useState(ROOT_REGION);
     const [currentSubRegions, setCurrentSubRegions] = useState([]);
-
+    
     // A first effect executed only once to get regions
     useEffect(() => {
         dataProvider.getRegions().then(items => {
@@ -94,13 +102,7 @@ const Destinations = () => {
             return;
         }
         dataProvider.getDestinations().then(destinations => {
-            setAllDestinations(destinations.map(dest => {
-                return {
-                    ...dest,
-                    // Maybe we should compute the size ans use resizeObserver instead of using hard-coded thumb size??
-                    cover: getThumbnailSrc(dest.cover, 500)
-                }
-            }));
+            setAllDestinations(destinations);
 
             // Build the regions map by destination (destination id -> region list)
             const regionsByDestination = new Map();
@@ -143,6 +145,10 @@ const Destinations = () => {
         onRegionClick(regionId);
     }
 
+    const handleChangeDestinationView = (event, newValue) => {
+        setDestinationsView(newValue);
+      };
+
     function RegionPath() {
         if (regionMap === null) {
             return null;
@@ -165,14 +171,41 @@ const Destinations = () => {
         <React.Fragment>
             <PageTitle>Toutes Les Destinations</PageTitle>
             <RegionPath></RegionPath>
-            <Paper variant="elevation" elevation={0} classes={{ root: classes.regionContainer}}>
+            <Box classes={{ root: classes.regionContainer}}>
                 {currentSubRegions.map(region => <Chip key={region.id} label={region.title} onClick={handleRegionClick(region.id)} variant="outlined" />)}
-            </Paper>
-            <GridList component="div" classes={{
-                    root: classes.gridList
-                }}>
-                {filteredDestinations.map(item => <Destination key={item.id} destination={item} regions={regionsByDestination.get(item.id)} />)}
-            </GridList>
+            </Box>
+            <TabContext value={destinationsView}>
+                <Box style={{ width: '100%', margin: 5 }}>
+                    <Tabs
+                        value={destinationsView}
+                        onChange={handleChangeDestinationView}
+                        variant="fullWidth"
+                        indicatorColor="primary"
+                        centered
+                    >
+                        <Tab icon={<AppsIcon fontSize="large" />} value={VIEW_GRID} />
+                        <Tab icon={<PublicIcon fontSize="large" />} value={VIEW_MAP} />
+                    </Tabs>
+                </Box>
+                <TabPanel 
+                    value={VIEW_GRID}
+                    classes={{
+                        root: classes.tabPanel
+                    }}
+                >
+                    <VerticalSpacing factor={2} />
+                    <DestinationsGrid destinations={filteredDestinations} regionsByDestination={regionsByDestination} />
+                </TabPanel>
+                <TabPanel 
+                    value={VIEW_MAP}
+                    classes={{
+                        root: classes.tabPanel
+                    }}
+                >
+                    <VerticalSpacing factor={2} />
+                    <DestinationsMap destinations={filteredDestinations} />
+                </TabPanel>
+            </TabContext>
         </React.Fragment>
     )
 };

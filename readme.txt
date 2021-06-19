@@ -12,6 +12,9 @@
 # Build React app for Firebase simulators
 npm run-script build
 
+# Build React app for deployment purpose
+npm run-script build4deploy
+
 # Deploy the Firebase application
 firebase deploy
 firebase deploy --only functions:newImage

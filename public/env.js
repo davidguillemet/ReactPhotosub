@@ -1,3 +1,1 @@
-window.env = {
-  "USE_MOCK": "true"
-};
+window.env = {};

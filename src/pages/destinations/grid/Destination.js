@@ -2,11 +2,11 @@ import GridListTile from "@material-ui/core/GridListTile"
 import GridListTileBar from "@material-ui/core/GridListTileBar";
 import { makeStyles } from '@material-ui/core/styles';
 import { easing, duration } from '@material-ui/core/styles/transitions';
-import { formatDate } from '../../utils/utils';
+import { formatDate } from '../../../utils/utils';
 import Typography from "@material-ui/core/Typography";
 import Chip from "@material-ui/core/Chip";
 import React from "react";
-import { Link } from 'react-router-dom';
+import DestinationLink from '../../../components/destinationLink';
 
 const useStyles = makeStyles((theme) => ({
     tileRoot: {
@@ -149,19 +149,19 @@ const Destination = ({destination, regions}) => {
                 imgFullHeight: classes.imgFullHeight,
                 imgFullWidth: classes.imgFullWidth
             }}>
-            <Link to={`/destinations/${destination.path}`}>
-            <img src={destination.cover} alt={destination.title} style={{
-                height: '100%',
-                width: '100%'
-            }}/>
-            <GridListTileBar
-                classes={{
-                    root: classes.titleBar,
-                }}
-                title={<Typography variant="h5">{formatDate(new Date(destination.date))}</Typography>}
-                subtitle={<DestinationDetails destination={destination} regions={regions} />}
-            />
-            </Link>
+            <DestinationLink destination={destination}>
+                <img src={destination.cover} alt={destination.title} style={{
+                    height: '100%',
+                    width: '100%'
+                }}/>
+                <GridListTileBar
+                    classes={{
+                        root: classes.titleBar,
+                    }}
+                    title={<Typography variant="h5">{formatDate(new Date(destination.date))}</Typography>}
+                    subtitle={<DestinationDetails destination={destination} regions={regions} />}
+                />
+            </DestinationLink>
         </GridListTile>
     );
 }

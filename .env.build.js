@@ -1,3 +1,3 @@
 window.env = {
-    "USE_MOCK": "false"
+    "REACT_APP_USE_MOCK": "true"
 };

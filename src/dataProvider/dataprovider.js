@@ -38,6 +38,13 @@ function getRegions() {
     });
 }
 
+function getLocations() {
+    return axios.get("/api/locations")
+    .then(response => {
+        return response.data;
+    });
+}
+
 function getDestinationDetailsFromPath(year, title) {
     return getDestinationProps(year, title, "head");
 }
@@ -155,6 +162,7 @@ function waitForThumbnails(fileName) {
 const dataProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
+    getLocations: getLocations,
     getDestinationDetailsFromPath: getDestinationDetailsFromPath,
     getDestinationImagesFromPath: getDestinationImagesFromPath,
     getUserData: getUserData,
