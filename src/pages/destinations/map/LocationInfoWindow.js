@@ -78,7 +78,11 @@ const LocationInfoWindow = ({location, coverWidth}) => {
                 <h2>{location.destinations[0].title}</h2>
             </div>
             <div className={classes.locationTitle}>
-                <div className={classes.linkLabel}>{location.title}</div><a href={location.link} target="_blank" rel="noreferrer"><div className={classes.link}></div></a>
+                <div className={classes.linkLabel}>{location.title}</div>
+                {
+                    location.link && location.link.length > 0 &&
+                    <a href={location.link} target="_blank" rel="noreferrer"><div className={classes.link}></div></a>
+                }
             </div>
             <div className={classes.tripsGalery}>
             {
