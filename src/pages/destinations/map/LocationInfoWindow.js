@@ -84,7 +84,7 @@ const LocationInfoWindow = ({location, coverWidth}) => {
             {
                 location.destinations.map(destination => {
                     return (
-                        <div className={classes.tripCard}>
+                        <div className={classes.tripCard} key={destination.id}>
                             <DestinationLink destination={destination}>
                                 <img alt="" src={destination.cover} className={classes.tripCover} width={coverWidth} />
                                 <div className={classes.tripDateContainer}>

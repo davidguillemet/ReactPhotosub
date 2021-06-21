@@ -31,8 +31,8 @@ const _infoCoverWidth = 150;
 
 const DestinationsMap = ({destinations}) => {
 
-    const [locationMap, setLocationMap] = useState(new Map());
     const [selectedLocation, setSelectedLocation] = useState(null);
+    const [destinationsPerLocation, setDestinationsPerLocation] = useState([]);
 
     // Another effect to get locations
     useEffect(() => {
@@ -41,35 +41,30 @@ const DestinationsMap = ({destinations}) => {
             items.forEach(location => {
                 locationMap.set(location.id, location);
             })
-            setLocationMap(locationMap);
-        })
-    }, [])
+
+            const locations = new Map();
+            destinations.forEach(destination => {
     
-    const destinationsPerLocation = useMemo(() => {
-
-        const locations = new Map();
-
-        destinations.forEach(destination => {
-
-            const modifiedDestination = {
-                ...destination,
-                date: formatDate(new Date(destination.date)),
-                cover: getThumbnailSrc(destination.cover, _infoCoverWidth)
-            };
-            let locationInstance;
-            if (locations.has(destination.location)) {
-                locationInstance = locations.get(destination.location);
-            } else {
-                locationInstance = { ...locationMap.get(destination.location) }
-                locationInstance.destinations = [];
-                locations.set(destination.location, locationInstance);
-            }
-            locationInstance.destinations.push(modifiedDestination);
-
-        });
-        return [ ...locations.values() ];
-    }, [locationMap, destinations]);
-
+                const modifiedDestination = {
+                    ...destination,
+                    date: formatDate(new Date(destination.date)),
+                    cover: getThumbnailSrc(destination.cover, _infoCoverWidth)
+                };
+                let locationInstance;
+                if (locations.has(destination.location)) {
+                    locationInstance = locations.get(destination.location);
+                } else {
+                    locationInstance = { ...locationMap.get(destination.location) }
+                    locationInstance.destinations = [];
+                    locations.set(destination.location, locationInstance);
+                }
+                locationInstance.destinations.push(modifiedDestination);
+    
+            });
+            setDestinationsPerLocation([ ...locations.values() ]);
+        })
+    }, [destinations])
+    
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         // The google ma^API keys are restricted (IP and HTTP referrer)
@@ -121,9 +116,11 @@ const DestinationsMap = ({destinations}) => {
                     (clusterer) =>
                         destinationsPerLocation.map((location) => {
                             return <LocationMarker
+                                        key={location.id}
                                         clusterer={clusterer}
                                         location={location}
-                                        onClick={handleMarkerClick} />
+                                        onClick={handleMarkerClick}
+                                    />
                         })
                 }
             </MarkerClusterer>
