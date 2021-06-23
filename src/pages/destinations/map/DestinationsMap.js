@@ -61,7 +61,8 @@ const DestinationsMap = ({destinations}) => {
                 locationInstance.destinations.push(modifiedDestination);
     
             });
-            setDestinationsPerLocation([ ...locations.values() ]);
+            setDestinationsPerLocation([ ...items ]);
+            //setDestinationsPerLocation([ ...locations.values() ]);
         })
     }, [destinations])
     
@@ -72,17 +73,26 @@ const DestinationsMap = ({destinations}) => {
     })
 
     const [map, setMap] = React.useState(null)
+    const [clusterer, setClusterer] = React.useState(null)
 
-    const onLoad = React.useCallback(function callback(map) {
+    const handleMapLoaded = React.useCallback((map) => {
         // Center in the middle of the atlantic ocean
         map.setCenter({lat: 34, lng: -40});
         map.setZoom(2);
         setMap(map)
     }, [])
     
-    const onUnmount = React.useCallback(function callback(map) {
+    const handleMapUnmount = React.useCallback((map) => {
         setMap(null)
     }, [])
+
+    const handleClustererLoaded = React.useCallback(clusterer => {
+        setClusterer(clusterer);
+    }, []);
+
+    const handleClustererUnmount = React.useCallback(clusterer => {
+        setClusterer(null);
+    }, []);
 
     const handleMarkerClick = (location) => {
         setSelectedLocation(location);
@@ -98,19 +108,18 @@ const DestinationsMap = ({destinations}) => {
                 width: '100%',
                 height: '600px'
             }}
-            onLoad={onLoad}
-            onUnmount={onUnmount}
+            onLoad={handleMapLoaded}
+            onUnmount={handleMapUnmount}
             options={{
                 gestureHandling: "cooperative" // For mobile device,
             }}
         >
             <MarkerClusterer
                 averageCenter={true}
-                options={{
-                    imagePath: "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-                    averageCenter: true,
-                    gridSize: 20
-                }}
+                imagePath={"https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m"}
+                gridSize={20}
+                onLoad={handleClustererLoaded}
+                onUnmount={handleClustererUnmount}
             >
                 {
                     (clusterer) =>
