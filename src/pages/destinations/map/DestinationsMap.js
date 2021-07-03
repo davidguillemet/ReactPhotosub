@@ -1,47 +1,44 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { GoogleMap, Marker, InfoWindow, MarkerClusterer, useJsApiLoader } from '@react-google-maps/api';
+/*global google*/
+import React, { useState, useEffect, useRef } from 'react';
+import {unstable_batchedUpdates} from 'react-dom';
+import { GoogleMap, Marker, InfoWindow, MarkerClusterer, useLoadScript } from '@react-google-maps/api';
 
 import dataProvider from '../../../dataProvider';
 import { formatDate, getThumbnailSrc } from '../../../utils/utils';
 
 import LocationInfoWindow from './LocationInfoWindow';
 
-const LocationMarker = ({clusterer, location, onClick}) => {
-
-    const handleMarkerClick = () => {
-        onClick(location);
-    }
-
-    return (
-        <Marker
-            key={location.id}
-            position={{
-                lat: location.latitude,
-                lng: location.longitude
-            }}
-            clusterer={clusterer}
-            icon="diver.png"
-            onClick={handleMarkerClick}
-        />
-    );
-}
-
 const _infoCoverWidth = 150;
+const _defaultCenter = {
+    lat: 34,
+    lng: -40
+}
 
 const DestinationsMap = ({destinations}) => {
 
+    const locationMapRef = useRef(null);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [destinationsPerLocation, setDestinationsPerLocation] = useState([]);
+    const [map, setMap] = React.useState(null)
+    const [clusterer, setClusterer] = React.useState(null)
 
     // Another effect to get locations
     useEffect(() => {
-        dataProvider.getLocations().then(items => {
-            const locationMap = new Map();
-            items.forEach(location => {
-                locationMap.set(location.id, location);
-            })
 
+        const promise =
+            locationMapRef.current != null ?
+            Promise.resolve(locationMapRef.current) :
+            dataProvider.getLocations().then(items => {
+                const locationMap = new Map();
+                items.forEach(location => {
+                    locationMap.set(location.id, location);
+                })
+                locationMapRef.current = locationMap;
+                return locationMap;
+            });
+        
+        promise.then(locationMap => {
             const locations = new Map();
             destinations.forEach(destination => {
     
@@ -58,26 +55,54 @@ const DestinationsMap = ({destinations}) => {
                     locationInstance.destinations = [];
                     locations.set(destination.location, locationInstance);
                 }
-                locationInstance.destinations.push(modifiedDestination);
-    
+                locationInstance.destinations.push(modifiedDestination);    
             });
-            setDestinationsPerLocation([ ...items ]);
-            //setDestinationsPerLocation([ ...locations.values() ]);
+
+            unstable_batchedUpdates(() => {
+                //setDestinationsPerLocation([ ...locationMap.values() ]);
+                setDestinationsPerLocation([ ...locations.values() ]);
+                setSelectedLocation(null);
+            })
         })
     }, [destinations])
+
+    useEffect(() => {
+        if (clusterer === null) {
+            return;
+        }
+        clusterer.clearMarkers();
+        const markers = destinationsPerLocation.map(location => {
+            const marker = new google.maps.Marker({
+                position: {
+                    lat: location.latitude,
+                    lng: location.longitude
+                },
+                icon: "https://static.wixstatic.com/media/e50527_e57f1250c77142098a1be8ee71f78144~mv2.png"
+            });
+            marker.addListener("click", () => handleMarkerClick(location));
+            return marker;
+        });
+        clusterer.addMarkers(markers);
+        if (markers.length === 0) {
+            clusterer.map.setZoom(2);
+            clusterer.map.panTo(_defaultCenter);
+        } else if (markers.length === 1) {
+            clusterer.map.setZoom(8);
+            clusterer.map.panTo(markers[0].getPosition());
+        } else {
+            clusterer.fitMapToMarkers();
+        }
+    }, [clusterer, destinationsPerLocation])
     
-    const { isLoaded } = useJsApiLoader({
+    const { isLoaded } = useLoadScript({
         id: 'google-map-script',
-        // The google ma^API keys are restricted (IP and HTTP referrer)
+        // The google maps API keys are restricted (IP and HTTP referrer)
         googleMapsApiKey: process.env.REACT_APP_GMAP_API_KEY
     })
 
-    const [map, setMap] = React.useState(null)
-    const [clusterer, setClusterer] = React.useState(null)
-
     const handleMapLoaded = React.useCallback((map) => {
         // Center in the middle of the atlantic ocean
-        map.setCenter({lat: 34, lng: -40});
+        map.setCenter(_defaultCenter);
         map.setZoom(2);
         setMap(map)
     }, [])
@@ -122,15 +147,7 @@ const DestinationsMap = ({destinations}) => {
                 onUnmount={handleClustererUnmount}
             >
                 {
-                    (clusterer) =>
-                        destinationsPerLocation.map((location) => {
-                            return <LocationMarker
-                                        key={location.id}
-                                        clusterer={clusterer}
-                                        location={location}
-                                        onClick={handleMarkerClick}
-                                    />
-                        })
+                    (clusterer) => (null)
                 }
             </MarkerClusterer>
             {
@@ -140,8 +157,11 @@ const DestinationsMap = ({destinations}) => {
                         setSelectedLocation(null);
                     }}
                     position={{
-                        lat: selectedLocation.latitude + 13,
+                        lat: selectedLocation.latitude + 0.2,
                         lng: selectedLocation.longitude
+                    }}
+                    options={{
+                        disableAutoPan: false
                     }}
                 >
                     <LocationInfoWindow location={selectedLocation} coverWidth={_infoCoverWidth} />
