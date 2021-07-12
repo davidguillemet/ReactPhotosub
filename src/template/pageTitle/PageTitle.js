@@ -5,7 +5,16 @@ import 'fontsource-roboto/100.css';
 
 const useStyles = makeStyles((theme) => ({
     title: {
-        fontWeight: "100"
+        fontWeight: "100",
+        [theme.breakpoints.up('xs')]: {
+            fontSize: "24pt"
+        },
+        [theme.breakpoints.up('sm')]: {
+            fontSize: "34pt"
+        },
+        [theme.breakpoints.up('md')]: {
+            fontSize: "44pt"
+        }
     },
 }));
   

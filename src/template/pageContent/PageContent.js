@@ -14,12 +14,17 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: theme.spacing(3),
       marginRight: theme.spacing(3),
       marginLeft: theme.spacing(3),
+      [theme.breakpoints.down('sm')]: {
+        marginRight: theme.spacing(2),
+        marginLeft: theme.spacing(2),
+      },
       padding: 0,
       display: 'flex',
       flex: 1,
       flexDirection: 'column',
       flexWrap: 'wrap',
-      alignItems: 'center'
+      alignItems: 'center',
+      textAlign: 'center'
     }
 }));  
 
