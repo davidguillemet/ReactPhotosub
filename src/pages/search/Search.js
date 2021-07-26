@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
 import SearchIcon from '@material-ui/icons/Search';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import axios from 'axios';
 
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
@@ -14,12 +14,16 @@ import Divider from '@material-ui/core/Divider';
 import HelpIcon from '@material-ui/icons/Help';
 import WarningIcon from '@material-ui/icons/Warning';
 
+import { Gallery } from '../../components';
 import PageTitle from '../../template/pageTitle';
-import dataProvider from '../../dataProvider';
+import dataProvider from '../../dataProvider/dataprovider';
+import { uniqueID } from '../../utils/utils';
+
+const _pageSize = 10;
 
 const useStyles = makeStyles((theme) => ({
     noMargin: {
-      margin: 0,//theme.spacing(1),
+      margin: 0
     },
     root: {
         '& > *': {
@@ -34,6 +38,9 @@ const useStyles = makeStyles((theme) => ({
     resultContainer: {
         display: 'flex',
         width: '100%',
+        marginTop: theme.spacing(3)
+    },
+    viewMore: {
         marginTop: theme.spacing(3)
     }
 }));
@@ -77,18 +84,18 @@ const StatusIcon = ({searchIsRunning}) => {
     );
 }
 
-const SearchInput = ({imageCount, status, onChange}) => {
+const SearchInput = ({imageCount, running, hasError, onChange}) => {
 
     const classes = useSearchInputStyle();
 
     return (
         <Paper component="form" className={classes.root}>
-        <IconButton className={classes.iconButton} aria-label="menu">
-            <StatusIcon searchIsRunning={status.running}/>
+        <IconButton className={classes.iconButton} aria-label="menu" disabled={true}>
+            <StatusIcon searchIsRunning={running}/>
         </IconButton>
         <InputBase
             className={classes.input}
-            placeholder={`Rechercher parmi ${imageCount} images...`}
+            placeholder={imageCount > 0 && `Rechercher parmi ${imageCount} images...`}
             autoFocus={true}
             inputProps={{ 'aria-label': 'search google maps' }}
             fullWidth
@@ -96,7 +103,7 @@ const SearchInput = ({imageCount, status, onChange}) => {
             onChange={onChange}
         />
         {
-            status.hasError &&
+            hasError &&
             <IconButton className={classes.iconButton} aria-label="search">
                 <WarningIcon />
             </IconButton>
@@ -109,16 +116,28 @@ const SearchInput = ({imageCount, status, onChange}) => {
     );
 }
 
-const Search = () => {
-    
-    const [ searchTimer, setSearchTimer ] = useState(null);
-    const [ searchStatus, setSearchStatus ] = useState({
-        running: false,
+function getEmptySearchResult() {
+    return {
+        images: [],
+        hasNext: false,
         hasError: false
-    });
-    const [ imageCount, setImageCount ] = useState(0);
-    const [ searchExact, setSearchExact ] = useState(false);
+    }
+}
+
+const Search = () => {
     const classes = useStyles();
+
+    const [ searchTimer, setSearchTimer ] = useState(null);
+    const [ searchIsRunning, setSearchIsRunning ] = useState(false);
+    const [ searchResult, setSearchResult] = useState(getEmptySearchResult())
+    const [ imageCount, setImageCount ] = useState(0);
+    const [ searchConfig, setSearchConfig ] = useState({
+        exact: false,
+        pageIndex: 0,
+        query: ""
+    });
+
+    const lastSearchProcessId = useRef(null);
 
     useEffect(() => {
         dataProvider.getImageCount().then(count => {
@@ -126,40 +145,84 @@ const Search = () => {
         });
     }, []);
 
-    function onChange(event) {
-        if (searchTimer !== null) {
-            clearTimeout(searchTimer);
+    useEffect(() => {
+        if (searchConfig.query.length <= 2)
+        {
+            setSearchResult(getEmptySearchResult());
+            return;
         }
-        setSearchTimer(setTimeout(runSearch, 500, 0, event.target.value));
-    }
 
-    function runSearch(pageIndex, searchQuery) {
-        setSearchStatus({
-            ...searchStatus,
-            running: true
-        });
-        return axios.post("/api/search", {
-            page: pageIndex,
-            pageSize: 10,
-            exact: searchExact,
-            query: searchQuery
-        }).then(response => {
-            const results = response.data;
-            console.log(results);
+        setSearchIsRunning(true);
+
+        lastSearchProcessId.current = uniqueID();
+
+        dataProvider.searchImages(searchConfig.pageIndex, searchConfig.query, _pageSize, searchConfig.exact, lastSearchProcessId.current)
+        .then(response => {
+            if (response.processId !== lastSearchProcessId.current) {
+                console.log(`skip obsolete search results ${response.processId}`);
+                return;
+            }
+
+            // response format:
+            // {
+            //     items: <image array>,
+            //     criteria: <criteria array>
+            //     query: <string>,
+            //     processId: <string>
+            // }
+            setSearchResult(oldResult => {
+                const results = response.items;
+                const newResult = {
+                    images: searchConfig.pageIndex === 0 ? results : oldResult.images.concat(results),
+                    hasNext: _pageSize === results.length,
+                    hasError: false
+                }
+                return newResult;
+            });
         }).catch(err => {
             // TODO display error message
         }).finally(() => {
-            setSearchStatus({
-                ...searchStatus,
-                running: false
-            });
+            setSearchIsRunning(false);
+        })
+
+    }, [searchConfig]);
+
+    function handleChangeExact(event) {
+        setSearchConfig(oldConfig => {
+            return {
+                ...oldConfig,
+                exact: event.target.checked,
+                pageIndex: 0
+            }
+        });
+    }
+
+    function handleNextPage() {
+        setSearchConfig(oldConfig => {
+            return {
+                ...oldConfig,
+                pageIndex: oldConfig.pageIndex + 1
+            }
         })
     }
 
-    function handleChangeExact(event) {
-        setSearchExact(event.target.checked);
+    function setSearchQuery(query) {
+        setSearchConfig(oldConfig => {
+            return {
+                ...oldConfig,
+                query: query,
+                pageIndex: 0
+            }
+        })
     }
-    
+
+    function onQueryChange(event) {
+        if (searchTimer !== null) {
+            clearTimeout(searchTimer);
+        }
+        setSearchTimer(setTimeout(setSearchQuery, 500, event.target.value.trim()));
+    }
+
     return (
         <React.Fragment>
             <PageTitle>Recherche</PageTitle>
@@ -168,13 +231,14 @@ const Search = () => {
                 }}>
                 <SearchInput
                     imageCount={imageCount}
-                    status={searchStatus}
-                    onChange={onChange}
+                    running={searchIsRunning}
+                    hasError={false}
+                    onChange={onQueryChange}
                 />
                 <FormControlLabel
                     control={
                         <Switch
-                            checked={searchExact}
+                            checked={searchConfig.exact}
                             onChange={handleChangeExact}
                             name="checkedExact"
                             color="primary"
@@ -182,9 +246,17 @@ const Search = () => {
                     label="Rechercher les termes exacts"
                 />
             </Box>
-            <Box className={classes.resultContainer}>
-                Résultat
-            </Box>
+            <Gallery images={searchResult.images} style={{width: '100%'}} colWidth={300} margin={5}/>
+            {
+                searchResult.hasNext &&
+                <Button
+                    className={classes.viewMore}
+                    variant="contained"
+                    color="primary"
+                    onClick={handleNextPage}>
+                    En voir plus
+                </Button>
+            }
         </React.Fragment>
     );
 };

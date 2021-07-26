@@ -125,7 +125,7 @@ function removeSimulation(simulation) {
 function getImageCount() {
     return axios.get('/api/images')
     .then(response => {
-        return response.data;
+        return response.data.count;
     })
 }
 
@@ -159,6 +159,18 @@ function waitForThumbnails(fileName) {
     return axios.get(`/api/thumbstatus/${fileName}`);
 }
 
+function searchImages(pageIndex, query, pageSize, exact, processId) {
+    return axios.post('/api/search', {
+        query: query,
+        page: pageIndex,
+        pageSize: pageSize,
+        exact: exact,
+        processId: processId
+    }).then(response => {
+        return response.data;
+    })
+}
+
 const dataProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
@@ -178,7 +190,8 @@ const dataProvider = {
     getUploadedInteriors: getUploadedInteriors,
     removeUploadedInterior: removeUploadedInterior,
     getImageDefaultSelection: getImageDefaultSelection,
-    waitForThumbnails: waitForThumbnails
+    waitForThumbnails: waitForThumbnails,
+    searchImages: searchImages
 }
 
 export default dataProvider;
