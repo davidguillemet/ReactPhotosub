@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Box from '@material-ui/core/Box';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import TabContext from '@material-ui/lab/TabContext';
 import TabPanel from '@material-ui/lab/TabPanel';
 import AppsIcon from '@material-ui/icons/Apps';
 import PublicIcon from '@material-ui/icons/Public';
 import { makeStyles } from '@material-ui/styles';
+
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 
 import dataProvider from '../../dataProvider';
 import PageTitle from '../../template/pageTitle';
@@ -46,6 +46,26 @@ function getRegionPath(regionId, regionMap) {
     } while (parentId !== null)
 
     return regionList.reverse();
+}
+
+const DisplayModeSelector = ({listType, onChange}) => {
+
+    const [ type, setType ] = useState(listType);
+
+    useEffect(() => {
+        setType(listType);
+    }, [listType]);
+
+    return (
+        <ToggleButtonGroup exclusive value={type} onChange={onChange} >
+            <ToggleButton value={VIEW_GRID} >
+                <AppsIcon />
+            </ToggleButton>
+            <ToggleButton value={VIEW_MAP} >
+                <PublicIcon />
+            </ToggleButton>
+        </ToggleButtonGroup>
+    );
 }
 
 const Destinations = () => {
@@ -114,19 +134,8 @@ const Destinations = () => {
         <React.Fragment>
             <PageTitle>Toutes Les Destinations</PageTitle>
             <RegionFilter hierarchy={regionHierarchy} onChange={handleRegionFilterChange} />
+            <DisplayModeSelector listType={destinationsView} onChange={handleChangeDestinationView} />
             <TabContext value={destinationsView}>
-                <Box style={{ width: '100%' }}>
-                    <Tabs
-                        value={destinationsView}
-                        onChange={handleChangeDestinationView}
-                        variant="fullWidth"
-                        indicatorColor="primary"
-                        centered
-                    >
-                        <Tab icon={<AppsIcon fontSize="large" />} value={VIEW_GRID} />
-                        <Tab icon={<PublicIcon fontSize="large" />} value={VIEW_MAP} />
-                    </Tabs>
-                </Box>
                 <TabPanel 
                     value={VIEW_GRID}
                     classes={{
