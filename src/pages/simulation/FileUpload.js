@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core/styles';
 import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import Box from '@material-ui/core/Box';
@@ -16,13 +15,6 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './fileUploadStyles.css';
 // don't use the mocck provider here
 import dataProvider from '../../dataProvider/dataprovider';
-
-
-const useStyle = makeStyles((theme) => ({
-    input: {
-        display: 'none',
-    },
-}));
 
 const STEP_UPLOAD = "upload";
 const STEP_THUMBAILS = "thumbnail";
@@ -150,8 +142,6 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
 
 const FileUpload = ({caption, user, onFileUploaded}) => {
 
-    const classes = useStyle();
-
     const [uploadFiles, setUploadFiles] = useState([]);
     const userUploadRef = useRef(null);
 
@@ -185,11 +175,13 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
             <VerticalSpacing factor={1} />
             <input
                 accept="image/*"
-                className={classes.input}
                 id="contained-button-file"
                 multiple
                 type="file"
                 onChange={handleFileSelection}
+                style={{
+                    display: 'none'
+                }}
             />
             <label htmlFor="contained-button-file">
                 <Button

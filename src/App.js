@@ -1,13 +1,13 @@
 import React from 'react';
-import clsx from 'clsx';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import Box from '@material-ui/core/Box';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import CloseIcon from '@material-ui/icons/Close';
 import logo from './assets/images/logo.jpg';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 
 import Hidden from '@material-ui/core/Hidden';
 import Drawer from '@material-ui/core/Drawer';
@@ -17,8 +17,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 
-import { BrowserRouter as Router, NavLink } from "react-router-dom";
-import { routes, useMenuStyles } from './navigation/routes';
+import { BrowserRouter as Router } from "react-router-dom";
+import { routes, NavigationLink } from './navigation/routes';
 import { FirebaseSignin } from './components/firebase';
 import { AuthProvider } from './components/authentication';
 import Footer from './template/footer';
@@ -30,35 +30,10 @@ import './App.css';
 const drawerWidth = 240;
 const scrollTopAnchor = "back-to-top-anchor";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  appBar: {
-    width: '100%',
-  },
-  toolbar: theme.mixins.toolbar,
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-  closeButton: {
-    marginLeft: theme.spacing(1),
-  },
-  hide: {
-    display: 'none',
-  },
-  drawerHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar
-  },
-  content: {
+const Main = styled('main', {
+  shouldForwardProp: (prop) => prop !== 'open'
+})(({ theme, open }) => {
+  return {
     display: 'flex',
     flexDirection: 'column',
     minHeight: '100vh',
@@ -69,27 +44,30 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.leavingScreen,
     }),
     marginLeft: -drawerWidth,
-    overflow: 'hidden'
-  },
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
+    overflow: 'hidden',
+    ...(open && {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
     }),
-    marginLeft: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth,
-  }
+  }}
+);
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+  justifyContent: 'flex-start',
 }));
 
 function App(props) {
 
-  const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const classes = useStyles();
-  const menuClasses = useMenuStyles();
 
   const handleDrawerOpen = () => {
     setMobileOpen(true);
@@ -102,6 +80,10 @@ function App(props) {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  const handleHistoryChanged = () => {
+    handleDrawerClose();
+  }
   
   function isLinkActive(match, location) {
     if (match === null) {
@@ -121,31 +103,37 @@ function App(props) {
 
   const drawerContent = (
     <div>
-      <div className={classes.drawerHeader}>
-      <IconButton
-        color="inherit"
-        aria-label="close drawer"
-        onClick={handleDrawerClose}
-        edge="start"
-        className={classes.closeButton}
-      >
-        <CloseIcon />
-      </IconButton>
-    </div>
+      <DrawerHeader>
+        <IconButton
+          color="inherit"
+          aria-label="close drawer"
+          onClick={handleDrawerClose}
+          edge="start"
+          sx={{ ml: 1 }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DrawerHeader>
     <Divider variant="middle" />
-    <img src={logo} className="logo" alt="logo" />
+    <Box sx={{
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center'
+    }}>
+      <img src={logo} className="logo" alt="logo" />
+    </Box>
     <List style={{width: '100%', marginTop: 30, marginBottom: 30}}>
     {
       routes.filter(route => route.sidebar).map((route, index) => {
         return (
-          <NavLink key={index} to={route.path} className={menuClasses.link} isActive={isLinkActive}>
+          <NavigationLink key={index} to={route.path} isActive={isLinkActive}>
             <ListItem button>
               <ListItemIcon>
                 {route.icon}
               </ListItemIcon>
               <ListItemText primary={route.label} />
             </ListItem>
-          </NavLink>
+          </NavigationLink>
         );
       })
     }
@@ -156,7 +144,7 @@ function App(props) {
   const container = window !== undefined ? () => window.document.body : undefined;
 
   return (
-    <div className={classes.root}>
+    <div style={{ display: 'flex'}}>
     <AuthProvider>
 
       <CssBaseline />
@@ -165,7 +153,7 @@ function App(props) {
 
         <AppBar
           position="fixed"
-          className={classes.appBar}
+          sx={{ width: '100%' }}
         >
           <Toolbar>
             <IconButton
@@ -173,7 +161,7 @@ function App(props) {
               aria-label="open drawer"
               onClick={handleDrawerOpen}
               edge="start"
-              className={clsx(classes.menuButton, open && classes.hide)}
+              sx={{ mr: 2, ...(open && { display: 'none' }) }}
             >
               <MenuIcon />
             </IconButton>
@@ -181,16 +169,22 @@ function App(props) {
           </Toolbar>
         </AppBar>
 
-        <nav className={classes.drawer}>
+        <nav style={{
+              width: drawerWidth,
+              flexShrink: 0
+          }}
+        >
         <Hidden smUp implementation="css">
           <Drawer
             container={container}
             variant="temporary"
-            anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+            anchor="left"
             open={mobileOpen}
             onClose={handleDrawerToggle}
-            classes={{
-              paper: classes.drawerPaper,
+            sx={{
+              '& .MuiPaper-root': {
+                width: drawerWidth
+              }
             }}
             ModalProps={{
               keepMounted: true, // Better open performance on mobile.
@@ -201,12 +195,12 @@ function App(props) {
         </Hidden>
         </nav>
 
-        <main className={clsx(classes.content, {[classes.contentShift]: open})}>
+        <Main open={open}>
           <div id={scrollTopAnchor} />
-          <div className={classes.drawerHeader} />
-          <PageContent />
+          <DrawerHeader />
+          <PageContent onHistoryChanged={handleHistoryChanged}/>
           <Footer />
-        </main>
+        </Main>
 
       </Router>
 

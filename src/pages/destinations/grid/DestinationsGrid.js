@@ -1,23 +1,22 @@
-import React, { useMemo } from 'react';
-import GridList from "@material-ui/core/GridList";
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useMemo, useState, useEffect } from 'react';
+import Box from '@material-ui/core/Box';
 
 import { getThumbnailSrc } from '../../../utils/utils';
 import Destination from './Destination';
 
-const useStyles = makeStyles((theme) => ({
-    gridList: {
-        margin: 0,
-        width: '100%',
-        '& > *': {
-            margin: 5,
-        },
-    }
-}));
+import { useResizeObserver } from '../../../components/hooks';
+
+const _destinationsMargin = 7;
+const _destinationsBaseWidth = 300;
 
 const DestinationsGrid = ({destinations, regionsByDestination}) => {
 
-    const classes = useStyles();
+    const resizeObserver = useResizeObserver();
+
+    const [galleryProps, setGalleryProps] = useState({
+        imageWidth: _destinationsBaseWidth,
+        columnsCount: 0
+    });
 
     const adaptedDestinations = useMemo(() => {
         return destinations.map(destination => {
@@ -30,17 +29,45 @@ const DestinationsGrid = ({destinations, regionsByDestination}) => {
 
     }, [destinations]);
 
+    useEffect(() => {
+        const containerWidth = resizeObserver.width;
+        const columnsCount = Math.floor((containerWidth + _destinationsMargin) / (_destinationsBaseWidth + _destinationsMargin));
+        const totalMargin = (columnsCount-1)*_destinationsMargin;
+        let imageWidth = Math.round((containerWidth - totalMargin) / columnsCount);
+        if (imageWidth * columnsCount + _destinationsMargin * (columnsCount-1) > containerWidth) {
+            imageWidth--;
+        }
+        setGalleryProps({
+            imageWidth: imageWidth,
+            columnsCount: columnsCount
+        });
+    }, [resizeObserver.width])
+
     return (
-        <GridList
-            component="div"
-            classes={{
-                root: classes.gridList
+        <Box
+            ref={resizeObserver.ref}
+            sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                m: 0,
+                width: '100%'
             }}
         >
             {
-                adaptedDestinations.map(item => <Destination key={item.id} destination={item} regions={regionsByDestination.get(item.id)} />)
+                adaptedDestinations.map((item, index) => {
+                    return (
+                        <Destination
+                            key={item.id}
+                            destination={item}
+                            regions={regionsByDestination.get(item.id)}
+                            itemWidth={galleryProps.imageWidth}
+                            margin={_destinationsMargin}
+                            colIndex={index % galleryProps.columnsCount}
+                        />
+                    );
+                })
             }
-        </GridList>
+        </Box>
     );
 }
 

@@ -1,9 +1,10 @@
+import { NavLink } from "react-router-dom";
 import HomeIcon from '@material-ui/icons/Home';
 import LanguageIcon from '@material-ui/icons/Language';
 import SearchIcon from '@material-ui/icons/Search';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 
 import { lazy } from 'react';
 const Home = lazy(() => import("../pages/home"));
@@ -67,8 +68,8 @@ export const routes = [
     },
 ];
 
-export const useMenuStyles = makeStyles((theme) => ({
-    link: {
+export const NavigationLink = styled(NavLink)(
+    ({theme}) => ({
         textDecoration: 'none',
         color: theme.palette.text.primary,
         "&.active span": {
@@ -78,6 +79,7 @@ export const useMenuStyles = makeStyles((theme) => ({
         "&.active > div, &.active > li": {
             backgroundColor: "rgba(0,0,0,0.06)"
         }
-    }
-}));
+    })
+);
+
   

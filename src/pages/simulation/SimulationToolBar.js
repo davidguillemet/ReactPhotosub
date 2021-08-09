@@ -69,10 +69,10 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
     }
 
     return (
-        <Paper style={{
+        <Paper sx={{
             position: "fixed",
             top: 5,
-            zIndex: 99999
+            zIndex: "tooltip"
         }}>
             <SimulationNameDialog
                 open={nameDlgOpen}

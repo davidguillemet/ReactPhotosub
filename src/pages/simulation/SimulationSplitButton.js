@@ -1,5 +1,4 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
@@ -17,15 +16,6 @@ import Divider from '@material-ui/core/Divider';
 
 import { isFromDb, isDirty } from '../../dataProvider';
 
-const useStyle = makeStyles((theme) => ({
-    buttonLabel: {
-        textTransform: 'none',
-    },
-    dirtyIcon: {
-        marginLeft: theme.spacing(1)
-    }
-}));
-
 const DirtyIcon = ({simulation}) => {
     return isDirty(simulation) === false ?
             null :
@@ -35,8 +25,6 @@ const DirtyIcon = ({simulation}) => {
 }
 
 const SimulationSplitButtonItem = ({simulation, index, selected, onClick}) => {
-
-    const classes = useStyle();
 
     const handleMenuItemClick = useCallback(() => {
         onClick(index)
@@ -52,7 +40,7 @@ const SimulationSplitButtonItem = ({simulation, index, selected, onClick}) => {
             {simulation.name}
             {
                 isDirty(simulation) &&
-                <ListItemIcon className={classes.dirtyIcon}>
+                <ListItemIcon sx={{ ml: 1 }}>
                     <DirtyIcon simulation={simulation} />
                 </ListItemIcon>            
             }
@@ -61,7 +49,6 @@ const SimulationSplitButtonItem = ({simulation, index, selected, onClick}) => {
 };
 
 const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange}) => {
-    const classes = useStyle();
 
     const [open, setOpen] = useState(false);
     const anchorRef = useRef(null);
@@ -99,8 +86,8 @@ const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange}) =
                 <ButtonGroup variant="contained" color="secondary" ref={anchorRef} aria-label="split button">
                     <Button
                         onClick={handleToggle}
-                        classes={{
-                            label: classes.buttonLabel
+                        sx={{
+                            textTransform: 'none'
                         }}
                         disabled={splitButtonDisabled}
                         endIcon={<DirtyIcon simulation={simulation} />}

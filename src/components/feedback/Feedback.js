@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
-
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+import Alert from '@material-ui/core/Alert';
 
 const FeedbackMessage = ({severity, message}) => {
 
@@ -35,11 +31,15 @@ const FeedbackMessage = ({severity, message}) => {
     };
 
     return (
-        <Snackbar open={feedback.open} autoHideDuration={6000} onClose={handleClose}>
-            <Alert onClose={handleClose} severity={feedback.severity}>
-            {feedback.message}
+        <Snackbar
+            open={feedback.open}
+            autoHideDuration={6000}
+            onClose={handleClose}
+        >
+            <Alert onClose={handleClose} severity={feedback.severity} elevation={6} variant="filled">
+                {feedback.message}
             </Alert>
-      </Snackbar>
+        </Snackbar>
     );
 };
 

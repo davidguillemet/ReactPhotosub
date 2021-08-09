@@ -17,11 +17,10 @@ import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import MenuList from '@material-ui/core/MenuList';
-import { NavLink } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { AuthContext } from '../authentication';
-import { routes, useMenuStyles } from '../../navigation/routes';
+import { routes, NavigationLink } from '../../navigation/routes';
 
 // Configure FirebaseUI.
 const uiConfig = {
@@ -44,7 +43,7 @@ const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => (
         variant="contained"
         onClick={onClick}
         ref={ref}
-        style={{
+        sx={{
             position: 'absolute',
             top: '50%',
             transform: 'translateY(-50%)',
@@ -64,8 +63,6 @@ const NotSignedInButton = ({handleSignIn}) => {
 };
 
 const SignedInButton = ({user, handleLogout}) => {
-
-    const menuClasses = useMenuStyles();
 
     const [menuOpen, setMenuOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
@@ -98,16 +95,21 @@ const SignedInButton = ({user, handleLogout}) => {
 
             <Chip
                 ref={anchorRef}
+                variant="outlined"
                 avatar={<AccountCircleOutlinedIcon />}
                 label={user.displayName}
                 onClick={handleToggle}
                 deleteIcon={<MoreVertIcon />}
                 onDelete={handleToggle}
-                style={{
+                sx={{
                     position: 'absolute',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    right: 20
+                    right: 20,
+                    borderColor: 'white',
+                    '& .MuiChip-avatar, & .MuiChip-deleteIcon, & .MuiChip-deleteIcon:hover, & .MuiChip-label': {
+                        color: 'white'
+                    }
                 }}
             />
             <Popper open={menuOpen} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
@@ -122,14 +124,14 @@ const SignedInButton = ({user, handleLogout}) => {
                                 {
                                     routes.filter(route => route.private).map((route, index) => {
                                         return (
-                                            <NavLink key={index} to={route.path} className={menuClasses.link}>
+                                            <NavigationLink key={index} to={route.path}>
                                                 <MenuItem onClick={handleClose}>
                                                     <ListItemIcon>
                                                         {route.icon}
                                                     </ListItemIcon>
                                                     <Typography variant="inherit">{route.label}</Typography>
                                                 </MenuItem>
-                                            </NavLink>
+                                            </NavigationLink>
                                         );
                                     })
                                 }
@@ -186,14 +188,16 @@ const FirebaseAuth = ({ user }) => {
                 onClose={onCloseModal}
                 BackdropComponent={Backdrop}
                 BackdropProps={{
-                    timeout: 500,
+                    transitionDuration: 500,
                     style: {
                         backgroundColor: 'rgba(0,0,0,0.7)'
                     }
                 }}
             >
                 <Fade in={isLogin}>
-                    <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseAuth()} />
+                    <div style={{display: 'flex', flex: 1}}>
+                        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseAuth()} />
+                    </div>
                 </Fade>
             </Modal>
 

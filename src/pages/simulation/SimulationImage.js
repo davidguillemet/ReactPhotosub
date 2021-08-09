@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
 import clsx from 'clsx';
 import { Rnd } from "react-rnd";
 import ButtonGroup from '@material-ui/core/ButtonGroup';
@@ -12,7 +12,7 @@ import { useEffect } from 'react';
 import {moveImage, resizeAndMoveImage, deleteImage} from './actions/SimulationActions';
 import { getThumbnailSrc } from '../../utils/utils';
 
-const useStyle = makeStyles((theme) => ({
+const useStyle = makeStyles(() => ({
     container: {
         '&:hover div[class*="MuiButtonGroup"]': {
             display: 'block'

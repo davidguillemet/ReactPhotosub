@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -36,14 +35,6 @@ const borderColors = [
     "#8B4513",
 ];
 
-const useStyle = makeStyles((theme) => ({
-    paper: {
-        display: 'flex',
-        border: `1px solid ${theme.palette.divider}`,
-        flexWrap: 'wrap',
-    }
-}));
-
 const EmptySimulationImages = ({type, images}) => {
     if (images === null) {
         // to avoid blinking component display when transitionning
@@ -69,8 +60,6 @@ const EmptySimulationImages = ({type, images}) => {
 }
 
 const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
-
-    const classes = useStyle();
 
     const [listType, setListType] = useState(LIST_HOME_SLIDESHOW);
     const [interiors, images, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
@@ -262,7 +251,14 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 alignItems: 'center'}}>
                 <Typography variant="h5" style={{fontWeight: "100"}}>Couleur du cadre</Typography>
                 <HorizontalSpacing factor={2} />
-                <FormControl variant="outlined" className={classes.formControl}>
+                <FormControl
+                    variant="outlined"
+                    sx={{
+                        display: 'flex',
+                        border: (theme) => `1px solid ${theme.palette.divider}`,
+                        flexWrap: 'wrap'               
+                    }}
+                >
                     <Select
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"

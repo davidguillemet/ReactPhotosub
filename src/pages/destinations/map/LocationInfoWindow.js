@@ -1,8 +1,8 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
 import DestinationLink from '../../../components/destinationLink';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     locationTitle: {
         overflow: "hidden",
         marginBottom: 5,

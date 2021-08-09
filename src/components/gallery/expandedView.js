@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
 import React, { useEffect, useState, useRef } from 'react';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
@@ -41,21 +41,6 @@ const useStyles = makeStyles({
         opacity: 0,
         transition: 'opacity 1s',
         '&.loaded': {
-            opacity: 1
-        }
-    },
-    detailsOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        bottom: 0,
-        right: 0,
-        opacity: 0,
-        backgroundColor: 'rgba(255,255,255,0.6)',
-        display: 'flex',
-        transition: 'all 500ms',
-        '&.active': {
-            backgroundColor: 'rgba(255,255,255,0.6)',
             opacity: 1
         }
     },
@@ -242,7 +227,6 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
 
     return (
         <Box
-            ref={ref}
             onMouseMove={(isPlaying || fullScreen) ? handleMouseMove : null}
             style={{
                 display: 'flex',
@@ -254,6 +238,7 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                 padding: 10
             }}
         >
+            { /* HEADER TOOLBAR */}
             <Paper
                 elevation={4}
                 ref={headerBarRef}
@@ -267,13 +252,14 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                     zIndex: (isPlaying || fullScreen) ? 100 : 1 
                 }}
             >
-                <Box style={{
-                    display: 'flex',
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center'
-                }}
+                <Box
+                    style={{
+                        display: 'flex',
+                        flex: 1,
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center'
+                    }}
                 >
                     {
                         isPlaying ?
@@ -309,23 +295,25 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                         </React.Fragment>
                     }
                 </Box>
-                <Box style={{
-                    display: 'flex',
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }}
+                <Box
+                    style={{
+                        display: 'flex',
+                        flex: 1,
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
                 >
                     <Chip label={`${currentIndex + 1} / ${images.length}`} />
                 </Box>
-                <Box style={{
-                    display: 'flex',
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center'
-                }}
+                <Box
+                    style={{
+                        display: 'flex',
+                        flex: 1,
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        alignItems: 'center'
+                    }}
                 >
                     {
                         isPlaying ?
@@ -338,16 +326,19 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                     }
                 </Box>
             </Paper>
-            <Box style={{
-                position: 'relative',
-                display: 'flex',
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
-                overflow: 'hidden'
-            }}
+            
+            { /* IMAGE BOX WITH NAVIGATION BUTTONS */}
+            <Box
+                style={{
+                    position: 'relative',
+                    display: 'flex',
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                    overflow: 'hidden'
+                }}
             >
                 <TransitionGroup component={null}>
                     <CSSTransition
@@ -374,7 +365,8 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                                 alt=""
                                 onLoad={onImageLoaded}
                                 src={currentImage ? getThumbnailSrc(currentImage, THUMB_LARGEST) : null}
-                                className={classes.mainImage} />
+                                className={classes.mainImage}
+                            />
                         </Box>
                     </CSSTransition>
                 </TransitionGroup>
@@ -385,7 +377,8 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                         onClick={handlePreviousImage}
                         style={{
                             left: 10
-                        }}>
+                        }}
+                    >
                         <ArrowBackIosRoundedIcon fontSize='large' />
                     </IconButton>
                     <IconButton
@@ -400,23 +393,27 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
             </Box>
 
             <Collapse in={infoVisible}>
-                <Paper elevation={4} style={{
-                    marginBottom: 5,
-                    padding: 10,
-                    textAlign: 'center',
-                    backgroundColor: '#edfeff'
-                }}>
-                    {
-                        currentImageHasDetails() ?
-                        <React.Fragment>
-                            <Typography variant="h4" style={{ margin: 0 }}>{currentImage?.title}</Typography>
-                            <Typography variant="h5" style={{ marginBottom: 0 }}>{currentImage?.description}</Typography>
-                        </React.Fragment> :
-                        <React.Fragment>
-                            <Typography variant="h4" style={{ margin: 0 }}>...</Typography>
-                            <Typography variant="h5" style={{ marginBottom: 0 }}>...</Typography>
-                        </React.Fragment>
-                    }
+                <Paper
+                    elevation={4}
+                    style={{
+                        position: 'relative',
+                        marginBottom: 5,
+                        padding: 10,
+                        textAlign: 'center',
+                        backgroundColor: '#edfeff'
+                    }}
+                >
+                {
+                    currentImageHasDetails() ?
+                    <React.Fragment>
+                        <Typography variant="h4" style={{ margin: 0 }}>{currentImage?.title}</Typography>
+                        <Typography variant="h5" style={{ marginBottom: 0 }}>{currentImage?.description}</Typography>
+                    </React.Fragment> :
+                    <React.Fragment>
+                        <Typography variant="h4" style={{ margin: 0 }}>...</Typography>
+                        <Typography variant="h5" style={{ marginBottom: 0 }}>...</Typography>
+                    </React.Fragment>
+                }
                 </Paper>
             </Collapse>
 

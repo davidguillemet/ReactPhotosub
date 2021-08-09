@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/styles'
 import React, { useEffect, useState } from 'react';
 import Box from '@material-ui/core/Box';
 import Modal from '@material-ui/core/Modal';
@@ -75,7 +75,7 @@ const Gallery = ({ images, style, colWidth, margin }) => {
         setExpandedImage(imageId);
     }
 
-    function onCloseModal() {
+    function onCloseModal(/*event, reason*/) {
         setExpandedImage(null);
     }
 
@@ -109,7 +109,7 @@ const Gallery = ({ images, style, colWidth, margin }) => {
                 onClose={onCloseModal}
                 BackdropComponent={Backdrop}
                 BackdropProps={{
-                    timeout: 1000,
+                    transitionDuration: 1000,
                     style: {
                         backgroundColor: '#fff'
                     }
@@ -117,9 +117,9 @@ const Gallery = ({ images, style, colWidth, margin }) => {
             >
                 <Fade in={expandedImage !== null}>
                     { /* Empty wrapper node to avoid error "The modal content node does not accept focus" */ }
-                    <>
+                    <div style={{display: 'flex', flex: 1, height: '100%'}}>
                         <ExpandedView images={images} currentId={expandedImage} onClose={onCloseModal} />
-                    </>
+                    </div>
                 </Fade>
             </Modal>
         </React.Fragment>

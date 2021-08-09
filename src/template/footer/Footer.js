@@ -1,17 +1,6 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-
-const useFooterStyles = makeStyles((theme) => ({
-    footer: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: theme.spacing(1),
-        marginTop: 'auto',
-        backgroundColor: theme.palette.type === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
-    }    
-}));
 
 function SocialMedia() {
     return (null);
@@ -27,15 +16,20 @@ function Copyright() {
     );
 }
 
-const Footer = () => {
-    const classes = useFooterStyles();
+const StyledFooter = styled('footer')``;
 
-    return (
-        <footer className={classes.footer}>
-            <SocialMedia />
-            <Copyright />
-        </footer>
-    );
-}
+const Footer = () => (
+    <StyledFooter sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        p: 1,
+        mt: 'auto',
+        backgroundColor: (theme) => theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
+    }}>
+        <SocialMedia />
+        <Copyright />
+    </StyledFooter>
+);
 
 export default Footer;

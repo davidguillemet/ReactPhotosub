@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import FavoriteButton from './favoriteButton';
@@ -7,7 +7,7 @@ import { getThumbnailSrc } from '../../utils/utils';
 
 const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
     imageContainer: {
         display: "block",
         position: 'absolute',

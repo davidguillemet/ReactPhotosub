@@ -6,18 +6,17 @@ import TabContext from '@material-ui/lab/TabContext';
 import TabPanel from '@material-ui/lab/TabPanel';
 import AppsIcon from '@material-ui/icons/Apps';
 import PublicIcon from '@material-ui/icons/Public';
-import Chip from '@material-ui/core/Chip';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
 
 import dataProvider from '../../dataProvider';
 import PageTitle from '../../template/pageTitle';
 import { VerticalSpacing } from '../../template/spacing';
 import DestinationsGrid from './grid/DestinationsGrid';
 import DestinationsMap from './map/DestinationsMap';
+import RegionFilter from './RegionFilter';
+import useRegions from './RegionLoaderHook';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     regionContainer: {
         display: 'flex',
         flexDirection: 'row',
@@ -33,17 +32,10 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const ROOT_REGION_ID = -999999;
-const ROOT_REGION = {
-    title: "Toutes les régions",
-    id: ROOT_REGION_ID,
-    parent: null
-};
-
 const VIEW_GRID = 'grid';
 const VIEW_MAP = 'map';
 
-function getRegionPath(regionId, regionMap, includeRoot) {
+function getRegionPath(regionId, regionMap) {
 
     const regionList = [];
     let parentId = regionId;
@@ -51,7 +43,7 @@ function getRegionPath(regionId, regionMap, includeRoot) {
         const region = regionMap.get(parentId);
         regionList.push(region);
         parentId = region.parent;
-    } while ((includeRoot === true && parentId !== null) || (includeRoot === false && parentId !== ROOT_REGION_ID))
+    } while (parentId !== null)
 
     return regionList.reverse();
 }
@@ -62,120 +54,68 @@ const Destinations = () => {
 
     const [allDestinations, setAllDestinations] = useState(null);
     const [filteredDestinations, setFilteredDestinations] = useState([]);
-    const [destinationsView, setDestinationsView] = useState(VIEW_GRID);
-
-    const [regionMap, setRegionMap] = useState(null);
-    const [regionList, setRegionList] = useState([]);
     const [regionsByDestination, setRegionsByDestination] = useState(null);
-    const [currentRegion, setCurrentRegion] = useState(ROOT_REGION);
-    const [currentSubRegions, setCurrentSubRegions] = useState([]);
-    
-    // A first effect executed only once to get regions
+    const [destinationsView, setDestinationsView] = useState(VIEW_GRID);
+    const [regionHierarchy, regionMap] = useRegions();
+    const [regionFilterSet, setRegionFilterSet] = useState(null);
+
+    // Another effect executed only to load destinations
     useEffect(() => {
-        dataProvider.getRegions().then(items => {
-
-            items.forEach(item => {
-                if (item.parent === null) {
-                    item.parent = ROOT_REGION_ID;
-                }
-            });
-            setRegionList(items);
-
-            // Build the region lmap (region id -> region)
-            const regionMap = new Map();
-            // Add the virtual root region in th emap but not in the list...
-            regionMap.set(ROOT_REGION_ID, ROOT_REGION)
-            items.forEach(region => {
-                regionMap.set(region.id, region);
-            })
-            setRegionMap(regionMap);
-
-            const rootRegions = items.filter(region => region.parent === ROOT_REGION_ID).sort((a, b) => a.title === b.title ? 0 : a.title < b.title ? -1 : 1);
-            setCurrentSubRegions(rootRegions);
-        })
-    }, []);
-
-    // Another effect executed only once when regions has been loaded, to get destinations
-    useEffect(() => {
-        if (regionMap === null) {
-            // Wait for the region map to be populated
-            return;
-        }
         dataProvider.getDestinations().then(destinations => {
             setAllDestinations(destinations);
-
-            // Build the regions map by destination (destination id -> region list)
-            const regionsByDestination = new Map();
-            destinations.forEach(destination => {
-                regionsByDestination.set(destination.id, getRegionPath(destination.region, regionMap, false));
-            });
-            setRegionsByDestination(regionsByDestination);
         });
-    }, [regionMap]); // regions dependency to load estinations one regions have been initialized
+    }, []); 
 
     useEffect(() => {
-        if (regionsByDestination === null || allDestinations === null) {
+        if (regionMap === null || allDestinations == null) {
+            // Wait for the regions and destinations being loaded
             return;
         }
-        setFilteredDestinations(allDestinations);
-    }, [regionsByDestination, allDestinations]); // Needs regionsByDestination to update destination cards
 
-    // Another effect executed only once when 
-    
-    function onRegionClick(regionId) {
-
-        setCurrentRegion(regionMap.get(regionId));
-        const subRegions = regionList.filter(region => region.parent === regionId);
-
-        setCurrentSubRegions(subRegions);
+        // Build the regions map by destination (destination id -> region list)
+        const regionsByDestination = new Map();
+        allDestinations.forEach(destination => {
+            regionsByDestination.set(destination.id, getRegionPath(destination.region, regionMap));
+        });
         
+        // Needs regionsByDestination to update destination cards
+        setRegionsByDestination(regionsByDestination);
+        setFilteredDestinations(allDestinations);
+
+    }, [allDestinations, regionMap])
+
+    useEffect(() => {
+        if (allDestinations === null || regionsByDestination === null || regionFilterSet === null) {
+            return;
+        }
+
         // filter by region
-        const resultsByRegion = (regionId === ROOT_REGION_ID) ?
+        const resultsByRegion =
+            regionFilterSet.size === 0 ?
             allDestinations :
-            allDestinations.filter(destination => regionsByDestination.get(destination.id).find(destRegion => destRegion.id === regionId))
+            allDestinations.filter(destination => regionsByDestination.get(destination.id).find(destRegion => regionFilterSet.has(destRegion.id)))
 
         // filter by keyword
         // TODO
         const resultsByRegionAndKeyword = resultsByRegion;
 
         setFilteredDestinations(resultsByRegionAndKeyword);
-    }
-
-    const handleRegionClick = (regionId) => () => {
-        onRegionClick(regionId);
-    }
+    }, [regionFilterSet, allDestinations, regionsByDestination]);
 
     const handleChangeDestinationView = (event, newValue) => {
         setDestinationsView(newValue);
-      };
+    };
 
-    function RegionPath() {
-        if (regionMap === null) {
-            return null;
-        }
-        const ancestors = getRegionPath(currentRegion.id, regionMap, true);
-        return (
-            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} >
-                {ancestors.map((region, index, all) => {
-                    const clickable = index === all.length - 1 ? false : true;
-                    const variant = clickable ? "outlined" : "default";
-                    return (
-                        <Chip key={region.id} color="primary" label={region.title} variant={variant} clickable={clickable} onClick={handleRegionClick(region.id)} />
-                    );
-                })}
-            </Breadcrumbs>
-        )
-    }
+    const handleRegionFilterChange = (regionSet) => {
+        setRegionFilterSet(regionSet);
+    };
 
     return (
         <React.Fragment>
             <PageTitle>Toutes Les Destinations</PageTitle>
-            <RegionPath></RegionPath>
-            <Box classes={{ root: classes.regionContainer}}>
-                {currentSubRegions.map(region => <Chip key={region.id} label={region.title} onClick={handleRegionClick(region.id)} variant="outlined" />)}
-            </Box>
+            <RegionFilter hierarchy={regionHierarchy} onChange={handleRegionFilterChange} />
             <TabContext value={destinationsView}>
-                <Box style={{ width: '100%', margin: 5 }}>
+                <Box style={{ width: '100%' }}>
                     <Tabs
                         value={destinationsView}
                         onChange={handleChangeDestinationView}

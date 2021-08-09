@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Box from "@material-ui/core/Box";
@@ -21,48 +21,8 @@ import { uniqueID } from '../../utils/utils';
 
 const _pageSize = 10;
 
-const useStyles = makeStyles((theme) => ({
-    noMargin: {
-      margin: 0
-    },
-    root: {
-        '& > *': {
-          margin: theme.spacing(0.5),
-        },
-        width: '95%',
-        maxWidth: '700px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center'
-    },
-    resultContainer: {
-        display: 'flex',
-        width: '100%',
-        marginTop: theme.spacing(3)
-    },
-    viewMore: {
-        marginTop: theme.spacing(3)
-    }
-}));
-
-const useSearchInputStyle = makeStyles((theme) => ({
-    root: {
-        padding: '2px 4px',
-        display: 'flex',
-        alignItems: 'center',
-        width: '100%',
-      },
-    input: {
-        marginLeft: theme.spacing(1),
-        flex: 1,
-    },
-    iconButton: {
-        padding: 10,
-    },
-    divider: {
-        height: 28,
-        margin: 4,
-    },
+const SearcIconButton = styled(IconButton)(({theme}) => ({
+    padding: 10
 }));
 
 const StatusIcon = ({searchIsRunning}) => {
@@ -86,16 +46,23 @@ const StatusIcon = ({searchIsRunning}) => {
 
 const SearchInput = ({imageCount, running, hasError, onChange}) => {
 
-    const classes = useSearchInputStyle();
-
     return (
-        <Paper component="form" className={classes.root}>
-        <IconButton className={classes.iconButton} aria-label="menu" disabled={true}>
+        <Paper component="form" sx={{
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',    
+            py: '2px',
+            px: '4px'
+        }}>
+        <SearcIconButton disabled={true}>
             <StatusIcon searchIsRunning={running}/>
-        </IconButton>
+        </SearcIconButton>
         <InputBase
-            className={classes.input}
-            placeholder={imageCount > 0 && `Rechercher parmi ${imageCount} images...`}
+            sx={{
+                flex: 1,
+                ml: 1
+            }}
+            placeholder={imageCount > 0  ? `Rechercher parmi ${imageCount} images...` : ""}
             autoFocus={true}
             inputProps={{ 'aria-label': 'search google maps' }}
             fullWidth
@@ -104,14 +71,20 @@ const SearchInput = ({imageCount, running, hasError, onChange}) => {
         />
         {
             hasError &&
-            <IconButton className={classes.iconButton} aria-label="search">
+            <SearcIconButton>
                 <WarningIcon />
-            </IconButton>
+            </SearcIconButton>
         }
-        <Divider className={classes.divider} orientation="vertical" />
-        <IconButton className={classes.iconButton} aria-label="directions">
+        <Divider
+            sx={{
+                height: '28px',
+                m: '4px'
+            }}
+            orientation="vertical"
+        />
+        <SearcIconButton>
             <HelpIcon />
-        </IconButton>
+        </SearcIconButton>
       </Paper>
     );
 }
@@ -125,7 +98,6 @@ function getEmptySearchResult() {
 }
 
 const Search = () => {
-    const classes = useStyles();
 
     const [ searchTimer, setSearchTimer ] = useState(null);
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
@@ -226,9 +198,17 @@ const Search = () => {
     return (
         <React.Fragment>
             <PageTitle>Recherche</PageTitle>
-            <Box classes={{
-                    root: classes.root
-                }}>
+            <Box sx={{
+                    '& > *': {
+                        m: 0.5,
+                    },
+                    width: '95%',
+                    maxWidth: '700px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                }}
+            >
                 <SearchInput
                     imageCount={imageCount}
                     running={searchIsRunning}
@@ -250,7 +230,7 @@ const Search = () => {
             {
                 searchResult.hasNext &&
                 <Button
-                    className={classes.viewMore}
+                    sx={{ mt: 3}}
                     variant="contained"
                     color="primary"
                     onClick={handleNextPage}>

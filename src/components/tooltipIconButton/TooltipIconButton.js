@@ -1,9 +1,9 @@
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import Zoom from '@material-ui/core/Zoom';
 import IconButton from '@material-ui/core/IconButton';
 
-const useTooltipButtonStyles = makeStyles((theme) => ({
+const useTooltipButtonStyles = makeStyles(() => ({
     tooltipLabel: {
         fontSize: 16
     },
@@ -17,12 +17,8 @@ const useTooltipButtonStyles = makeStyles((theme) => ({
     },
     arrow: {
         color: 'black',
-    },
-    menuButton: {
-        marginRight: theme.spacing(0),
-      },
-  }));
-
+    }
+}));
 
 const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style, edge = false}) => {
 
@@ -43,7 +39,9 @@ const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style,
         >
             <IconButton
                 edge={edge}
-                className={classes.menuButton}
+                sx={{
+                    mr: 0
+                }}
                 color="inherit"
                 aria-label="menu"
                 onClick={onClick}
