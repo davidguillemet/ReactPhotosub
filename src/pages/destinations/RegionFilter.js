@@ -1,103 +1,100 @@
 import React from 'react';
 import { useState } from 'react';
-import FormControl from '@material-ui/core/FormControl';
+import { styled } from '@material-ui/core/styles';
 import FormHelperText from '@material-ui/core/FormHelperText';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
-import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 
-const RegionFilter = ({hierarchy, onChange}) => {
+import Autocomplete from '@material-ui/core/Autocomplete';
+import TextField from '@material-ui/core/TextField';
+
+const StyledListItem = styled('li')(({theme}) => ({
+}));
+
+const RegionFilter = ({hierarchy, onChange, newVersion}) => {
 
     const [filter, setFilter] = useState([]);
     
-    const handleChange = (event) => {
-        const { target: { value } } = event;
-        setFilter(value);
+    const handleChange = (event, newValue) => {
+        setFilter(newValue);
         if (onChange) {
-            onChange(new Set(value.map(region => region.id)));
+            onChange(new Set(newValue.map(region => region.id)));
         }
     };
 
-    const handleRemoveRegion = (clickedRegion) => {
-        setFilter(prevFilter => {
-            const newFilter = prevFilter.filter(region => region.id !== clickedRegion.id);
-            onChange(new Set(newFilter.map(region => region.id)));
-            return newFilter;
-        })
-    }
-
     return (
-        <FormControl sx={{ m: 1, width: '95%', maxWidth: 700 }}>
-            <InputLabel id="select-region-label">Filtrer par régions</InputLabel>
-            <Select
-                labelId="select-region-label"
-                id="select-region"
-                multiple
-                MenuProps={{
-                    MenuListProps: {
-                        sx: {
-                            maxWidth: 700,
-                            px: 1,
-                            py: 2
+        <React.Fragment>
+        <Autocomplete
+            id='regionSelector'
+            sx={{
+                width: '95%',
+                maxWidth: 700,
+            }}
+            ListboxProps={{
+                sx: {
+                    p: 1,
+                    maxHeight: '100vh',
+                    '& .MuiAutocomplete-option': {
+                        p: {
+                            xs: 0,
+                        },
+                        minHeight: {
+                            xs: 0
                         }
+                    },
+                    '& .MuiAutocomplete-option:hover': {
+                        bgcolor: 'unset'
+                    },
+                    '& .MuiAutocomplete-option[aria-selected="true"]': {
+                        bgcolor: 'unset'
+                    },
+                    '& .MuiAutocomplete-option[aria-selected="true"]:hover': {
+                        bgcolor: 'unset'
                     }
-                }}
-                autoWidth={true}
-                value={filter}
-                onChange={handleChange}
-                input={<OutlinedInput id="select-region-input" label="Filtrer par régions" inputProps={{ height: '50px'}}/>}
-                renderValue={(selected) => (
-                    <Box style={{ display: 'flex', flexWrap: 'wrap' }}>
-                        {selected.map((region) => (
-                            <Chip
-                                key={region.id}
-                                label={region.title}
-                                sx={{ m: '2px' }}
-                                size="small"
-                                deleteIcon={<CancelOutlinedIcon />}
-                                onDelete={() => handleRemoveRegion(region)}
-                                onMouseDown={(event) => {
-                                    event.stopPropagation();
-                                }}
-                            />
-                        ))}
-                    </Box>
-                )}
-            >
-            { hierarchy.map((region) => (
-                <MenuItem
-                    key={region.id}
-                    value={region}
+                }
+            }}
+            multiple
+            disableCloseOnSelect
+            filterSelectedOptions={false}
+            options={hierarchy}
+            noOptionsText='Aucune région...'
+            getOptionLabel={(option) => option.title}
+            defaultValue={[]}
+            renderInput={(params) => (
+                <TextField
+                    {...params}
+                    label="Filtrer par régions"
+                />
+            )}
+            renderOption={(props, option, { selected }) => (
+                <StyledListItem {...props}
+                    key={option.id}
+                    value={option}
                     sx={{
                         width: 'auto',
                         float: 'left',
-                        p: 0,
-                        mx: 0.5,
-                        mt: 0,
-                        mb: 1,
-                        borderRadius: '20px',
-                        '&.Mui-selected, &.MuiMenuItem-root:hover, &.Mui-selected:hover': {
-                            bgcolor: 'unset'
+                        p: {
+                            xs: 0
+                        },
+                        m: {
+                            xs: 0.5
                         }
                     }}
                 >
                     <Chip
-                        label={region.title}
+                        label={option.title}
                         clickable={true}
-                        color={filter.findIndex(item => region.id === item.id) !== -1 ? 'primary' : 'default'}
+                        color={selected? 'primary' : 'default'}
                     />
-                </MenuItem>
-            )) }
-            </Select>
-            <FormHelperText style={{ textAlign: "center" }}>
-                Sélectionnez une ou plusieurs régions pour filtrer les destinations
-            </FormHelperText>
-        </FormControl>
-    );
+                </StyledListItem>
+            )}
+            onChange={handleChange}
+            value={filter}
+        />
+        <FormHelperText style={{ textAlign: "center" }}>
+            Sélectionnez une ou plusieurs régions pour filtrer les destinations
+        </FormHelperText>
+        </React.Fragment>
+    )
 }
 
 export default RegionFilter;
