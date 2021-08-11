@@ -21,7 +21,7 @@ function buildHierarchy(regionList) {
     return hierarchy;
 }
 
-const useRegions = (user, simulations, listType) => {
+const useRegions = () => {
 
     const [regions, setRegions] = useState({
         hierarchy: [],

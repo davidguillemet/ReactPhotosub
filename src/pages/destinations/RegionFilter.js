@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { styled } from '@material-ui/core/styles';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Chip from '@material-ui/core/Chip';
+import {unstable_batchedUpdates} from 'react-dom';
 
 import Autocomplete from '@material-ui/core/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -10,12 +11,21 @@ import TextField from '@material-ui/core/TextField';
 const StyledListItem = styled('li')(({theme}) => ({
 }));
 
-const RegionFilter = ({hierarchy, onChange, newVersion}) => {
+const RegionFilter = ({hierarchy, onChange}) => {
 
     const [filter, setFilter] = useState([]);
+    const [options, setOptions] = useState([]);
     
+    useEffect(() => {
+        setOptions(hierarchy.filter(region => region.parent === null));
+    }, [hierarchy]);
+
     const handleChange = (event, newValue) => {
-        setFilter(newValue);
+        unstable_batchedUpdates(() => {
+            setFilter(newValue);
+            const parentId = newValue.length > 0 ? newValue[newValue.length - 1].id : null;
+            setOptions(hierarchy.filter(region => region.parent === parentId))
+        });
         if (onChange) {
             onChange(new Set(newValue.map(region => region.id)));
         }
@@ -55,7 +65,7 @@ const RegionFilter = ({hierarchy, onChange, newVersion}) => {
             multiple
             disableCloseOnSelect
             filterSelectedOptions={false}
-            options={hierarchy}
+            options={options}
             noOptionsText='Aucune région...'
             getOptionLabel={(option) => option.title}
             defaultValue={[]}
