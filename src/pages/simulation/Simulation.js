@@ -51,7 +51,7 @@ const EmptySimulationImages = ({type, images}) => {
                 justifyContent: 'center',
                 alignItems: 'center'
             }}>
-                <Alert severity="warning" elevation={4} variant="filled">Votre liste de favoris est vide.</Alert>
+                <Alert severity="info" elevation={4} variant="filled">Votre liste de favoris est vide.</Alert>
             </Box>
         );
     }

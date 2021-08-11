@@ -144,6 +144,12 @@ const SimulationManager = ({ user }) => {
     return (
         <React.Fragment>
 
+            <Prompt when={hasDirty} message={promptMessage} />
+
+            <FeedbackMessage severity={feedback.severity} message={feedback.message} key={feedback.key}/>
+
+            <PageTitle>Simulation</PageTitle>
+
             {
                 user && state &&
                 <SimulationToolBar
@@ -155,12 +161,6 @@ const SimulationManager = ({ user }) => {
                     dispatch={dispatch}
                 />
             }
-
-            <Prompt when={hasDirty} message={promptMessage} />
-
-            <FeedbackMessage severity={feedback.severity} message={feedback.message} key={feedback.key}/>
-
-            <PageTitle>Simulation</PageTitle>
 
             <VerticalSpacing factor={3} />
 

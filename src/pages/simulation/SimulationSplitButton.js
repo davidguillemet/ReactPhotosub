@@ -82,12 +82,25 @@ const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange}) =
 
     return (
         <Grid container direction="column" alignItems="center">
-            <Grid item xs={12}>
-                <ButtonGroup variant="contained" color="secondary" ref={anchorRef} aria-label="split button">
+            <Grid item xs={12} sx={{ width: '100%'}}>
+                <ButtonGroup
+                    variant="contained"
+                    color="info"
+                    ref={anchorRef}
+                    aria-label="split button"
+                    sx={{
+                        width: '100%',
+                        borderWidth: '1px',
+                        borderColor: 'text.disabled',
+                        borderStyle: 'solid',
+                        boxShadow: 'unset'
+                    }}
+                >
                     <Button
                         onClick={handleToggle}
                         sx={{
-                            textTransform: 'none'
+                            textTransform: 'none',
+                            width: '100%'
                         }}
                         disabled={splitButtonDisabled}
                         endIcon={<DirtyIcon simulation={simulation} />}
@@ -95,7 +108,7 @@ const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange}) =
                         {simulations[currentIndex].name}
                     </Button>
                     <Button
-                        color="secondary"
+                        color="info"
                         size="small"
                         aria-controls={open ? 'split-button-menu' : undefined}
                         aria-expanded={open ? 'true' : undefined}
