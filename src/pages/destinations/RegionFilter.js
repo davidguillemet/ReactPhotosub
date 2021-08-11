@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -8,8 +9,6 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
-
-import { HorizontalSpacing } from '../../template/spacing';
 
 const RegionFilter = ({hierarchy, onChange}) => {
 
@@ -38,9 +37,19 @@ const RegionFilter = ({hierarchy, onChange}) => {
                 labelId="select-region-label"
                 id="select-region"
                 multiple
+                MenuProps={{
+                    MenuListProps: {
+                        sx: {
+                            maxWidth: 700,
+                            px: 1,
+                            py: 2
+                        }
+                    }
+                }}
+                autoWidth={true}
                 value={filter}
                 onChange={handleChange}
-                input={<OutlinedInput id="select-region-input" label="Filtrer par régions" />}
+                input={<OutlinedInput id="select-region-input" label="Filtrer par régions" inputProps={{ height: '50px'}}/>}
                 renderValue={(selected) => (
                     <Box style={{ display: 'flex', flexWrap: 'wrap' }}>
                         {selected.map((region) => (
@@ -48,6 +57,7 @@ const RegionFilter = ({hierarchy, onChange}) => {
                                 key={region.id}
                                 label={region.title}
                                 sx={{ m: '2px' }}
+                                size="small"
                                 deleteIcon={<CancelOutlinedIcon />}
                                 onDelete={() => handleRemoveRegion(region)}
                                 onMouseDown={(event) => {
@@ -58,17 +68,34 @@ const RegionFilter = ({hierarchy, onChange}) => {
                     </Box>
                 )}
             >
-                {
-                    hierarchy.map((region) => (
-                        <MenuItem
-                            key={region.id}
-                            value={region}
-                        >
-                            <HorizontalSpacing factor={region.level} />{region.title}
-                        </MenuItem>
-                    ))
-                }
+            { hierarchy.map((region) => (
+                <MenuItem
+                    key={region.id}
+                    value={region}
+                    sx={{
+                        width: 'auto',
+                        float: 'left',
+                        p: 0,
+                        mx: 0.5,
+                        mt: 0,
+                        mb: 1,
+                        borderRadius: '20px',
+                        '&.Mui-selected, &.MuiMenuItem-root:hover, &.Mui-selected:hover': {
+                            bgcolor: 'unset'
+                        }
+                    }}
+                >
+                    <Chip
+                        label={region.title}
+                        clickable={true}
+                        color={filter.findIndex(item => region.id === item.id) !== -1 ? 'primary' : 'default'}
+                    />
+                </MenuItem>
+            )) }
             </Select>
+            <FormHelperText style={{ textAlign: "center" }}>
+                Sélectionnez une ou plusieurs régions pour filtrer les destinations
+            </FormHelperText>
         </FormControl>
     );
 }
