@@ -61,26 +61,20 @@ const Destination = ({destination, regions, itemWidth, margin, colIndex}) => {
                         easing: theme.transitions.easing.easeOut
                     }
                 ),
-                '&:hover': {
-                    transform: 'translateY(-5px)',
-                    boxShadow: '5px 10px 10px 0 rgb(74 74 74 / 40%)',
-                    top: 0,
-                    left: 0
-                },
 
                 // Scale image on hover
                 '& img': {
                     transition: (theme) => theme.transitions.create(
                         'transform',
                         {
-                            duration: 1000,
+                            duration: 700,
                             easing: theme.transitions.easing.easeOut,
-                            delay: theme.transitions.duration.standard - 100
+                            delay: 0
                         }
                     )
                 },
                 '&:hover img': {
-                    transform: 'scale(1.02)'
+                    transform: 'scale(1.05)'
                 },
 
                 // Translate the details box up on hover
