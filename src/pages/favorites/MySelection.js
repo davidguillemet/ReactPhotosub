@@ -5,6 +5,7 @@ import { AuthContext } from '../../components/authentication';
 import dataProvider from '../../dataProvider';
 import Gallery from '../../components/gallery';
 import PageTitle from '../../template/pageTitle';
+import { VerticalSpacing } from '../../template/spacing';
 
 const MySelectionContent= ({user, images}) => {
     if (user === null) {
@@ -19,7 +20,9 @@ const MySelectionContent= ({user, images}) => {
 
     if (images.length === 0) {
         return (
-            <Alert severity="info" elevation={4} variant="filled">Vous n'avez sélectionné aucun favori.</Alert>
+            <React.Fragment>
+                <Alert severity="info" elevation={4} variant="filled">Votre liste de favoris est vide.</Alert>
+            </React.Fragment>
         );
     }
     
@@ -42,6 +45,7 @@ const MySelection = ({user, favorites, updateUserContext}) => {
     return (
         <React.Fragment>
             <PageTitle>Ma Sélection</PageTitle>
+            <VerticalSpacing factor={2} />
             <MySelectionContent user={user} images={images} ></MySelectionContent>
         </React.Fragment>
     );
