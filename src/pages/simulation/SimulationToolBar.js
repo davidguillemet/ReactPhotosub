@@ -16,10 +16,7 @@ import {isFromDb, isDirty} from '../../dataProvider';
 import TooltipIconButton from '../../components/tooltipIconButton';
 
 import {simulationHasName} from './actions/SimulationReducer';
-import {
-    setCurrentSimulationIndex,
-    toggleLock
-} from './actions/SimulationActions';
+import { setCurrentSimulationIndex, toggleLock } from './actions/SimulationActions';
 
 
 const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, dispatch}) => {
@@ -29,8 +26,15 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
     const simulation = useMemo(() => simulations[currentIndex], [simulations, currentIndex]);
 
     const validateSimulationName = useCallback((name, action) => {
+        if (name === null ) {
+            return false;
+        }
+        const trimedName = name.trim();
+        if (trimedName.length === 0) {
+            return false;
+        }
         const sameNameIndex = simulations.findIndex((simulation, index) => {
-            return (action === "new" || index !== currentIndex) && (simulation.name.toLowerCase() === name.toLowerCase())
+            return (action === "new" || index !== currentIndex) && (simulation.name.toLowerCase() === trimedName.toLowerCase())
         });
         return (sameNameIndex < 0)
     }, [simulations, currentIndex]);

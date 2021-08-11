@@ -14,6 +14,7 @@ export default function SimulationNameDialog({ open, action = "save", validation
     const [isOpen, setIsOpen] = useState(open);
     const [actionName, setActionName] = useState(action);
     const [hasError, setHasError] = useState(false);
+    const [okDisabled, setOkDisabled] = useState(true);
     const [name, setName] = useState("");
 
     useEffect(() => {
@@ -29,8 +30,10 @@ export default function SimulationNameDialog({ open, action = "save", validation
             const newName = event.target.value;
             if (!validation(newName, actionName)) {
                 setHasError(true);
+                setOkDisabled(true);
             } else {
                 setHasError(false);
+                setOkDisabled(false);
             }
             setName(newName);
         });
@@ -38,6 +41,7 @@ export default function SimulationNameDialog({ open, action = "save", validation
 
     const handleClose = () => {
         setName("");
+        setOkDisabled(true);
         setIsOpen(false);
         onOpenChanged(false);
     };
@@ -45,7 +49,7 @@ export default function SimulationNameDialog({ open, action = "save", validation
     const handleValidate = () => {
         handleClose();
         if (onValidate) {
-            onValidate(name);
+            onValidate(name.trim());
         }
     };
 
@@ -90,14 +94,14 @@ export default function SimulationNameDialog({ open, action = "save", validation
                         type="text"
                         fullWidth
                         error={hasError}
-                        helperText={hasError ? "Ce nom existe déjà" : ""}
+                        helperText={hasError ? (name.trim().length > 0 ? "Ce nom existe déjà" : "") : ""}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
                         Annuler
                     </Button>
-                    <Button onClick={handleValidate} color="primary" disabled={hasError}>
+                    <Button onClick={handleValidate} color="primary" disabled={okDisabled}>
                         Valider
                     </Button>
                 </DialogActions>
