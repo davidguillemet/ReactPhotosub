@@ -40,7 +40,10 @@ const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style,
             <IconButton
                 edge={edge}
                 sx={{
-                    mr: 1
+                    mr: {
+                        xs: 0,
+                        sm: 1
+                    }
                 }}
                 color="inherit"
                 aria-label="menu"

@@ -133,7 +133,9 @@ const Destinations = () => {
     return (
         <React.Fragment>
             <PageTitle>Toutes Les Destinations</PageTitle>
+            <VerticalSpacing factor={2} />
             <RegionFilter hierarchy={regionHierarchy} onChange={handleRegionFilterChange} />
+            <VerticalSpacing factor={2} />
             <DisplayModeSelector listType={destinationsView} onChange={handleChangeDestinationView} />
             <TabContext value={destinationsView}>
                 <TabPanel 
