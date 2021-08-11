@@ -54,38 +54,38 @@ const SearchInput = ({imageCount, running, hasError, onChange}) => {
             py: '2px',
             px: '4px'
         }}>
-        <SearcIconButton disabled={true}>
-            <StatusIcon searchIsRunning={running}/>
-        </SearcIconButton>
-        <InputBase
-            sx={{
-                flex: 1,
-                ml: 1
-            }}
-            placeholder={imageCount > 0  ? `Rechercher parmi ${imageCount} images...` : ""}
-            autoFocus={true}
-            inputProps={{ 'aria-label': 'search google maps' }}
-            fullWidth
-            type="search"
-            onChange={onChange}
-        />
-        {
-            hasError &&
-            <SearcIconButton>
-                <WarningIcon />
+            <SearcIconButton disabled={true}>
+                <StatusIcon searchIsRunning={running}/>
             </SearcIconButton>
-        }
-        <Divider
-            sx={{
-                height: '28px',
-                m: '4px'
-            }}
-            orientation="vertical"
-        />
-        <SearcIconButton>
-            <HelpIcon />
-        </SearcIconButton>
-      </Paper>
+            <InputBase
+                sx={{
+                    flex: 1,
+                    ml: 1
+                }}
+                placeholder={imageCount > 0  ? `Rechercher parmi ${imageCount} images...` : ""}
+                autoFocus={true}
+                inputProps={{ 'aria-label': 'search google maps' }}
+                fullWidth
+                type="search"
+                onChange={onChange}
+            />
+            {
+                hasError &&
+                <SearcIconButton>
+                    <WarningIcon />
+                </SearcIconButton>
+            }
+            <Divider
+                sx={{
+                    height: '28px',
+                    m: '4px'
+                }}
+                orientation="vertical"
+            />
+            <SearcIconButton>
+                <HelpIcon />
+            </SearcIconButton>
+        </Paper>
     );
 }
 
