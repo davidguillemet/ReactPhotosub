@@ -5,6 +5,7 @@ import 'fontsource-roboto/100.css';
 const TitleTypography = ({children, ...other}) => (<Typography variant="h2" component="h1" {...other}>{children}</Typography>);
 
 const PageTitle = styled(TitleTypography)(({ theme }) => ({
+    fontWeight: "300",
     [theme.breakpoints.up('xs')]: {
         fontSize: "24pt"
     },
