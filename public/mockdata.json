@@ -404,8 +404,24 @@
             "location": "Misool",
             "longitude": 130.5127,
             "latitude": -2.031179,
-            "link": "",
-            "region": 20
+            "link": "http://www.libertydiveresort.com/",
+            "region_path": [
+                {
+                    "id": 20,
+                    "title": "Raja Ampat",
+                    "parent": 13
+                },
+                {
+                    "id": 13,
+                    "title": "Indonésie",
+                    "parent": 5
+                },
+                {
+                    "id": 5,
+                    "title": "Asie du Sud-Est",
+                    "parent": null
+                }
+            ]
         },
         "images": [
             {

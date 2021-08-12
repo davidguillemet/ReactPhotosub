@@ -2,14 +2,31 @@ module.exports = function(config) {
     // Get a specific destination head from identifier
     config.app.route("/destination/:year/:title/head")
         .get(function(req, res, next) {
-            config.pool({d: "destinations"})
-                .select(
-                    "d.title", "d.date", "d.cover", "d.path", "d.id",
-                    "l.title as location", "l.longitude", "l.latitude", "l.link", "l.region")
-                .where("d.path", `${req.params.year}/${req.params.title}`)
-                .join("locations as l", {"d.location": "l.id"})
+            config.pool().raw(
+                `WITH RECURSIVE destination AS (
+                    SELECT
+                    d.title, d.date, d.cover, d.path, d.id,
+                    l.title as location, l.longitude, l.latitude, l.link, l.region
+                    from locations l, destinations d
+                    where l.id = d.location and d.path = ?
+                ),
+                regionpath AS (
+                    SELECT
+                    regions.id, regions.title, regions.parent
+                    FROM regions, destination
+                    WHERE regions.id = destination.region
+                    UNION ALL
+                    SELECT r.id, r.title, r.parent
+                    FROM regions r
+                    JOIN regionpath ON r.id = regionpath.parent
+                )
+                SELECT d.title, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link,
+                       ARRAY( select row_to_json(row) as region from (SELECT * FROM regionpath) row) as region_path from destination d`,
+                `${req.params.year}/${req.params.title}`)
                 .then((destinations) => {
-                    const destination = destinations[0];
+                    config.logger.info("Destinations:");
+                    config.logger.info(destinations);
+                    const destination = destinations.rows[0];
                     destination.cover = config.convertPathToUrl(destination.path + "/" + destination.cover);
                     res.json(destination);
                 }).catch((err) => {
