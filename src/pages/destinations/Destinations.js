@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { unstable_batchedUpdates } from 'react-dom';
 import TabContext from '@material-ui/lab/TabContext';
 import TabPanel from '@material-ui/lab/TabPanel';
 import AppsIcon from '@material-ui/icons/Apps';
@@ -99,8 +100,10 @@ const Destinations = () => {
         });
         
         // Needs regionsByDestination to update destination cards
-        setRegionsByDestination(regionsByDestination);
-        setFilteredDestinations(allDestinations);
+        unstable_batchedUpdates(() => {
+            setRegionsByDestination(regionsByDestination);
+            setFilteredDestinations(allDestinations);
+        });
 
     }, [allDestinations, regionMap])
 
