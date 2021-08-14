@@ -30,3 +30,8 @@ export function isFromDb(simulation) {
 export function isDirty(simulation) {
     return simulation[TRANSIENT_PROPERTY_IS_DIRTY] === true;
 }
+
+export const API_PREFIX =
+    process.env.REACT_APP_BUILD_VERSION === 'false' ?
+    'http://localhost:5001/photosub/us-central1/mainapi':
+    '';

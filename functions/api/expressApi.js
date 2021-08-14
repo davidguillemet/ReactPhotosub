@@ -7,6 +7,7 @@ const express = require("express");
 const {logger/* , makeExpressLoggerMiddleware */} = require("../utils/logger");
 const {convertPathToUrl, bucket} = require("../utils/firebase");
 const isAuthenticated = require("./authenticated");
+const cors = require("cors");
 
 // Get a connection pool for postgreSql
 const {pool} = require("../utils/pool-postgresql");
@@ -29,10 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // Fix the CORS Error
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    next();
-});
+app.use(cors());
 
 const resourceConfiguration = {
     app,

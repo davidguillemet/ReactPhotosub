@@ -6,6 +6,7 @@ import {
     deleteTransientProperties,
     setDbIndex,
     getDbIndex,
+    API_PREFIX
 } from './common';
 
 // Add a request interceptor
@@ -17,29 +18,33 @@ axios.interceptors.request.use(async function (config) {
     return config;
 });
 
+function _getApiUri(apiName) {
+    return API_PREFIX + apiName;
+}
+
 function getDestinationProps(year, title, props) {
-    return axios.get(`/api/destination/${year}/${title}/${props}`)
+    return axios.get(_getApiUri(`/api/destination/${year}/${title}/${props}`))
     .then(response => {
         return response.data;
     })
 }
 
 function getDestinations() {
-    return axios.get("/api/destinations")
+    return axios.get(_getApiUri("/api/destinations"))
     .then(response => {
         return response.data;
     });
 }
 
 function getRegions() {
-    return axios.get("/api/regions")
+    return axios.get(_getApiUri("/api/regions"))
     .then(response => {
         return response.data;
     });
 }
 
 function getLocations() {
-    return axios.get("/api/locations")
+    return axios.get(_getApiUri("/api/locations"))
     .then(response => {
         return response.data;
     });
@@ -54,28 +59,28 @@ function getDestinationImagesFromPath(year, title) {
 }
 
 function getUserData(uid) {
-    return axios.get(`/api/userdata/${uid}`)
+    return axios.get(_getApiUri(`/api/userdata/${uid}`))
     .then(response => {
         return response.data;
     });
 }
 
 function addFavorite(path) {
-    return axios.post('/api/favorites', { path: path })
+    return axios.post(_getApiUri('/api/favorites'), { path: path })
     .then(response => {
         return response.data;
     });
 }
 
 function removeFavorite(path) {
-    return axios.delete('/api/favorites', {data: { path: path } } )
+    return axios.delete(_getApiUri('/api/favorites'), {data: { path: path } } )
     .then(response => {
         return response.data;
     });
 }
 
 function getFavorites() {
-    return axios.get('/api/favorites')
+    return axios.get(_getApiUri('/api/favorites'))
     .then(response => {
         return response.data;
     })
@@ -89,7 +94,7 @@ function _addSimulationDbIndex(simulations) {
 }
 
 function getSimulations() {
-    return axios.get('/api/simulations')
+    return axios.get(_getApiUri('/api/simulations'))
     .then(response => {
         // we generate an index property that corresponds to the index in the db json array
         // this index we allow to identify any simulation for deletion or update
@@ -99,7 +104,7 @@ function getSimulations() {
 
 function addSimulation(newSimulation) {
     deleteTransientProperties(newSimulation);
-    return axios.post('/api/simulations', newSimulation)
+    return axios.post(_getApiUri('/api/simulations'), newSimulation)
     .then(response => {
         return _addSimulationDbIndex(response.data);
     });
@@ -109,21 +114,21 @@ function updateSimulation(simulation) {
     // Delete transient properties but keep dbindex
     deleteTransientProperties(simulation, [TRANSIENT_PROPERTY_DB_INDEX]);
     // Here, simulation should contain an index property
-    return axios.post('/api/simulations', simulation)
+    return axios.post(_getApiUri('/api/simulations'), simulation)
     .then(response => {
         return _addSimulationDbIndex(response.data);
     });
 }
 
 function removeSimulation(simulation) {
-    return axios.delete('/api/simulations', {data: { index: getDbIndex(simulation) } })
+    return axios.delete(_getApiUri('/api/simulations'), {data: { index: getDbIndex(simulation) } })
     .then(response => {
         return _addSimulationDbIndex(response.data);
     });
 }
 
 function getImageCount() {
-    return axios.get('/api/images')
+    return axios.get(_getApiUri('/api/images'))
     .then(response => {
         return response.data.count;
     })
@@ -134,14 +139,14 @@ function getInteriors() {
 }
 
 function getUploadedInteriors() {
-    return axios.get('/api/uploadedInteriors')
+    return axios.get(_getApiUri('/api/uploadedInteriors'))
     .then(response => {
         return response.data;
     });
 }
 
 function removeUploadedInterior(fileName) {
-    return axios.delete('/api/uploadedInteriors', {data: { fileName: fileName } })
+    return axios.delete(_getApiUri('/api/uploadedInteriors'), {data: { fileName: fileName } })
 }
 
 function getImageDefaultSelection() {
@@ -149,18 +154,18 @@ function getImageDefaultSelection() {
 }
 
 function _getBucketContent(folder) {
-    return axios.get(`/api/bucket/${folder}`)
+    return axios.get(_getApiUri(`/api/bucket/${folder}`))
     .then(response => {
         return response.data;
     });
 }
 
 function waitForThumbnails(fileName) {
-    return axios.get(`/api/thumbstatus/${fileName}`);
+    return axios.get(_getApiUri(`/api/thumbstatus/${fileName}`));
 }
 
 function searchImages(pageIndex, query, pageSize, exact, processId) {
-    return axios.post('/api/search', {
+    return axios.post(_getApiUri('/api/search'), {
         query: query,
         page: pageIndex,
         pageSize: pageSize,
