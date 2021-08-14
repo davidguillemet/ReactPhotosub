@@ -27,7 +27,7 @@ function getTargetColumnIndex(columnHeight) {
     return bestColumnIndex;
 }
 
-const MasonryLayout = ({images, imageWidth, columnsCount, margin, onImageClick}) => {
+const MasonryLayout = ({images = [], imageWidth, columnsCount, margin, onImageClick}) => {
     
     // Compute the cumulative height of each column
     const columnTopPosition = Array.from({length: columnsCount}, () => 0);
