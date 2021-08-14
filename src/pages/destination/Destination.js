@@ -28,7 +28,7 @@ const RegionPath = ({regions}) => {
                 flexDirection: 'row',
             }}
         >
-        { regions.map(region => <RegionChip key={region.id} region={region} />) }
+        { regions.slice(0).reverse().map(region => <RegionChip key={region.id} region={region} />) }
         </Box>
     );
 } 
