@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Alert from '@material-ui/lab/Alert';
+import Alert from '@material-ui/core/Alert';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { AuthContext } from '../../components/authentication';
 import dataProvider from '../../dataProvider';

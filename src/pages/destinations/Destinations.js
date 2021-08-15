@@ -6,8 +6,8 @@ import AppsIcon from '@material-ui/icons/Apps';
 import PublicIcon from '@material-ui/icons/Public';
 import { makeStyles } from '@material-ui/styles';
 
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import ToggleButton from '@material-ui/core/ToggleButton';
+import ToggleButtonGroup from '@material-ui/core/ToggleButtonGroup';
 
 import dataProvider from '../../dataProvider';
 import PageTitle from '../../template/pageTitle';
