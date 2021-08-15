@@ -143,6 +143,7 @@ const useImageLoader = (user, simulations, listType) => {
     return [
         allInteriors,
         images,
+        setImages,
         addUploadedInterior,
         deleteUploadedInterior
     ];

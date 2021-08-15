@@ -14,17 +14,9 @@ import HelpIcon from '@material-ui/icons/Help';
 import WarningIcon from '@material-ui/icons/Warning';
 
 import dataProvider from '../../dataProvider/dataprovider';
-import { uniqueID } from '../../utils/utils';
+import { uniqueID, getEmptySearchResult } from '../../utils/utils';
 
 const _pageSize = 10;
-
-function getEmptySearchResult() {
-    return {
-        images: [],
-        hasNext: false,
-        hasError: false
-    }
-}
 
 const SearcIconButton = styled(IconButton)(({theme}) => ({
     padding: 10
@@ -94,10 +86,12 @@ const SearchInput = ({imageCount, running, hasError, onChange}) => {
     );
 }
 
-const Search = ({
-    showExactSwitch,
-    galleryComponent,
-    nextPageComponent}) => {
+const Search = React.forwardRef(({
+    showExactSwitch = true,
+    onResult = null,
+    galleryComponent = null,
+    nextPageComponent = null,
+    pageIndex = 0}, ref) => {
 
     const [ searchTimer, setSearchTimer ] = useState(null);
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
@@ -116,6 +110,21 @@ const Search = ({
             setImageCount(count);
         });
     }, []);
+
+    useEffect(() => {
+        setSearchConfig(oldConfig => {
+            return {
+                ...oldConfig,
+                page: pageIndex
+            }
+        })
+    }, [pageIndex])
+
+    useEffect(() => {
+        if (onResult) {
+            onResult(searchResult);
+        }
+    }, [onResult, searchResult])
 
     useEffect(() => {
         if (searchConfig.query.length <= 2)
@@ -147,7 +156,8 @@ const Search = ({
                 const newResult = {
                     images: searchConfig.page === 0 ? results : oldResult.images.concat(results),
                     hasNext: _pageSize === results.length,
-                    hasError: false
+                    hasError: false,
+                    page: searchConfig.page
                 }
                 return newResult;
             });
@@ -196,13 +206,15 @@ const Search = ({
     }
 
     return (
-        <React.Fragment>
+        <div ref={ref} style={{
+            width: '95%',
+            maxWidth: '700px',
+        }}>
         <Box sx={{
                 '& > *': {
                     m: 0.5,
                 },
-                width: '95%',
-                maxWidth: '700px',
+                width: '100%',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center'
@@ -228,12 +240,12 @@ const Search = ({
                 />
             }
         </Box>
-        {React.cloneElement(galleryComponent, {images: searchResult.images})}
+        {galleryComponent && React.cloneElement(galleryComponent, {images: searchResult.images})}
         {
-            searchResult.hasNext && React.cloneElement(nextPageComponent, {onClick: handleNextPage, count: searchResult.images.length})
+            searchResult.hasNext && nextPageComponent && React.cloneElement(nextPageComponent, {onClick: handleNextPage, count: searchResult.images.length})
         }
-        </React.Fragment>
+        </div>
     );
-};
+});
 
 export default Search;

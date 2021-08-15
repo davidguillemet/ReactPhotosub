@@ -2,10 +2,12 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import Fade from '@material-ui/core/Fade';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { useResizeObserver } from '../../components/hooks';
@@ -36,7 +38,9 @@ const ImageSlider = ({
     imageBorderRadius = 3,
     disabled,
     onDeleteUploaded,
-    emptyComponent = null}) => {
+    emptyComponent = null,
+    onNextPage = null,
+    hasNext = false}) => {
     
     const [thumnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
     const [lastThumbRight, setLastThumbRight] = useState(0);
@@ -222,6 +226,20 @@ const ImageSlider = ({
                                 })
                             }
                             </TransitionGroup>
+                        }
+                        {
+                            hasNext &&
+                            <Button
+                                variant="outlined"
+                                size="large"
+                                onClick={onNextPage}
+                                sx={{
+                                    height: imageHeight,
+                                    mt: `${imageBorderWidth}px`
+                                }}
+                                startIcon={<MoreHorizIcon />}
+                            >
+                            </Button>
                         }
                     </Box>
                 }

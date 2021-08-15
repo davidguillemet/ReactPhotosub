@@ -5,14 +5,14 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import ToggleButton from '@material-ui/core/ToggleButton';
+import ToggleButtonGroup from '@material-ui/core/ToggleButtonGroup';
 import CollectionsIcon from '@material-ui/icons/Collections';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import SearchIcon from '@material-ui/icons/Search';
 import Tooltip from '@material-ui/core/Tooltip';
 
-import Alert from '@material-ui/lab/Alert';
+import Alert from '@material-ui/core/Alert';
 
 import {unstable_batchedUpdates} from 'react-dom';
 
@@ -26,7 +26,9 @@ import FileUpload from './FileUpload';
 import {setBackground, resize, borderWidth, borderColor, addImage, setImage} from './actions/SimulationActions';
 
 import { useResizeObserver } from '../../components/hooks';
+import { Search } from '../../components';
 import useImageLoader, {LIST_HOME_SLIDESHOW, LIST_FAVORITES, LIST_SEARCH} from './imageLoaderHook';
+import { getEmptySearchResult } from '../../utils/utils';
 
 const borderColors = [
     "#FFFFFF",
@@ -62,8 +64,9 @@ const EmptySimulationImages = ({type, images}) => {
 const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     const [listType, setListType] = useState(LIST_HOME_SLIDESHOW);
-    const [interiors, images, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
+    const [interiors, images, setImages, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
+    const [searchResult, setSearchResult] = useState(getEmptySearchResult());
 
     const [currentImageId, setCurrentImageId] = useState(null);
 
@@ -161,6 +164,22 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         setListType(newListType);
     }
 
+    const handleSearchResult = useCallback((searchResults) => {
+        unstable_batchedUpdates(() => {
+            setImages(searchResults.images)
+            setSearchResult(searchResults);
+        });
+    }, [setImages]);
+
+    const handleNextSearchPage = useCallback(() => {
+        setSearchResult(prevSearchResult => {
+            return {
+                ...prevSearchResult,
+                page: prevSearchResult.page + 1
+            }
+        });
+    }, []);
+
     return (
         <React.Fragment>
 
@@ -213,6 +232,16 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     </Tooltip>
                 </ToggleButton>
             </ToggleButtonGroup>
+
+            {
+                listType === LIST_SEARCH &&
+                <Search
+                    showExactSwitch={false}
+                    onResult={handleSearchResult}
+                    pageIndex={searchResult.page}
+                />
+            }
+
             <VerticalSpacing factor={2} />
             <ImageSlider
                 images={images}
@@ -227,6 +256,8 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 imageBorderRadius={5}
                 disabled={simulation.isLocked}
                 emptyComponent={<EmptySimulationImages type={listType} images={images} />}
+                onNextPage={handleNextSearchPage}
+                hasNext={searchResult.hasNext}
             />
 
             <VerticalSpacing factor={3} />

@@ -189,3 +189,12 @@ export function clearThumbnailSrc(image) {
     }
     return image;
 }
+
+export function getEmptySearchResult() {
+    return {
+        images: [],
+        hasNext: false,
+        hasError: false,
+        page: 0
+    }
+}
