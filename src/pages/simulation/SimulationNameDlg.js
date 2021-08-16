@@ -40,10 +40,13 @@ export default function SimulationNameDialog({ open, action = "save", validation
     }, [actionName, validation]);
 
     const handleClose = () => {
-        setName("");
-        setOkDisabled(true);
-        setIsOpen(false);
-        onOpenChanged(false);
+        unstable_batchedUpdates(() => {
+            setName("");
+            setHasError(false);
+            setOkDisabled(true);
+            setIsOpen(false);
+            onOpenChanged(false);
+        });
     };
 
     const handleValidate = () => {

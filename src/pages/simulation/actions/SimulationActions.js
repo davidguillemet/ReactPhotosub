@@ -13,6 +13,7 @@ import {
     ACTION_SET_SIMULATION_DBINDEX,
     ACTION_SET_SIMULATION_DIRTY,
     ACTION_TOGGLE_LOCK,
+    ACTION_RENAME,
     // Actions on simulations' array
     ACTION_LOAD_SIMULATIONS,
     ACTION_SET_CURRENT_SIMULATION_INDEX,
@@ -159,5 +160,13 @@ export function toggleLock(simulationIndex) {
     return {
         type: ACTION_TOGGLE_LOCK,
         simulationIndex: simulationIndex
+    };
+}
+
+export function rename(name, simulationIndex) {
+    return {
+        type: ACTION_RENAME,
+        simulationIndex: simulationIndex,
+        name: name
     };
 }

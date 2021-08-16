@@ -48,7 +48,7 @@ const SimulationSplitButtonItem = ({simulation, index, selected, onClick}) => {
     );
 };
 
-const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange}) => {
+const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange, onRenameCurrent}) => {
 
     const [open, setOpen] = useState(false);
     const anchorRef = useRef(null);
@@ -73,10 +73,6 @@ const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange}) =
     const handleSaveNew = () => {
         // TODO
     };
-
-    const handleRenameCurrent= () => {
-        // TODO
-    }
 
     const splitButtonDisabled = simulations.length === 0 || (simulations.length === 1 && isFromDb(simulations[0]) === false);
 
@@ -144,11 +140,11 @@ const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange}) =
                                         {
                                             simulations.length > 0 && currentIndex >= 0 &&
                                             <React.Fragment>
-                                            {
-                                                isDirty(simulation) &&
-                                                <MenuItem onClick={handleSaveNew}>{`Enregistrer "${simulations[currentIndex].name}" en tant que nouvelle simulation`}</MenuItem>
-                                            }
-                                            <MenuItem onClick={handleRenameCurrent}>{`Renommer la simulation "${simulations[currentIndex].name}"`}</MenuItem>
+                                                {
+                                                    isDirty(simulation) &&
+                                                    <MenuItem onClick={handleSaveNew}>{`Enregistrer "${simulations[currentIndex].name}" en tant que nouvelle simulation`}</MenuItem>
+                                                }
+                                                <MenuItem onClick={onRenameCurrent}>{`Renommer la simulation "${simulations[currentIndex].name}"`}</MenuItem>
                                             </React.Fragment>
                                         }
                                     </MenuList>

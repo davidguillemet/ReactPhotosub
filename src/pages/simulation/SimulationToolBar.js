@@ -16,11 +16,14 @@ import {isFromDb, isDirty} from '../../dataProvider';
 import TooltipIconButton from '../../components/tooltipIconButton';
 
 import {simulationHasName} from './actions/SimulationReducer';
-import { setCurrentSimulationIndex, toggleLock } from './actions/SimulationActions';
+import { setCurrentSimulationIndex, toggleLock, rename } from './actions/SimulationActions';
 
+const NAME_DIALOG_ACTION_NEW = "new";
+const NAME_DIALOG_ACTION_SAVE = "save";
+const NAME_DIALOG_ACTION_RENAME = "rename";
 
 const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, dispatch}) => {
-    const [action, setAction] = useState("save");
+    const [action, setAction] = useState(NAME_DIALOG_ACTION_SAVE);
     const [nameDlgOpen, setNameDlgOpen] = useState(false);
 
     const simulation = useMemo(() => simulations[currentIndex], [simulations, currentIndex]);
@@ -34,7 +37,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
             return false;
         }
         const sameNameIndex = simulations.findIndex((simulation, index) => {
-            return (action === "new" || index !== currentIndex) && (simulation.name.toLowerCase() === trimedName.toLowerCase())
+            return (action === NAME_DIALOG_ACTION_NEW || index !== currentIndex) && (simulation.name.toLowerCase() === trimedName.toLowerCase())
         });
         return (sameNameIndex < 0)
     }, [simulations, currentIndex]);
@@ -42,7 +45,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
     const handleSave = () => {
         if (!simulationHasName(simulations[currentIndex])) {
             unstable_batchedUpdates(() => {
-                setAction("save");
+                setAction(NAME_DIALOG_ACTION_SAVE);
                 setNameDlgOpen(true);
             });
         } else {
@@ -59,7 +62,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
     const handleAdd = () => {
         // Open dialog to enter a name
         unstable_batchedUpdates(() => {
-            setAction("new");
+            setAction(NAME_DIALOG_ACTION_NEW);
             setNameDlgOpen(true);
         });
     }
@@ -68,8 +71,33 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
         dispatch(setCurrentSimulationIndex(index));
     }
 
+    const onRenameCurrent = useCallback(() => {
+        // Open dialog to enter a name
+        unstable_batchedUpdates(() => {
+            setAction(NAME_DIALOG_ACTION_RENAME);
+            setNameDlgOpen(true);
+        });
+    }, []);
+
     const handleToggleLock = () => {
         dispatch(toggleLock(currentIndex));
+    }
+
+    const onRename = (newName) => {
+        dispatch(rename(newName, currentIndex));
+    } 
+
+    const getDialogCallback = (action) => {
+        switch(action) {
+            case NAME_DIALOG_ACTION_SAVE:
+                return onSave;
+            case NAME_DIALOG_ACTION_NEW:
+                return onAdd;
+            case NAME_DIALOG_ACTION_RENAME:
+                return onRename;
+            default:
+                throw new Error(`Invalid action ${action}`);
+        }
     }
 
     return (
@@ -89,7 +117,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                 action={action}
                 validation={validateSimulationName}
                 onOpenChanged={setNameDlgOpen}
-                onValidate={action === "save" ? onSave : onAdd}
+                onValidate={getDialogCallback(action)}
             />
 
             <Toolbar variant="dense">
@@ -126,6 +154,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     simulations={simulations}
                     currentIndex={currentIndex}
                     onSelectionChange={onSelectionChange}
+                    onRenameCurrent={onRenameCurrent}
                 />
 
                 <TooltipIconButton
