@@ -43,7 +43,6 @@ const Thumbnail = ({
                 padding: imageBorderWidth,
                 backgroundColor: active === true ? imageBorderColor : null,
                 height: imageHeight + 2*imageBorderWidth,
-                zIndex: 10,
                 borderRadius: imageBorderRadius
             }}>
                 <img
