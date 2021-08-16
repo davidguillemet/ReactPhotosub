@@ -206,15 +206,15 @@ const Search = React.forwardRef(({
     }
 
     return (
-        <div ref={ref} style={{
-            width: '95%',
-            maxWidth: '700px',
-        }}>
-        <Box sx={{
+        <React.Fragment>
+        <Box 
+            ref={ref}
+            sx={{
                 '& > *': {
                     m: 0.5,
                 },
-                width: '100%',
+                width: '95%',
+                maxWidth: '700px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center'
@@ -244,7 +244,7 @@ const Search = React.forwardRef(({
         {
             searchResult.hasNext && nextPageComponent && React.cloneElement(nextPageComponent, {onClick: handleNextPage, count: searchResult.images.length})
         }
-        </div>
+        </React.Fragment>
     );
 });
 
