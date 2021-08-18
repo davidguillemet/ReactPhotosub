@@ -52,7 +52,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const LazyImage = ({ image, onClick, top, left, width }) => {
+const LazyImage = ({ image, index, onClick, top, left, width }) => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
     const [imageRef, setImageRef] = useState(null);
     const intersectionObserver = useRef(null);
@@ -106,7 +106,7 @@ const LazyImage = ({ image, onClick, top, left, width }) => {
 
     function handleImageClick() {
         if (onClick) {
-            onClick(image.id);
+            onClick(index);
         }
     }
 

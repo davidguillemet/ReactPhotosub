@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/styles';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
 import Paper from '@material-ui/core/Paper';
@@ -22,8 +22,12 @@ import ImageSlider from '../imageSlider';
 import TooltipIconButton from '../../components/tooltipIconButton';
 import { HorizontalSpacing } from '../../template/spacing';
 
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import './styles.css';
+import SwipeableViews from 'react-swipeable-views';
+import { virtualize } from 'react-swipeable-views-utils';
+
+import {isMobile} from 'react-device-detect';
+
+const VirtualizeSwipeableViews = virtualize(SwipeableViews);
 
 const useStyles = makeStyles({
     navigationButton: {
@@ -97,10 +101,9 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
     );
 }
 
-const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
+const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
 
-    const [currentIndex, setCurrentIndex] = useState(-1);
-    const [currentImage, setCurrentImage] = useState(null);
+    const [currentIndex, setCurrentIndex] = useState(index);
     const [infoVisible, setInfoVisible] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [fullScreen, setFullScreen] = useState(false);
@@ -111,6 +114,8 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
 
     useEventListener('keydown', handleKeyDown);
 
+    const currentImage = useMemo(() => images[currentIndex], [images, currentIndex]);
+
     // Make sure to clear the timeout on unmount
     useEffect(() => {
         if (!isPlaying) {
@@ -120,16 +125,8 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
     }, [isPlaying]);
 
     useEffect(() => {
-        const currentImageIndex = images.findIndex(image => image.id === currentId);
-        setCurrentIndex(currentImageIndex);
-    }, [currentId, images])
-
-    useEffect(() => {
-        if (currentIndex >= 0) {
-            const currentImage = images[currentIndex];
-            setCurrentImage(currentImage);
-        }
-    }, [currentIndex, images]);
+        setCurrentIndex(index);
+    }, [index, images])
 
     function handleMouseMove() {
         headerBarRef.current.classList.remove('hidden');
@@ -219,11 +216,41 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
     }
 
     function currentImageHasDetails() {
-        if (currentImage === null) {
-            return false;
-        }
         return currentImage.title.length > 0 || currentImage.description.length > 0
     }
+    const slideRenderer = (params) => {
+        const {index} = params;
+
+        let image = null;
+        const modulo = index % images.length;
+        if (index >= 0) {
+            image = images[modulo];
+        } else {
+            image = images[images.length + modulo]; // modulo is less than 0
+        }
+
+        return (
+            <Box
+                key={image.id}
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
+                    height: '100%',
+                    padding: fullScreen || isMobile ? 0 : 10,
+                    overflow: 'hidden'
+                }}
+            >
+                <img
+                    alt=""
+                    onLoad={onImageLoaded}
+                    src={getThumbnailSrc(image, THUMB_LARGEST)}
+                    className={classes.mainImage}
+                />
+        </Box>
+        );
+    };
 
     return (
         <Box
@@ -235,7 +262,7 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                 justifyContent: 'flex-start',
                 width: '100%',
                 height: '100%',
-                padding: 10
+                padding: 0
             }}
         >
             { /* HEADER TOOLBAR */}
@@ -249,7 +276,7 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                     transition: 'opacity 1s',
                     width: (isPlaying || fullScreen) ? "auto" : "100%",
                     position: (isPlaying || fullScreen) ? "absolute" : "relative",
-                    zIndex: (isPlaying || fullScreen) ? 100 : 1 
+                    zIndex: (isPlaying || fullScreen) ? 100 : 1
                 }}
             >
                 <Box
@@ -263,7 +290,7 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                 >
                     {
                         isPlaying ?
-                            <StopButtonWithCircularProgress onClick={handleStopClick} onCompleted={handleNextImage} duration={5000} key={currentImage?.id}/> :
+                            <StopButtonWithCircularProgress onClick={handleStopClick} onCompleted={handleNextImage} duration={5000} key={currentImage.id}/> :
                             <TooltipIconButton
                                 tooltip="Lancer le diaporama"
                                 onClick={handlePlayClick}
@@ -281,7 +308,7 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                             >
                                 <InfoIcon fontSize='large'></InfoIcon>
                             </TooltipIconButton>
-                            <FavoriteButton fontSize='large' path={`${currentImage?.path}/${currentImage?.name}`} />
+                            <FavoriteButton fontSize='large' path={`${currentImage.path}/${currentImage.name}`} />
                             <TooltipIconButton
                                 tooltip={fullScreen ? "Réduire" : "Plein écran"}
                                 onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}
@@ -340,36 +367,19 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                     overflow: 'hidden'
                 }}
             >
-                <TransitionGroup component={null}>
-                    <CSSTransition
-                        key={currentImage?.id}
-                        timeout={500}
-                        classNames="slide"
-                    >
-                        <Box
-                            key={currentImage?.id}
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                padding: 10,
-                                overflow: 'hidden'
-                            }}
-                        >
-                            <img
-                                alt=""
-                                onLoad={onImageLoaded}
-                                src={currentImage ? getThumbnailSrc(currentImage, THUMB_LARGEST) : null}
-                                className={classes.mainImage}
-                            />
-                        </Box>
-                    </CSSTransition>
-                </TransitionGroup>
+                <VirtualizeSwipeableViews
+                    style={{
+                        width: '100%',
+                        height: '100%'
+                    }}
+                    containerStyle={{
+                        height: '100%'
+                    }}
+                    index={currentIndex}
+                    onChangeIndex={setCurrentIndex}
+                    slideRenderer={slideRenderer}
+                    slideCount={images.length}
+                />
 
                 <Collapse in={!isPlaying}>
                     <IconButton
@@ -406,8 +416,8 @@ const ExpandedView = React.forwardRef(({ images, currentId, onClose }, ref) => {
                 {
                     currentImageHasDetails() ?
                     <React.Fragment>
-                        <Typography variant="h4" style={{ margin: 0 }}>{currentImage?.title}</Typography>
-                        <Typography variant="h5" style={{ marginBottom: 0 }}>{currentImage?.description}</Typography>
+                        <Typography variant="h4" style={{ margin: 0 }}>{currentImage.title}</Typography>
+                        <Typography variant="h5" style={{ marginBottom: 0 }}>{currentImage.description}</Typography>
                     </React.Fragment> :
                     <React.Fragment>
                         <Typography variant="h4" style={{ margin: 0 }}>...</Typography>
