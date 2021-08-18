@@ -1,17 +1,21 @@
 import { makeStyles } from '@material-ui/styles'
 import React, { useEffect, useState } from 'react';
 import Box from '@material-ui/core/Box';
-import Modal from '@material-ui/core/Modal';
-import Fade from '@material-ui/core/Fade';
-import Backdrop from '@material-ui/core/Backdrop';
+import Zoom from '@material-ui/core/Zoom';
+import Dialog from '@material-ui/core/Dialog';
 import LazyImage from './image';
 import ExpandedView from './expandedView';
 import { useResizeObserver } from '../../components/hooks';
+import {unstable_batchedUpdates} from 'react-dom';
 
 const useStyles = makeStyles({
     galleryContainer: {
         position: 'relative'
     }
+});
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Zoom ref={ref} {...props} />;
 });
 
 function getTargetColumnIndex(columnHeight) {
@@ -43,6 +47,7 @@ const MasonryLayout = ({images = [], imageWidth, columnsCount, margin, onImageCl
                     return (
                         <LazyImage
                             key={image.id}
+                            index={index}
                             image={image}
                             onClick={onImageClick}
                             top={imageTop}
@@ -63,7 +68,8 @@ const MasonryLayout = ({images = [], imageWidth, columnsCount, margin, onImageCl
 
 const Gallery = ({ images, style, colWidth, margin }) => {
     const classes = useStyles();
-    const [expandedImage, setExpandedImage] = useState(null);
+    const [expandedImageIndex, setExpandedImageIndex] = useState(null);
+    const [expandedViewOpen, setExpandedViewOpen] = useState(false);
     const [masonryProps, setMasonryProps] = useState({
         imageWidth: colWidth,
         columnsCount: 0
@@ -71,12 +77,15 @@ const Gallery = ({ images, style, colWidth, margin }) => {
 
     const resizeObserver = useResizeObserver();
 
-    function onImageClick(imageId) {
-        setExpandedImage(imageId);
+    function onImageClick(imageIndex) {
+        unstable_batchedUpdates(() => {
+            setExpandedImageIndex(imageIndex);
+            setExpandedViewOpen(true);
+        });
     }
 
     function onCloseModal(/*event, reason*/) {
-        setExpandedImage(null);
+        setExpandedViewOpen(false);
     }
 
     useEffect(() => {
@@ -104,24 +113,14 @@ const Gallery = ({ images, style, colWidth, margin }) => {
                 />
             }
             </Box>
-            <Modal
-                open={expandedImage !== null}
+            <Dialog
+                open={expandedViewOpen}
                 onClose={onCloseModal}
-                BackdropComponent={Backdrop}
-                BackdropProps={{
-                    transitionDuration: 1000,
-                    style: {
-                        backgroundColor: '#fff'
-                    }
-                }}
+                fullScreen={true}
+                TransitionComponent={Transition}
             >
-                <Fade in={expandedImage !== null}>
-                    { /* Empty wrapper node to avoid error "The modal content node does not accept focus" */ }
-                    <div style={{display: 'flex', flex: 1, height: '100%'}}>
-                        <ExpandedView images={images} currentId={expandedImage} onClose={onCloseModal} />
-                    </div>
-                </Fade>
-            </Modal>
+                <ExpandedView images={images} index={expandedImageIndex} onClose={onCloseModal} />
+            </Dialog>
         </React.Fragment>
     );
 }
