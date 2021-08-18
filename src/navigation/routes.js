@@ -55,7 +55,7 @@ export const routes = [
     // Private menu for connected users : private = true
     {
         label: "Ma Sélection",
-        path: "/my_selection",
+        path: "/favorites",
         component: <MySelection />,
         icon: <FavoriteIcon fontSize="small" />,
         private: true
