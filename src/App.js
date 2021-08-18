@@ -1,4 +1,5 @@
 import React from 'react';
+import { isIOS } from 'react-device-detect'
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Box from '@material-ui/core/Box';
 import AppBar from '@material-ui/core/AppBar';
@@ -10,7 +11,7 @@ import logo from './assets/images/logo.jpg';
 import { styled } from '@material-ui/core/styles';
 
 import Hidden from '@material-ui/core/Hidden';
-import Drawer from '@material-ui/core/Drawer';
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -175,7 +176,9 @@ function App(props) {
           }}
         >
         <Hidden smUp implementation="css">
-          <Drawer
+          <SwipeableDrawer
+            disableBackdropTransition={!isIOS}
+            disableDiscovery={isIOS}
             container={container}
             variant="temporary"
             anchor="left"
@@ -191,7 +194,7 @@ function App(props) {
             }}
           >
             {drawerContent}
-          </Drawer>
+          </SwipeableDrawer>
         </Hidden>
         </nav>
 
