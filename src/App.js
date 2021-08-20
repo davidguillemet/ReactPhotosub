@@ -8,7 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import CloseIcon from '@material-ui/icons/Close';
 import logo from './assets/images/logo.jpg';
-import { styled } from '@material-ui/core/styles';
+import { styled, ThemeProvider } from '@material-ui/core/styles';
 
 import Hidden from '@material-ui/core/Hidden';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
@@ -25,6 +25,7 @@ import { AuthProvider } from './components/authentication';
 import Footer from './template/footer';
 import ScrollTop from './template/scrollTop';
 import PageContent from './template/pageContent';
+import ResponsiveTheme from './template/theme/theme';
 
 import './App.css';
 
@@ -146,6 +147,7 @@ function App(props) {
 
   return (
     <div style={{ display: 'flex'}}>
+    <ThemeProvider theme={ResponsiveTheme}>
     <AuthProvider>
 
       <CssBaseline />
@@ -184,6 +186,7 @@ function App(props) {
             anchor="left"
             open={mobileOpen}
             onClose={handleDrawerToggle}
+            onOpen={handleDrawerToggle}
             sx={{
               '& .MuiPaper-root': {
                 width: drawerWidth
@@ -210,6 +213,7 @@ function App(props) {
       <ScrollTop {...props} anchorSelector={`#${scrollTopAnchor}`}></ScrollTop>
 
     </AuthProvider>
+    </ThemeProvider>
     </div>
   );
 }

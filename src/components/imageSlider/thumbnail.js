@@ -33,17 +33,17 @@ const Thumbnail = ({
 
     return (
         <Box
-            style={{
+            sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center'
             }}>
-            <Box style={{
+            <Box sx={{
                 position: 'relative',
-                padding: imageBorderWidth,
+                padding: `${imageBorderWidth}px`,
                 backgroundColor: active === true ? imageBorderColor : null,
-                height: imageHeight + 2*imageBorderWidth,
-                borderRadius: imageBorderRadius
+                height: `${imageHeight + 2*imageBorderWidth}px`,
+                borderRadius: `${imageBorderRadius}px`
             }}>
                 <img
                     alt=""

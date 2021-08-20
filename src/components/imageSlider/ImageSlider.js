@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import {isMobile} from 'react-device-detect';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
@@ -151,31 +152,32 @@ const ImageSlider = ({
             flexDirection: 'column',
         }}>
 
-            <Box style={{
+            <Box sx={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center'
             }}>
 
-                { /* TODO : remove on mobile device */ }
+                { !isMobile &&
                 <Fade in={thumnailScrollActivation.scrollLeft}>
                 <IconButton onClick={handleThumbnailsScrollLeft} disabled={!thumnailScrollActivation.scrollLeft}>
                     <ArrowBackIosRoundedIcon fontSize="large"/>
                 </IconButton>
                 </Fade>
+                }
 
                 {
                     images === null ?
                     <Box
-                        style={{
+                        sx={{
                             display: 'flex',
                             flexDirection: 'row',
                             justifyContent: 'center',
                             alignItems: 'center',
                             width: '100%',
-                            height: imageHeight + 2*imageBorderWidth,
-                            marginTop: indicatorHeight,
-                            marginBottom: indicatorHeight
+                            height: `${imageHeight + 2*imageBorderWidth}px`,
+                            marginTop: `${indicatorHeight / 2}px`,
+                            marginBottom: `${indicatorHeight}px`
                         }}
                     >
                         <CircularProgress />
@@ -184,15 +186,16 @@ const ImageSlider = ({
                     <Box
                         ref={resizeObserver.ref}
                         className="hideScroll" 
-                        style={{
+                        sx={{
                             flex: 1,
                             overflowY: 'hidden',
                             overflowX: 'auto',
                             display: 'flex',
                             flexDirection: 'row',
                             alignItems: 'flex-start',
-                            height: imageHeight + 2*imageBorderWidth + indicatorHeight,
-                            marginTop: indicatorHeight
+                            height: `${imageHeight + 2*imageBorderWidth + indicatorHeight}px`,
+                            mt: `${indicatorHeight / 2}px`,
+                            mx: `${2*imageBorderWidth}px`
                         }}
                     >
                         {
@@ -234,8 +237,9 @@ const ImageSlider = ({
                                 size="large"
                                 onClick={onNextPage}
                                 sx={{
-                                    height: imageHeight,
-                                    mt: `${imageBorderWidth}px`
+                                    height: `${imageHeight}px`,
+                                    mt: `${imageBorderWidth}px`,
+                                    ml: `${imageBorderWidth}px`
                                 }}
                                 startIcon={<MoreHorizIcon />}
                             >
@@ -244,12 +248,13 @@ const ImageSlider = ({
                     </Box>
                 }
 
-                { /* TODO : remove on mobile device */ }
+                { !isMobile &&
                 <Fade in={thumnailScrollActivation.scrollRight}>
                 <IconButton onClick={handleThumbnailsScrollRight} disabled={!thumnailScrollActivation.scrollRight}>
                     <ArrowForwardIosRoundedIcon fontSize="large"/>
                 </IconButton>
                 </Fade>
+                }
 
             </Box>
 

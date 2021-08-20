@@ -129,7 +129,6 @@ const Search = React.forwardRef(({
     useEffect(() => {
         if (searchConfig.query.length <= 2)
         {
-            setSearchResult(getEmptySearchResult());
             return;
         }
 
@@ -153,6 +152,10 @@ const Search = React.forwardRef(({
             // }
             setSearchResult(oldResult => {
                 const results = response.items;
+                if (results.length === 0 && searchConfig.page === 0)
+                {
+                    return getEmptySearchResult(true);
+                }
                 const newResult = {
                     images: searchConfig.page === 0 ? results : oldResult.images.concat(results),
                     hasNext: _pageSize === results.length,

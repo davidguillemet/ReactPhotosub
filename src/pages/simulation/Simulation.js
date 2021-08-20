@@ -37,13 +37,19 @@ const borderColors = [
     "#8B4513",
 ];
 
-const EmptySimulationImages = ({type, images}) => {
+const EmptySimulationImages = ({type, images, searchResult}) => {
     if (images === null) {
         // to avoid blinking component display when transitionning
         return null;
     }
 
-    if (type === LIST_FAVORITES) {
+    if (type === LIST_FAVORITES || type === LIST_SEARCH) {
+        const message = 
+            type === LIST_FAVORITES ?
+            "Votre liste de favoris est vide." :
+            searchResult.emptyResult ?
+            "Votre recherche n'a retourné aucun résultat." :
+            "Saisissez un critère pour lancer une recherche.";
         return (
             <Box style={{
                 display: 'flex',
@@ -53,7 +59,7 @@ const EmptySimulationImages = ({type, images}) => {
                 justifyContent: 'center',
                 alignItems: 'center'
             }}>
-                <Alert severity="info" elevation={4} variant="filled">Votre liste de favoris est vide.</Alert>
+                <Alert severity="info" elevation={4} variant="filled">{message}</Alert>
             </Box>
         );
     }
@@ -161,7 +167,13 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     }, [deleteUploadedInterior]);
 
     const handleListType = (event, newListType) => {
-        setListType(newListType);
+        unstable_batchedUpdates(() => {
+            if (newListType !== LIST_SEARCH)
+            {
+                setSearchResult(getEmptySearchResult());
+            }
+            setListType(newListType);
+        });
     }
 
     const handleSearchResult = useCallback((searchResults) => {
@@ -199,7 +211,9 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 onThumbnailClick={onInteriorClick}
                 style={{
                     maxWidth: 1200,
-                    width: '100%'
+                    width: '100%',
+                    marginLeft: '-10px',
+                    marginRight: '-10px'
                 }}
                 imageHeight={120}
                 imageBorderWidth={3}
@@ -255,7 +269,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 imageBorderWidth={3}
                 imageBorderRadius={5}
                 disabled={simulation.isLocked}
-                emptyComponent={<EmptySimulationImages type={listType} images={images} />}
+                emptyComponent={<EmptySimulationImages type={listType} images={images} searchResult={searchResult} />}
                 onNextPage={handleNextSearchPage}
                 hasNext={searchResult.hasNext}
             />
@@ -270,7 +284,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 <BorderInput
                     value={simulation.border.width}
                     onChange={handleBorderWidthChange}
-                    width={200}
+                    width={160}
                     disabled={simulation.isLocked}
                 />
             </Box>
@@ -286,7 +300,6 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     variant="outlined"
                     sx={{
                         display: 'flex',
-                        border: (theme) => `1px solid ${theme.palette.divider}`,
                         flexWrap: 'wrap'               
                     }}
                 >

@@ -13,7 +13,7 @@ const StyledDivider = styled(Divider)(({theme}) => ({
 }));
 
 const StyledIconButton = styled(IconButton)(({theme}) =>({
-    padding: 10
+    padding: theme.spacing(1)
 }));
 
 const BorderInput = ({value, onChange, width, disabled}) => {
@@ -53,12 +53,12 @@ const BorderInput = ({value, onChange, width, disabled}) => {
             width: width
         }}>
         <StyledIconButton onClick={decrementWidth} disabled={isDisabled}>
-            <RemoveOutlinedIcon fontSize="large"/>
+            <RemoveOutlinedIcon />
         </StyledIconButton>
         <StyledDivider orientation="vertical" />
         <InputBase
             sx={{
-                ml: 1,
+                ml: 0.5,
                 flex: 1,
             }}
             fullWidth
@@ -69,7 +69,7 @@ const BorderInput = ({value, onChange, width, disabled}) => {
         />
         <StyledDivider orientation="vertical" />
         <StyledIconButton onClick={incrementWidth} disabled={isDisabled}>
-            <AddOutlinedIcon fontSize="large" />
+            <AddOutlinedIcon />
         </StyledIconButton>
       </Paper>
     );

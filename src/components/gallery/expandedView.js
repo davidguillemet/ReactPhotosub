@@ -6,7 +6,8 @@ import Paper from '@material-ui/core/Paper';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import InfoIcon from '@material-ui/icons/InfoOutlined';
+import InfoOutlined from '@material-ui/icons/InfoOutlined';
+import InfoIcon from '@material-ui/icons/Info';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
@@ -238,7 +239,7 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                     alignItems: 'center',
                     width: '100%',
                     height: '100%',
-                    padding: fullScreen || isMobile ? 0 : 10,
+                    padding: (fullScreen || isMobile) ? 0 : 10,
                     overflow: 'hidden'
                 }}
             >
@@ -270,13 +271,18 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                 elevation={4}
                 ref={headerBarRef}
                 className={classes.expandedHeader}
-                style={{
+                sx={{
                     display: 'flex',
                     flexDirection: 'row',
                     transition: 'opacity 1s',
                     width: (isPlaying || fullScreen) ? "auto" : "100%",
                     position: (isPlaying || fullScreen) ? "absolute" : "relative",
-                    zIndex: (isPlaying || fullScreen) ? 100 : 1
+                    zIndex: (isPlaying || fullScreen) ? 100 : 1,
+                    ...((isPlaying || fullScreen) && {
+                        position: 'absolute',
+                        left: '50%',
+                        transform: 'translateX(-50%)'
+                    })
                 }}
             >
                 <Box
@@ -306,7 +312,11 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                                 tooltip={infoVisible ? "Cacher les détails" : "Afficher les détails"}
                                 onClick={handleInfoClick}
                             >
-                                <InfoIcon fontSize='large'></InfoIcon>
+                                {
+                                    infoVisible ?
+                                    <InfoIcon fontSize='large'></InfoIcon> :
+                                    <InfoOutlined fontSize='large'></InfoOutlined>
+                                }
                             </TooltipIconButton>
                             <FavoriteButton fontSize='large' path={`${currentImage.path}/${currentImage.name}`} />
                             <TooltipIconButton
@@ -364,7 +374,7 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: '100%',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
                 }}
             >
                 <VirtualizeSwipeableViews
@@ -381,6 +391,8 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                     slideCount={images.length}
                 />
 
+
+                { !isMobile && 
                 <Collapse in={!isPlaying}>
                     <IconButton
                         className={classes.navigationButton}
@@ -400,31 +412,34 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                         <ArrowForwardIosRoundedIcon fontSize='large' />
                     </IconButton>
                 </Collapse>
+                }
+
             </Box>
 
             <Collapse in={infoVisible}>
-                <Paper
-                    elevation={4}
-                    style={{
-                        position: 'relative',
-                        marginBottom: 5,
-                        padding: 10,
-                        textAlign: 'center',
-                        backgroundColor: '#edfeff'
-                    }}
-                >
-                {
-                    currentImageHasDetails() ?
-                    <React.Fragment>
-                        <Typography variant="h4" style={{ margin: 0 }}>{currentImage.title}</Typography>
-                        <Typography variant="h5" style={{ marginBottom: 0 }}>{currentImage.description}</Typography>
-                    </React.Fragment> :
-                    <React.Fragment>
-                        <Typography variant="h4" style={{ margin: 0 }}>...</Typography>
-                        <Typography variant="h5" style={{ marginBottom: 0 }}>...</Typography>
-                    </React.Fragment>
-                }
-                </Paper>
+                <Box sx={{
+                    px: 1
+                }}>
+                    <Paper
+                        elevation={4}
+                        style={{
+                            position: 'relative',
+                            marginBottom: 5,
+                            padding: 10,
+                            textAlign: 'center',
+                            backgroundColor: '#edfeff'
+                        }}
+                    >
+                    {
+                        currentImageHasDetails() ?
+                        <React.Fragment>
+                            <Typography variant="h4" style={{ margin: 0 }}>{currentImage.title}</Typography>
+                            <Typography variant="h5" style={{ marginBottom: 0 }}>{currentImage.description}</Typography>
+                        </React.Fragment> :
+                            <Typography variant="h5" style={{ marginBottom: 0 }}>Aucune description</Typography>
+                        }
+                    </Paper>
+                </Box>
             </Collapse>
 
             <Collapse in={!isPlaying && !fullScreen}>

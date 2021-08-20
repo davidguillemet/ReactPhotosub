@@ -7,8 +7,7 @@ import { routes } from '../../navigation/routes';
 const PageContent = ({history, onHistoryChanged}) => {
 
     useEffect(() => history.listen(() => {
-        // do something on route change
-        // for my example, close a drawer
+        // Close the Drawer
         onHistoryChanged();
     }), [history, onHistoryChanged])
 
