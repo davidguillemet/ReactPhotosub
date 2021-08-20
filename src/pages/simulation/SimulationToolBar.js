@@ -11,6 +11,7 @@ import {unstable_batchedUpdates} from 'react-dom';
 
 import SimulationSplitButton from './SimulationSplitButton';
 import SimulationNameDialog from './SimulationNameDlg';
+import SimulationDeletionDialog from './SimulationDeletionDlg';
 import {isFromDb, isDirty} from '../../dataProvider';
 
 import TooltipIconButton from '../../components/tooltipIconButton';
@@ -25,6 +26,7 @@ const NAME_DIALOG_ACTION_RENAME = "rename";
 const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, dispatch}) => {
     const [action, setAction] = useState(NAME_DIALOG_ACTION_SAVE);
     const [nameDlgOpen, setNameDlgOpen] = useState(false);
+    const [deletionDlgOpen, setDeletionDlgOpen] = useState(false);
 
     const simulation = useMemo(() => simulations[currentIndex], [simulations, currentIndex]);
 
@@ -120,6 +122,13 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                 onValidate={getDialogCallback(action)}
             />
 
+            <SimulationDeletionDialog
+                open={deletionDlgOpen}
+                name={simulation.name}
+                onOpenChanged={setDeletionDlgOpen}
+                onValidate={handleDelete}
+            />
+
             <Toolbar variant="dense">
                 <TooltipIconButton
                     tooltip={`Sauvegarder "${simulation.name}"`}
@@ -159,7 +168,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
 
                 <TooltipIconButton
                     tooltip={`Supprimer "${simulation.name}"`}
-                    onClick={handleDelete}
+                    onClick={() => setDeletionDlgOpen(true)}
                     disabled={simulations.length === 1 && isFromDb(simulations[0]) === false}
                     style={{
                         marginLeft: 0,
