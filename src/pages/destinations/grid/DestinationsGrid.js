@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import Box from '@material-ui/core/Box';
 
-import { getThumbnailSrc } from '../../../utils/utils';
+import { getThumbnailSrc } from '../../../utils';
 import Destination from './Destination';
 
 import { useResizeObserver } from '../../../components/hooks';

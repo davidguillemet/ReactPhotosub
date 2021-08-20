@@ -1,3 +1,1 @@
-import useResizeObserver from './resizeHook';
-
-export { useResizeObserver };
+export { default as useResizeObserver } from './resizeHook';

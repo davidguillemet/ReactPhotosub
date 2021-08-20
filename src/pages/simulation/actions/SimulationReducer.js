@@ -1,7 +1,7 @@
-import { uniqueID } from '../../../utils/utils';
+import { uniqueID } from '../../../utils';
 import { TRANSIENT_PROPERTY_IS_DIRTY, TRANSIENT_PROPERTY_DB_INDEX, getDbIndex, isFromDb } from '../../../dataProvider';
 
-import { clearThumbnailSrc } from '../../../utils/utils';
+import { clearThumbnailSrc } from '../../../utils';
 
 // Actions for a single image
 export const ACTION_UPDATE_IMAGE_SRC = 'image:set';

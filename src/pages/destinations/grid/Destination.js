@@ -1,4 +1,4 @@
-import { formatDate } from '../../../utils/utils';
+import { formatDate } from '../../../utils';
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import Chip from "@material-ui/core/Chip";

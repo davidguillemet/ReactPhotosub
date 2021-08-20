@@ -25,7 +25,7 @@ import { AuthProvider } from './components/authentication';
 import Footer from './template/footer';
 import ScrollTop from './template/scrollTop';
 import PageContent from './template/pageContent';
-import ResponsiveTheme from './template/theme/theme';
+import ResponsiveTheme from './template/theme';
 
 import './App.css';
 

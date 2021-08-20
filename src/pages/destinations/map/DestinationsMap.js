@@ -5,7 +5,7 @@ import {unstable_batchedUpdates} from 'react-dom';
 import { GoogleMap, Marker, InfoWindow, MarkerClusterer, useLoadScript } from '@react-google-maps/api';
 
 import dataProvider from '../../../dataProvider';
-import { formatDate, getThumbnailSrc } from '../../../utils/utils';
+import { formatDate, getThumbnailSrc } from '../../../utils';
 
 import LocationInfoWindow from './LocationInfoWindow';
 

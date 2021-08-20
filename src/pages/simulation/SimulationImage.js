@@ -10,7 +10,7 @@ import { green, grey } from '@material-ui/core/colors';
 import { useEffect } from 'react';
 
 import {moveImage, resizeAndMoveImage, deleteImage} from './actions/SimulationActions';
-import { getThumbnailSrc } from '../../utils/utils';
+import { getThumbnailSrc } from '../../utils';
 
 const useStyle = makeStyles(() => ({
     container: {

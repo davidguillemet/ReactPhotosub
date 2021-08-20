@@ -16,7 +16,7 @@ import CloseIcon from '@material-ui/icons/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import Typography from '@material-ui/core/Typography';
-import { useEventListener, getThumbnailSrc, THUMB_LARGEST } from '../../utils/utils';
+import { useEventListener, getThumbnailSrc, THUMB_LARGEST } from '../../utils';
 import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
 

@@ -1,3 +1,1 @@
-import TooltipIconButton from './TooltipIconButton';
-
-export default TooltipIconButton;
+export { default } from './TooltipIconButton';

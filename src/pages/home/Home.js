@@ -13,7 +13,7 @@ import './styles.css';
 import {unstable_batchedUpdates} from 'react-dom';
 
 import dataProvider from '../../dataProvider';
-import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils/utils';
+import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils';
 import PageTitle from '../../template/pageTitle';
 import { Typography } from '@material-ui/core';
 

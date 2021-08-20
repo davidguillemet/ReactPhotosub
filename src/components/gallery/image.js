@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import FavoriteButton from './favoriteButton';
-import { getThumbnailSrc } from '../../utils/utils';
+import { getThumbnailSrc } from '../../utils';
 
 const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
 

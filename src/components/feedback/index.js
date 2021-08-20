@@ -1,3 +1,1 @@
-import FeedbackMessage from './Feedback';
-
-export default FeedbackMessage;
+export { default } from './Feedback';

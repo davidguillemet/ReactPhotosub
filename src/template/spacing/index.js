@@ -1,3 +1,1 @@
-import { VerticalSpacing, HorizontalSpacing } from './Spacing';
-
-export { VerticalSpacing, HorizontalSpacing };
+export { VerticalSpacing, HorizontalSpacing } from './Spacing';

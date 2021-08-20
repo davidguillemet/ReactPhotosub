@@ -1,7 +1,8 @@
 import React from 'react';
 import Button from "@material-ui/core/Button";
 
-import { Gallery, Search } from '../../components';
+import Gallery from '../../components/gallery';
+import Search from '../../components/search';
 import PageTitle from '../../template/pageTitle';
 
 const NextPageButton = ({

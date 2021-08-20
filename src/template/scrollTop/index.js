@@ -1,3 +1,1 @@
-import ScrollTop from './scrollTop';
-
-export default ScrollTop;
+export {default} from './scrollTop';

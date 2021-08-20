@@ -2,7 +2,7 @@ import { Fab } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
-import { getThumbnailSrc, THUMB_S } from '../../utils/utils';
+import { getThumbnailSrc, THUMB_S } from '../../utils';
 
 const Thumbnail = ({
     image,

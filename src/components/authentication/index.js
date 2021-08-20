@@ -1,9 +1,3 @@
-import AuthContext from './authContext';
-import AuthProvider from './authProvider';
-import useAuthContext from './authContextHook';
-
- export {
-    AuthContext,
-    AuthProvider,
-    useAuthContext
-}
+export { default as AuthContext } from './authContext';
+export { default as AuthProvider } from './authProvider';
+export { default as useAuthContext } from './authContextHook';

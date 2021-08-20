@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import dataProvider from '../../dataProvider';
-import { uniqueID } from '../../utils/utils';
+import { uniqueID } from '../../utils';
 
 export const LIST_HOME_SLIDESHOW = "slideshow";
 export const LIST_FAVORITES = "favorites";

@@ -12,7 +12,7 @@ import Simulation from './Simulation';
 
 import FeedbackMessage from '../../components/feedback';
 import { AuthContext } from '../../components/authentication';
-import { uniqueID } from '../../utils/utils';
+import { uniqueID } from '../../utils';
 
 import simulationsReducer from './actions/SimulationReducer';
 import {

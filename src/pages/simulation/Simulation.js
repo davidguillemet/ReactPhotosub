@@ -26,9 +26,9 @@ import FileUpload from './FileUpload';
 import {setBackground, resize, borderWidth, borderColor, addImage, setImage} from './actions/SimulationActions';
 
 import { useResizeObserver } from '../../components/hooks';
-import { Search } from '../../components';
+import Search from '../../components/search';
 import useImageLoader, {LIST_HOME_SLIDESHOW, LIST_FAVORITES, LIST_SEARCH} from './imageLoaderHook';
-import { getEmptySearchResult } from '../../utils/utils';
+import { getEmptySearchResult } from '../../utils';
 
 const borderColors = [
     "#FFFFFF",

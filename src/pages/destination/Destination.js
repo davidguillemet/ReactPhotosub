@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
-import { formatDate } from '../../utils/utils';
+import { formatDate } from '../../utils';
 import dataProvider from '../../dataProvider';
-import { Gallery } from '../../components';
+import Gallery from '../../components/gallery';
 import PageTitle, { PageSubTitle } from '../../template/pageTitle';
 
 import 'fontsource-roboto/400.css';

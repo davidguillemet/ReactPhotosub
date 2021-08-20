@@ -14,7 +14,7 @@ import HelpIcon from '@material-ui/icons/Help';
 import WarningIcon from '@material-ui/icons/Warning';
 
 import dataProvider from '../../dataProvider/dataprovider';
-import { uniqueID, getEmptySearchResult } from '../../utils/utils';
+import { uniqueID, getEmptySearchResult } from '../../utils';
 
 const _pageSize = 10;
 

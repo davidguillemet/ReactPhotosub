@@ -1,3 +1,1 @@
-import DestinationLink from './DestinationLink';
-
-export default DestinationLink;
+export { default } from './DestinationLink';
