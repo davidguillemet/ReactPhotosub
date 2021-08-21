@@ -83,7 +83,11 @@ export default function SimulationNameDialog({ open, action = "save", validation
 
     return (
         <div>
-            <Dialog open={isOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
+            <Dialog
+                fullWidth={true}
+                open={isOpen}
+                onClose={handleClose}
+            >
                 <DialogTitle id="form-dialog-title">{dialogDetails.title}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>{dialogDetails.desc}</DialogContentText>
@@ -101,10 +105,10 @@ export default function SimulationNameDialog({ open, action = "save", validation
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary">
+                    <Button onClick={handleClose} color="primary" variant="outlined">
                         Annuler
                     </Button>
-                    <Button onClick={handleValidate} color="primary" disabled={okDisabled}>
+                    <Button onClick={handleValidate} color="primary" disabled={okDisabled} variant="outlined">
                         Valider
                     </Button>
                 </DialogActions>

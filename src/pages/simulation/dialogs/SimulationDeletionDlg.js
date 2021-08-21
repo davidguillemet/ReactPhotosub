@@ -20,17 +20,21 @@ export default function SimulationDeletionDialog({ open, name, onOpenChanged, on
 
     return (
         <div>
-            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+            <Dialog
+                fullWidth={true}
+                open={open}
+                onClose={handleClose}
+            >
                 <DialogTitle id="form-dialog-title">Suppression</DialogTitle>
                 <DialogContent>
                     <DialogContentText>{`Confirmez-vous la supression de la simulation '${name}' ?`}</DialogContentText>
                     <DialogContentText>Cette action est irreversible.</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary">
+                    <Button onClick={handleClose} color="primary" variant="outlined">
                         Annuler
                     </Button>
-                    <Button onClick={handleValidate} color="primary">
+                    <Button onClick={handleValidate} color="primary" variant="outlined">
                         Valider
                     </Button>
                 </DialogActions>

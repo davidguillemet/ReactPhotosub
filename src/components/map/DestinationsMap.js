@@ -2,10 +2,10 @@
 /*global google*/
 import React, { useState, useEffect, useRef } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
-import { GoogleMap, Marker, InfoWindow, MarkerClusterer, useLoadScript } from '@react-google-maps/api';
+import { GoogleMap, InfoWindow, MarkerClusterer, useLoadScript } from '@react-google-maps/api';
 
-import dataProvider from '../../../dataProvider';
-import { formatDate, getThumbnailSrc } from '../../../utils';
+import dataProvider from '../../dataProvider';
+import { formatDate, getThumbnailSrc } from '../../utils';
 
 import LocationInfoWindow from './LocationInfoWindow';
 
@@ -22,9 +22,26 @@ const DestinationsMap = ({destinations}) => {
     const [destinationsPerLocation, setDestinationsPerLocation] = useState([]);
     const [map, setMap] = React.useState(null)
     const [clusterer, setClusterer] = React.useState(null)
+    const [openInfoWindow, setOpenInfoWindow] = useState(true);
 
     // Another effect to get locations
     useEffect(() => {
+
+        if (destinations.length === 1 && destinations[0].latitude) {
+            const destination = destinations[0];
+            const location = {
+                title: destination.location,
+                latitude: destination.latitude,
+                longitude: destination.longitude,
+                destinations: [ destination ]
+            }
+            unstable_batchedUpdates(() => {
+                setDestinationsPerLocation([ location ]);
+                setSelectedLocation(null);
+                setOpenInfoWindow(false);
+            })
+            return;
+        }
 
         const promise =
             locationMapRef.current != null ?
@@ -59,12 +76,17 @@ const DestinationsMap = ({destinations}) => {
             });
 
             unstable_batchedUpdates(() => {
-                //setDestinationsPerLocation([ ...locationMap.values() ]);
                 setDestinationsPerLocation([ ...locations.values() ]);
                 setSelectedLocation(null);
             })
         })
     }, [destinations])
+
+    const handleMarkerClick = React.useCallback((location) => {
+        if (openInfoWindow === true) {
+            setSelectedLocation(location);
+        }
+    }, [openInfoWindow]);
 
     useEffect(() => {
         if (clusterer === null) {
@@ -77,7 +99,7 @@ const DestinationsMap = ({destinations}) => {
                     lat: location.latitude,
                     lng: location.longitude
                 },
-                icon: "https://static.wixstatic.com/media/e50527_e57f1250c77142098a1be8ee71f78144~mv2.png"
+                icon: "/diver.png"
             });
             marker.addListener("click", () => handleMarkerClick(location));
             return marker;
@@ -92,7 +114,7 @@ const DestinationsMap = ({destinations}) => {
         } else {
             clusterer.fitMapToMarkers();
         }
-    }, [clusterer, destinationsPerLocation])
+    }, [clusterer, destinationsPerLocation, handleMarkerClick])
     
     const { isLoaded } = useLoadScript({
         id: 'google-map-script',
@@ -119,10 +141,6 @@ const DestinationsMap = ({destinations}) => {
         setClusterer(null);
     }, []);
 
-    const handleMarkerClick = (location) => {
-        setSelectedLocation(location);
-    };
-
     if (isLoaded === false) {
         return <></>;
     }
@@ -131,7 +149,7 @@ const DestinationsMap = ({destinations}) => {
         <GoogleMap
             mapContainerStyle={{
                 width: '100%',
-                height: '600px'
+                height: '100%'
             }}
             onLoad={handleMapLoaded}
             onUnmount={handleMapUnmount}

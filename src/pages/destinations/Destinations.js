@@ -13,7 +13,7 @@ import dataProvider from '../../dataProvider';
 import PageTitle from '../../template/pageTitle';
 import { VerticalSpacing } from '../../template/spacing';
 import DestinationsGrid from './grid/DestinationsGrid';
-import DestinationsMap from './map/DestinationsMap';
+import DestinationsMap from '../../components/map';
 import RegionFilter from './RegionFilter';
 import useRegions from './RegionLoaderHook';
 

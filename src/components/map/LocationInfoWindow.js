@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/styles';
-import DestinationLink from '../../../components/destinationLink';
+import DestinationLink from '../destinationLink';
 
 const useStyles = makeStyles(() => ({
     locationTitle: {

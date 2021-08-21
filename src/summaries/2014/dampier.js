@@ -1,0 +1,18 @@
+import React from 'react';
+import SummaryParagraph from '../SummaryParagraph';
+
+const dampier = () => (
+<React.Fragment>
+<SummaryParagraph>Après la muck-dive à Ambon et la croisière qui a suivi jusqu'à Misool à bord du Lambo, nous prolongeons notre voyage par un petit séjour dans le détroit de Dampier,  au cœur de l'archipel des Raja Ampat. Nous avons donc choisi de passer quelques jours au <a href="http://rajaampatbiodiversity.com/" target="_blank" rel="noreferrer">Biodiversity Eco Resort</a>, idéalement situé sur l'île de Gam, à proximité immédiate du fameux détroit, et bien plus abordable que certains autres resorts du coin...</SummaryParagraph>
+<SummaryParagraph>Pour nous y rendre, nous allons d'abord emprunter un Ferry depuis Sorong jusqu'à Waisai, situé au sud de l'une des Îles les plus importantes de l'archipel, Waigeo. L'embarquement sera un peu surprenant puisque pour rejoindre notre ferry, il nous faudra d'abord passer sur un premier bateau, à couple duquel nous sommes amarrés. Pour l'occasion, nous avons d'ailleurs loué les services de deux porteurs pour nos sacs de près de 30kg, et pour lesquels la manœuvre ne sera qu'une formalité alors que le fait de passer d'un bateau à l'autre en empruntant une passerelle en bois des plus incertaines ne nous a pas paru forcément évident :)</SummaryParagraph>
+<SummaryParagraph>Le voyage en lui-même, d'une durée de deux heures, sera un peu éprouvant pour cause de climatisation en panne et donc de chaleur extrême dans un espace pas spécialement inconfortable, mais assez exigüe, chacun essayant de profiter du peu d'air frais disponible à la proue du bateau, pas spécialement conçu pour accueillir des passagers.</SummaryParagraph>
+<SummaryParagraph>Arrivés au terminal de Waisai, et après une sortie du bateau quelque peu épique avec nos sacs de plongeurs (j'ai bien cru finir à l'eau), nous allons prendre un petit speed boat qui nous amènera finalement jusqu'au Biodiversity Eco Resort en 20mn, sous une légère pluie rafraichissante, la seule du séjour.</SummaryParagraph>
+<SummaryParagraph>Nous prenons alors nos quartiers dans notre bungalow dit "standard", simple mais spacieux et confortable, avec une salle de bain que nous partageons avec nos voisins.</SummaryParagraph>
+<SummaryParagraph>A la première immersion, la différence entre le détroit et Misool nous saute aux yeux...Ici, l'eau est particulièrement limpide, d'un magnifique bleu, mais le décor est aussi beaucoup plus "minéral", c'est à dire pas aussi riche en faune fixée et coraux mous multicolores.</SummaryParagraph>
+<SummaryParagraph>Par contre, nous aurons l'occasion de rencontrer à maintes reprises l'une des stars du coin, le fameux Wobbegong (requin-tapis), que nous n'avions rencontré qu'une seule et unique fois sur Misool.</SummaryParagraph>
+<SummaryParagraph>L'emplacement du Biodiversity est idéale, et nous sommes donc à proximité immédiate des sites les plus célèbres comme Sardines Reef, Mioskun et son bénitier géant (photo n°42), Blue Magic, Chicken Reef et bien-sûr Cape Kri. Seul le site Manta Sandy, pour les raies manta, n'aura pas été exploré pendant notre séjour, pour des raisons de logistique essentiellement.</SummaryParagraph>
+<SummaryParagraph>Au final, nous avons pu voir de beaux bancs de poissons (vivaneaux divers, carangues, platax, barracudas, chirurgiens, etc) et même si le détroit de Dampier reste une destination de très haut niveau, nous resterons plus marqués par l'expérience extraordinaire du bloom des anchois et des coraux mous de Misool.</SummaryParagraph>
+</React.Fragment>
+);
+
+export default dampier;

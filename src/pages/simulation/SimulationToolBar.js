@@ -10,8 +10,8 @@ import LockOpenOutlinedIcon from '@material-ui/icons/LockOpenOutlined';
 import {unstable_batchedUpdates} from 'react-dom';
 
 import SimulationSplitButton from './SimulationSplitButton';
-import SimulationNameDialog from './SimulationNameDlg';
-import SimulationDeletionDialog from './SimulationDeletionDlg';
+import SimulationNameDialog from './dialogs/SimulationNameDlg';
+import SimulationDeletionDialog from './dialogs/SimulationDeletionDlg';
 import {isFromDb, isDirty} from '../../dataProvider';
 
 import TooltipIconButton from '../../components/tooltipIconButton';
