@@ -148,7 +148,7 @@ const SimulationManager = ({ user }) => {
 
             <FeedbackMessage severity={feedback.severity} message={feedback.message} key={feedback.key}/>
 
-            <PageTitle>Simulation</PageTitle>
+            <PageTitle>Simulateur</PageTitle>
 
             {
                 user && state &&

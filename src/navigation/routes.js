@@ -1,9 +1,10 @@
 import { NavLink } from "react-router-dom";
 import HomeIcon from '@material-ui/icons/Home';
-import LanguageIcon from '@material-ui/icons/Language';
+import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
 import SearchIcon from '@material-ui/icons/Search';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
+import PanoramaIcon from '@material-ui/icons/Panorama';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
 import { styled } from '@material-ui/core/styles';
@@ -31,7 +32,7 @@ export const routes = [
         label: "Destinations",
         path: "/destinations",
         component: <Destinations/>,
-        icon: <LanguageIcon />,
+        icon: <FlightTakeoffIcon />,
         sidebar: true
     },
     {
@@ -49,10 +50,10 @@ export const routes = [
         sidebar: true
     },
     {
-        label: "Simulation",
+        label: "Simulateur",
         path: "/simulation",
         component: <SimulationManager/>,
-        icon: <HomeIcon />, // TODO
+        icon: <PanoramaIcon />,
         sidebar: true
     },
     {
