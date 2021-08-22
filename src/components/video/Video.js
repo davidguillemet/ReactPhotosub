@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Box from '@material-ui/core/Box';
-import Alert from '@material-ui/core/Alert';
 
 const PlayerContainer = ({children}) => {
     return (
@@ -17,19 +16,53 @@ const PlayerContainer = ({children}) => {
     );
 }
 
-const YoutubePlayer = ({src}) => {
+const Player = ({src}) => {
+
+    const intersectionObserver = useRef(null);
+    const [videoSrc, setVideoSrc] = useState("");
+
+    const setFrameRef = useCallback((frameRef) => {
+        if (frameRef !== null) {
+            if (IntersectionObserver) {
+                if (intersectionObserver.current !== null) {
+                    intersectionObserver.current.unobserve(frameRef)
+                }
+                intersectionObserver.current = new IntersectionObserver(
+                    entries => {
+                        entries.forEach(entry => {
+                            // when image is visible in the viewport + rootMargin
+                            if ((entry.intersectionRatio > 0 || entry.isIntersecting)) {
+                                    setVideoSrc(src)
+                            }
+                        })
+                    }
+                )
+                intersectionObserver.current.observe(frameRef)
+            } else {
+                // Old browsers fallback
+                setVideoSrc(src)
+            }
+        }
+    }, [src]);
+
+    useEffect(() => () => {
+        intersectionObserver.current.disconnect();
+    }, []);
+    
 
     return (
         <PlayerContainer>
             <iframe
+                ref={setFrameRef}
                 style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     width: '100%',
-                    height: '100%'
+                    height: '100%',
+                    backgroundColor: 'black'
                 }}
-                src={src}
+                src={videoSrc}
                 title="Youtube video"
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -39,48 +72,7 @@ const YoutubePlayer = ({src}) => {
     );
 }
 
-const VimeoPlayer = ({src}) => {
-    return (
-        <PlayerContainer>
-            <iframe
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'black'
-                }}
-                src={src}
-                title="Vimeo video"
-                frameborder="0"
-                allow="autoplay; fullscreen; picture-in-picture"
-                allowfullscreen />
-        </PlayerContainer>
-    )
-}
-
-const PLAYER_YOUTUBE = "youtube.com";
-const PLAYER_VIMEO = "vimeo.com";
-
-const _players = {
-    [PLAYER_YOUTUBE]: YoutubePlayer,
-    [PLAYER_VIMEO]: VimeoPlayer
-};
-
 const Video = ({src, legend = null, width = '100%'}) => {
-
-    const playerType =
-        src.indexOf(PLAYER_YOUTUBE) >= 0 ?
-        PLAYER_YOUTUBE :
-        src.indexOf(PLAYER_VIMEO) >= 0 ?
-        PLAYER_VIMEO : null;
-
-    if (playerType === null) {
-        return <Alert sx={{mb: 3}} severity="error" elevation={4} variant="filled">{`This video source '${src}' is not supported`}</Alert>
-    }
-
-    const Player = _players[playerType];
 
     return (
         <Box sx={{
