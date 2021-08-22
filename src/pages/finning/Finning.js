@@ -66,7 +66,7 @@ const Finning = () => {
                         dense={true}
                     >
                         {
-                            _menuListItems.map((caption, index) => <FinningListItem caption={caption} index={index} />)
+                            _menuListItems.map((caption, index) => <FinningListItem key={index} caption={caption} index={index} />)
                         }
                     </List>
                 </BlockQuote>
