@@ -8,12 +8,9 @@ import Chip from '@material-ui/core/Chip';
 import { formatDate } from '../../utils';
 import dataProvider from '../../dataProvider';
 import Gallery from '../../components/gallery';
-import PageTitle, { PageSubTitle } from '../../template/pageTitle';
+import { PageTitle, PageSubTitle } from '../../template/pageTypography';
 import SummaryDialog from './SummaryDialog';
 import LocationDialog from './LocationDialog';
-
-import 'fontsource-roboto/400.css';
-import 'fontsource-roboto/100.css';
 
 
 const RegionChip = ({region}) => {

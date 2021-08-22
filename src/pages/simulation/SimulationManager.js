@@ -4,7 +4,7 @@ import { Prompt } from "react-router-dom";
 
 import {unstable_batchedUpdates} from 'react-dom';
 
-import PageTitle from '../../template/pageTitle';
+import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import dataProvider, { isFromDb, isDirty, getDbIndex } from '../../dataProvider';
 import SimulationToolBar from './SimulationToolBar';

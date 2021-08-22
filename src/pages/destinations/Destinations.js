@@ -10,7 +10,7 @@ import ToggleButton from '@material-ui/core/ToggleButton';
 import ToggleButtonGroup from '@material-ui/core/ToggleButtonGroup';
 
 import dataProvider from '../../dataProvider';
-import PageTitle from '../../template/pageTitle';
+import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import DestinationsGrid from './grid/DestinationsGrid';
 import DestinationsMap from '../../components/map';

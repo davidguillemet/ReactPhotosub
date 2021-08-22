@@ -3,7 +3,7 @@ import Button from "@material-ui/core/Button";
 
 import Gallery from '../../components/gallery';
 import Search from '../../components/search';
-import PageTitle from '../../template/pageTitle';
+import { PageTitle } from '../../template/pageTypography';
 
 const NextPageButton = ({
     onClick,

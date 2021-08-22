@@ -14,7 +14,7 @@ import {unstable_batchedUpdates} from 'react-dom';
 
 import dataProvider from '../../dataProvider';
 import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils';
-import PageTitle from '../../template/pageTitle';
+import { PageTitle } from '../../template/pageTypography';
 import { Typography } from '@material-ui/core';
 
 const _diaporamaInterval = 10000;

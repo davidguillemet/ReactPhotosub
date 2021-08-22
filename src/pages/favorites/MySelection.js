@@ -4,7 +4,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { AuthContext } from '../../components/authentication';
 import dataProvider from '../../dataProvider';
 import Gallery from '../../components/gallery';
-import PageTitle from '../../template/pageTitle';
+import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 
 const MySelectionContent= ({user, images}) => {
