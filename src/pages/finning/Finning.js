@@ -51,6 +51,12 @@ const Finning = () => {
             maxWidth: '800px'
         }}>
             <PageTitle>Le Finning, Késako ?</PageTitle>
+            <PageHeader sx={{color: 'red', fontWeight: 400, textAlign: 'center'}}>Initiative Citoyenne Européenne<br></br>Apportez votre soutien !</PageHeader>
+            <Link href="https://www.stop-finning.eu/" target="_blank">
+            <Box sx={{ width: '100%', bgcolor: 'black', p: '20px', mb: 3}}>
+                <img src="/logo-stop-finning.png" alt="Stop Finninf" style={{maxWidth: '100%'}}/>
+            </Box>
+            </Link>
             <Box sx={{
                 width: '100%',
             }}>
