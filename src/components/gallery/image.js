@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import FavoriteButton from './favoriteButton';
 import { getThumbnailSrc } from '../../utils';
+import { useIntersectionObserver } from '../hooks';
 
 const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
 
@@ -54,8 +55,11 @@ const useStyles = makeStyles(() => ({
 
 const LazyImage = ({ image, index, onClick, top, left, width }) => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
-    const [imageRef, setImageRef] = useState(null);
-    const intersectionObserver = useRef(null);
+    const onVisible = useCallback(() => {
+        const updatedSrc = getThumbnailSrc(image, width);
+        setImageSrc(updatedSrc);
+    }, [image, width]);
+    const imageRef = useIntersectionObserver(onVisible);
     const classes = useStyles();
     
     const onLoad = event => {
@@ -67,42 +71,6 @@ const LazyImage = ({ image, index, onClick, top, left, width }) => {
     const onError = event => {
         event.target.classList.add('has-error');
     }
-
-    useEffect(() => {
-        let didCancel = false
-
-        const updatedSrc = getThumbnailSrc(image, width);
-        if (imageRef && (imageSrc === placeHolder || imageSrc !== updatedSrc)) {
-            if (IntersectionObserver) {
-                if (intersectionObserver.current !== null) {
-                    intersectionObserver.current.unobserve(imageRef)
-                }
-                intersectionObserver.current = new IntersectionObserver(
-                    entries => {
-                        entries.forEach(entry => {
-                            // when image is visible in the viewport + rootMargin
-                            if (!didCancel &&
-                                (entry.intersectionRatio > 0 || entry.isIntersecting)) {
-                                setImageSrc(updatedSrc)
-                            }
-                        })
-                    }
-                )
-                intersectionObserver.current.observe(imageRef)
-            } else {
-                // Old browsers fallback
-                setImageSrc(updatedSrc)
-            }
-        }
-
-        return () => {
-            didCancel = true
-            // on component unmount, we remove the listner
-            if (intersectionObserver.current && intersectionObserver.current.unobserve) {
-                intersectionObserver.current.unobserve(imageRef)
-            }
-        }
-    }, [imageRef, imageSrc, image, width]);
 
     function handleImageClick() {
         if (onClick) {
@@ -129,7 +97,7 @@ const LazyImage = ({ image, index, onClick, top, left, width }) => {
         >
             <img
                 className={classes.lazyImage}
-                ref={setImageRef}
+                ref={imageRef}
                 src={imageSrc}
                 alt="alt"
                 onLoad={onLoad}
