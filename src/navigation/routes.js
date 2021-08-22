@@ -3,6 +3,7 @@ import HomeIcon from '@material-ui/icons/Home';
 import LanguageIcon from '@material-ui/icons/Language';
 import SearchIcon from '@material-ui/icons/Search';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
 import { styled } from '@material-ui/core/styles';
@@ -14,6 +15,7 @@ const Destination = lazy(() => import("../pages/destination"));
 const Search = lazy(() => import("../pages/search"));
 const Finning = lazy(() => import("../pages/finning"));
 const SimulationManager = lazy(() => import("../pages/simulation"));
+const About = lazy(() => import("../pages/about"));
 const MySelection = lazy(() => import("../pages/favorites"));
 
 export const routes = [
@@ -51,6 +53,13 @@ export const routes = [
         path: "/simulation",
         component: <SimulationManager/>,
         icon: <HomeIcon />, // TODO
+        sidebar: true
+    },
+    {
+        label: "A propos",
+        path: "/about",
+        component: <About/>,
+        icon: <PersonOutlineIcon />,
         sidebar: true
     },
     // Private menu for connected users : private = true
