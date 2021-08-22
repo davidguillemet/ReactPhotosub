@@ -1,66 +1,61 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Box from '@material-ui/core/Box';
+import { useIntersectionObserver } from '../hooks';
+import {unstable_batchedUpdates} from 'react-dom';
 
-const PlayerContainer = ({children}) => {
+const PlayerContainer = ({loaded, children}) => {
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        if (loaded === true) {
+            containerRef.current.classList.add('loaded');
+        }
+    }, [loaded]);
+
     return (
-        <div style={{
+        <Box
+            ref={containerRef}
+            sx={{
                 position: 'relative',
                 paddingBottom: '56.25%',
                 height: 0,
                 overflow: 'hidden',
-                width: '100%'
+                width: '100%',
+                opacity: 0,
+                transition: 'opacity 1.5s',
+                '&.loaded': {
+                    opacity: 1
+                }        
             }}
         >
             {children}
-        </div>
+        </Box>
     );
 }
 
 const Player = ({src}) => {
 
-    const intersectionObserver = useRef(null);
     const [videoSrc, setVideoSrc] = useState("");
-
-    const setFrameRef = useCallback((frameRef) => {
-        if (frameRef !== null) {
-            if (IntersectionObserver) {
-                if (intersectionObserver.current !== null) {
-                    intersectionObserver.current.unobserve(frameRef)
-                }
-                intersectionObserver.current = new IntersectionObserver(
-                    entries => {
-                        entries.forEach(entry => {
-                            // when image is visible in the viewport + rootMargin
-                            if ((entry.intersectionRatio > 0 || entry.isIntersecting)) {
-                                    setVideoSrc(src)
-                            }
-                        })
-                    }
-                )
-                intersectionObserver.current.observe(frameRef)
-            } else {
-                // Old browsers fallback
-                setVideoSrc(src)
-            }
-        }
+    const [loaded, setLoaded] = useState(false);
+    const setVideoSrcCallback = useCallback(() => {
+        unstable_batchedUpdates(() => {
+            setVideoSrc(src);
+            setLoaded(true);
+        });
     }, [src]);
-
-    useEffect(() => () => {
-        intersectionObserver.current.disconnect();
-    }, []);
-    
+    const frameRef = useIntersectionObserver(setVideoSrcCallback);
 
     return (
-        <PlayerContainer>
+        <PlayerContainer loaded={loaded}>
             <iframe
-                ref={setFrameRef}
+                ref={frameRef}
                 style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    backgroundColor: 'black'
+                    backgroundColor: 'black'                    
                 }}
                 src={videoSrc}
                 title="Youtube video"
