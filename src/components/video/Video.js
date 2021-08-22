@@ -59,9 +59,9 @@ const Player = ({src}) => {
                 }}
                 src={videoSrc}
                 title="Youtube video"
-                frameborder="0"
+                frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
+                allowFullScreen
             />
         </PlayerContainer>
     );
