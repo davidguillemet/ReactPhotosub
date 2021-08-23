@@ -4,10 +4,7 @@ import { PageTitle, Paragraph } from '../../template/pageTypography';
 
 const About = () => {
     return (
-        <Box sx={{
-            width: '97%',
-            maxWidth: '800px'
-        }}>
+        <React.Fragment>
             <PageTitle>A Propos</PageTitle>
             <Box sx={{
                 width: '100%',
@@ -25,7 +22,7 @@ const About = () => {
             <Paragraph>Je passe donc au reflex en juillet 2009, et plus précisément au Nikon D90 en caisson Aquatica, avec mon fidèle flash DS125, auquel je vais associer un DS160, plus recent.</Paragraph>
             <Paragraph>Entre temps, ce site est tout simplement né du désir de partager cette passion avec famille et amis, et c'est en septembre 2021 que cette 6ème version voit le jour...</Paragraph>
             <Paragraph>Après 5 ans passés avec mon D90, j'ai ensuite évolué vers le D7100 puis le D7200, toujours en caisson Aquatica, avec mes deux flashs Ikelite DS125 et DS160.</Paragraph>
-        </Box>
+        </React.Fragment>
     )
 }
 

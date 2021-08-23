@@ -1,8 +1,25 @@
 import { Suspense, useEffect } from 'react';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import { Switch, Route, withRouter } from "react-router-dom";
 import { routes } from '../../navigation/routes';
+
+const RouteComponent = ({route}) => {
+    const Component = route.component;
+    if (route.fullWidth) {
+        return <Component />
+    } else {
+        return (
+            <Box sx={{
+                width: (theme) => theme.pageWidth.width,
+                maxWidth: (theme) => theme.pageWidth.maxWidth,
+            }}>
+                <Component />
+            </Box>
+        )
+    }
+}
 
 const PageContent = ({history, onHistoryChanged}) => {
 
@@ -38,7 +55,7 @@ const PageContent = ({history, onHistoryChanged}) => {
                     routes.map((route, index) => {
                         return (
                         <Route key={index} exact strict path={route.path}>
-                            {route.component}
+                            <RouteComponent route={route} />
                         </Route>
                         );
                     })

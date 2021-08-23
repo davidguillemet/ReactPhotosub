@@ -46,10 +46,7 @@ const FinningListItem = ({caption, index}) => {
 
 const Finning = () => {
     return (
-        <Box sx={{
-            width: '97%',
-            maxWidth: '800px'
-        }}>
+        <React.Fragment>
             <PageTitle>Le Finning, Késako ?</PageTitle>
             <PageHeader sx={{color: 'red', fontWeight: 400, textAlign: 'center'}}>Initiative Citoyenne Européenne<br></br>Apportez votre soutien !</PageHeader>
             <Link href="https://www.stop-finning.eu/" target="_blank">
@@ -146,7 +143,7 @@ const Finning = () => {
                 <Paragraph>C'est d'ailleurs à Puntarenas qu'il a été aspergé d'essence et tenu sous la menace d'une arme à feu alors qu'il était en train de filmer des activités illégales de finning en 2011...</Paragraph>
                 <Video src="https://www.youtube.com/embed/r65FgUYdBOc" />
             </Box>
-        </Box>
+        </React.Fragment>
     );
 };
 
