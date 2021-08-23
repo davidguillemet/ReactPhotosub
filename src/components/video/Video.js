@@ -2,6 +2,9 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Box from '@material-ui/core/Box';
 import { useIntersectionObserver } from '../hooks';
 import {unstable_batchedUpdates} from 'react-dom';
+import { styled } from '@material-ui/core/styles';
+
+const Frame = styled('iframe')(({ theme }) => ({ }));
 
 const PlayerContainer = ({loaded, children}) => {
     const containerRef = useRef(null);
@@ -21,6 +24,7 @@ const PlayerContainer = ({loaded, children}) => {
                 height: 0,
                 overflow: 'hidden',
                 width: '100%',
+                backgroundColor: 'black',
                 opacity: 0,
                 transition: 'opacity 1.5s',
                 '&.loaded': {
@@ -45,23 +49,34 @@ const Player = ({src}) => {
     }, [src]);
     const frameRef = useIntersectionObserver(setVideoSrcCallback);
 
+    const onLoad = event => {
+        console.log("iFrame loaded");
+        event.target.classList.add('loaded');
+    }
+
     return (
         <PlayerContainer loaded={loaded}>
-            <iframe
+            <Frame
                 ref={frameRef}
-                style={{
+                sx={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    backgroundColor: 'black'                    
+                    backgroundColor: 'black',
+                    opacity: 0,
+                    transition: 'opacity 1.5s',
+                    '&.loaded': {
+                        opacity: 1
+                    }        
                 }}
                 src={videoSrc}
                 title="Youtube video"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                onLoad={onLoad}
             />
         </PlayerContainer>
     );
