@@ -77,7 +77,8 @@ export const routes = [
         component: Contact,
         icon: <MailOutlineIcon />,
         sidebar: true,
-        fullWidth: false
+        fullWidth: false,
+        maxWidth: 550
     },
     // Private menu for connected users : private = true
     {

@@ -13,7 +13,7 @@ const RouteComponent = ({route}) => {
         return (
             <Box sx={{
                 width: (theme) => theme.pageWidth.width,
-                maxWidth: (theme) => theme.pageWidth.maxWidth,
+                maxWidth: (theme) => route.maxWidth || theme.pageWidth.maxWidth,
             }}>
                 <Component />
             </Box>
