@@ -50,7 +50,6 @@ const Player = ({src}) => {
     const frameRef = useIntersectionObserver(setVideoSrcCallback);
 
     const onLoad = event => {
-        console.log("iFrame loaded");
         event.target.classList.add('loaded');
     }
 
