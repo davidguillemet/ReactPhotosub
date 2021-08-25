@@ -16,7 +16,7 @@ import LocationDialog from './LocationDialog';
 const RegionChip = ({region}) => {
 
     return (
-        <Chip label={region.title} sx={{mx: 0.5, my: 1}} variant='outlined' />
+        <Chip label={region.title} sx={{mx: 0.5, my: 0.5}} variant='outlined' />
     )
 }
 
@@ -27,6 +27,9 @@ const RegionPath = ({regions}) => {
             sx={{
                 display: 'flex',
                 flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                my: 1
             }}
         >
         { regions.slice(0).reverse().map(region => <RegionChip key={region.id} region={region} />) }
@@ -77,8 +80,8 @@ const Destination = () => {
 
     return (
         <React.Fragment>
-            <PageTitle>{destination.title}</PageTitle>
-            <PageSubTitle>{formatDate(new Date(destination.date))}</PageSubTitle>
+            <PageTitle sx={{mb: 0}}>{destination.title}</PageTitle>
+            <PageSubTitle sx={{mt: 0, mb: 1}}>{formatDate(new Date(destination.date))}</PageSubTitle>
             <RegionPath regions={destination.region_path}></RegionPath>
             <Chip
                 icon={<PhotoLibraryIcon />}
