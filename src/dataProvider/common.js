@@ -32,6 +32,6 @@ export function isDirty(simulation) {
 }
 
 export const API_PREFIX =
-    process.env.REACT_APP_BUILD_VERSION === 'false' ?
+    process.env.REACT_APP_USE_FUNCTIONS_EMULATOR === 'true' ?
     'http://localhost:5001/photosub/us-central1/mainapi':
     '';
