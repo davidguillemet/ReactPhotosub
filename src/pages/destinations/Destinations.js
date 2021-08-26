@@ -29,7 +29,8 @@ const useStyles = makeStyles(() => ({
     },
     tabPanel: {
         padding: 0,
-        width: '100%'
+        width: '100%',
+        height: '500px'
     }
 }));
 
