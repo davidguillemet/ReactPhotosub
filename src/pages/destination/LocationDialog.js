@@ -20,7 +20,14 @@ const LocationDialog = ({destination, open, handleClose}) => {
                 }
             }}
         >
-            <DialogContent sx={{ mt: 3, py: 0, height: '100%'}}>
+            <DialogContent
+                sx={{
+                    mt: isMobile ? 0 : 2,
+                    px: isMobile ? 0 : 2,
+                    py: 0,
+                    height: '100%'
+                }}
+            >
             { open &&
                 <DestinationsMap destinations={[destination]} />
             }
