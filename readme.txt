@@ -13,6 +13,10 @@ firebase emulators:start --only hosting,functions
 # Build React app for Firebase simulators
 npm run-script build
 
+# .env files priority from right to left (left priority is higher)
+npm start: .env.development.local > .env.local > .env.development > .env
+npm run build: .env.production.local > .env.local > .env.production > .env
+
 # Build React app for deployment purpose
 npm run-script build4deploy
 
