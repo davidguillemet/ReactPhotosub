@@ -3,12 +3,12 @@
 }
 .slide-enter-active {
     opacity: 1;
-    transition: opacity 500ms ease-in;
+    transition: opacity 2000ms ease-in;
 }
 .slide-exit {
     opacity: 1;
 }
 .slide-exit-active {
     opacity: 0;
-    transition: opacity 500ms ease-in;
+    transition: opacity 2000ms ease-in;
 }

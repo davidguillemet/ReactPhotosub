@@ -27,7 +27,7 @@ const MainImage = styled('img')({
     height: 'auto',
     objectFit: 'cover', // prevent image from shrinking when window width is too small
     opacity: 0,
-    transition: 'opacity 1.0s',
+    transition: 'opacity 2.0s',
     '&.loaded': {
         opacity: 1
     }
@@ -141,7 +141,7 @@ const Home = () => {
                 <TransitionGroup component={null}>
                     <CSSTransition
                         key={currentImageIndex}
-                        timeout={500}
+                        timeout={2000}
                         classNames="slide"
                     >
                         <Box
