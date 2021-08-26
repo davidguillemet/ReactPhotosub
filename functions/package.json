@@ -23,7 +23,7 @@
     "exifr": "^6.0.0",
     "express": "^4.17.1",
     "firebase-admin": "^9.2.0",
-    "firebase-functions": "^3.11.0",
+    "firebase-functions": "^3.15.4",
     "knex": "^0.21.18",
     "pg": "^8.5.1",
     "sharp": "^0.28.1",
