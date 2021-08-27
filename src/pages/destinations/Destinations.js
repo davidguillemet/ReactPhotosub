@@ -162,7 +162,6 @@ const Destinations = () => {
                     <DestinationsMap destinations={filteredDestinations} />
                 </TabPanel>
             </TabContext>
-            <VerticalSpacing factor={2} />
         </React.Fragment>
     )
 };

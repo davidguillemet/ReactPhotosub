@@ -45,6 +45,7 @@ const PageContent = ({history, onHistoryChanged}) => {
                 },
                 my: 0,
                 p: 0,
+                pb: 3
             }}
             disableGutters={true}
             maxWidth={false}
