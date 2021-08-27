@@ -107,11 +107,12 @@ const Home = () => {
                 <Paper elevation={6}
                     sx={{
                         position: 'absolute',
-                        background: 'rgba(0,0,0,0.4)',
-                        p: 2,
-                        m: 2,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
                         width: '95%',
-                        maxWidth: 600,
+                        maxWidth: '600px',
+                        p: 2,
+                        background: 'rgba(0,0,0,0.4)',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'center',
