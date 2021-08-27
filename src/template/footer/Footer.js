@@ -12,7 +12,7 @@ const Copyright = ({isHome}) => {
         <Typography
             variant="body"
             sx={{
-                color: (theme) => isHome ? 'white' : theme.palette.text.secondary,
+                color: (theme) => isHome ? '#ccc' : theme.palette.text.secondary,
                 fontWeight: '400'
             }}
         >
