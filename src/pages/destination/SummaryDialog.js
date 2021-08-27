@@ -25,9 +25,16 @@ const SummaryDialog = ({destination, open, handleClose}) => {
             fullWidth={true}
             open={open}
             onClose={handleClose}
+            sx={{
+                textAlign: 'center'
+            }}
         >
             <DialogTitle>{`${destination.title} - ${formatDate(new Date(destination.date))}`}</DialogTitle>
-            <DialogContent>
+            <DialogContent
+                sx={{
+                    px: isMobile ? 1 : 3
+                }}
+            >
             { open &&
                 <React.Suspense fallback={<CircularProgress/>}>
                     <LazySummaryView />
