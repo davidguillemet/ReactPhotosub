@@ -19,6 +19,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 
 import { BrowserRouter as Router } from "react-router-dom";
+import { withRouter } from "react-router";
 import { routes, NavigationLink } from './navigation/routes';
 import { FirebaseSignin } from './components/firebase';
 import { AuthProvider } from './components/authentication';
@@ -65,6 +66,34 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
   justifyContent: 'flex-start',
 }));
+
+const TopToolBar = withRouter(({open, handleDrawerOpen, location}) => {
+
+  const transparent = location.pathname === '/';
+
+  return (
+    <AppBar
+      position="fixed"
+      sx={{ 
+        width: '100%',
+        ...(transparent && { backgroundColor: "transparent" })
+      }}
+    >
+      <Toolbar>
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          onClick={handleDrawerOpen}
+          edge="start"
+          sx={{ mr: 2, ...(open && { display: 'none' }) }}
+        >
+          <MenuIcon />
+        </IconButton>
+        <FirebaseSignin />
+      </Toolbar>
+    </AppBar>
+  )    
+})
 
 function App(props) {
 
@@ -154,23 +183,7 @@ function App(props) {
 
       <Router>
 
-        <AppBar
-          position="fixed"
-          sx={{ width: '100%' }}
-        >
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{ mr: 2, ...(open && { display: 'none' }) }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <FirebaseSignin />
-          </Toolbar>
-        </AppBar>
+        <TopToolBar open={open} handleDrawerOpen={handleDrawerOpen} />
 
         <nav style={{
               width: drawerWidth,

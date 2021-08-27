@@ -2,11 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
-import Modal from '@material-ui/core/Modal';
-import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { Link } from 'react-router-dom';
-
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 
@@ -14,8 +10,7 @@ import {unstable_batchedUpdates} from 'react-dom';
 
 import dataProvider from '../../dataProvider';
 import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils';
-import { PageTitle } from '../../template/pageTypography';
-import { Typography } from '@material-ui/core';
+import { PageSubTitle, Paragraph } from '../../template/pageTypography';
 
 const _diaporamaInterval = 10000;
 
@@ -25,41 +20,8 @@ const MainImage = styled('img')({
     minWidth : '100%',
     width: 'auto',
     height: 'auto',
-    objectFit: 'cover', // prevent image from shrinking when window width is too small
-    opacity: 0,
-    transition: 'opacity 2.0s',
-    '&.loaded': {
-        opacity: 1
-    }
+    objectFit: 'cover' // prevent image from shrinking when window width is too small
 });
-
-const StartLink = styled(Link)(({theme}) => ({
-    textDecoration: 'none',
-    color: theme.palette.text.primary,
-    backgroundColor: '#dddddd',
-    padding: 5,
-    borderRadius: 3,
-    transition: 'color 0.5s, backgroundColor 0.5s',
-    '&:hover': {
-        backgroundColor: theme.palette.text.secondary,
-        color: '#dddddd'
-    }
-}));
-
-const Subtitle = (props) => {
-    return (
-        <Typography
-            variant="subtitle1"
-            style={{
-                color: '#cccccc',
-                textAlign: 'center',
-                fontSize: 18
-            }}
-        >
-            {props.children}
-        </Typography>
-    );
-}
 
 const Home = () => {
 
@@ -106,38 +68,10 @@ const Home = () => {
         }
     };
 
-    function onCloseModal() {
-        // TODO??
-    }
-
     const currentImage = images !== null ? images[currentImageIndex] : null;
 
     return (
-        <Modal
-            open={true}
-            onClose={onCloseModal}
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 0,
-                style: {
-                    backgroundColor: '#fff'
-                }
-            }}
-        >
-            <Box
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    padding: 0,
-                    overflow: 'hidden'
-                }}
-            >
+        <React.Fragment>
                 <TransitionGroup component={null}>
                     <CSSTransition
                         key={currentImageIndex}
@@ -171,34 +105,25 @@ const Home = () => {
                     </CSSTransition>
                 </TransitionGroup>
                 <Paper elevation={6}
-                    style={{
+                    sx={{
                         position: 'absolute',
-                        background: 'rgba(0,0,0,0.3)',
-                        padding: 15,
-                        margin: 15,
+                        background: 'rgba(0,0,0,0.4)',
+                        p: 2,
+                        m: 2,
                         width: '95%',
-                        maxWidth: 700,
+                        maxWidth: 600,
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center'
                     }}
                 >
-                    <PageTitle
-                        sx={{
-                            color: '#cccccc',
-                            textAlign: 'center',
-                            fontWeight: '400'
-                        }}
-                    >
-                        Bienvenue
-                    </PageTitle>
-                    <Subtitle>Bienvenue sur ce site de photographie sous-marine.</Subtitle>
-                    <Subtitle>Je vous propose une immersion au cœur des océans, au travers de clichés réalisés lors de plongées sur quelques-uns des plus beaux sites au monde...</Subtitle>
-                    <Subtitle>Alors, prêt à <StartLink to="/destinations">démarrer l'aventure</StartLink> ?</Subtitle>
+                    <PageSubTitle sx={{ fontWeight: "400", color: '#fff' }}>Bienvenue</PageSubTitle>
+                    <Paragraph sx={{ color: '#fff', my: 0.5, textAlign: "start" }}>Bienvenue sur ce site de photographie sous-marine.</Paragraph>
+                    <Paragraph sx={{ color: '#fff', my: 0.5, textAlign: "start" }}>Je vous propose une immersion au cœur des océans, au travers de clichés réalisés lors de plongées sur quelques-uns des plus beaux sites au monde...</Paragraph>
+                    <Paragraph sx={{ color: '#fff', my: 0.5, textAlign: "start" }}>Prêt à démarrer l'aventure ?</Paragraph>
                 </Paper>
-            </Box>
-        </Modal>
+                </React.Fragment>
     )
 };
 
