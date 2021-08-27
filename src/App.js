@@ -76,7 +76,7 @@ const TopToolBar = withRouter(({open, handleDrawerOpen, location}) => {
       position="fixed"
       sx={{ 
         width: '100%',
-        ...(transparent && { backgroundColor: "transparent" })
+        ...(transparent && { backgroundColor: 'rgba(0,0,0,0.2)' })
       }}
     >
       <Toolbar>

@@ -43,7 +43,7 @@ const PageContent = ({history, onHistoryChanged}) => {
                     "sm": 2,
                     "md": 3
                 },
-                my: 3,
+                my: 0,
                 p: 0,
             }}
             disableGutters={true}

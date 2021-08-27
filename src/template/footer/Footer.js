@@ -1,14 +1,21 @@
 import React from 'react';
 import { styled } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import { withRouter } from "react-router";
 
 function SocialMedia() {
     return (null);
 }
 
-function Copyright() {
+const Copyright = ({isHome}) => {
     return (
-        <Typography variant="body2" color="textSecondary">
+        <Typography
+            variant="body"
+            sx={{
+                color: (theme) => isHome ? 'white' : theme.palette.text.secondary,
+                fontWeight: '400'
+            }}
+        >
             {'Copyright © David Guillemet '}
             {new Date().getFullYear()}
             {'.'}
@@ -18,18 +25,24 @@ function Copyright() {
 
 const StyledFooter = styled('footer')``;
 
-const Footer = () => (
-    <StyledFooter sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        p: 1,
-        mt: 'auto',
-        backgroundColor: (theme) => theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
-    }}>
-        <SocialMedia />
-        <Copyright />
-    </StyledFooter>
-);
+const Footer = withRouter(({location}) => {
+
+    const isHome = location.pathname === '/';
+
+    return (
+        <StyledFooter sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            p: 1,
+            mt: 'auto',
+            backgroundColor: (theme) => isHome ? 'rgba(0,0,0,0.3)' : theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
+            zIndex: (theme) => theme.zIndex.appBar
+        }}>
+            <SocialMedia />
+            <Copyright isHome={isHome}/>
+        </StyledFooter>
+    )
+});
 
 export default Footer;

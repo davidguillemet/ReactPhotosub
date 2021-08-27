@@ -29,8 +29,7 @@ const useStyles = makeStyles(() => ({
     },
     tabPanel: {
         padding: 0,
-        width: '100%',
-        height: '500px'
+        width: '100%'
     }
 }));
 
@@ -141,6 +140,7 @@ const Destinations = () => {
             <RegionFilter hierarchy={regionHierarchy} onChange={handleRegionFilterChange} />
             <VerticalSpacing factor={2} />
             <DisplayModeSelector listType={destinationsView} onChange={handleChangeDestinationView} />
+            <VerticalSpacing factor={2} />
             <TabContext value={destinationsView}>
                 <TabPanel 
                     value={VIEW_GRID}
@@ -148,7 +148,6 @@ const Destinations = () => {
                         root: classes.tabPanel
                     }}
                 >
-                    <VerticalSpacing factor={2} />
                     <DestinationsGrid destinations={filteredDestinations} regionsByDestination={regionsByDestination} />
                 </TabPanel>
                 <TabPanel 
@@ -156,11 +155,14 @@ const Destinations = () => {
                     classes={{
                         root: classes.tabPanel
                     }}
+                    sx={{
+                        height: '500px'
+                    }}
                 >
-                    <VerticalSpacing factor={2} />
                     <DestinationsMap destinations={filteredDestinations} />
                 </TabPanel>
             </TabContext>
+            <VerticalSpacing factor={2} />
         </React.Fragment>
     )
 };

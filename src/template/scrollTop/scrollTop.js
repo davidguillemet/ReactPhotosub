@@ -1,7 +1,10 @@
+import { styled } from '@material-ui/core/styles';
 import Zoom from '@material-ui/core/Zoom';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import Fab from '@material-ui/core/Fab';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+
+const Div = styled('div')(() => {});
 
 const ScrollTop = (props) => {
     const { window, anchorSelector } = props;
@@ -24,19 +27,20 @@ const ScrollTop = (props) => {
 
     return (
         <Zoom in={trigger}>
-            <div
+            <Div
                 onClick={handleClick}
                 role="presentation"
-                style={{
+                sx={{
                     position: 'fixed',
-                    bottom: 20,
-                    right: 20
+                    bottom: '20px',
+                    right: '20px',
+                    zIndex: (theme) => theme.zIndex.appBar
                 }}
             >
                 <Fab color="secondary" size="medium" aria-label="scroll back to top">
                     <KeyboardArrowUpIcon />
                 </Fab>
-            </div>
+            </Div>
         </Zoom>
     );
 }

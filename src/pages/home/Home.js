@@ -10,7 +10,6 @@ import {unstable_batchedUpdates} from 'react-dom';
 
 import dataProvider from '../../dataProvider';
 import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils';
-import { PageSubTitle, Paragraph } from '../../template/pageTypography';
 
 const _diaporamaInterval = 10000;
 
@@ -72,59 +71,39 @@ const Home = () => {
 
     return (
         <React.Fragment>
-                <TransitionGroup component={null}>
-                    <CSSTransition
-                        key={currentImageIndex}
-                        timeout={2000}
-                        classNames="slide"
-                    >
-                        <Box
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                padding: 0,
-                                overflow: 'hidden'
-                            }}
-                        >
-                            {
-                                images === null ?
-                                <CircularProgress /> :
-                                <MainImage
-                                    alt=""
-                                    onLoad={handleImageLoaded}
-                                    src={currentImage.isLoaded ? currentImage.src : currentImage.blurrySrc}
-                                />
-                            }
-                        </Box>
-                    </CSSTransition>
-                </TransitionGroup>
-                <Paper elevation={6}
-                    sx={{
-                        position: 'absolute',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: '95%',
-                        maxWidth: '600px',
-                        p: 2,
-                        background: 'rgba(0,0,0,0.4)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
+            <TransitionGroup component={null}>
+                <CSSTransition
+                    key={currentImageIndex}
+                    timeout={2000}
+                    classNames="slide"
                 >
-                    <PageSubTitle sx={{ fontWeight: "400", color: '#fff' }}>Bienvenue</PageSubTitle>
-                    <Paragraph sx={{ color: '#fff', my: 0.5, textAlign: "start" }}>Bienvenue sur ce site de photographie sous-marine.</Paragraph>
-                    <Paragraph sx={{ color: '#fff', my: 0.5, textAlign: "start" }}>Je vous propose une immersion au cœur des océans, au travers de clichés réalisés lors de plongées sur quelques-uns des plus beaux sites au monde...</Paragraph>
-                    <Paragraph sx={{ color: '#fff', my: 0.5, textAlign: "start" }}>Prêt à démarrer l'aventure ?</Paragraph>
-                </Paper>
-                </React.Fragment>
+                    <Box
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            padding: 0,
+                            overflow: 'hidden'
+                        }}
+                    >
+                        {
+                            images === null ?
+                            <CircularProgress /> :
+                            <MainImage
+                                alt=""
+                                onLoad={handleImageLoaded}
+                                src={currentImage.isLoaded ? currentImage.src : currentImage.blurrySrc}
+                            />
+                        }
+                    </Box>
+                </CSSTransition>
+            </TransitionGroup>
+        </React.Fragment>
     )
 };
 
