@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Alert from '@material-ui/core/Alert';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { AuthContext } from '../../components/authentication';
 import dataProvider from '../../dataProvider';
 import Gallery from '../../components/gallery';
@@ -14,20 +13,8 @@ const MySelectionContent= ({user, images}) => {
         );
     }
 
-    if (images === null) {
-        return <CircularProgress size={40} />
-    }
-
-    if (images.length === 0) {
-        return (
-            <React.Fragment>
-                <Alert severity="info" elevation={4} variant="filled">Votre liste de favoris est vide.</Alert>
-            </React.Fragment>
-        );
-    }
-    
     return (
-        <Gallery images={images} style={{width: '100%'}} colWidth={300} margin={5}/>
+        <Gallery images={images} style={{width: '100%'}} colWidth={300} margin={5} emptyMessage="Votre liste de favoris est vide."/>
     );
 }
 

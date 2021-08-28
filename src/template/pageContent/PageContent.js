@@ -1,9 +1,9 @@
 import { Suspense, useEffect } from 'react';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import { Switch, Route, withRouter } from "react-router-dom";
 import { routes } from '../../navigation/routes';
+import { Loading } from '../../components/loading';
 
 const RouteComponent = ({route}) => {
     const Component = route.component;
@@ -50,7 +50,7 @@ const PageContent = ({history, onHistoryChanged}) => {
             disableGutters={true}
             maxWidth={false}
         >
-            <Suspense fallback={<CircularProgress />}>
+            <Suspense fallback={<Loading />}>
                 <Switch>
                 {
                     routes.map((route, index) => {

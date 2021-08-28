@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from "react-router-dom";
 import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
@@ -11,7 +10,7 @@ import Gallery from '../../components/gallery';
 import { PageTitle, PageSubTitle } from '../../template/pageTypography';
 import SummaryDialog from './SummaryDialog';
 import LocationDialog from './LocationDialog';
-
+import { withLoading, buildLoadingState } from '../../components/loading';
 
 const RegionChip = ({region}) => {
 
@@ -35,23 +34,26 @@ const RegionPath = ({regions}) => {
         { regions.slice(0).reverse().map(region => <RegionChip key={region.id} region={region} />) }
         </Box>
     );
-} 
+}
 
-const Destination = () => {
-    const { year, title } = useParams();
-    const [destination, setDestination] = useState(null);
-    const [images, setImages] = useState([]);
+const ImageCount = withLoading(({images}) => {
+    return (
+        <Chip
+            icon={<PhotoLibraryIcon />}
+            label={`${images.length} images`}
+            sx={{
+                px: 1
+            }}>
+        </Chip>
+    )
+}, [buildLoadingState("images", null)], { size: 20, marginTop: 0 });
+
+const DestinationDisplay = withLoading(({destination, year, title}) => {
+
+    const [images, setImages] = useState(null);
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [locationOpen, setLocationOpen] = useState(false);
 
-    // First hook to get the destination details
-    useEffect(() => {
-        dataProvider.getDestinationDetailsFromPath(year, title).then(destination => {
-            setDestination(destination);
-        })
-    }, [year, title]);
-
-    // Second hook to get destination images
     useEffect(() => {
         dataProvider.getDestinationImagesFromPath(year, title).then(images => {
             setImages(images);
@@ -66,10 +68,6 @@ const Destination = () => {
         setLocationOpen(false);
     }, []);
 
-    if (destination === null) {
-        return <CircularProgress size={40} />
-    }
-
     const handleOpenSummary = () => {
         setSummaryOpen(true);
     }
@@ -83,13 +81,7 @@ const Destination = () => {
             <PageTitle sx={{mb: 0}}>{destination.title}</PageTitle>
             <PageSubTitle sx={{mt: 0, mb: 1}}>{formatDate(new Date(destination.date))}</PageSubTitle>
             <RegionPath regions={destination.region_path}></RegionPath>
-            <Chip
-                icon={<PhotoLibraryIcon />}
-                label={`${images.length} images`}
-                sx={{
-                    px: 1
-                }}>
-            </Chip>
+            <ImageCount images={images}/>
 
             <Box sx={{
                 display: 'flex',
@@ -113,6 +105,20 @@ const Destination = () => {
 
         </React.Fragment>
     );
+}, [buildLoadingState("destination", null)]);
+
+const Destination = () => {
+    const { year, title } = useParams();
+    const [destination, setDestination] = useState(null);
+
+    // First hook to get the destination details
+    useEffect(() => {
+        dataProvider.getDestinationDetailsFromPath(year, title).then(destination => {
+            setDestination(destination);
+        })
+    }, [year, title]);
+
+    return <DestinationDisplay destination={destination} year={year} title={title} />
 };
 
 export default Destination;

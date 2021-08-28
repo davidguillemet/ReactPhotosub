@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { styled } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { withLoading, buildLoadingState } from '../../components/loading';
 import './styles.css';
 
 import {unstable_batchedUpdates} from 'react-dom';
@@ -13,7 +12,7 @@ import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils';
 
 const _diaporamaInterval = 10000;
 
-const MainImage = styled('img')({
+const MainImageStyled = styled('img')({
     display: 'block',
     minHeight: '100%',
     minWidth : '100%',
@@ -21,6 +20,19 @@ const MainImage = styled('img')({
     height: 'auto',
     objectFit: 'cover' // prevent image from shrinking when window width is too small
 });
+
+const MainImage = withLoading(({images, currentImageIndex, handleImageLoaded}) => {
+
+    const currentImage = images[currentImageIndex];
+
+    return (
+        <MainImageStyled 
+            alt=""
+            onLoad={handleImageLoaded}
+            src={currentImage.isLoaded ? currentImage.src : currentImage.blurrySrc}
+        />
+    )
+}, [buildLoadingState("images", null)]);
 
 const Home = () => {
 
@@ -67,8 +79,6 @@ const Home = () => {
         }
     };
 
-    const currentImage = images !== null ? images[currentImageIndex] : null;
-
     return (
         <React.Fragment>
             <TransitionGroup component={null}>
@@ -91,15 +101,11 @@ const Home = () => {
                             overflow: 'hidden'
                         }}
                     >
-                        {
-                            images === null ?
-                            <CircularProgress /> :
-                            <MainImage
-                                alt=""
-                                onLoad={handleImageLoaded}
-                                src={currentImage.isLoaded ? currentImage.src : currentImage.blurrySrc}
-                            />
-                        }
+                        <MainImage
+                            images={images}
+                            currentImageIndex={currentImageIndex}
+                            handleImageLoaded={handleImageLoaded}
+                        />
                     </Box>
                 </CSSTransition>
             </TransitionGroup>

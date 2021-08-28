@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import Fade from '@material-ui/core/Fade';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { withLoading, buildLoadingState } from '../loading';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
@@ -167,22 +167,6 @@ const ImageSlider = ({
                 }
 
                 {
-                    images === null ?
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            width: '100%',
-                            height: `${imageHeight + 2*imageBorderWidth}px`,
-                            marginTop: `${indicatorHeight / 2}px`,
-                            marginBottom: `${indicatorHeight}px`
-                        }}
-                    >
-                        <CircularProgress />
-                    </Box>
-                    :
                     <Box
                         ref={resizeObserver.ref}
                         className="hideScroll" 
@@ -261,5 +245,4 @@ const ImageSlider = ({
         </Paper>
     );
 }
-
-export default ImageSlider;
+export default withLoading(ImageSlider, [buildLoadingState("images", null)]);

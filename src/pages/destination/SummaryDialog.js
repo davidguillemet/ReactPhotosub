@@ -4,7 +4,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { Loading } from '../../components/loading';
 import Button from '@material-ui/core/Button';
 import { lazy } from 'react';
 import { formatDate } from '../../utils';
@@ -36,7 +36,7 @@ const SummaryDialog = ({destination, open, handleClose}) => {
                 }}
             >
             { open &&
-                <React.Suspense fallback={<CircularProgress/>}>
+                <React.Suspense fallback={<Loading/>}>
                     <LazySummaryView />
                 </React.Suspense>
             }

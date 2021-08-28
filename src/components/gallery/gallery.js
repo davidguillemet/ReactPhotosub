@@ -1,5 +1,6 @@
 import { makeStyles } from '@material-ui/styles'
 import React, { useEffect, useState } from 'react';
+import Alert from '@material-ui/core/Alert';
 import Box from '@material-ui/core/Box';
 import Zoom from '@material-ui/core/Zoom';
 import Dialog from '@material-ui/core/Dialog';
@@ -7,6 +8,7 @@ import LazyImage from './image';
 import ExpandedView from './expandedView';
 import { useResizeObserver } from '../../components/hooks';
 import {unstable_batchedUpdates} from 'react-dom';
+import { withLoading, buildLoadingState } from '../../components/loading';
 
 const useStyles = makeStyles({
     galleryContainer: {
@@ -31,7 +33,7 @@ function getTargetColumnIndex(columnHeight) {
     return bestColumnIndex;
 }
 
-const MasonryLayout = ({images = [], imageWidth, columnsCount, margin, onImageClick}) => {
+const MasonryLayout = withLoading(({images, imageWidth, columnsCount, margin, onImageClick}) => {
     
     // Compute the cumulative height of each column
     const columnTopPosition = Array.from({length: columnsCount}, () => 0);
@@ -64,9 +66,9 @@ const MasonryLayout = ({images = [], imageWidth, columnsCount, margin, onImageCl
             }} />
         </React.Fragment>
     );
-}
+}, [ buildLoadingState("images", null), buildLoadingState("columnsCount", 0) ]);
 
-const Gallery = ({ images, style, colWidth, margin }) => {
+const Gallery = ({ images, style, colWidth, margin, emptyMessage = null}) => {
     const classes = useStyles();
     const [expandedImageIndex, setExpandedImageIndex] = useState(null);
     const [expandedViewOpen, setExpandedViewOpen] = useState(false);
@@ -99,11 +101,16 @@ const Gallery = ({ images, style, colWidth, margin }) => {
         });
     }, [resizeObserver.width, colWidth, margin])
 
+    if (images.length === 0 && emptyMessage !== null) {
+        return (
+            <Alert severity="info" elevation={4} variant="filled">{emptyMessage}</Alert>
+        );
+    }
+
     return (
         <React.Fragment>
             <Box className={classes.galleryContainer} ref={resizeObserver.ref} style={style}>
             {
-                masonryProps.columnsCount > 0 && 
                 <MasonryLayout
                     images={images}
                     imageWidth={masonryProps.imageWidth}
@@ -125,4 +132,4 @@ const Gallery = ({ images, style, colWidth, margin }) => {
     );
 }
 
-export default Gallery;
+export default withLoading(Gallery, [buildLoadingState("images", null)]);
