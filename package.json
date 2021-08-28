@@ -34,6 +34,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "firebase": "firebase emulators:start --only hosting,functions",
     "build4deploy": "mv .env.production.local .env.tmp && react-scripts build && rm build/mockdata.json && rm -rf build/static-storage && mv .env.tmp .env.production.local",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
