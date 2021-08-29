@@ -1,3 +1,5 @@
+const axios = require("axios");
+
 const nodemailer = require("nodemailer");
 
 const headOpenRegexp = new RegExp("<h[0-9]>|<p>", "g");
@@ -52,7 +54,29 @@ module.exports = function(config) {
             //     subject: <string>,   -> subject of the message
             //     message: <string>,   -> message boy as text
             //     sendcopy: <string>   -> true if a copy shall be sent to the user email
+            //     token: <string>      -> RECAPTCHA token
             // };
+
+            // FIrst try to validate the reCaptcha token:
+            try {
+                const verify = await axios.post("https://www.google.com/recaptcha/api/siteverify", {
+                    secret: config.settings.recaptcha.secretekey,
+                    response: req.body.token,
+                });
+                // verify =
+                // {
+                //     "success": true|false,
+                //     "challenge_ts": timestamp,  // timestamp of the challenge load (ISO format yyyy-MM-dd'T'HH:mm:ssZZ)
+                //     "hostname": string,         // the hostname of the site where the reCAPTCHA was solved
+                //     "error-codes": [...]        // optional
+                // }
+                if (verify.sucess === false) {
+                    res.status(500).send("It seems you're a spammer...").end();
+                }
+            } catch (error) {
+                config.logger.error("Failed to verify reCaptcha token", error);
+            }
+
             const transporter = nodemailer.createTransport({
                 port: parseInt(config.settings.mail.smtp.port), // 465,
                 host: config.settings.mail.smtp.host, // "smtp.gmail.com",

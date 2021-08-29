@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import Stack from '@material-ui/core/Stack';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -9,6 +9,7 @@ import { PageTitle } from '../../template/pageTypography';
 import FeedbackMessage from '../../components/feedback/Feedback';
 import { uniqueID } from '../../utils';
 import dataProvider from '../../dataProvider';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const FormField = ({ field, handleChange, sending }) => {
     if (field.type === "switch") {
@@ -54,7 +55,8 @@ const Contact = () => {
             required: true,
             errorText: "Merci d'indiquer votre nom.",
             type: "text",
-            multiline: false
+            multiline: false,
+            default: null
         },
         {
             id: "email",
@@ -62,7 +64,8 @@ const Contact = () => {
             required: true,
             errorText: "Merci d'indiquer une adresse de messagerie valide.",
             type: "email",
-            multiline: false
+            multiline: false,
+            default: null
         },
         {
             id: "subject",
@@ -70,7 +73,8 @@ const Contact = () => {
             required: true,
             errorText: "Merci d'indiquer l'objet de votre message.",
             type: "text",
-            multiline: false
+            multiline: false,
+            default: null
         },
         {
             id: "message",
@@ -78,20 +82,28 @@ const Contact = () => {
             required: true,
             errorText: "Merci de saisir un message.",
             type: "text",
-            multiline: true
+            multiline: true,
+            default: null
         },
         {
             id: "sendcopy",
             label: "Recevoir une copie de votre message",
             type: "switch",
+            default: false
         },
+        {
+            id: "token",
+            type: "text",
+            hidden: true,
+            default: null
+        }
     ]);
 
     // Build a map that contains all field values
     const [values, setValues] = React.useState(fields.current.reduce((values, field) => {
         return {
             ...values,
-            [field.id]: ''
+            [field.id]: field.default
         }
     }, {/* empty map */}));
 
@@ -133,13 +145,23 @@ const Contact = () => {
     useEffect(() => {
         let isValid = true;
         for (let key in values) {
-            if (values[key].length === 0) {
+            const fieldValue = values[key];
+            if (fieldValue === null || (typeof fieldValue === 'string' && fieldValue.length === 0)) {
                 isValid = false;
                 break;
             }
         }
         setIsValid(isValid);
     }, [values])
+
+    const onCaptchaChange = useCallback((value) => {
+        setValues(oldValues => {
+            return {
+                ...oldValues,
+                "token": value
+            }
+        })
+    }, []);
 
     function validateEmail(email) {
         const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -174,10 +196,14 @@ const Contact = () => {
         <React.Fragment>
             <PageTitle>Pour me contatcter</PageTitle>
 
-            <Stack alignItems="center">
+            <Stack spacing={2} alignItems="center">
             {
-                fields.current.map(field => <FormField field={field} handleChange={handleChange} sending={sending} />)
+                fields.current.filter(field => !field.hidden).map(field => <FormField key={field.id} field={field} handleChange={handleChange} sending={sending} />)
             }
+                <ReCAPTCHA
+                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                    onChange={onCaptchaChange}
+                />
             </Stack>
             <LoadingButton
                 sx={{mt: 3}}
