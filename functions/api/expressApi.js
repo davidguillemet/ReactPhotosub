@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const express = require("express");
 const {logger/* , makeExpressLoggerMiddleware */} = require("../utils/logger");
-const {convertPathToUrl, bucket} = require("../utils/firebase");
+const {convertPathToUrl, bucket, settings} = require("../utils/firebase");
 const isAuthenticated = require("./authenticated");
 const cors = require("cors");
 
@@ -37,6 +37,7 @@ const resourceConfiguration = {
     pool,
     convertPathToUrl,
     bucket,
+    settings,
     logger,
     isAuthenticated,
 };
@@ -52,6 +53,7 @@ require("./resources/simulations")(resourceConfiguration);
 require("./resources/bucket")(resourceConfiguration);
 require("./resources/uploadedInteriors")(resourceConfiguration);
 require("./resources/search")(resourceConfiguration);
+require("./resources/message")(resourceConfiguration);
 
 app.get("/status", (req, res) => res.send("Working!"));
 

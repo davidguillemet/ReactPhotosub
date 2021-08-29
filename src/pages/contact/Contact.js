@@ -1,10 +1,49 @@
 import React, { useEffect } from 'react';
+import Stack from '@material-ui/core/Stack';
 import TextField from '@material-ui/core/TextField';
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
+import LoadingButton from '@material-ui/lab/LoadingButton';
+import SendIcon from '@material-ui/icons/Send';
 import { PageTitle } from '../../template/pageTypography';
-import { Button } from '@material-ui/core';
-import { firebaseDb } from  '../../components/firebase';
 import FeedbackMessage from '../../components/feedback/Feedback';
 import { uniqueID } from '../../utils';
+import dataProvider from '../../dataProvider';
+
+const FormField = ({ field, handleChange, sending }) => {
+    if (field.type === "switch") {
+        return (
+            <FormControlLabel
+                control={
+                    <Switch
+                        onChange={handleChange}
+                        id={field.id}
+                        color="primary"
+                />}
+                label={field.label}
+            />
+        )
+    } else {
+        return (
+            <TextField
+                key={field.id}
+                id={field.id}
+                label={field.label}
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                required={field.required}
+                type={field.type}
+                multiline={field.multiline}
+                minRows="10"
+                onChange={handleChange}
+                error={field.error}
+                helperText={field.error ? field.errorText : ''}
+                disabled={sending}
+            />
+        )
+    }
+}
 
 const Contact = () => {
 
@@ -41,6 +80,11 @@ const Contact = () => {
             type: "text",
             multiline: true
         },
+        {
+            id: "sendcopy",
+            label: "Recevoir une copie de votre message",
+            type: "switch",
+        },
     ]);
 
     // Build a map that contains all field values
@@ -58,16 +102,18 @@ const Contact = () => {
         message: null
     })
 
+    const [sending, setSending] = React.useState(false);
+
     const onSubmit = (e) => {
         e.preventDefault();
+        setSending(true);
         const documentProperties = {
             ...values
         };
-        const collection = firebaseDb().collection("mail");
-        collection.add(documentProperties)
-        .then((docRef) => {
+        dataProvider.sendMessage(documentProperties)
+        .then(() => {
             setResult({
-                key: docRef.id,
+                key: uniqueID(),
                 status: 'success',
                 message: 'Votre message a bien été envoyé. Merci!'
             })
@@ -78,7 +124,10 @@ const Contact = () => {
                 status: 'error',
                 message: 'Une erreur est survenue lors de l\'envoi de votre message...'
             })
-        });
+        })
+        .finally(() => {
+            setSending(false);
+        })
     }
 
     useEffect(() => {
@@ -92,11 +141,27 @@ const Contact = () => {
         setIsValid(isValid);
     }, [values])
 
+    function validateEmail(email) {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+    }
+
     const handleChange = (event) => {
         const fieldId = event.target.id;
-        const fieldValue = event.target.value.trim();
         const field = fields.current.find(f => f.id === fieldId);
-        field.error = fieldValue.length === 0;
+
+        let fieldValue = null;
+        if (field.type === "switch") {
+            fieldValue = event.target.checked;
+        } else {
+            fieldValue = event.target.value.trim();
+            if (field.type === "email") {
+                field.error = !validateEmail(fieldValue);
+            } else {
+                field.error = fieldValue.length === 0;
+            }
+        }
+
         setValues(oldValues => {
             return {
                 ...oldValues,
@@ -109,38 +174,26 @@ const Contact = () => {
         <React.Fragment>
             <PageTitle>Pour me contatcter</PageTitle>
 
+            <Stack alignItems="center">
             {
-                fields.current.map(field => (
-                    <TextField
-                        key={field.id}
-                        id={field.id}
-                        label={field.label}
-                        variant="outlined"
-                        fullWidth
-                        margin="normal"
-                        required={field.required}
-                        type={field.type}
-                        multiline={field.multiline}
-                        minRows="10"
-                        onChange={handleChange}
-                        error={field.error}
-                        helperText={field.error ? field.errorText : ''}
-                    />
-                ))
+                fields.current.map(field => <FormField field={field} handleChange={handleChange} sending={sending} />)
             }
-
-            <Button
+            </Stack>
+            <LoadingButton
                 sx={{mt: 3}}
                 onClick={onSubmit}
                 variant="contained"
                 disabled={!isValid}
-            >
+                startIcon={<SendIcon />}
+                loadingPosition="start"
+                loading={sending}
+                >
                 Envoyer
-            </Button>
+            </LoadingButton>
 
             <FeedbackMessage key={result.key} severity={result.severity} message={result.message} />
         </React.Fragment>
     );
 }
 
-export default Contact;
+export default Contact

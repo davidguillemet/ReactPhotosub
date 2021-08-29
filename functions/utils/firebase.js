@@ -25,6 +25,7 @@ function convertPathToUrl(imagePath) {
 }
 
 module.exports = {
-    convertPathToUrl,
-    bucket,
+    convertPathToUrl: convertPathToUrl,
+    bucket: bucket,
+    settings: configFunctions,
 };

@@ -176,6 +176,14 @@ function searchImages(pageIndex, query, pageSize, exact, processId) {
     })
 }
 
+function sendMessage(messageProperties) {
+    return axios.post(_getApiUri('/api/message'), {
+        ...messageProperties
+    }).then(response => {
+        return response.data;
+    })
+}
+
 const dataProvider = {
     getDestinations: getDestinations,
     getRegions: getRegions,
@@ -196,7 +204,8 @@ const dataProvider = {
     removeUploadedInterior: removeUploadedInterior,
     getImageDefaultSelection: getImageDefaultSelection,
     waitForThumbnails: waitForThumbnails,
-    searchImages: searchImages
+    searchImages: searchImages,
+    sendMessage: sendMessage
 }
 
 export default dataProvider;
