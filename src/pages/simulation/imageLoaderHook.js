@@ -95,8 +95,6 @@ const useImageLoader = (user, simulations, listType) => {
 
     // Load images from current source (homeslideshow, favorites, search)
     useEffect(() => {
-        setImages(null);
-
         if (imagesBySource[listType] !== null) {
             setImages(imagesBySource[listType]);
             return;
