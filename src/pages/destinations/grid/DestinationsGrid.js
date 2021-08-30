@@ -3,7 +3,7 @@ import Box from '@material-ui/core/Box';
 
 import { getThumbnailSrc } from '../../../utils';
 import Destination from './Destination';
-
+import { withLoading, buildLoadingState } from '../../../components/loading';
 import { useResizeObserver } from '../../../components/hooks';
 
 const _destinationsMargin = 7;
@@ -71,4 +71,7 @@ const DestinationsGrid = ({destinations, regionsByDestination}) => {
     );
 }
 
-export default DestinationsGrid;
+export default withLoading(DestinationsGrid, [
+    buildLoadingState("destinations", null),
+    buildLoadingState("regionsByDestination", null)
+]);

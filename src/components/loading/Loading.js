@@ -1,7 +1,7 @@
 import React from 'react';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-export const Loading = ({size, marginTop}) => {
+export const Loading = ({size, marginTop = 3}) => {
     return (
         <CircularProgress
             sx={{

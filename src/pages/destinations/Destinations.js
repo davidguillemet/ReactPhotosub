@@ -74,7 +74,7 @@ const Destinations = () => {
     const classes = useStyles();
 
     const [allDestinations, setAllDestinations] = useState(null);
-    const [filteredDestinations, setFilteredDestinations] = useState([]);
+    const [filteredDestinations, setFilteredDestinations] = useState(null);
     const [regionsByDestination, setRegionsByDestination] = useState(null);
     const [destinationsView, setDestinationsView] = useState(VIEW_GRID);
     const [regionHierarchy, regionMap] = useRegions();

@@ -32,7 +32,7 @@ const MainImage = withLoading(({images, currentImageIndex, handleImageLoaded}) =
             src={currentImage.isLoaded ? currentImage.src : currentImage.blurrySrc}
         />
     )
-}, [buildLoadingState("images", null)]);
+}, [buildLoadingState("images", null)], { marginTop: 0 });
 
 const Home = () => {
 
