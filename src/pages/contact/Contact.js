@@ -194,7 +194,7 @@ const Contact = () => {
 
     return (
         <React.Fragment>
-            <PageTitle>Pour me contatcter</PageTitle>
+            <PageTitle>Pour me contacter</PageTitle>
 
             <Stack spacing={2} alignItems="center">
             {
