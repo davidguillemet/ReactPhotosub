@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { styled } from '@material-ui/core/styles';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
@@ -15,6 +15,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 
 import dataProvider from '../../dataProvider/dataprovider';
 import { uniqueID, getEmptySearchResult } from '../../utils';
+import LazyDialog from '../../dialogs/LazyDialog';
 
 const _pageSize = 10;
 
@@ -41,7 +42,7 @@ const StatusIcon = ({searchIsRunning}) => {
     );
 }
 
-const SearchInput = ({imageCount, running, hasError, onChange}) => {
+const SearchInput = ({imageCount, running, hasError, onChange, onOpenHelp}) => {
 
     return (
         <Paper component="form" sx={{
@@ -79,7 +80,7 @@ const SearchInput = ({imageCount, running, hasError, onChange}) => {
                 }}
                 orientation="vertical"
             />
-            <SearcIconButton>
+            <SearcIconButton onClick={onOpenHelp}>
                 <HelpIcon />
             </SearcIconButton>
         </Paper>
@@ -93,6 +94,7 @@ const Search = React.forwardRef(({
     nextPageComponent = null,
     pageIndex = 0}, ref) => {
 
+    const [ helpOpen, setHelpOpen ] = useState(false);
     const [ searchTimer, setSearchTimer ] = useState(null);
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
     const [ searchResult, setSearchResult] = useState(getEmptySearchResult())
@@ -172,6 +174,10 @@ const Search = React.forwardRef(({
 
     }, [searchConfig]);
 
+    const toggleSearchHelpOpen = useCallback(() => {
+        setHelpOpen(open => !open);
+    }, []);
+
     function handleChangeExact(event) {
         setSearchConfig(oldConfig => {
             return {
@@ -228,6 +234,7 @@ const Search = React.forwardRef(({
                 running={searchIsRunning}
                 hasError={false}
                 onChange={onQueryChange}
+                onOpenHelp={toggleSearchHelpOpen}
             />
             { 
                 showExactSwitch && 
@@ -247,6 +254,9 @@ const Search = React.forwardRef(({
         {
             searchResult.hasNext && nextPageComponent && React.cloneElement(nextPageComponent, {onClick: handleNextPage, count: searchResult.images.length})
         }
+
+        <LazyDialog title={"Rechercher des images"} path="search/help" open={helpOpen} handleClose={toggleSearchHelpOpen} />
+
         </React.Fragment>
     );
 });
