@@ -11,7 +11,7 @@ function extractCriteriaList(queryString) {
     //      any character except space and slash
     //    OR
     //      slash, any charater except slash, ending slash
-    const criteriaRegexp = new RegExp("[ ]*(-?(?:(?:[^ \/]+)|(?:\/[^\/]+\/)))", "g");
+    const criteriaRegexp = new RegExp("[ ]*(-?(?:(?:[^ /]+)|(?:/[^/]+/)))", "g");
     let match = null;
     while ((match = criteriaRegexp.exec(queryString)) !== null) {
         let criteria = match[1]; // One single main group
