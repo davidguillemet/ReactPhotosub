@@ -1,8 +1,8 @@
 import React from 'react';
-import SummaryParagraph from '../SummaryParagraph';
-import List from '@material-ui/core/List';
+import SummaryParagraph from '../../SummaryParagraph';
+import HtmlList from '../../HtmlList';
 import ListItem from '@material-ui/core/ListItem';
-import SubTitle from '../SubTitle';
+import SubTitle from '../../SubTitle';
 
 const coron = () => (
 <React.Fragment>
@@ -17,22 +17,13 @@ const coron = () => (
 <SummaryParagraph>L'histoire des épaves de Coron remonte à la seconde guerre mondiale. Après avoir attaqué Pearl Harbor le 7 décembre 1941 et provoqué ainsi l'entrée en guerre des Etats-Unis, les Japonais ont poursuivi les hostilités par l'invasion des Philippines, alors sous contrôle Américain.</SummaryParagraph>
 <SummaryParagraph>Presque 3 ans plus tard, le 24 septembre 1944, la marine Américaine, forte de plus de 150 bombardiers, mena un raid sur une flotte de ravitaillement Japonaise stationnée dans la baie de Coron et autour de l'île de Busuanga. Près de 24 bâtiments ont ainsi été coulés, qui gisent depuis entre 20 et 50m.</SummaryParagraph>
 <SummaryParagraph>Les 6 épaves sur lesquelles nous avons plongées sont celles qui sont accessibles en bateau au départ de la ville de Coron. Dans l'ordre, nous avons:
-<List dense={true} sx={{
-    "&.MuiList-root" : {
-        listStyleType: "disc",
-        listStylePosition: "inside"
-    },
-    "& li" : {
-        display: "list-item",
-        px: 1
-    }
-}}>
+<HtmlList>
     <ListItem>l'Olympia Maru, cargo de 122 m</ListItem>
     <ListItem>l'Irako Maru, navire frigorifique de 150 m</ListItem>
     <ListItem>le Morazaan Maru, navire de 140 m</ListItem>
     <ListItem>l'Akitsushima, transport d’hydravions de 118 m</ListItem>
     <ListItem>l'Okikawa Maru, pétrolier ravitailleur de 168 m</ListItem>
-</List>
+</HtmlList>
 </SummaryParagraph>
 <SummaryParagraph>Malheureusement, nous n'avons pas eu de chance avec la visibilité, très mauvaise pendant toute la durée de notre séjour. C'est pourquoi vous ne verrez ici pratiquement que des photos prises à l'intérieur des cales, où l'eau était beaucoup moins chargée.</SummaryParagraph>
 <SubTitle>Un curieux lac...</SubTitle>

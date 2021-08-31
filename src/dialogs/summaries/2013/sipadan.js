@@ -1,6 +1,6 @@
 import React from 'react';
-import SummaryParagraph from '../SummaryParagraph';
-import SubTitle from '../SubTitle';
+import SummaryParagraph from '../../SummaryParagraph';
+import SubTitle from '../../SubTitle';
 
 const sipadan = () => (
 <React.Fragment>

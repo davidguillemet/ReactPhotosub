@@ -8,8 +8,8 @@ import { formatDate } from '../../utils';
 import dataProvider from '../../dataProvider';
 import Gallery from '../../components/gallery';
 import { PageTitle, PageSubTitle } from '../../template/pageTypography';
-import SummaryDialog from './SummaryDialog';
 import LocationDialog from './LocationDialog';
+import LazyDialog from '../../dialogs/LazyDialog';
 import { withLoading, buildLoadingState } from '../../components/loading';
 
 const RegionChip = ({region}) => {
@@ -60,21 +60,18 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
         })
     }, [year, title]);
 
-    const handleCloseSummary = useCallback(() => {
-        setSummaryOpen(false);
-    }, []);
-
     const handleCloseLocation = useCallback(() => {
         setLocationOpen(false);
     }, []);
 
-    const handleOpenSummary = () => {
-        setSummaryOpen(true);
-    }
-
-    const handleLocationSummary = () => {
+    const handleOpenLocation = () => {
         setLocationOpen(true);
     }
+
+    const toggleOpenSummary = useCallback(() => {
+        setSummaryOpen(open => !open);
+    }, []);
+
 
     return (
         <React.Fragment>
@@ -87,14 +84,17 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
                 display: 'flex',
                 flexDirection: 'row',
             }}>
-                <Button sx={{m: 1}} onClick={handleOpenSummary} variant="outlined">Voir le Résumé</Button>
-                <Button sx={{m: 1}} onClick={handleLocationSummary} variant="outlined">Voir le lieu</Button>
+                <Button sx={{m: 1}} onClick={toggleOpenSummary} variant="outlined">Voir le Résumé</Button>
+                <Button sx={{m: 1}} onClick={handleOpenLocation} variant="outlined">Voir le lieu</Button>
             </Box>
-            <SummaryDialog
-                destination={destination}
+
+            <LazyDialog
                 open={summaryOpen}
-                handleClose={handleCloseSummary}
+                handleClose={toggleOpenSummary}
+                title={`${destination.title} - ${formatDate(new Date(destination.date))}`}
+                path={`summaries/${destination.path}`}
             />
+
             <LocationDialog
                 destination={destination}
                 open={locationOpen}

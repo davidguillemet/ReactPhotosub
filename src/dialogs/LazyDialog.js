@@ -4,20 +4,19 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
-import { Loading } from '../../components/loading';
+import { Loading } from '../components/loading';
 import Button from '@material-ui/core/Button';
 import { lazy } from 'react';
-import { formatDate } from '../../utils';
 
-const importLazySummaryView = path => {
-    return lazy(() => import(`../../summaries/${path}`).catch(() => import(`../../summaries/EmptySummary`)));
+const importLazyModule = path => {
+    return lazy(() => import(`./${path}`).catch(() => import(`./ModuleNotFound`)));
 }
 
-const SummaryDialog = ({destination, open, handleClose}) => {
+const LazyDialog = ({path, title, open, handleClose}) => {
 
     const LazySummaryView = useMemo(() => {
-        return open === false ? null : importLazySummaryView(destination.path);
-    }, [destination, open]);
+        return open === false ? null : importLazyModule(path);
+    }, [path, open]);
 
     return (
         <Dialog
@@ -29,7 +28,7 @@ const SummaryDialog = ({destination, open, handleClose}) => {
                 textAlign: 'center'
             }}
         >
-            <DialogTitle>{`${destination.title} - ${formatDate(new Date(destination.date))}`}</DialogTitle>
+            <DialogTitle>{title}</DialogTitle>
             <DialogContent
                 sx={{
                     px: isMobile ? 1 : 3
@@ -37,7 +36,7 @@ const SummaryDialog = ({destination, open, handleClose}) => {
             >
             { open &&
                 <React.Suspense fallback={<Loading/>}>
-                    <LazySummaryView />
+                    <LazySummaryView name={path}/>
                 </React.Suspense>
             }
             </DialogContent>
@@ -48,4 +47,4 @@ const SummaryDialog = ({destination, open, handleClose}) => {
     )
 }
 
-export default SummaryDialog;
+export default LazyDialog;

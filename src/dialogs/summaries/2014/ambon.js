@@ -1,5 +1,5 @@
 import React from 'react';
-import SummaryParagraph from '../SummaryParagraph';
+import SummaryParagraph from '../../SummaryParagraph';
 
 const ambon = () => (
 <React.Fragment>
