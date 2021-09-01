@@ -57,6 +57,16 @@ require("./resources/message")(resourceConfiguration);
 
 app.get("/status", (req, res) => res.send("Working!"));
 
+// In case we would like to take advantage of this generic error handler
+// just add a try/catch in a route handler and call next in a promise catch statement:
+// promise.then((...) => { ... }).catch(next);
+// -> https://www.robinwieruch.de/node-express-error-handling
+// be cacthed here and we will send an internal server error http 500
+// response with the error message as the response body
+app.use((error, req, res, next) => {
+    return res.status(500).json({error: error.toString()});
+});
+
 const mainapi = express();
 mainapi.use("/api", app);
 

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { styled } from '@material-ui/core/styles';
+import { green, orange } from '@material-ui/core/colors';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Box from "@material-ui/core/Box";
+import Chip from "@material-ui/core/Chip";
 import SearchIcon from '@material-ui/icons/Search';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
@@ -14,10 +16,28 @@ import HelpIcon from '@material-ui/icons/Help';
 import WarningIcon from '@material-ui/icons/Warning';
 
 import dataProvider from '../../dataProvider/dataprovider';
-import { uniqueID, getEmptySearchResult } from '../../utils';
+import { uniqueID } from '../../utils';
 import LazyDialog from '../../dialogs/LazyDialog';
 
 const _pageSize = 10;
+
+
+export function getInitialSearchResult() {
+    return {
+        images: [],
+        hasNext: false,
+        hasError: false,
+        page: 0,
+        totalCount: -1
+    }
+}
+
+function getEmptySearchResult() {
+    return {
+        ...getInitialSearchResult(),
+        totalCount: 0
+    }
+}
 
 const SearcIconButton = styled(IconButton)(({theme}) => ({
     padding: 10
@@ -42,7 +62,18 @@ const StatusIcon = ({searchIsRunning}) => {
     );
 }
 
-const SearchInput = ({imageCount, running, hasError, onChange, onOpenHelp}) => {
+const ResultStatus= ({searchResult}) => {
+    const totalCount = searchResult.totalCount;
+    if (searchResult.hasError === true) {
+        return <WarningIcon sx={{ml: 1, color: orange[400]}} />
+    } else if (totalCount >= 0) {
+        return <Chip color="success" sx={{ml: 1, bgcolor: totalCount > 0 ? green[600] : orange[700]}} label={totalCount}></Chip>
+    }
+
+    return null;
+}
+
+const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp}) => {
 
     return (
         <Paper component="form" sx={{
@@ -67,12 +98,6 @@ const SearchInput = ({imageCount, running, hasError, onChange, onOpenHelp}) => {
                 type="search"
                 onChange={onChange}
             />
-            {
-                hasError &&
-                <SearcIconButton>
-                    <WarningIcon />
-                </SearcIconButton>
-            }
             <Divider
                 sx={{
                     height: '28px',
@@ -80,6 +105,7 @@ const SearchInput = ({imageCount, running, hasError, onChange, onOpenHelp}) => {
                 }}
                 orientation="vertical"
             />
+            <ResultStatus searchResult={searchResult} />
             <SearcIconButton onClick={onOpenHelp}>
                 <HelpIcon />
             </SearcIconButton>
@@ -97,7 +123,7 @@ const Search = React.forwardRef(({
     const [ helpOpen, setHelpOpen ] = useState(false);
     const [ searchTimer, setSearchTimer ] = useState(null);
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
-    const [ searchResult, setSearchResult] = useState(getEmptySearchResult())
+    const [ searchResult, setSearchResult] = useState(getInitialSearchResult())
     const [ imageCount, setImageCount ] = useState(0);
     const [ searchConfig, setSearchConfig ] = useState({
         exact: false,
@@ -150,24 +176,29 @@ const Search = React.forwardRef(({
             //     items: <image array>,
             //     criteria: <criteria array>
             //     query: <string>,
-            //     processId: <string>
+            //     processId: <string>,
+            //     totalCount: <integer>
             // }
             setSearchResult(oldResult => {
                 const results = response.items;
                 if (results.length === 0 && searchConfig.page === 0)
                 {
-                    return getEmptySearchResult(true);
+                    return getEmptySearchResult();
                 }
                 const newResult = {
                     images: searchConfig.page === 0 ? results : oldResult.images.concat(results),
                     hasNext: _pageSize === results.length,
                     hasError: false,
-                    page: searchConfig.page
+                    page: searchConfig.page,
+                    totalCount: response.totalCount
                 }
                 return newResult;
             });
         }).catch(err => {
-            // TODO display error message
+            setSearchResult({
+                ...getEmptySearchResult(),
+                hasError: true
+            });
         }).finally(() => {
             setSearchIsRunning(false);
         })
@@ -231,6 +262,7 @@ const Search = React.forwardRef(({
         >
             <SearchInput
                 imageCount={imageCount}
+                searchResult={searchResult}
                 running={searchIsRunning}
                 hasError={false}
                 onChange={onQueryChange}

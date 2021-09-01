@@ -26,9 +26,8 @@ import FileUpload from './FileUpload';
 import {setBackground, resize, borderWidth, borderColor, addImage, setImage} from './actions/SimulationActions';
 
 import { useResizeObserver } from '../../components/hooks';
-import Search from '../../components/search';
+import Search, { getInitialSearchResult } from '../../components/search';
 import useImageLoader, {LIST_HOME_SLIDESHOW, LIST_FAVORITES, LIST_SEARCH} from './imageLoaderHook';
-import { getEmptySearchResult } from '../../utils';
 
 const borderColors = [
     "#FFFFFF",
@@ -47,9 +46,14 @@ const EmptySimulationImages = ({type, images, searchResult}) => {
         const message = 
             type === LIST_FAVORITES ?
             "Votre liste de favoris est vide." :
-            searchResult.emptyResult ?
+            searchResult.totalCount >= 0 ?
             "Votre recherche n'a retourné aucun résultat." :
             "Saisissez un critère pour lancer une recherche.";
+
+            const severity =
+            type === LIST_FAVORITES || searchResult.totalCount < 0 ?
+            "info" : "warning";
+
         return (
             <Box style={{
                 display: 'flex',
@@ -59,7 +63,7 @@ const EmptySimulationImages = ({type, images, searchResult}) => {
                 justifyContent: 'center',
                 alignItems: 'center'
             }}>
-                <Alert severity="info" elevation={4} variant="filled">{message}</Alert>
+                <Alert severity={severity} elevation={4} variant="filled">{message}</Alert>
             </Box>
         );
     }
@@ -72,7 +76,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     const [listType, setListType] = useState(LIST_HOME_SLIDESHOW);
     const [interiors, images, setImages, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
-    const [searchResult, setSearchResult] = useState(getEmptySearchResult());
+    const [searchResult, setSearchResult] = useState(getInitialSearchResult());
 
     const [currentImageId, setCurrentImageId] = useState(null);
 
@@ -170,7 +174,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         unstable_batchedUpdates(() => {
             if (newListType !== LIST_SEARCH)
             {
-                setSearchResult(getEmptySearchResult());
+                setSearchResult(getInitialSearchResult());
             }
             setListType(newListType);
         });

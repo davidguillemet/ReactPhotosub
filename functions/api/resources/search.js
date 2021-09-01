@@ -46,6 +46,9 @@ function extractCriteriaList(queryString) {
     return criteriaArray;
 }
 
+function getFinalColumnSelection(config) {
+    return config.pool().raw("\"id\", \"name\", \"path\", \"title\", \"description\", \"sizeRatio\", count(*) OVER() AS total_count");
+}
 
 function getWhereFunctionFromSingleCriteria(builder, criteria) {
     return builder.whereRaw("? = ANY (tags)", [criteria]).orWhere("caption", "like", "% " + criteria + " %");
@@ -78,7 +81,7 @@ function getWhereFunctionFromCriteria(criteriaObject) {
 //     where  ('alcyonides' = ANY (tags) or caption like '% alcyionides %')
 //     and    NOT ('bait ball' = ANY (tags) or caption like '% bait ball %');
 function buildSearchQueryExact(config, criteriaList, page, pageSize) {
-    let sqlQuery = config.pool().select("id", "name", "path", "title", "description", "sizeRatio").from("images");
+    let sqlQuery = config.pool().select(getFinalColumnSelection(config)).from("images");
 
     for (let criteriaIndex = 0; criteriaIndex < criteriaList.length; criteriaIndex++) {
         const criteriaObject = criteriaList[criteriaIndex];
@@ -121,28 +124,34 @@ function addWhereClauseFromFlatTags(sqlQuery, criteria) {
 //     where id NOT IN (select distinct id from unnestedtags where tag like '%plongeur%' or caption like '%plongeur%')
 
 function buildSearchQueryNotExact(config, criteriaList, page, pageSize) {
-    let sqlQuery = config.pool()
+    const sqlQuery = config.pool()
         .with(
             _flatTagsRows,
-            config.pool().raw(`select id, name, path, title, description, "sizeRatio", coalesce(caption, '') as caption, unnest(tags) as ${_unnestedTagColumn} from images`));
-
-    const intersectQueries = [];
-    for (let criteriaIndex = 0; criteriaIndex < criteriaList.length; criteriaIndex++) {
-        const criteria = criteriaList[criteriaIndex];
-        if (criteriaIndex == 0) {
-            sqlQuery = addWhereClauseFromFlatTags(
-                getSelectFromFlatTags(sqlQuery),
-                criteria);
-        } else {
-            intersectQueries.push(addWhereClauseFromFlatTags(
-                getSelectFromFlatTags(config.pool()),
-                criteria));
-        }
-    }
-
-    if (intersectQueries.length > 0) {
-        sqlQuery = sqlQuery.intersect(intersectQueries);
-    }
+            config.pool().raw(`select id, name, path, title, description, "sizeRatio", coalesce(caption, '') as caption, unnest(tags) as ${_unnestedTagColumn} from images`))
+        .with(
+            "results",
+            (qb) => {
+                let sqlQuery = qb;
+                const intersectQueries = [];
+                for (let criteriaIndex = 0; criteriaIndex < criteriaList.length; criteriaIndex++) {
+                    const criteria = criteriaList[criteriaIndex];
+                    if (criteriaIndex == 0) {
+                        sqlQuery = addWhereClauseFromFlatTags(
+                            getSelectFromFlatTags(sqlQuery),
+                            criteria);
+                    } else {
+                        intersectQueries.push(addWhereClauseFromFlatTags(
+                            getSelectFromFlatTags(config.pool()),
+                            criteria));
+                    }
+                }
+                if (intersectQueries.length > 0) {
+                    sqlQuery = sqlQuery.intersect(intersectQueries);
+                }
+                return sqlQuery;
+            })
+        .select(getFinalColumnSelection(config))
+        .from("results");
 
     return sqlQuery;
 }
@@ -186,10 +195,12 @@ module.exports = function(config) {
                         criteria: criteriaList,
                         query: searchData.query,
                         processId: processId,
+                        totalCount: results.length > 0 ? results[0].total_count : 0,
                     });
                 }).catch((err) => {
-                    config.logger.error(`Failed to search images from query "${searchData.query}"`, err);
-                    res.status(500).send("Error while searching image.").end();
+                    config.logger.error(`Failed to search images from query "${searchData.query}"`);
+                    config.logger.error(err.toString());
+                    res.status(500).end();
                 });
         });
 };
