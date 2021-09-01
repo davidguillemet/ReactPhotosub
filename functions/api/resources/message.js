@@ -57,7 +57,7 @@ module.exports = function(config) {
             //     token: <string>      -> RECAPTCHA token
             // };
 
-            // FIrst try to validate the reCaptcha token:
+            // First try to validate the reCaptcha token:
             try {
                 const verify = await axios.post("https://www.google.com/recaptcha/api/siteverify", {
                     secret: config.settings.recaptcha.secretekey,
@@ -75,6 +75,7 @@ module.exports = function(config) {
                 }
             } catch (error) {
                 config.logger.error("Failed to verify reCaptcha token", error);
+                res.status(500).send({error: "An error occurred while verifying the reCaptcha token"}).end();
             }
 
             const transporter = nodemailer.createTransport({
