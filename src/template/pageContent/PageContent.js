@@ -24,8 +24,8 @@ const RouteComponent = ({route}) => {
 const PageContent = ({history, onHistoryChanged}) => {
 
     useEffect(() => history.listen(() => {
-        // Close the Drawer
         onHistoryChanged();
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }), [history, onHistoryChanged])
 
     return (
