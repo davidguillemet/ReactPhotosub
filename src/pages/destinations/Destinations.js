@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 import TabContext from '@material-ui/lab/TabContext';
 import TabPanel from '@material-ui/lab/TabPanel';
@@ -9,13 +9,13 @@ import { makeStyles } from '@material-ui/styles';
 import ToggleButton from '@material-ui/core/ToggleButton';
 import ToggleButtonGroup from '@material-ui/core/ToggleButtonGroup';
 
-import dataProvider from '../../dataProvider';
 import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import DestinationsGrid from './grid/DestinationsGrid';
 import DestinationsMap from '../../components/map';
 import RegionFilter from './RegionFilter';
 import useRegions from './RegionLoaderHook';
+import { GlobalContext } from '../../components/globalContext';
 
 const useStyles = makeStyles(() => ({
     regionContainer: {
@@ -71,6 +71,7 @@ const DisplayModeSelector = ({listType, onChange}) => {
 
 const Destinations = () => {
 
+    const context = useContext(GlobalContext);
     const classes = useStyles();
 
     const [allDestinations, setAllDestinations] = useState(null);
@@ -82,10 +83,10 @@ const Destinations = () => {
 
     // Another effect executed only to load destinations
     useEffect(() => {
-        dataProvider.getDestinations().then(destinations => {
+        context.dataProvider.getDestinations().then(destinations => {
             setAllDestinations(destinations);
         });
-    }, []); 
+    }, [context.dataProvider]); 
 
     useEffect(() => {
         if (regionMap === null || allDestinations == null) {

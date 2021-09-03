@@ -1,10 +1,9 @@
 
 /*global google*/
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import { GoogleMap, InfoWindow, MarkerClusterer, useLoadScript } from '@react-google-maps/api';
-
-import dataProvider from '../../dataProvider';
+import { GlobalContext } from '../globalContext';
 import { formatDate, getThumbnailSrc } from '../../utils';
 
 import LocationInfoWindow from './LocationInfoWindow';
@@ -16,6 +15,8 @@ const _defaultCenter = {
 }
 
 const DestinationsMap = ({destinations}) => {
+
+    const context = useContext(GlobalContext);
 
     const locationMapRef = useRef(null);
     const [selectedLocation, setSelectedLocation] = useState(null);
@@ -46,7 +47,7 @@ const DestinationsMap = ({destinations}) => {
         const promise =
             locationMapRef.current != null ?
             Promise.resolve(locationMapRef.current) :
-            dataProvider.getLocations().then(items => {
+            context.dataProvider.getLocations().then(items => {
                 const locationMap = new Map();
                 items.forEach(location => {
                     locationMap.set(location.id, location);
@@ -80,7 +81,7 @@ const DestinationsMap = ({destinations}) => {
                 setSelectedLocation(null);
             })
         })
-    }, [destinations])
+    }, [destinations, context.dataProvider])
 
     const handleMarkerClick = React.useCallback((location) => {
         if (openInfoWindow === true) {

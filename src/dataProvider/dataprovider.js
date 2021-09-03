@@ -1,90 +1,10 @@
-import axios from 'axios';
-import { firebaseAuth } from '../components/firebase';
-
 import {
     TRANSIENT_PROPERTY_DB_INDEX,
     deleteTransientProperties,
     setDbIndex,
-    getDbIndex,
-    API_PREFIX
+    getDbIndex
 } from './common';
 
-// Add a request interceptor
-axios.interceptors.request.use(async function (config) {
-    if (firebaseAuth().currentUser) {
-        const token = await firebaseAuth().currentUser.getIdToken(false);
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
-
-function _getApiUri(apiName) {
-    return API_PREFIX + apiName;
-}
-
-function getDestinationProps(year, title, props) {
-    return axios.get(_getApiUri(`/api/destination/${year}/${title}/${props}`))
-    .then(response => {
-        return response.data;
-    })
-}
-
-function getDestinations() {
-    return axios.get(_getApiUri("/api/destinations"))
-    .then(response => {
-        return response.data;
-    });
-}
-
-function getRegions() {
-    return axios.get(_getApiUri("/api/regions"))
-    .then(response => {
-        return response.data;
-    });
-}
-
-function getLocations() {
-    return axios.get(_getApiUri("/api/locations"))
-    .then(response => {
-        return response.data;
-    });
-}
-
-function getDestinationDetailsFromPath(year, title) {
-    return getDestinationProps(year, title, "head");
-}
-
-function getDestinationImagesFromPath(year, title) {
-    return getDestinationProps(year, title, "images");
-}
-
-function getUserData(uid) {
-    return axios.get(_getApiUri(`/api/userdata/${uid}`))
-    .then(response => {
-        return response.data;
-    });
-}
-
-function addFavorite(path) {
-    return axios.post(_getApiUri('/api/favorites'), { path: path })
-    .then(response => {
-        return response.data;
-    });
-}
-
-function removeFavorite(path) {
-    return axios.delete(_getApiUri('/api/favorites'), {data: { path: path } } )
-    .then(response => {
-        return response.data;
-    });
-}
-
-function getFavorites() {
-    return axios.get(_getApiUri('/api/favorites'))
-    .then(response => {
-        return response.data;
-    })
-}
 
 function _addSimulationDbIndex(simulations) {
     simulations.forEach((simulation, index) => {
@@ -93,8 +13,76 @@ function _addSimulationDbIndex(simulations) {
     return simulations;
 }
 
-function getSimulations() {
-    return axios.get(_getApiUri('/api/simulations'))
+function DataProvider(axiosInstance) {
+    this.axios = axiosInstance
+}
+
+DataProvider.prototype.getDestinationProps = function(year, title, props) {
+    return this.axios.get(`/destination/${year}/${title}/${props}`)
+    .then(response => {
+        return response.data;
+    })
+};
+
+DataProvider.prototype.getDestinations = function() {
+    return this.axios.get("/destinations")
+    .then(response => {
+        return response.data;
+    });
+};
+
+DataProvider.prototype.getRegions = function() {
+    return this.axios.get("/regions")
+    .then(response => {
+        return response.data;
+    });
+};
+
+DataProvider.prototype.getLocations = function() {
+    return this.axios.get("/locations")
+    .then(response => {
+        return response.data;
+    });
+};
+
+DataProvider.prototype.getDestinationDetailsFromPath = function(year, title) {
+    return this.getDestinationProps(year, title, "head");
+};
+
+DataProvider.prototype.getDestinationImagesFromPath = function(year, title) {
+    return this.getDestinationProps(year, title, "images");
+};
+
+DataProvider.prototype.getUserData = function(uid) {
+    return this.axios.get(`/userdata/${uid}`)
+    .then(response => {
+        return response.data;
+    });
+};
+
+DataProvider.prototype.addFavorite = function(path) {
+    return this.axios.post('/favorites', { path: path })
+    .then(response => {
+        return response.data;
+    });
+};
+
+DataProvider.prototype.removeFavorite = function(path) {
+    return this.axios.delete('/favorites', {data: { path: path } } )
+    .then(response => {
+        return response.data;
+    });
+};
+
+DataProvider.prototype.getFavorites = function() {
+    return this.axios.get('/favorites')
+    .then(response => {
+        return response.data;
+    })
+};
+
+DataProvider.prototype.getSimulations = function() {
+    return this.axios.get('/simulations')
     .then(response => {
         // we generate an index property that corresponds to the index in the db json array
         // this index we allow to identify any simulation for deletion or update
@@ -102,70 +90,70 @@ function getSimulations() {
     });
 }
 
-function addSimulation(newSimulation) {
+DataProvider.prototype.addSimulation = function(newSimulation) {
     deleteTransientProperties(newSimulation);
-    return axios.post(_getApiUri('/api/simulations'), newSimulation)
+    return this.axios.post('/simulations', newSimulation)
     .then(response => {
         return _addSimulationDbIndex(response.data);
     });
 }
 
-function updateSimulation(simulation) {
+DataProvider.prototype.updateSimulation = function(simulation) {
     // Delete transient properties but keep dbindex
     deleteTransientProperties(simulation, [TRANSIENT_PROPERTY_DB_INDEX]);
     // Here, simulation should contain an index property
-    return axios.post(_getApiUri('/api/simulations'), simulation)
+    return this.axios.post('/simulations', simulation)
     .then(response => {
         return _addSimulationDbIndex(response.data);
     });
 }
 
-function removeSimulation(simulation) {
-    return axios.delete(_getApiUri('/api/simulations'), {data: { index: getDbIndex(simulation) } })
+DataProvider.prototype.removeSimulation = function(simulation) {
+    return this.axios.delete('/simulations', {data: { index: getDbIndex(simulation) } })
     .then(response => {
         return _addSimulationDbIndex(response.data);
     });
 }
 
-function getImageCount() {
-    return axios.get(_getApiUri('/api/images'))
+DataProvider.prototype.getImageCount = function() {
+    return this.axios.get('/api/images')
     .then(response => {
         return response.data.count;
     })
 }
 
-function getInteriors() {
-    return _getBucketContent('interiors');
+DataProvider.prototype.getInteriors = function() {
+    return this._getBucketContent('interiors');
 }
 
-function getUploadedInteriors() {
-    return axios.get(_getApiUri('/api/uploadedInteriors'))
+DataProvider.prototype.getUploadedInteriors = function() {
+    return this.axios.get('/uploadedInteriors')
     .then(response => {
         return response.data;
     });
 }
 
-function removeUploadedInterior(fileName) {
-    return axios.delete(_getApiUri('/api/uploadedInteriors'), {data: { fileName: fileName } })
+DataProvider.prototype.removeUploadedInterior = function(fileName) {
+    return this.axios.delete('/uploadedInteriors', {data: { fileName: fileName } })
 }
 
-function getImageDefaultSelection() {
-    return _getBucketContent('homeslideshow');
+DataProvider.prototype.getImageDefaultSelection = function() {
+    return this._getBucketContent('homeslideshow');
 }
 
-function _getBucketContent(folder) {
-    return axios.get(_getApiUri(`/api/bucket/${folder}`))
+DataProvider.prototype._getBucketContent = function(folder) {
+    return this.axios.get(`/bucket/${folder}`)
     .then(response => {
         return response.data;
     });
 }
 
-function waitForThumbnails(fileName) {
-    return axios.get(_getApiUri(`/api/thumbstatus/${fileName}`));
+DataProvider.prototype.waitForThumbnails = function(fileName) {
+    return this.axios.get(`/thumbstatus/${fileName}`);
 }
 
-function searchImages(pageIndex, query, pageSize, exact, processId) {
-    return axios.post(_getApiUri('/api/search'), {
+DataProvider.prototype.searchImages = function(pageIndex, query, pageSize, exact, processId) {
+    return this.axios.post('/search', {
         query: query,
         page: pageIndex,
         pageSize: pageSize,
@@ -176,36 +164,12 @@ function searchImages(pageIndex, query, pageSize, exact, processId) {
     })
 }
 
-function sendMessage(messageProperties) {
-    return axios.post(_getApiUri('/api/message'), {
+DataProvider.prototype.sendMessage = function(messageProperties) {
+    return this.axios.post('/api/message', {
         ...messageProperties
     }).then(response => {
         return response.data;
     })
 }
 
-const dataProvider = {
-    getDestinations: getDestinations,
-    getRegions: getRegions,
-    getLocations: getLocations,
-    getDestinationDetailsFromPath: getDestinationDetailsFromPath,
-    getDestinationImagesFromPath: getDestinationImagesFromPath,
-    getUserData: getUserData,
-    addFavorite: addFavorite,
-    removeFavorite: removeFavorite,
-    getFavorites: getFavorites,
-    getSimulations: getSimulations,
-    addSimulation: addSimulation,
-    updateSimulation: updateSimulation,
-    removeSimulation: removeSimulation,
-    getImageCount: getImageCount,
-    getInteriors: getInteriors,
-    getUploadedInteriors: getUploadedInteriors,
-    removeUploadedInterior: removeUploadedInterior,
-    getImageDefaultSelection: getImageDefaultSelection,
-    waitForThumbnails: waitForThumbnails,
-    searchImages: searchImages,
-    sendMessage: sendMessage
-}
-
-export default dataProvider;
+export default DataProvider;

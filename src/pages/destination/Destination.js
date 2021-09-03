@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useParams } from "react-router-dom";
 import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
 import { formatDate } from '../../utils';
-import dataProvider from '../../dataProvider';
 import Gallery from '../../components/gallery';
 import { PageTitle, PageSubTitle } from '../../template/pageTypography';
 import LocationDialog from './LocationDialog';
 import LazyDialog from '../../dialogs/LazyDialog';
 import { withLoading, buildLoadingState } from '../../components/loading';
+import { GlobalContext } from '../../components/globalContext';
 
 const RegionChip = ({region}) => {
 
@@ -50,15 +50,16 @@ const ImageCount = withLoading(({images}) => {
 
 const DestinationDisplay = withLoading(({destination, year, title}) => {
 
+    const context = useContext(GlobalContext);
     const [images, setImages] = useState(null);
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [locationOpen, setLocationOpen] = useState(false);
 
     useEffect(() => {
-        dataProvider.getDestinationImagesFromPath(year, title).then(images => {
+        context.dataProvider.getDestinationImagesFromPath(year, title).then(images => {
             setImages(images);
         })
-    }, [year, title]);
+    }, [year, title, context.dataProvider]);
 
     const handleCloseLocation = useCallback(() => {
         setLocationOpen(false);
@@ -108,15 +109,16 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
 }, [buildLoadingState("destination", null)]);
 
 const Destination = () => {
+    const context = useContext(GlobalContext);
     const { year, title } = useParams();
     const [destination, setDestination] = useState(null);
 
     // First hook to get the destination details
     useEffect(() => {
-        dataProvider.getDestinationDetailsFromPath(year, title).then(destination => {
+        context.dataProvider.getDestinationDetailsFromPath(year, title).then(destination => {
             setDestination(destination);
         })
-    }, [year, title]);
+    }, [year, title, context.dataProvider]);
 
     return <DestinationDisplay destination={destination} year={year} title={title} />
 };

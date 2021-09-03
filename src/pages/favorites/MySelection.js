@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Alert from '@material-ui/core/Alert';
 import { AuthContext } from '../../components/authentication';
-import dataProvider from '../../dataProvider';
 import Gallery from '../../components/gallery';
 import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
+import { GlobalContext } from '../../components/globalContext';
 
 const MySelectionContent= ({user, images}) => {
     if (user === null) {
@@ -18,41 +18,29 @@ const MySelectionContent= ({user, images}) => {
     );
 }
 
-const MySelection = ({user, favorites, updateUserContext}) => {
+const MySelection = () => {
 
+    const context = useContext(GlobalContext);
+    const authContext = useContext(AuthContext);
     const [images, setImages] = useState(null);
 
     useEffect(() => {
-        dataProvider.getFavorites()
+        if (authContext.user === null) {
+            return;
+        }
+        context.dataProvider.getFavorites()
         .then(images => {
             setImages(images);
         });
-    }, []);
+    }, [context.dataProvider, authContext.user]);
 
     return (
         <React.Fragment>
             <PageTitle>Ma Sélection</PageTitle>
             <VerticalSpacing factor={2} />
-            <MySelectionContent user={user} images={images} ></MySelectionContent>
+            <MySelectionContent user={authContext.user} images={images} ></MySelectionContent>
         </React.Fragment>
     );
 }
 
-const MySelectionConsumer = (props) => {
-    return (
-        <AuthContext.Consumer>
-            { ({user, data, updateUserContext}) => {
-                return (
-                    <MySelection
-                        user={user}
-                        favorites={data && data.favorites}
-                        updateUserContext={updateUserContext}
-                        {...props}
-                    />
-                );
-            }}
-        </AuthContext.Consumer>
-    );
-}
-
-export default MySelectionConsumer;
+export default MySelection;

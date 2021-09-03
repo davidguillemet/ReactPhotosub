@@ -1,24 +1,29 @@
-import React from 'react';
+import React, {useContext, useMemo} from 'react';
 import FavoriteIconOutlined from '@material-ui/icons/FavoriteBorderOutlined';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import dataProvider from '../../dataProvider';
 
 import TooltipIconButton from '../tooltipIconButton';
 import { AuthContext } from '../authentication';
+import { GlobalContext } from '../globalContext';
 
-const FavoriteButton = ({user, isInFavorites, updateUserFavorites, fontSize = 'default', style, color, path }) => {
+const FavoriteButton = ({fontSize = 'default', style, color, path }) => {
+
+    const context = useContext(GlobalContext);
+    const authContext = useContext(AuthContext);
+
+    const isInFavorites = useMemo(() => authContext.data && authContext.data.favorites.has(path), [authContext.data, path]);
 
     function handleFavoriteClick() {
         const updatePromise =
             isInFavorites ?
-            dataProvider.removeFavorite :
-            dataProvider.addFavorite;
+            context.dataProvider.removeFavorite :
+            context.dataProvider.addFavorite;
 
         updatePromise(path).then(favorites => {
-            updateUserFavorites(favorites);
+            authContext.updateUserFavorites(favorites);
         })
     }
 
@@ -41,7 +46,7 @@ const FavoriteButton = ({user, isInFavorites, updateUserFavorites, fontSize = 'd
                 }}>
                     <Typography variant="body1">{title}</Typography>
                     {
-                        user === null &&
+                        authContext.user === null &&
                         <Box style={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -53,7 +58,7 @@ const FavoriteButton = ({user, isInFavorites, updateUserFavorites, fontSize = 'd
                     }        
                 </Box>
             }
-            onClick={user ? handleFavoriteClick : null}
+            onClick={authContext.user ? handleFavoriteClick : null}
             style={buttonStyle}
         >
             {
@@ -65,20 +70,4 @@ const FavoriteButton = ({user, isInFavorites, updateUserFavorites, fontSize = 'd
     );
 }
 
-const FavoriteButtonConsumer = (props) => {
-    return (
-        <AuthContext.Consumer>
-            { ({user, data, updateUserFavorites}) => {
-                return (
-                    <FavoriteButton
-                        user={user}
-                        isInFavorites={data && data.favorites.has(props.path)}
-                        updateUserFavorites={updateUserFavorites}
-                        {...props} />
-                );
-            }}
-        </AuthContext.Consumer>
-    );
-}
-
-export default FavoriteButtonConsumer;
+export default FavoriteButton;

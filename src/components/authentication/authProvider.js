@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import AuthContext from './authContext';
-import { firebaseAuth } from '../firebase';
-import dataProvider from '../../dataProvider';
+import { GlobalContext } from '../globalContext/GlobalContext';
 
 const AuthProvider = ({ children }) => {
+
+    const context = useContext(GlobalContext);
 
     const updateUserContext = useCallback((user, userData) => {
         // Transform the favorites array as a Set
@@ -33,27 +34,27 @@ const AuthProvider = ({ children }) => {
     }, []);
 
     const [userContext, setUserContext] = useState({
-        user: firebaseAuth().currentUser,
+        user: context.firebase.auth().currentUser,
         data: null,
         updateUserContext: updateUserContext,
         updateUserFavorites: updateUserFavorites
     });
 
     useEffect(() => {
-        const unregisterAuthObserver = firebaseAuth().onAuthStateChanged(newUser => {
+        const unregisterAuthObserver = context.firebase.auth().onAuthStateChanged(newUser => {
 
             if (newUser === null) {
                 updateUserContext(null, null);
             } else {
                 newUser.getIdToken().then(token => {
-                    return dataProvider.getUserData(newUser.uid);
+                    return context.dataProvider.getUserData(newUser.uid);
                 }).then(userData => {
                     updateUserContext(newUser, userData);
                 });
             }
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-    }, [updateUserContext]);
+    }, [updateUserContext, context.dataProvider, context.firebase]);
 
     return (
         <AuthContext.Provider value={userContext}>

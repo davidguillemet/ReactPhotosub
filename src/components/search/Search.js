@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { styled } from '@material-ui/core/styles';
 import { green, orange } from '@material-ui/core/colors';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -15,9 +15,9 @@ import Divider from '@material-ui/core/Divider';
 import HelpIcon from '@material-ui/icons/Help';
 import WarningIcon from '@material-ui/icons/Warning';
 
-import dataProvider from '../../dataProvider/dataprovider';
 import { uniqueID } from '../../utils';
 import LazyDialog from '../../dialogs/LazyDialog';
+import { GlobalContext } from '../globalContext';
 
 const _pageSize = 10;
 
@@ -120,6 +120,7 @@ const Search = React.forwardRef(({
     nextPageComponent = null,
     pageIndex = 0}, ref) => {
 
+    const context = useContext(GlobalContext);
     const [ helpOpen, setHelpOpen ] = useState(false);
     const [ searchTimer, setSearchTimer ] = useState(null);
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
@@ -134,10 +135,10 @@ const Search = React.forwardRef(({
     const lastSearchProcessId = useRef(null);
 
     useEffect(() => {
-        dataProvider.getImageCount().then(count => {
+        context.dataProvider.getImageCount().then(count => {
             setImageCount(count);
         });
-    }, []);
+    }, [context.dataProvider]);
 
     useEffect(() => {
         setSearchConfig(oldConfig => {
@@ -164,7 +165,7 @@ const Search = React.forwardRef(({
 
         lastSearchProcessId.current = uniqueID();
 
-        dataProvider.searchImages(searchConfig.page, searchConfig.query, _pageSize, searchConfig.exact, lastSearchProcessId.current)
+        context.dataProvider.searchImages(searchConfig.page, searchConfig.query, _pageSize, searchConfig.exact, lastSearchProcessId.current)
         .then(response => {
             if (response.processId !== lastSearchProcessId.current) {
                 console.log(`skip obsolete search results ${response.processId}`);
@@ -203,7 +204,7 @@ const Search = React.forwardRef(({
             setSearchIsRunning(false);
         })
 
-    }, [searchConfig]);
+    }, [searchConfig, context.dataProvider]);
 
     const toggleSearchHelpOpen = useCallback(() => {
         setHelpOpen(open => !open);

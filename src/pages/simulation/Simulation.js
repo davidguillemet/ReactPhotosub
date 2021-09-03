@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useContext } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -19,7 +19,6 @@ import {unstable_batchedUpdates} from 'react-dom';
 import BorderInput from './BorderInput';
 import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import ImageSlider from '../../components/imageSlider';
-import dataProvider from '../../dataProvider';
 import SimulationDisplay from './SimulationDisplay';
 import FileUpload from './FileUpload';
 
@@ -28,6 +27,7 @@ import {setBackground, resize, borderWidth, borderColor, addImage, setImage} fro
 import { useResizeObserver } from '../../components/hooks';
 import Search, { getInitialSearchResult } from '../../components/search';
 import useImageLoader, {LIST_HOME_SLIDESHOW, LIST_FAVORITES, LIST_SEARCH} from './imageLoaderHook';
+import { GlobalContext } from '../../components/globalContext';
 
 const borderColors = [
     "#FFFFFF",
@@ -73,6 +73,7 @@ const EmptySimulationImages = ({type, images, searchResult}) => {
 
 const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
+    const context = useContext(GlobalContext);
     const [listType, setListType] = useState(LIST_HOME_SLIDESHOW);
     const [interiors, images, setImages, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
@@ -163,12 +164,12 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     const onDeleteUploaded = useCallback((fileUrl) => {
         // Extract the file name from the src
         const fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
-        dataProvider.removeUploadedInterior(fileName).then(() => {
+        context.dataProvider.removeUploadedInterior(fileName).then(() => {
             deleteUploadedInterior(fileUrl);
         }).catch(err => {
             // TODO
         });
-    }, [deleteUploadedInterior]);
+    }, [deleteUploadedInterior, context.dataProvider]);
 
     const handleListType = (event, newListType) => {
         unstable_batchedUpdates(() => {

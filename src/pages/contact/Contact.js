@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useContext } from 'react';
 import Stack from '@material-ui/core/Stack';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -8,8 +8,8 @@ import SendIcon from '@material-ui/icons/Send';
 import { PageTitle } from '../../template/pageTypography';
 import FeedbackMessage from '../../components/feedback/Feedback';
 import { uniqueID } from '../../utils';
-import dataProvider from '../../dataProvider';
 import ReCAPTCHA from "react-google-recaptcha";
+import { GlobalContext } from '../../components/globalContext';
 
 const FormField = ({ field, handleChange, sending }) => {
     if (field.type === "switch") {
@@ -48,6 +48,7 @@ const FormField = ({ field, handleChange, sending }) => {
 
 const Contact = () => {
 
+    const context = useContext(GlobalContext);
     const fields = React.useRef([
         {
             id: "name",
@@ -122,7 +123,7 @@ const Contact = () => {
         const documentProperties = {
             ...values
         };
-        dataProvider.sendMessage(documentProperties)
+        context.dataProvider.sendMessage(documentProperties)
         .then(() => {
             setResult({
                 key: uniqueID(),

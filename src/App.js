@@ -23,6 +23,7 @@ import { withRouter } from "react-router";
 import { routes, NavigationLink } from './navigation/routes';
 import { FirebaseSignin } from './components/firebase';
 import { AuthProvider } from './components/authentication';
+import GlobalContextProvider from './components/globalContext';
 import Footer from './template/footer';
 import ScrollTop from './template/scrollTop';
 import PageContent from './template/pageContent';
@@ -177,6 +178,7 @@ function App(props) {
   return (
     <div style={{ display: 'flex'}}>
     <ThemeProvider theme={ResponsiveTheme}>
+    <GlobalContextProvider>
     <AuthProvider>
 
       <CssBaseline />
@@ -226,6 +228,7 @@ function App(props) {
       <ScrollTop {...props} anchorSelector={`#${scrollTopAnchor}`}></ScrollTop>
 
     </AuthProvider>
+    </GlobalContextProvider>
     </ThemeProvider>
     </div>
   );

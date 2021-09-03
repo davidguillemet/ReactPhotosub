@@ -1,7 +1,7 @@
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import {firebaseAuth} from './firebase';
+import { GlobalContext } from '../globalContext';
 import './firebaseui.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Backdrop from '@material-ui/core/Backdrop';
 import Modal from '@material-ui/core/Modal';
 import Fade from '@material-ui/core/Fade';
@@ -21,22 +21,6 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { AuthContext } from '../authentication';
 import { routes, NavigationLink } from '../../navigation/routes';
-
-// Configure FirebaseUI.
-const uiConfig = {
-    // Popup signin flow rather than redirect flow.
-    signInFlow: 'popup',
-    // We will display Google and Facebook as auth providers.
-    signInOptions: [
-        firebaseAuth.EmailAuthProvider.PROVIDER_ID
-    ],
-    callbacks: {
-        signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-            // No redirect after login
-            return false;
-        }
-    },
-};
 
 const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => (
     <IconButton
@@ -151,36 +135,55 @@ const SignedInButton = ({user, handleLogout}) => {
     );
 }
 
-const FirebaseAuth = ({ user }) => {
+const FirebaseAuth = (props) => {
+
+    const context = useContext(GlobalContext);
+    const authContext = useContext(AuthContext);
 
     const [isLogin, setIsLogin] = useState(false);
 
     // Listen to the Firebase Auth state and set the local state.
     useEffect(() => {
-        const unregisterAuthObserver = firebaseAuth().onAuthStateChanged(newUser => {
+        const unregisterAuthObserver = context.firebase.auth().onAuthStateChanged(newUser => {
             setIsLogin(false);
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-    }, []);
+    }, [context.firebase]);
 
     function handleSignIn(event) {
         setIsLogin(true);
     }
 
     function logout() {
-        firebaseAuth().signOut();
+        context.firebase.auth().signOut();
     }
 
     function onCloseModal() {
         setIsLogin(false);
     }
 
+    // Configure FirebaseUI.
+    const uiConfig = {
+        // Popup signin flow rather than redirect flow.
+        signInFlow: 'popup',
+        // We will display Google and Facebook as auth providers.
+        signInOptions: [
+            context.firebase.auth.EmailAuthProvider.PROVIDER_ID
+        ],
+        callbacks: {
+            signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+                // No redirect after login
+                return false;
+            }
+        },
+    };
+
     return (
         <React.Fragment>
             {
-                user === null ?
+                authContext.user === null ?
                 <NotSignedInButton handleSignIn={handleSignIn} /> :
-                <SignedInButton user={user} handleLogout={logout}/>
+                <SignedInButton user={authContext.user} handleLogout={logout}/>
             }
 
             <Modal
@@ -196,7 +199,7 @@ const FirebaseAuth = ({ user }) => {
             >
                 <Fade in={isLogin}>
                     <div style={{display: 'flex', flex: 1}}>
-                        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseAuth()} />
+                        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={context.firebase.auth()} />
                     </div>
                 </Fade>
             </Modal>
@@ -205,16 +208,4 @@ const FirebaseAuth = ({ user }) => {
     );
 }
 
-const FirebaseAuthConsumer = () => {
-    return (
-        <AuthContext.Consumer>
-            { ({user}) => {
-                return (
-                    <FirebaseAuth user={user} />
-                );
-            }}
-        </AuthContext.Consumer>
-    );
-}
-
-export default FirebaseAuthConsumer;
+export default FirebaseAuth;

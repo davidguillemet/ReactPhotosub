@@ -1,13 +1,14 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useContext } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
-import dataProvider from '../../dataProvider';
 import { uniqueID } from '../../utils';
+import { GlobalContext } from '../../components/globalContext';
 
 export const LIST_HOME_SLIDESHOW = "slideshow";
 export const LIST_FAVORITES = "favorites";
 export const LIST_SEARCH = "search";
 
 const useImageLoader = (user, simulations, listType) => {
+    const context = useContext(GlobalContext);
     const [interiors, setInteriors] = useState(null);
     const [userInteriors, setUserInteriors] = useState(null);
     const [allInteriors, setAllInteriors] = useState(null);
@@ -39,20 +40,20 @@ const useImageLoader = (user, simulations, listType) => {
 
     // Load interiors
     useEffect(() => {
-        dataProvider.getInteriors().then(images => {
+        context.dataProvider.getInteriors().then(images => {
             unstable_batchedUpdates(() => {
                 const defaultInteriors = buildImages(images, false);
                 setInteriors(defaultInteriors);
             });
         })
-    }, [buildImages]);
+    }, [buildImages, context.dataProvider]);
 
     // Load user uploaded interiors
     useEffect(() => {
         const loadPromise =
             user === null ?
             Promise.resolve([]) :
-            dataProvider.getUploadedInteriors();
+            context.dataProvider.getUploadedInteriors();
         
         loadPromise.then(images => {
             unstable_batchedUpdates(() => {
@@ -60,7 +61,7 @@ const useImageLoader = (user, simulations, listType) => {
                 setUserInteriors(userInteriors);
             });
         })
-    }, [user, buildImages]);
+    }, [user, buildImages, context.dataProvider]);
 
     // Update the collection containing all interiors 
     useEffect(() => {
@@ -101,8 +102,8 @@ const useImageLoader = (user, simulations, listType) => {
         }
 
         const promise =
-            listType === LIST_HOME_SLIDESHOW ? dataProvider.getImageDefaultSelection() :
-            listType === LIST_FAVORITES ? dataProvider.getFavorites() : 
+            listType === LIST_HOME_SLIDESHOW ? context.dataProvider.getImageDefaultSelection() :
+            listType === LIST_FAVORITES ? context.dataProvider.getFavorites() : 
             Promise.resolve([]); // initialize the search with an empty list
 
         promise.then(images => {
@@ -122,7 +123,7 @@ const useImageLoader = (user, simulations, listType) => {
                 setImages(newImages);
             });
         })
-    }, [listType, imagesBySource]);
+    }, [listType, imagesBySource, context.dataProvider]);
 
     const addUploadedInterior = useCallback((fileSrc) => {
         // Add the new uploaded image to the user interiors' array

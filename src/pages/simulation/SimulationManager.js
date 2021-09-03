@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo, useReducer } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useReducer, useContext } from 'react';
 
 import { Prompt } from "react-router-dom";
 
@@ -6,13 +6,14 @@ import {unstable_batchedUpdates} from 'react-dom';
 
 import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
-import dataProvider, { isFromDb, isDirty, getDbIndex } from '../../dataProvider';
+import { isFromDb, isDirty, getDbIndex } from '../../dataProvider';
 import SimulationToolBar from './SimulationToolBar';
 import Simulation from './Simulation';
 
 import FeedbackMessage from '../../components/feedback';
 import { AuthContext } from '../../components/authentication';
 import { uniqueID } from '../../utils';
+import { GlobalContext } from '../../components/globalContext';
 
 import simulationsReducer from './actions/SimulationReducer';
 import {
@@ -25,8 +26,10 @@ import {
 
 import 'fontsource-roboto/100.css';
 
-const SimulationManager = ({ user }) => {
+const SimulationManager = () => {
 
+    const context = useContext(GlobalContext);
+    const authContext = useContext(AuthContext);
     /**
      * state = {
      *  simulations: <array>,
@@ -51,14 +54,14 @@ const SimulationManager = ({ user }) => {
     // load simulations if connected
     // -> simulations won't be null after this hook execution
     useEffect(() => {
-        if (user !== null) {
-            dataProvider.getSimulations().then(res => {
+        if (authContext.user !== null) {
+            context.dataProvider.getSimulations().then(res => {
                 dispatch(initSimulations(res));
             })
         } else {
             dispatch(addSimulation());
         }
-    }, [user]);
+    }, [context.dataProvider, authContext.user]);
 
     const onSave = useCallback((simulationname) => {
         const simulationData = state.simulations[state.currentIndex];
@@ -67,7 +70,7 @@ const SimulationManager = ({ user }) => {
         }
         
         if (isFromDb(simulationData)) {
-            dataProvider.updateSimulation(simulationData).then(res => {
+            context.dataProvider.updateSimulation(simulationData).then(res => {
                 unstable_batchedUpdates(() => {
                     dispatch(setSimulationDirty(false, state.currentIndex));
                     displayFeedback("success", `The simulation '${simulationData.name}' has been saved.`);
@@ -78,7 +81,7 @@ const SimulationManager = ({ user }) => {
                 displayFeedback("error", "Error while saving the simulation...");
             })
         } else {
-            dataProvider.addSimulation(simulationData).then(res => {
+            context.dataProvider.addSimulation(simulationData).then(res => {
                 // res contains all the simulations
                 // The last one is the new one
                 const newSimulationFromDb = res[res.length-1];
@@ -98,7 +101,7 @@ const SimulationManager = ({ user }) => {
                 displayFeedback("error", "Error while saving the simulation...");
             });
         } 
-    }, [displayFeedback, state]);
+    }, [displayFeedback, state, context.dataProvider]);
 
     const onAdd = useCallback((name) => {
         unstable_batchedUpdates(() => {
@@ -114,7 +117,7 @@ const SimulationManager = ({ user }) => {
 
         const removePromise =
             isFromDb(simulationToRemove) ?
-            dataProvider.removeSimulation(simulationToRemove) :
+            context.dataProvider.removeSimulation(simulationToRemove) :
             Promise.resolve(null); // just remove from the store
 
         removePromise.then((res) => {
@@ -128,17 +131,17 @@ const SimulationManager = ({ user }) => {
             displayFeedback("error", `Error while deleting the simulation '${simulationName}'`);
         });
 
-    }, [state, dispatch, displayFeedback]);
+    }, [state, dispatch, displayFeedback, context.dataProvider]);
 
     const promptMessage = useMemo(() => {
         let message = "Des modifications sont en cours.\n"
                     + "Cliquez sur OK pour confirmer la navigation et perdre vos modifications.\n"
                     + "Cliquez sur Annuler pour rester sur la page et sauvagarder vos modifications";
-        if (user === null) {
+        if (authContext.user === null) {
             message += " (connexion requise)";
         }
         return message;
-    }, [user]);
+    }, [authContext.user]);
 
     const hasDirty = state !== null && state.simulations.find(simulation => isDirty(simulation)) !== undefined;
     return (
@@ -151,7 +154,7 @@ const SimulationManager = ({ user }) => {
             <PageTitle>Simulateur</PageTitle>
 
             {
-                user && state &&
+                authContext.user && state &&
                 <SimulationToolBar
                     simulations={state.simulations}
                     currentIndex={state.currentIndex}
@@ -166,27 +169,11 @@ const SimulationManager = ({ user }) => {
 
             {
                 state &&
-                <Simulation simulations={state.simulations} simulationIndex={state.currentIndex} user={user} dispatch={dispatch} />
+                <Simulation simulations={state.simulations} simulationIndex={state.currentIndex} user={authContext.user} dispatch={dispatch} />
             }
 
         </React.Fragment>
     );
 };
 
-const SimulationManagerConsumer = (props) => {
-    return (
-        <AuthContext.Consumer>
-            { ({user, data, updateUserContext}) => {
-                return (
-                    <SimulationManager
-                        user={user}
-                        updateUserContext={updateUserContext}
-                        {...props}
-                    />
-                );
-            }}
-        </AuthContext.Consumer>
-    );
-}
-
-export default SimulationManagerConsumer;
+export default SimulationManager;
