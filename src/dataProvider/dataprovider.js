@@ -116,7 +116,7 @@ DataProvider.prototype.removeSimulation = function(simulation) {
 }
 
 DataProvider.prototype.getImageCount = function() {
-    return this.axios.get('/api/images')
+    return this.axios.get('/images')
     .then(response => {
         return response.data.count;
     })
