@@ -165,7 +165,7 @@ DataProvider.prototype.searchImages = function(pageIndex, query, pageSize, exact
 }
 
 DataProvider.prototype.sendMessage = function(messageProperties) {
-    return this.axios.post('/api/message', {
+    return this.axios.post('/message', {
         ...messageProperties
     }).then(response => {
         return response.data;

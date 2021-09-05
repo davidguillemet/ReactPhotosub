@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useContext } from 'react';
+import { Prompt } from "react-router-dom";
 import Stack from '@material-ui/core/Stack';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -130,6 +131,7 @@ const Contact = () => {
                 status: 'success',
                 message: 'Votre message a bien été envoyé. Merci!'
             })
+            fields.current.forEach(f => f.isDirty = false);
         })
         .catch((error) => {
             setResult({
@@ -172,6 +174,7 @@ const Contact = () => {
     const handleChange = (event) => {
         const fieldId = event.target.id;
         const field = fields.current.find(f => f.id === fieldId);
+        field.isDirty = true;
 
         let fieldValue = null;
         if (field.type === "switch") {
@@ -192,6 +195,8 @@ const Contact = () => {
             }
         })
     }
+
+    const isDirty = fields.current.findIndex(f => f.isDirty === true) !== -1;
 
     return (
         <React.Fragment>
@@ -219,6 +224,9 @@ const Contact = () => {
             </LoadingButton>
 
             <FeedbackMessage key={result.key} severity={result.severity} message={result.message} />
+
+            <Prompt when={isDirty} message={"Votre message n'a pas été envoyé après les dernières modifications.\nContinuer la navigation?"} />
+
         </React.Fragment>
     );
 }
