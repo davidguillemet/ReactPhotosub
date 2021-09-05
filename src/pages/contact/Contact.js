@@ -12,6 +12,10 @@ import { uniqueID } from '../../utils';
 import ReCAPTCHA from "react-google-recaptcha";
 import { GlobalContext } from '../../components/globalContext';
 
+const FIELD_TYPE_TEXT = 'text';
+const FIELD_TYPE_EMAIL = 'email';
+const FIELD_TYPE_SWITCH = 'switch';
+
 const FormField = ({ field, handleChange, sending }) => {
     if (field.type === "switch") {
         return (
@@ -56,7 +60,7 @@ const Contact = () => {
             label: "Votre nom",
             required: true,
             errorText: "Merci d'indiquer votre nom.",
-            type: "text",
+            type: FIELD_TYPE_TEXT,
             multiline: false,
             default: null
         },
@@ -65,7 +69,7 @@ const Contact = () => {
             label: "Votre adresse de messagerie",
             required: true,
             errorText: "Merci d'indiquer une adresse de messagerie valide.",
-            type: "email",
+            type: FIELD_TYPE_EMAIL,
             multiline: false,
             default: null
         },
@@ -74,7 +78,7 @@ const Contact = () => {
             label: "Le titre de votre message",
             required: true,
             errorText: "Merci d'indiquer l'objet de votre message.",
-            type: "text",
+            type: FIELD_TYPE_TEXT,
             multiline: false,
             default: null
         },
@@ -83,19 +87,19 @@ const Contact = () => {
             label: "Votre message",
             required: true,
             errorText: "Merci de saisir un message.",
-            type: "text",
+            type: FIELD_TYPE_TEXT,
             multiline: true,
             default: null
         },
         {
             id: "sendcopy",
             label: "Recevoir une copie de votre message",
-            type: "switch",
+            type: FIELD_TYPE_SWITCH,
             default: false
         },
         {
             id: "token",
-            type: "text",
+            type: FIELD_TYPE_TEXT,
             hidden: true,
             default: null
         }
@@ -147,13 +151,16 @@ const Contact = () => {
 
     useEffect(() => {
         let isValid = true;
-        for (let key in values) {
-            const fieldValue = values[key];
-            if (fieldValue === null || (typeof fieldValue === 'string' && fieldValue.length === 0)) {
+
+        fields.current.forEach(field => {
+            const fieldValue = values[field.id];
+            if (fieldValue === null ||
+                (field.type === FIELD_TYPE_TEXT && fieldValue.length === 0) ||
+                (field.type === FIELD_TYPE_EMAIL && !validateEmail(fieldValue))) {
                 isValid = false;
-                break;
+                // No break with forEach...
             }
-        }
+        })
         setIsValid(isValid);
     }, [values])
 
@@ -177,11 +184,11 @@ const Contact = () => {
         field.isDirty = true;
 
         let fieldValue = null;
-        if (field.type === "switch") {
+        if (field.type === FIELD_TYPE_SWITCH) {
             fieldValue = event.target.checked;
         } else {
             fieldValue = event.target.value.trim();
-            if (field.type === "email") {
+            if (field.type === FIELD_TYPE_EMAIL) {
                 field.error = !validateEmail(fieldValue);
             } else {
                 field.error = fieldValue.length === 0;
