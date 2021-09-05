@@ -4,6 +4,7 @@
 .slide-enter-active {
     opacity: 1;
     transition: opacity 2000ms ease-in;
+    -webkit-transition: opacity 2000ms ease-in;
 }
 .slide-exit {
     opacity: 1;
@@ -11,4 +12,5 @@
 .slide-exit-active {
     opacity: 0;
     transition: opacity 2000ms ease-in;
+    -webkit-transition: opacity 2000ms ease-in;
 }
