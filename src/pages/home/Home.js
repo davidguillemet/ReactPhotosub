@@ -8,6 +8,7 @@ import {unstable_batchedUpdates} from 'react-dom';
 
 import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils';
 import { GlobalContext } from '../../components/globalContext';
+import { useScrollBlock } from '../../utils';
 
 const _diaporamaInterval = 10000;
 const _cacheKey = "homeImages";
@@ -43,6 +44,7 @@ const Home = () => {
     const context = useContext(GlobalContext);
     const [images, setImages] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(-1);
+    const [blockScroll, allowScroll] = useScrollBlock();
 
     const diaporamaTimeoutRef = useRef(null);
 
@@ -80,9 +82,13 @@ const Home = () => {
             });
         }
 
+        blockScroll();
+
         return () => {
+            allowScroll();
             clearTimeout(diaporamaTimeoutRef.current);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [context.dataProvider]);
 
     const handleNextImage = useCallback(() => {
