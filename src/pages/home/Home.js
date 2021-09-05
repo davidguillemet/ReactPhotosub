@@ -116,7 +116,7 @@ const Home = () => {
             <TransitionGroup component={null}>
                 <CSSTransition
                     key={currentImageIndex}
-                    timeout={2000}
+                    timeout={2500}
                     classNames="slide"
                 >
                     <Box
