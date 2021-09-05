@@ -10,3 +10,4 @@ export {
     getThumbnailSrc,
     clearThumbnailSrc
 } from './utils';
+export { useScrollBlock } from './useScrollBlock';
