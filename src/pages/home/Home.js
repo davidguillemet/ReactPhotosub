@@ -82,10 +82,10 @@ const Home = () => {
             });
         }
 
-        blockScroll();
+        //blockScroll();
 
         return () => {
-            allowScroll();
+            //allowScroll();
             clearTimeout(diaporamaTimeoutRef.current);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
