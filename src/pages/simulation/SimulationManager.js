@@ -144,6 +144,11 @@ const SimulationManager = () => {
     }, [authContext.user]);
 
     const hasDirty = state !== null && state.simulations.find(simulation => isDirty(simulation)) !== undefined;
+
+    // Add a simulation property to the simulation to recreate the component from scratch when the user changes
+    // -> avoid an issue when refreshing the page
+    const simulationKey = authContext.user !== null ? authContext.user.uid : "anonymous";
+
     return (
         <React.Fragment>
 
@@ -169,7 +174,13 @@ const SimulationManager = () => {
 
             {
                 state &&
-                <Simulation simulations={state.simulations} simulationIndex={state.currentIndex} user={authContext.user} dispatch={dispatch} />
+                <Simulation
+                    simulations={state.simulations}
+                    simulationIndex={state.currentIndex}
+                    user={authContext.user}
+                    dispatch={dispatch}
+                    key={simulationKey}
+                />
             }
 
         </React.Fragment>
