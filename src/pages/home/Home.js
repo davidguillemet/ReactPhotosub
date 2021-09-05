@@ -25,7 +25,7 @@ const MainImageStyled = styled('img')({
 const MainImage = ({images, currentImageIndex, handleImageLoaded}) => {
 
     let currentImageSrc = "/home_initial.jpg";
-    if (images !== null) {
+    if (images !== null && currentImageIndex >= 0) {
         const currentImage = images[currentImageIndex];
         currentImageSrc = currentImage.isLoaded ? currentImage.src : currentImage.blurrySrc
     }
@@ -58,7 +58,7 @@ const Home = () => {
                         id: uniqueID()
                     }
                 }));
-                setCurrentImageIndex(0);
+                setCurrentImageIndex(-1); // change to image #0 after first round
             })
         };
         const cachedData = sessionStorage.getItem(_cacheKey);
@@ -106,7 +106,10 @@ const Home = () => {
             // We just loaded the blurry version, now load the normal version
             event.target.src = images[currentImageIndex].src
         } else if (images !== null) {
-            images[currentImageIndex].isLoaded = true;
+            if (currentImageIndex >= 0)
+            {
+                images[currentImageIndex].isLoaded = true;
+            }
             diaporamaTimeoutRef.current = setTimeout(handleNextImage, _diaporamaInterval);
         }
     };
