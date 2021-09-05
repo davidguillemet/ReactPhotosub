@@ -85,6 +85,7 @@ const Home = () => {
         blockScroll();
 
         return () => {
+            allowScroll();
             clearTimeout(diaporamaTimeoutRef.current);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
