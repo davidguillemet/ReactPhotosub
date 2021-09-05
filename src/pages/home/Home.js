@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useContext } from 'react';
+import React, { useState, useRef, useCallback, useContext } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -9,6 +9,7 @@ import {unstable_batchedUpdates} from 'react-dom';
 
 import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils';
 import { GlobalContext } from '../../components/globalContext';
+import { useCancellable } from '../../dataProvider';
 
 const _diaporamaInterval = 10000;
 
@@ -42,7 +43,7 @@ const Home = () => {
 
     const diaporamaTimeoutRef = useRef(null);
 
-    useEffect(() => {
+    useCancellable(() => {
         context.dataProvider.getImageDefaultSelection().then(images => {
             unstable_batchedUpdates(() => {
                 setImages(shuffleArray(images).map(image => {
@@ -58,7 +59,7 @@ const Home = () => {
         return () => {
             clearTimeout(diaporamaTimeoutRef.current);
         }
-    }, [context.dataProvider]);
+    }, [context.dataProvider], context.dataProvider);
 
     const handleNextImage = useCallback(() => {
         setCurrentImageIndex(prevIndex => {

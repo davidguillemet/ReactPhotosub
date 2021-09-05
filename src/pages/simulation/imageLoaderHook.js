@@ -2,22 +2,12 @@ import { useEffect, useState, useCallback, useContext } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import { uniqueID } from '../../utils';
 import { GlobalContext } from '../../components/globalContext';
+import { useCancellable } from '../../dataProvider'
 
 export const LIST_HOME_SLIDESHOW = "slideshow";
 export const LIST_FAVORITES = "favorites";
 export const LIST_SEARCH = "search";
 
-const useAxiosEffect = (func, dependencies, dataProvider) => {
-
-    useEffect(() => {
-        const source = dataProvider.cancelTokenSource();
-        func();
-        return () => {
-            source.cancel("Cancelling in cleanup");
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, dependencies);
-}
 
 const useImageLoader = (user, simulations, listType) => {
     const context = useContext(GlobalContext);
@@ -51,7 +41,7 @@ const useImageLoader = (user, simulations, listType) => {
     }, [buildImage]);
 
     // Load interiors
-    useAxiosEffect(() => {
+    useCancellable(() => {
         context.dataProvider.getInteriors().then(images => {
             unstable_batchedUpdates(() => {
                 const defaultInteriors = buildImages(images, false);
