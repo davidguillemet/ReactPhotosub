@@ -1,7 +1,18 @@
+
+function resolveAfterDelay(x) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, x);
+    });
+}
+
 module.exports = function(config) {
     config.app.route("/bucket/:folder")
         .get(async function(req, res, next) {
             // Get images from a bucket folder
+            await resolveAfterDelay(3000);
+
             config.bucket.getFiles({
                 prefix: `${req.params.folder}/`,
                 delimiter: "/",

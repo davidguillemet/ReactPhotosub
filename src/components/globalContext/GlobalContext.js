@@ -37,8 +37,10 @@ const GlobalContextProvider = ({children}) => {
 
         const axiosInstance = axios.create({
             baseURL: apiBaseUrl + '/api',
-            timeout: 3000,
+            timeout: 5000,
         });
+        axiosInstance.CancelToken = axios.CancelToken;
+        axiosInstance.isCancel = axios.isCancel;
         
         // configure axios to send an authentication token as soon as a user is connected
         axiosInstance.interceptors.request.use(async function (config) {

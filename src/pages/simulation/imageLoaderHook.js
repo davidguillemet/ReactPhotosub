@@ -7,6 +7,18 @@ export const LIST_HOME_SLIDESHOW = "slideshow";
 export const LIST_FAVORITES = "favorites";
 export const LIST_SEARCH = "search";
 
+const useAxiosEffect = (func, dependencies, dataProvider) => {
+
+    useEffect(() => {
+        const source = dataProvider.cancelTokenSource();
+        func();
+        return () => {
+            source.cancel("Cancelling in cleanup");
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, dependencies);
+}
+
 const useImageLoader = (user, simulations, listType) => {
     const context = useContext(GlobalContext);
     const [interiors, setInteriors] = useState(null);
@@ -39,14 +51,14 @@ const useImageLoader = (user, simulations, listType) => {
     }, [buildImage]);
 
     // Load interiors
-    useEffect(() => {
+    useAxiosEffect(() => {
         context.dataProvider.getInteriors().then(images => {
             unstable_batchedUpdates(() => {
                 const defaultInteriors = buildImages(images, false);
                 setInteriors(defaultInteriors);
             });
         })
-    }, [buildImages, context.dataProvider]);
+    }, [buildImages, context.dataProvider], context.dataProvider);
 
     // Load user uploaded interiors
     useEffect(() => {
