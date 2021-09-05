@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef, useCallback, useContext } from 'rea
 import { styled } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { withLoading, buildLoadingState } from '../../components/loading';
 import './styles.css';
 
 import {unstable_batchedUpdates} from 'react-dom';
@@ -11,6 +10,7 @@ import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils';
 import { GlobalContext } from '../../components/globalContext';
 
 const _diaporamaInterval = 10000;
+const _cacheKey = "homeImages";
 
 const MainImageStyled = styled('img')({
     display: 'block',
@@ -21,29 +21,33 @@ const MainImageStyled = styled('img')({
     objectFit: 'cover' // prevent image from shrinking when window width is too small
 });
 
-const MainImage = withLoading(({images, currentImageIndex, handleImageLoaded}) => {
+const MainImage = ({images, currentImageIndex, handleImageLoaded}) => {
 
-    const currentImage = images[currentImageIndex];
+    let currentImageSrc = "/home_initial.jpg";
+    if (images !== null) {
+        const currentImage = images[currentImageIndex];
+        currentImageSrc = currentImage.isLoaded ? currentImage.src : currentImage.blurrySrc
+    }
 
     return (
         <MainImageStyled 
             alt=""
             onLoad={handleImageLoaded}
-            src={currentImage.isLoaded ? currentImage.src : currentImage.blurrySrc}
+            src={currentImageSrc}
         />
     )
-}, [buildLoadingState("images", null)], { marginTop: 0 });
+};
 
 const Home = () => {
 
     const context = useContext(GlobalContext);
     const [images, setImages] = useState(null);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [currentImageIndex, setCurrentImageIndex] = useState(-1);
 
     const diaporamaTimeoutRef = useRef(null);
 
     useEffect(() => {
-        context.dataProvider.getImageDefaultSelection().then(images => {
+        const processHomeImages = (images) => {
             unstable_batchedUpdates(() => {
                 setImages(shuffleArray(images).map(image => {
                     return {
@@ -54,7 +58,28 @@ const Home = () => {
                 }));
                 setCurrentImageIndex(0);
             })
-        });
+        };
+        const cachedData = sessionStorage.getItem(_cacheKey);
+        let done = false;
+        if (cachedData) {
+            try
+            {
+                processHomeImages(JSON.parse(cachedData));
+                done = true;
+            }
+            catch (e)
+            {
+                done = false;
+            }
+        }
+
+        if (done === false) {
+            context.dataProvider.getImageDefaultSelection().then((images) => {
+                sessionStorage.setItem(_cacheKey, JSON.stringify(images));
+                processHomeImages(images)
+            });
+        }
+
         return () => {
             clearTimeout(diaporamaTimeoutRef.current);
         }
@@ -74,7 +99,7 @@ const Home = () => {
         if (isBlurrySrc(event.target.src)) {
             // We just loaded the blurry version, now load the normal version
             event.target.src = images[currentImageIndex].src
-        } else {
+        } else if (images !== null) {
             images[currentImageIndex].isLoaded = true;
             diaporamaTimeoutRef.current = setTimeout(handleNextImage, _diaporamaInterval);
         }
