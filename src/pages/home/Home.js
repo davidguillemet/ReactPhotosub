@@ -44,7 +44,7 @@ const Home = () => {
     const context = useContext(GlobalContext);
     const [images, setImages] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(-1);
-    const [blockScroll, allowScroll] = useScrollBlock();
+    //const [blockScroll, allowScroll] = useScrollBlock();
 
     const diaporamaTimeoutRef = useRef(null);
 
