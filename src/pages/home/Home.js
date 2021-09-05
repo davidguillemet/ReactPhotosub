@@ -2,7 +2,6 @@ import React, { useState, useRef, useCallback, useContext } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { withLoading, buildLoadingState } from '../../components/loading';
 import './styles.css';
 
 import {unstable_batchedUpdates} from 'react-dom';
