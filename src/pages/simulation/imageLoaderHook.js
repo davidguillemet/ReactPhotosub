@@ -2,10 +2,12 @@ import { useEffect, useState, useCallback, useContext } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import { uniqueID } from '../../utils';
 import { GlobalContext } from '../../components/globalContext';
+import { useCancellable } from '../../dataProvider'
 
 export const LIST_HOME_SLIDESHOW = "slideshow";
 export const LIST_FAVORITES = "favorites";
 export const LIST_SEARCH = "search";
+
 
 const useImageLoader = (user, simulations, listType) => {
     const context = useContext(GlobalContext);
@@ -39,14 +41,14 @@ const useImageLoader = (user, simulations, listType) => {
     }, [buildImage]);
 
     // Load interiors
-    useEffect(() => {
+    useCancellable(() => {
         context.dataProvider.getInteriors().then(images => {
             unstable_batchedUpdates(() => {
                 const defaultInteriors = buildImages(images, false);
                 setInteriors(defaultInteriors);
             });
         })
-    }, [buildImages, context.dataProvider]);
+    }, [buildImages, context.dataProvider], context.dataProvider);
 
     // Load user uploaded interiors
     useEffect(() => {

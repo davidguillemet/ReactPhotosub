@@ -17,6 +17,11 @@ function DataProvider(axiosInstance) {
     this.axios = axiosInstance
 }
 
+DataProvider.prototype.cancelTokenSource = function() {
+    this._source = this.axios.CancelToken.source()
+    return this._source;
+}
+
 DataProvider.prototype.getDestinationProps = function(year, title, props) {
     return this.axios.get(`/destination/${year}/${title}/${props}`)
     .then(response => {
@@ -142,7 +147,7 @@ DataProvider.prototype.getImageDefaultSelection = function() {
 }
 
 DataProvider.prototype._getBucketContent = function(folder) {
-    return this.axios.get(`/bucket/${folder}`)
+    return this.axios.get(`/bucket/${folder}`, { cancelToken: this._source.token })
     .then(response => {
         return response.data;
     });
