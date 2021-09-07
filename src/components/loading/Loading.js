@@ -13,7 +13,11 @@ export const Loading = ({size, marginTop = 3}) => {
 }
 
 const conditionIsReached = (condition, props) => {
-    return props[condition.property] !== condition.value;
+    if (Array.isArray(condition.value)) {
+        return condition.value.every(value => props[condition.property] !== value);
+    } else {
+        return props[condition.property] !== condition.value;        
+    }
 }
 
 const isReady = (conditions, props) => {
