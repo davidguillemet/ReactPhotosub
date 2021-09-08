@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo, useReducer, useContext } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useReducer } from 'react';
 
 import { Prompt } from "react-router-dom";
 
@@ -11,9 +11,9 @@ import SimulationToolBar from './SimulationToolBar';
 import Simulation from './Simulation';
 
 import FeedbackMessage from '../../components/feedback';
-import { AuthContext } from '../../components/authentication';
+import { useAuthContext } from '../../components/authentication';
 import { uniqueID } from '../../utils';
-import { GlobalContext } from '../../components/globalContext';
+import { useGlobalContext } from '../../components/globalContext';
 
 import simulationsReducer from './actions/SimulationReducer';
 import {
@@ -28,8 +28,8 @@ import 'fontsource-roboto/100.css';
 
 const SimulationManager = () => {
 
-    const context = useContext(GlobalContext);
-    const authContext = useContext(AuthContext);
+    const context = useGlobalContext();
+    const authContext = useAuthContext();
     /**
      * state = {
      *  simulations: <array>,

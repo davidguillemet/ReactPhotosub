@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 import TabContext from '@material-ui/lab/TabContext';
 import TabPanel from '@material-ui/lab/TabPanel';
@@ -15,7 +15,7 @@ import DestinationsGrid from './grid/DestinationsGrid';
 import DestinationsMap from '../../components/map';
 import RegionFilter from './RegionFilter';
 import useRegions from './RegionLoaderHook';
-import { GlobalContext } from '../../components/globalContext';
+import { useGlobalContext } from '../../components/globalContext';
 
 const useStyles = makeStyles(() => ({
     regionContainer: {
@@ -71,25 +71,20 @@ const DisplayModeSelector = ({listType, onChange}) => {
 
 const Destinations = () => {
 
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
     const classes = useStyles();
 
-    const [allDestinations, setAllDestinations] = useState(null);
     const [filteredDestinations, setFilteredDestinations] = useState(null);
     const [regionsByDestination, setRegionsByDestination] = useState(null);
     const [destinationsView, setDestinationsView] = useState(VIEW_GRID);
     const [regionHierarchy, regionMap] = useRegions();
     const [regionFilterSet, setRegionFilterSet] = useState(null);
 
-    // Another effect executed only to load destinations
+    // Fetch Destinations
+    const { data: allDestinations } = context.useFetchDestinations();
+    
     useEffect(() => {
-        context.dataProvider.getDestinations().then(destinations => {
-            setAllDestinations(destinations);
-        });
-    }, [context.dataProvider]); 
-
-    useEffect(() => {
-        if (regionMap === null || allDestinations == null) {
+        if (regionMap === null || allDestinations === undefined) {
             // Wait for the regions and destinations being loaded
             return;
         }
@@ -109,7 +104,7 @@ const Destinations = () => {
     }, [allDestinations, regionMap])
 
     useEffect(() => {
-        if (allDestinations === null || regionsByDestination === null || regionFilterSet === null) {
+        if (allDestinations === undefined || regionsByDestination === null || regionFilterSet === null) {
             return;
         }
 

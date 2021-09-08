@@ -1,9 +1,9 @@
 
 /*global google*/
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import { GoogleMap, InfoWindow, MarkerClusterer, useLoadScript } from '@react-google-maps/api';
-import { GlobalContext } from '../globalContext';
+import { useGlobalContext } from '../globalContext';
 import { formatDate, getThumbnailSrc } from '../../utils';
 
 import LocationInfoWindow from './LocationInfoWindow';
@@ -16,7 +16,7 @@ const _defaultCenter = {
 
 const DestinationsMap = ({destinations}) => {
 
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
 
     const locationMapRef = useRef(null);
     const [selectedLocation, setSelectedLocation] = useState(null);

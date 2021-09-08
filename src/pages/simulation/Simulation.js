@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo, useContext } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -27,7 +27,7 @@ import {setBackground, resize, borderWidth, borderColor, addImage, setImage} fro
 import { useResizeObserver } from '../../components/hooks';
 import Search, { getInitialSearchResult } from '../../components/search';
 import useImageLoader, {LIST_HOME_SLIDESHOW, LIST_FAVORITES, LIST_SEARCH} from './imageLoaderHook';
-import { GlobalContext } from '../../components/globalContext';
+import { useGlobalContext } from '../../components/globalContext';
 
 const borderColors = [
     "#FFFFFF",
@@ -73,7 +73,7 @@ const EmptySimulationImages = ({type, images, searchResult}) => {
 
 const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
     const [listType, setListType] = useState(LIST_HOME_SLIDESHOW);
     const [interiors, images, setImages, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);

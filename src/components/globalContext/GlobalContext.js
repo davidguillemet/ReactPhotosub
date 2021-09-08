@@ -1,4 +1,4 @@
-import React, { createContext, useRef } from 'react';
+import React, { createContext, useContext, useRef } from 'react';
 
 import firebase from 'firebase/app';
 import "firebase/auth";
@@ -7,9 +7,9 @@ import "firebase/storage";
 import axios from 'axios';
 import DataProvider from '../../dataProvider/dataprovider';
 
-const GlobalContext = createContext(null);
+import { useQuery } from 'react-query';
 
-export { GlobalContext };
+const GlobalContext = createContext(null);
 
 const GlobalContextProvider = ({children}) => {
 
@@ -53,7 +53,12 @@ const GlobalContextProvider = ({children}) => {
 
         globalContext.current = {
             firebase,
-            dataProvider
+            dataProvider,
+            useFetchHomeSlideshow: () => useQuery('homeslideshow', () => dataProvider.getImageDefaultSelection()),
+            useFetchRegions: () => useQuery('regions', () => dataProvider.getRegions()),
+            useFetchDestinations: () => useQuery('destinations', () => dataProvider.getDestinations()),
+            useFetchDestinationHeader: (year, title) => useQuery(['destinationheader', year, title], () => dataProvider.getDestinationDetailsFromPath(year, title)),
+            useFetchDestinationImages: (year, title) => useQuery(['destinationimages', year, title], () => dataProvider.getDestinationImagesFromPath(year, title))
         }
     }
 
@@ -65,3 +70,6 @@ const GlobalContextProvider = ({children}) => {
 };
 
 export default GlobalContextProvider;
+export { GlobalContext };
+export const useGlobalContext = () => useContext(GlobalContext)
+

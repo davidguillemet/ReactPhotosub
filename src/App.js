@@ -24,6 +24,7 @@ import { routes, NavigationLink } from './navigation/routes';
 import { FirebaseSignin } from './components/firebase';
 import { AuthProvider } from './components/authentication';
 import GlobalContextProvider from './components/globalContext';
+import ReactQueryClientProvider from './components/reactQuery';
 import Footer from './template/footer';
 import ScrollTop from './template/scrollTop';
 import PageContent from './template/pageContent';
@@ -179,6 +180,7 @@ function App(props) {
     <div style={{ display: 'flex'}}>
     <ThemeProvider theme={ResponsiveTheme}>
     <GlobalContextProvider>
+    <ReactQueryClientProvider>
     <AuthProvider>
 
       <CssBaseline />
@@ -228,6 +230,7 @@ function App(props) {
       <ScrollTop {...props} anchorSelector={`#${scrollTopAnchor}`}></ScrollTop>
 
     </AuthProvider>
+    </ReactQueryClientProvider>
     </GlobalContextProvider>
     </ThemeProvider>
     </div>

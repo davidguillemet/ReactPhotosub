@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useContext } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -7,11 +7,10 @@ import './styles.css';
 import {unstable_batchedUpdates} from 'react-dom';
 
 import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils';
-import { GlobalContext } from '../../components/globalContext';
+import { useGlobalContext } from '../../components/globalContext';
 import { useScrollBlock } from '../../utils';
 
 const _diaporamaInterval = 10000;
-const _cacheKey = "homeImages";
 
 const MainImageStyled = styled('img')({
     display: 'block',
@@ -40,58 +39,43 @@ const MainImage = ({images, currentImageIndex, handleImageLoaded}) => {
 };
 
 const Home = () => {
-
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
     const [images, setImages] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(-1);
     const [blockScroll, allowScroll] = useScrollBlock();
-
     const diaporamaTimeoutRef = useRef(null);
 
+    const { isLoading, data } = context.useFetchHomeSlideshow();
+    
     useEffect(() => {
-        const processHomeImages = (images) => {
-            unstable_batchedUpdates(() => {
-                setImages(shuffleArray(images).map(image => {
-                    return {
-                        ...image,
-                        blurrySrc: getBlurrySrc(image.src),
-                        id: uniqueID()
-                    }
-                }));
-                setCurrentImageIndex(-1); // change to image #0 after first round
-            })
-        };
-        const cachedData = sessionStorage.getItem(_cacheKey);
-        let done = false;
-        if (cachedData) {
-            try
-            {
-                processHomeImages(JSON.parse(cachedData));
-                done = true;
-            }
-            catch (e)
-            {
-                done = false;
-            }
+        if (isLoading) {
+            return;
         }
+        unstable_batchedUpdates(() => {
+            setImages(shuffleArray(data).map(image => {
+                return {
+                    ...image,
+                    blurrySrc: getBlurrySrc(image.src),
+                    id: uniqueID()
+                }
+            }));
+            setCurrentImageIndex(-1); // change to image #0 after first round
+        })
+    }, [isLoading, data]);
 
-        if (done === false) {
-            context.dataProvider.getImageDefaultSelection().then((images) => {
-                sessionStorage.setItem(_cacheKey, JSON.stringify(images));
-                processHomeImages(images)
-            });
-        }
-
+    useEffect(() => {
         blockScroll();
-
         return () => {
             allowScroll();
             clearTimeout(diaporamaTimeoutRef.current);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [context.dataProvider]);
+    }, []);
 
     const handleNextImage = useCallback(() => {
+        if (images === null) {
+            return;
+        }
         setCurrentImageIndex(prevIndex => {
             if (prevIndex >= images.length - 1) {
                 return 0;
@@ -99,6 +83,12 @@ const Home = () => {
             return prevIndex + 1;
         });
     }, [images]);
+
+    useEffect(() => {
+        // Images have just been loaded
+        // Start the slideswho with a first reduced timeout
+        diaporamaTimeoutRef.current = setTimeout(handleNextImage, _diaporamaInterval/2);
+    }, [handleNextImage]);
 
     const handleImageLoaded = (event) => {
         event.target.classList.add('loaded');

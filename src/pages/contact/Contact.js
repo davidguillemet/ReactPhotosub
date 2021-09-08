@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useContext } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { Prompt } from "react-router-dom";
 import Stack from '@material-ui/core/Stack';
 import TextField from '@material-ui/core/TextField';
@@ -10,7 +10,7 @@ import { PageTitle } from '../../template/pageTypography';
 import FeedbackMessage from '../../components/feedback/Feedback';
 import { uniqueID } from '../../utils';
 import ReCAPTCHA from "react-google-recaptcha";
-import { GlobalContext } from '../../components/globalContext';
+import { useGlobalContext } from '../../components/globalContext';
 
 const FIELD_TYPE_TEXT = 'text';
 const FIELD_TYPE_EMAIL = 'email';
@@ -53,7 +53,7 @@ const FormField = ({ field, handleChange, sending }) => {
 
 const Contact = () => {
 
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
     const fields = React.useRef([
         {
             id: "name",

@@ -1,14 +1,14 @@
-import { useEffect, useState, useCallback, useContext } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import { uniqueID } from '../../utils';
-import { GlobalContext } from '../../components/globalContext';
+import { useGlobalContext } from '../../components/globalContext';
 
 export const LIST_HOME_SLIDESHOW = "slideshow";
 export const LIST_FAVORITES = "favorites";
 export const LIST_SEARCH = "search";
 
 const useImageLoader = (user, simulations, listType) => {
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
     const [interiors, setInteriors] = useState(null);
     const [userInteriors, setUserInteriors] = useState(null);
     const [allInteriors, setAllInteriors] = useState(null);

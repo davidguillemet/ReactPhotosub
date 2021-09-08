@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useParams } from "react-router-dom";
 import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
 import Button from '@material-ui/core/Button';
@@ -10,7 +10,7 @@ import { PageTitle, PageSubTitle } from '../../template/pageTypography';
 import LocationDialog from './LocationDialog';
 import LazyDialog from '../../dialogs/LazyDialog';
 import { withLoading, buildLoadingState } from '../../components/loading';
-import { GlobalContext } from '../../components/globalContext';
+import { useGlobalContext } from '../../components/globalContext';
 
 const RegionChip = ({region}) => {
 
@@ -46,20 +46,14 @@ const ImageCount = withLoading(({images}) => {
             }}>
         </Chip>
     )
-}, [buildLoadingState("images", null)], { size: 20, marginTop: 0 });
+}, [buildLoadingState("images", [null, undefined])], { size: 20, marginTop: 0 });
 
 const DestinationDisplay = withLoading(({destination, year, title}) => {
 
-    const context = useContext(GlobalContext);
-    const [images, setImages] = useState(null);
+    const context = useGlobalContext();
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [locationOpen, setLocationOpen] = useState(false);
-
-    useEffect(() => {
-        context.dataProvider.getDestinationImagesFromPath(year, title).then(images => {
-            setImages(images);
-        })
-    }, [year, title, context.dataProvider]);
+    const { data: images } = context.useFetchDestinationImages(year, title);
 
     const handleCloseLocation = useCallback(() => {
         setLocationOpen(false);
@@ -106,21 +100,13 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
 
         </React.Fragment>
     );
-}, [buildLoadingState("destination", null)]);
+}, [buildLoadingState("destination", [null, undefined])]);
 
 const Destination = () => {
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
     const { year, title } = useParams();
-    const [destination, setDestination] = useState(null);
-
-    // First hook to get the destination details
-    useEffect(() => {
-        context.dataProvider.getDestinationDetailsFromPath(year, title).then(destination => {
-            setDestination(destination);
-        })
-    }, [year, title, context.dataProvider]);
-
-    return <DestinationDisplay destination={destination} year={year} title={title} />
+    const { data } = context.useFetchDestinationHeader(year, title);
+    return <DestinationDisplay destination={data} year={year} title={title} />
 };
 
 export default Destination;

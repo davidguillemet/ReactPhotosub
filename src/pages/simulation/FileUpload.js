@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useContext } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Button from '@material-ui/core/Button';
 import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
@@ -8,7 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import { Typography } from '@material-ui/core';
-import { GlobalContext } from '../../components/globalContext';
+import { useGlobalContext } from '../../components/globalContext';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './fileUploadStyles.css';
 
@@ -63,7 +63,7 @@ const ThumbnailGeneration = () => {
 
 const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
 
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
     const [step, setStep] = useState(STEP_UPLOAD);
     const [progress, setProgress] = useState(0);
     const uploadTaskRef = useRef(null);
@@ -139,7 +139,7 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
 
 const FileUpload = ({caption, user, onFileUploaded}) => {
 
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
     const [uploadFiles, setUploadFiles] = useState([]);
     const userUploadRef = useRef(null);
 

@@ -72,6 +72,6 @@ const DestinationsGrid = ({destinations, regionsByDestination}) => {
 }
 
 export default withLoading(DestinationsGrid, [
-    buildLoadingState("destinations", null),
+    buildLoadingState("destinations", [null, undefined]),
     buildLoadingState("regionsByDestination", null)
 ]);

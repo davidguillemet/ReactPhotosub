@@ -1,1 +1,1 @@
-export { default, GlobalContext } from './GlobalContext';
+export { default, GlobalContext, useGlobalContext } from './GlobalContext';

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import Alert from '@material-ui/core/Alert';
-import { AuthContext } from '../../components/authentication';
+import { useAuthContext } from '../../components/authentication';
 import Gallery from '../../components/gallery';
 import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
-import { GlobalContext } from '../../components/globalContext';
+import { useGlobalContext } from '../../components/globalContext';
 
 const MySelectionContent= ({user, images}) => {
     if (user === null) {
@@ -20,8 +20,8 @@ const MySelectionContent= ({user, images}) => {
 
 const MySelection = () => {
 
-    const context = useContext(GlobalContext);
-    const authContext = useContext(AuthContext);
+    const context = useGlobalContext();
+    const authContext = useAuthContext();
     const [images, setImages] = useState(null);
 
     useEffect(() => {

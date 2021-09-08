@@ -66,7 +66,7 @@ const MasonryLayout = withLoading(({images, imageWidth, columnsCount, margin, on
             }} />
         </React.Fragment>
     );
-}, [ buildLoadingState("images", null), buildLoadingState("columnsCount", 0) ]);
+}, [ buildLoadingState("images", [null, undefined]), buildLoadingState("columnsCount", 0) ]);
 
 const Gallery = ({ images, style, colWidth, margin, emptyMessage = null}) => {
     const classes = useStyles();
@@ -132,4 +132,4 @@ const Gallery = ({ images, style, colWidth, margin, emptyMessage = null}) => {
     );
 }
 
-export default withLoading(Gallery, [buildLoadingState("images", null)]);
+export default withLoading(Gallery, [buildLoadingState("images", [null, undefined])]);

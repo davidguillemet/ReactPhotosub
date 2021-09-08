@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AuthContext from './authContext';
-import { GlobalContext } from '../globalContext/GlobalContext';
+import { useGlobalContext } from '../globalContext/GlobalContext';
 
 const AuthProvider = ({ children }) => {
 
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
 
     const updateUserContext = useCallback((user, userData) => {
         // Transform the favorites array as a Set

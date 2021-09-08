@@ -1,5 +1,5 @@
-import { useState, useEffect, useContext } from 'react';
-import { GlobalContext } from '../../components/globalContext';
+import { useEffect, useState } from 'react';
+import { useGlobalContext } from '../../components/globalContext';
 
 const compareRegions = (a, b) => a.title === b.title ? 0 : a.title < b.title ? -1 : 1;
 
@@ -23,30 +23,33 @@ function buildHierarchy(regionList) {
 
 const useRegions = () => {
 
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
     const [regions, setRegions] = useState({
         hierarchy: [],
         map: null
     });
 
     // Executed only once to get regions
+    const { isLoading, data } = context.useFetchRegions();
+    
     useEffect(() => {
-        context.dataProvider.getRegions().then(items => {
+        if (isLoading === true) {
+            return;
+        }
 
-            // Build the region map (region id -> region)
-            const regionMap = new Map();
-            items.forEach(region => {
-                regionMap.set(region.id, region);
-            })
-
-            const hierarchy = buildHierarchy(items);
-
-            setRegions({
-                hierarchy: hierarchy,
-                map: regionMap
-            })
+        // Build the region map (region id -> region)
+        const regionMap = new Map();
+        data.forEach(region => {
+            regionMap.set(region.id, region);
         })
-    }, [context.dataProvider]);
+
+        const hierarchy = buildHierarchy(data);
+
+        setRegions({
+            hierarchy: hierarchy,
+            map: regionMap
+        })
+    }, [isLoading, data]);
     
     return [
         regions.hierarchy,

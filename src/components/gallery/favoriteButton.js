@@ -1,4 +1,4 @@
-import React, {useContext, useMemo} from 'react';
+import React, { useMemo} from 'react';
 import FavoriteIconOutlined from '@material-ui/icons/FavoriteBorderOutlined';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import Typography from '@material-ui/core/Typography';
@@ -6,13 +6,13 @@ import Box from '@material-ui/core/Box';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 
 import TooltipIconButton from '../tooltipIconButton';
-import { AuthContext } from '../authentication';
-import { GlobalContext } from '../globalContext';
+import { useAuthContext } from '../authentication';
+import { useGlobalContext } from '../globalContext';
 
 const FavoriteButton = ({fontSize = 'default', style, color, path }) => {
 
-    const context = useContext(GlobalContext);
-    const authContext = useContext(AuthContext);
+    const context = useGlobalContext();
+    const authContext = useAuthContext();
 
     const isInFavorites = useMemo(() => authContext.data && authContext.data.favorites.has(path), [authContext.data, path]);
 

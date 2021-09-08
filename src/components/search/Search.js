@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { styled } from '@material-ui/core/styles';
 import { green, orange } from '@material-ui/core/colors';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -17,7 +17,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 
 import { uniqueID } from '../../utils';
 import LazyDialog from '../../dialogs/LazyDialog';
-import { GlobalContext } from '../globalContext';
+import { useGlobalContext } from '../globalContext';
 
 const _pageSize = 10;
 
@@ -120,7 +120,7 @@ const Search = React.forwardRef(({
     nextPageComponent = null,
     pageIndex = 0}, ref) => {
 
-    const context = useContext(GlobalContext);
+    const context = useGlobalContext();
     const [ helpOpen, setHelpOpen ] = useState(false);
     const [ searchTimer, setSearchTimer ] = useState(null);
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);

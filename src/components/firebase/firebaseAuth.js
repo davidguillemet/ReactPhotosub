@@ -1,7 +1,7 @@
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import { GlobalContext } from '../globalContext';
+import { useGlobalContext } from '../globalContext';
 import './firebaseui.css';
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import Backdrop from '@material-ui/core/Backdrop';
 import Modal from '@material-ui/core/Modal';
 import Fade from '@material-ui/core/Fade';
@@ -19,7 +19,7 @@ import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import MenuList from '@material-ui/core/MenuList';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
-import { AuthContext } from '../authentication';
+import { useAuthContext } from '../authentication';
 import { routes, NavigationLink } from '../../navigation/routes';
 
 const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => (
@@ -137,8 +137,8 @@ const SignedInButton = ({user, handleLogout}) => {
 
 const FirebaseAuth = (props) => {
 
-    const context = useContext(GlobalContext);
-    const authContext = useContext(AuthContext);
+    const context = useGlobalContext();
+    const authContext = useAuthContext();
 
     const [isLogin, setIsLogin] = useState(false);
 
