@@ -26,7 +26,7 @@ import {setBackground, resize, borderWidth, borderColor, addImage, setImage} fro
 
 import { useResizeObserver } from '../../components/hooks';
 import Search, { getInitialSearchResult } from '../../components/search';
-import useImageLoader, {LIST_HOME_SLIDESHOW, LIST_FAVORITES, LIST_SEARCH} from './imageLoaderHook';
+import useImageLoader, {LIST_HOME_SLIDESHOW, LIST_FAVORITES, LIST_SEARCH} from './hooks/imageLoaderHook';
 import { useGlobalContext } from '../../components/globalContext';
 
 const borderColors = [

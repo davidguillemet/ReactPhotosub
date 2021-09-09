@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
-import { uniqueID } from '../../utils';
-import { useGlobalContext } from '../../components/globalContext';
+import { uniqueID } from '../../../utils';
+import { useGlobalContext } from '../../../components/globalContext';
 
 export const LIST_HOME_SLIDESHOW = "slideshow";
 export const LIST_FAVORITES = "favorites";
