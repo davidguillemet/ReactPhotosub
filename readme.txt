@@ -22,6 +22,7 @@ npm run-script build4deploy
 
 # Deploy the Firebase application
 firebase deploy
+firebase deploy --only functions
 firebase deploy --only functions:newImage
 firebase deploy --only functions:deleteImage
 firebase deploy --only functions:newImage,functions:deleteImage

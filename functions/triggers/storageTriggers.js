@@ -106,10 +106,11 @@ exports.newFile = function(file) {
 };
 
 function mustExtractExif(file) {
-    // Don't extract exif for interiors or home slideshow
+    // Don't extract exif for interiors, home slideshow and resized images
     return isAnImage(file) === true &&
            isInHomeSlideshow(file) === false &&
-           isInteriorImage(file) === false;
+           isInteriorImage(file) === false &&
+           isResizedImage(file) === false;
 }
 
 function mustResizeImage(file) {
@@ -122,7 +123,9 @@ function mustResizeImage(file) {
 function mustBlurImage(file) {
     // Blur only the images from home slideshow that are not already blurry
     return isAnImage(file) === true &&
-           isInHomeSlideshow(file) === true && isBlurryImage(file) === false && isResizedImage(file) === false;
+           isInHomeSlideshow(file) === true &&
+           isBlurryImage(file) === false &&
+           isResizedImage(file) === false;
 }
 
 function isAnImage(file) {
