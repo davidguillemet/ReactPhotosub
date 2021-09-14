@@ -58,7 +58,8 @@ const GlobalContextProvider = ({children}) => {
             useFetchRegions: () => useQuery('regions', () => dataProvider.getRegions()),
             useFetchDestinations: () => useQuery('destinations', () => dataProvider.getDestinations()),
             useFetchDestinationHeader: (year, title) => useQuery(['destinationheader', year, title], () => dataProvider.getDestinationDetailsFromPath(year, title)),
-            useFetchDestinationImages: (year, title) => useQuery(['destinationimages', year, title], () => dataProvider.getDestinationImagesFromPath(year, title))
+            useFetchDestinationImages: (year, title) => useQuery(['destinationimages', year, title], () => dataProvider.getDestinationImagesFromPath(year, title)),
+            useFetchInteriors: (thenFunc) => useQuery('interiors', () => dataProvider.getInteriors().then(thenFunc)),
         }
     }
 

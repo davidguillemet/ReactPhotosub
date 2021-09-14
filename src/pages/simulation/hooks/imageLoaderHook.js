@@ -9,16 +9,15 @@ export const LIST_SEARCH = "search";
 
 const useImageLoader = (user, simulations, listType) => {
     const context = useGlobalContext();
-    const [interiors, setInteriors] = useState(null);
     const [userInteriors, setUserInteriors] = useState(null);
     const [allInteriors, setAllInteriors] = useState(null);
     const [images, setImages] = useState(null);
-
     const [imagesBySource, setImagesBySource] = useState({
         [LIST_HOME_SLIDESHOW]: null,
         [LIST_FAVORITES]: null,
         [LIST_SEARCH]: null,
     });
+    const { data: interiors } = context.useFetchInteriors((images) => buildImages(images, false));
 
     const userInteriorIsUsed = useCallback((userInteriorUrl) => {
         // Check is any simulation contains the current background
@@ -38,16 +37,6 @@ const useImageLoader = (user, simulations, listType) => {
         return images.map((image) => buildImage(image, uploaded));
     }, [buildImage]);
 
-    // Load interiors
-    useEffect(() => {
-        context.dataProvider.getInteriors().then(images => {
-            unstable_batchedUpdates(() => {
-                const defaultInteriors = buildImages(images, false);
-                setInteriors(defaultInteriors);
-            });
-        })
-    }, [buildImages, context.dataProvider]);
-
     // Load user uploaded interiors
     useEffect(() => {
         const loadPromise =
@@ -65,7 +54,7 @@ const useImageLoader = (user, simulations, listType) => {
 
     // Update the collection containing all interiors 
     useEffect(() => {
-        if (interiors === null || userInteriors === null) {
+        if (interiors === undefined || userInteriors === null) {
             return;
         }
         unstable_batchedUpdates(() => {
@@ -75,7 +64,7 @@ const useImageLoader = (user, simulations, listType) => {
 
     // Check the "deletable" property of the uploaded interiors
     useEffect(() => {
-        if (simulations === null || userInteriors === null || interiors == null) {
+        if (simulations === null || userInteriors === null || interiors === undefined) {
             return;
         }
         let modified = false;
