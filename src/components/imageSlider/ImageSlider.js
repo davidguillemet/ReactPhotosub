@@ -245,4 +245,4 @@ const ImageSlider = ({
         </Paper>
     );
 }
-export default withLoading(ImageSlider, [buildLoadingState("images", null)]);
+export default withLoading(ImageSlider, [buildLoadingState("images", [null, undefined])]);

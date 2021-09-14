@@ -61,6 +61,14 @@ const GlobalContextProvider = ({children}) => {
             useFetchDestinationImages: (year, title) => useQuery(['destinationimages', year, title], () => dataProvider.getDestinationImagesFromPath(year, title)),
             useFetchInteriors: (thenFunc) => useQuery('interiors', () => dataProvider.getInteriors().then(thenFunc)),
             useFetchUserInteriors: (uid, thenFunc) => useQuery(['userInteriors', uid], () => dataProvider.getUploadedInteriors(uid).then(thenFunc)),
+            useFetchSimulationImages: (type, thenFunc) => useQuery(['simulationImages', type], () => {
+                switch (type) {
+                    case 'favorites': return dataProvider.getFavorites().then(thenFunc)
+                    case 'slideshow': return dataProvider.getImageDefaultSelection().then(thenFunc)
+                    case 'search': return Promise.resolve([])
+                    default: throw new Error(`Unexpected source type '${type}'`)
+                }
+             })
         }
     }
 

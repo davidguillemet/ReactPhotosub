@@ -75,7 +75,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     const context = useGlobalContext();
     const [listType, setListType] = useState(LIST_HOME_SLIDESHOW);
-    const [interiors, images, setImages, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
+    const [interiors, images, setSearchImages, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
     const [searchResult, setSearchResult] = useState(getInitialSearchResult());
 
@@ -183,10 +183,10 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     const handleSearchResult = useCallback((searchResults) => {
         unstable_batchedUpdates(() => {
-            setImages(searchResults.images)
+            setSearchImages(searchResults.images)
             setSearchResult(searchResults);
         });
-    }, [setImages]);
+    }, [setSearchImages]);
 
     const handleNextSearchPage = useCallback(() => {
         setSearchResult(prevSearchResult => {

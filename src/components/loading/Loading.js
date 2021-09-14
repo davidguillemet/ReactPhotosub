@@ -32,14 +32,12 @@ const isReady = (conditions, props) => {
  */
 export const withLoading = (Component, conditions, loadingProps) => (props) => {
 
-    const ready = React.useRef(false);
-
-    if (ready.current === false) {
-        ready.current = isReady(conditions, props);
-    }
+    // Don't keep a ref since teh state might change when props change
+    // -> the image slider for images in simulation when switching source
+    const ready = isReady(conditions, props);
 
     return (
-        ready.current === true ?
+        ready === true ?
         <Component {...props} /> :
         <Loading {...loadingProps}/>
     );

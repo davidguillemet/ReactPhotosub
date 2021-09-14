@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react';
-import { unstable_batchedUpdates } from 'react-dom';
 import { uniqueID } from '../../../utils';
 import { useGlobalContext } from '../../../components/globalContext';
 import { useQueryClient } from 'react-query';
@@ -11,16 +10,16 @@ export const LIST_SEARCH = "search";
 const useImageLoader = (user, simulations, listType) => {
     const context = useGlobalContext();
     const [allInteriors, setAllInteriors] = useState(null);
-    const [images, setImages] = useState(null);
-    const [imagesBySource, setImagesBySource] = useState({
-        [LIST_HOME_SLIDESHOW]: null,
-        [LIST_FAVORITES]: null,
-        [LIST_SEARCH]: null,
-    });
 
     const queryClient = useQueryClient();
     const { data: interiors } = context.useFetchInteriors((images) => buildImages(images, false));
     const { data: userInteriors } = context.useFetchUserInteriors(user && user.uid, (images) => buildImages(images, true))
+    const { data: images } = context.useFetchSimulationImages(listType, (images) => images.map(image => {
+        return {
+            ...image,
+            id: uniqueID()
+        }
+    }));
 
     const userInteriorIsUsed = useCallback((userInteriorUrl) => {
         // Check is any simulation contains the current background
@@ -69,37 +68,6 @@ const useImageLoader = (user, simulations, listType) => {
         }
     }, [userInteriorIsUsed, simulations, userInteriors, interiors]);
 
-    // Load images from current source (homeslideshow, favorites, search)
-    useEffect(() => {
-        if (imagesBySource[listType] !== null) {
-            setImages(imagesBySource[listType]);
-            return;
-        }
-
-        const promise =
-            listType === LIST_HOME_SLIDESHOW ? context.dataProvider.getImageDefaultSelection() :
-            listType === LIST_FAVORITES ? context.dataProvider.getFavorites() : 
-            Promise.resolve([]); // initialize the search with an empty list
-
-        promise.then(images => {
-            const newImages = images.map(image => {
-                return {
-                    ...image,
-                    id: uniqueID()
-                }
-            });
-            unstable_batchedUpdates(() => {
-                setImagesBySource(prevImagesBySource => {
-                    return {
-                        ...prevImagesBySource,
-                        [listType]: newImages
-                    };
-                })
-                setImages(newImages);
-            });
-        })
-    }, [listType, imagesBySource, context.dataProvider]);
-
     const addUploadedInterior = useCallback((fileSrc) => {
         // Add the new uploaded image to the user interiors' array
         queryClient.setQueryData(['userInteriors', user.uid], [
@@ -114,10 +82,14 @@ const useImageLoader = (user, simulations, listType) => {
         ]);
     }, [allInteriors, queryClient, user]);
 
+    const setSearchImages = useCallback((results) => {
+        queryClient.setQueryData(['simulationImages', 'search'], results);
+    }, [queryClient])
+
     return [
         allInteriors,
         images,
-        setImages,
+        setSearchImages,
         addUploadedInterior,
         deleteUploadedInterior
     ];
