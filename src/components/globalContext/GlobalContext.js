@@ -37,7 +37,7 @@ const GlobalContextProvider = ({children}) => {
 
         const axiosInstance = axios.create({
             baseURL: apiBaseUrl + '/api',
-            timeout: 3000,
+            timeout: 5000,
         });
         
         // configure axios to send an authentication token as soon as a user is connected
@@ -60,6 +60,7 @@ const GlobalContextProvider = ({children}) => {
             useFetchDestinationHeader: (year, title) => useQuery(['destinationheader', year, title], () => dataProvider.getDestinationDetailsFromPath(year, title)),
             useFetchDestinationImages: (year, title) => useQuery(['destinationimages', year, title], () => dataProvider.getDestinationImagesFromPath(year, title)),
             useFetchInteriors: (thenFunc) => useQuery('interiors', () => dataProvider.getInteriors().then(thenFunc)),
+            useFetchUserInteriors: (uid, thenFunc) => useQuery(['userInteriors', uid], () => dataProvider.getUploadedInteriors(uid).then(thenFunc)),
         }
     }
 

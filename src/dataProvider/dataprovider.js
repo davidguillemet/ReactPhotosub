@@ -126,7 +126,10 @@ DataProvider.prototype.getInteriors = function() {
     return this._getBucketContent('interiors');
 }
 
-DataProvider.prototype.getUploadedInteriors = function() {
+DataProvider.prototype.getUploadedInteriors = function(uid) {
+    if (uid === null) {
+        return Promise.resolve([]);
+    }
     return this.axios.get('/uploadedInteriors')
     .then(response => {
         return response.data;
@@ -149,7 +152,9 @@ DataProvider.prototype._getBucketContent = function(folder) {
 }
 
 DataProvider.prototype.waitForThumbnails = function(fileName) {
-    return this.axios.get(`/thumbstatus/${fileName}`);
+    return this.axios.get(`/thumbstatus/${fileName}`, {
+        timeout: 60000, // Specific timeout for this request
+    });
 }
 
 DataProvider.prototype.searchImages = function(pageIndex, query, pageSize, exact, processId) {

@@ -179,8 +179,8 @@ function App(props) {
   return (
     <div style={{ display: 'flex'}}>
     <ThemeProvider theme={ResponsiveTheme}>
-    <GlobalContextProvider>
     <ReactQueryClientProvider>
+    <GlobalContextProvider>
     <AuthProvider>
 
       <CssBaseline />
@@ -230,8 +230,8 @@ function App(props) {
       <ScrollTop {...props} anchorSelector={`#${scrollTopAnchor}`}></ScrollTop>
 
     </AuthProvider>
-    </ReactQueryClientProvider>
     </GlobalContextProvider>
+    </ReactQueryClientProvider>
     </ThemeProvider>
     </div>
   );

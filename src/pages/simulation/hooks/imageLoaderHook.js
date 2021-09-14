@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
-import {unstable_batchedUpdates} from 'react-dom';
+import { unstable_batchedUpdates } from 'react-dom';
 import { uniqueID } from '../../../utils';
 import { useGlobalContext } from '../../../components/globalContext';
+import { useQueryClient } from 'react-query';
 
 export const LIST_HOME_SLIDESHOW = "slideshow";
 export const LIST_FAVORITES = "favorites";
@@ -9,7 +10,6 @@ export const LIST_SEARCH = "search";
 
 const useImageLoader = (user, simulations, listType) => {
     const context = useGlobalContext();
-    const [userInteriors, setUserInteriors] = useState(null);
     const [allInteriors, setAllInteriors] = useState(null);
     const [images, setImages] = useState(null);
     const [imagesBySource, setImagesBySource] = useState({
@@ -17,7 +17,10 @@ const useImageLoader = (user, simulations, listType) => {
         [LIST_FAVORITES]: null,
         [LIST_SEARCH]: null,
     });
+
+    const queryClient = useQueryClient();
     const { data: interiors } = context.useFetchInteriors((images) => buildImages(images, false));
+    const { data: userInteriors } = context.useFetchUserInteriors(user && user.uid, (images) => buildImages(images, true))
 
     const userInteriorIsUsed = useCallback((userInteriorUrl) => {
         // Check is any simulation contains the current background
@@ -37,34 +40,17 @@ const useImageLoader = (user, simulations, listType) => {
         return images.map((image) => buildImage(image, uploaded));
     }, [buildImage]);
 
-    // Load user uploaded interiors
-    useEffect(() => {
-        const loadPromise =
-            user === null ?
-            Promise.resolve([]) :
-            context.dataProvider.getUploadedInteriors();
-        
-        loadPromise.then(images => {
-            unstable_batchedUpdates(() => {
-                const userInteriors = buildImages(images, true);
-                setUserInteriors(userInteriors);
-            });
-        })
-    }, [user, buildImages, context.dataProvider]);
-
     // Update the collection containing all interiors 
     useEffect(() => {
-        if (interiors === undefined || userInteriors === null) {
+        if (interiors === undefined || userInteriors === undefined) {
             return;
         }
-        unstable_batchedUpdates(() => {
-            setAllInteriors([...userInteriors, ...interiors]);
-        });
-    }, [interiors, userInteriors]);
+        setAllInteriors([...(userInteriors || []), ...interiors]);
+    }, [user, interiors, userInteriors]);
 
     // Check the "deletable" property of the uploaded interiors
     useEffect(() => {
-        if (simulations === null || userInteriors === null || interiors === undefined) {
+        if (simulations === null || userInteriors === undefined || interiors === undefined) {
             return;
         }
         let modified = false;
@@ -116,17 +102,17 @@ const useImageLoader = (user, simulations, listType) => {
 
     const addUploadedInterior = useCallback((fileSrc) => {
         // Add the new uploaded image to the user interiors' array
-        setUserInteriors(prevInteriors => [
-           buildImage({src: fileSrc}, true),
-           ...prevInteriors
+        queryClient.setQueryData(['userInteriors', user.uid], [
+            buildImage({src: fileSrc}, true),
+            ...allInteriors.filter(image => image.uploaded === true)
         ]);
-    }, [buildImage]);
+    }, [buildImage, allInteriors, queryClient, user]);
 
     const deleteUploadedInterior = useCallback((fileUrl) => {
-        setUserInteriors(prevInteriors => {
-            return prevInteriors.filter(interior => interior.src !== fileUrl);
-        });
-    }, []);
+        queryClient.setQueryData(['userInteriors', user.uid], [
+            ...allInteriors.filter(interior => interior.uploaded === true && interior.src !== fileUrl)
+        ]);
+    }, [allInteriors, queryClient, user]);
 
     return [
         allInteriors,
