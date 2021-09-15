@@ -186,9 +186,10 @@ const Search = React.forwardRef(({
                 {
                     return getEmptySearchResult();
                 }
+                const aggegatedResults = searchConfig.page === 0 ? results : oldResult.images.concat(results);
                 const newResult = {
-                    images: searchConfig.page === 0 ? results : oldResult.images.concat(results),
-                    hasNext: _pageSize === results.length,
+                    images: aggegatedResults,
+                    hasNext: aggegatedResults.length < response.totalCount,
                     hasError: false,
                     page: searchConfig.page,
                     totalCount: response.totalCount
