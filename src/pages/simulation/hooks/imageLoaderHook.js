@@ -7,6 +7,21 @@ export const LIST_HOME_SLIDESHOW = "slideshow";
 export const LIST_FAVORITES = "favorites";
 export const LIST_SEARCH = "search";
 
+const useFetchSource = (listType, user, thenFunc) => {
+
+    const context = useGlobalContext();
+    const { data: defaultSelection } = context.useFetchDefaultSelection(listType === LIST_HOME_SLIDESHOW, thenFunc);
+    const { data: favorites } = context.useFetchFavorites(user && user.uid, listType === LIST_FAVORITES, thenFunc);
+    const { data: searchResult } = context.useFetchSearchResults(listType === LIST_SEARCH, thenFunc);
+
+    switch (listType) {
+        case LIST_HOME_SLIDESHOW: return defaultSelection;
+        case LIST_FAVORITES: return favorites;
+        case LIST_SEARCH: return searchResult;
+        default: throw new Error(`Unexpected list type '${listType}'`)
+    }
+}
+
 const useImageLoader = (user, simulations, listType) => {
     const context = useGlobalContext();
     const [allInteriors, setAllInteriors] = useState(null);
@@ -14,7 +29,7 @@ const useImageLoader = (user, simulations, listType) => {
     const queryClient = useQueryClient();
     const { data: interiors } = context.useFetchInteriors((images) => buildImages(images, false));
     const { data: userInteriors } = context.useFetchUserInteriors(user && user.uid, (images) => buildImages(images, true))
-    const { data: images } = context.useFetchSimulationImages(listType, (images) => images.map(image => {
+    const images = useFetchSource(listType, user, (images) => images.map(image => {
         return {
             ...image,
             id: uniqueID()
@@ -83,7 +98,7 @@ const useImageLoader = (user, simulations, listType) => {
     }, [allInteriors, queryClient, user]);
 
     const setSearchImages = useCallback((results) => {
-        queryClient.setQueryData(['simulationImages', 'search'], results);
+        queryClient.setQueryData('searchResults', results);
     }, [queryClient])
 
     return [

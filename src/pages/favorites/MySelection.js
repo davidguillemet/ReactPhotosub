@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Alert from '@material-ui/core/Alert';
 import { useAuthContext } from '../../components/authentication';
 import Gallery from '../../components/gallery';
@@ -22,17 +22,7 @@ const MySelection = () => {
 
     const context = useGlobalContext();
     const authContext = useAuthContext();
-    const [images, setImages] = useState(null);
-
-    useEffect(() => {
-        if (authContext.user === null) {
-            return;
-        }
-        context.dataProvider.getFavorites()
-        .then(images => {
-            setImages(images);
-        });
-    }, [context.dataProvider, authContext.user]);
+    const { data: images } = context.useFetchFavorites(authContext.user && authContext.user.uid, true)
 
     return (
         <React.Fragment>

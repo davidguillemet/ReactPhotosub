@@ -74,7 +74,10 @@ DataProvider.prototype.removeFavorite = function(path) {
     });
 };
 
-DataProvider.prototype.getFavorites = function() {
+DataProvider.prototype.getFavorites = function(uid) {
+    if (uid === null) {
+        return Promise.resolve([]);
+    }
     return this.axios.get('/favorites')
     .then(response => {
         return response.data;
