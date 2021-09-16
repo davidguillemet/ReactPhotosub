@@ -27,7 +27,6 @@ import {setBackground, resize, borderWidth, borderColor, addImage, setImage} fro
 import { useResizeObserver } from '../../components/hooks';
 import Search, { getInitialSearchResult } from '../../components/search';
 import useImageLoader, {LIST_HOME_SLIDESHOW, LIST_FAVORITES, LIST_SEARCH} from './hooks/imageLoaderHook';
-import { useGlobalContext } from '../../components/globalContext';
 
 const borderColors = [
     "#FFFFFF",
@@ -73,7 +72,6 @@ const EmptySimulationImages = ({type, images, searchResult}) => {
 
 const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
-    const context = useGlobalContext();
     const [listType, setListType] = useState(LIST_HOME_SLIDESHOW);
     const [interiors, images, setSearchImages, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
@@ -161,16 +159,6 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         addUploadedInterior(fileSrc);
     }, [user, addUploadedInterior]);
 
-    const onDeleteUploaded = useCallback((fileUrl) => {
-        // Extract the file name from the src
-        const fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
-        context.dataProvider.removeUploadedInterior(fileName).then(() => {
-            deleteUploadedInterior(fileUrl);
-        }).catch(err => {
-            // TODO
-        });
-    }, [deleteUploadedInterior, context.dataProvider]);
-
     const handleListType = (event, newListType) => {
         unstable_batchedUpdates(() => {
             if (newListType !== LIST_SEARCH)
@@ -224,7 +212,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 imageBorderWidth={3}
                 imageBorderRadius={5}
                 disabled={simulation.isLocked}
-                onDeleteUploaded={onDeleteUploaded}
+                onDeleteUploaded={deleteUploadedInterior}
             />
 
             <VerticalSpacing factor={3} />

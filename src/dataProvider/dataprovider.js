@@ -84,11 +84,14 @@ DataProvider.prototype.getFavorites = function(uid) {
     })
 };
 
-DataProvider.prototype.getSimulations = function() {
+DataProvider.prototype.getSimulations = function(uid) {
+    if (uid === null) {
+        return Promise.resolve([]);
+    }
     return this.axios.get('/simulations')
     .then(response => {
         // we generate an index property that corresponds to the index in the db json array
-        // this index we allow to identify any simulation for deletion or update
+        // this index will be used as a simulation identifier for deletion / update
         return _addSimulationDbIndex(response.data.simulations);
     });
 }

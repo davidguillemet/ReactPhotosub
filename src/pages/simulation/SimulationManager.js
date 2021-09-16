@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo, useReducer } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useReducer, useRef } from 'react';
 
 import { Prompt } from "react-router-dom";
 
@@ -26,10 +26,29 @@ import {
 
 import 'fontsource-roboto/100.css';
 
+const sameUsers = (user1, user2) => {
+    if (user1 === null && user2 === null) {
+        return true;
+    }
+    if (user1 === undefined && user2 === undefined) {
+        return true;
+    }
+    if (user1 === null || user2 === null ||
+        user1 === undefined || user2 === undefined) {
+        return false;
+    }
+    return (user1.uid === user2.uid);
+}
+
 const SimulationManager = () => {
 
     const context = useGlobalContext();
     const authContext = useAuthContext();
+    const { data: fetchedSimulations } = context.useFetchSimulations(authContext.user && authContext.user.uid);
+    const addMutation = context.useAddSimulation();
+    const updateMutation = context.useUpdateSimulation();
+    const removeSimulation = context.useRemoveSimulation();
+    const simulationInitUser = useRef(undefined);
     /**
      * state = {
      *  simulations: <array>,
@@ -51,17 +70,14 @@ const SimulationManager = () => {
         });
     }, []);
 
-    // load simulations if connected
-    // -> simulations won't be null after this hook execution
     useEffect(() => {
-        if (authContext.user !== null) {
-            context.dataProvider.getSimulations().then(res => {
-                dispatch(initSimulations(res));
-            })
-        } else {
-            dispatch(addSimulation());
+        // No need to reinit simulations state it the user is the same
+        // -> initialize only once on component mount
+        if (fetchedSimulations !== undefined && sameUsers(simulationInitUser.current, authContext.user) === false) {
+            simulationInitUser.current = authContext.user;
+            dispatch(initSimulations(fetchedSimulations));
         }
-    }, [context.dataProvider, authContext.user]);
+    }, [fetchedSimulations, authContext.user]);
 
     const onSave = useCallback((simulationname) => {
         const simulationData = state.simulations[state.currentIndex];
@@ -70,7 +86,7 @@ const SimulationManager = () => {
         }
         
         if (isFromDb(simulationData)) {
-            context.dataProvider.updateSimulation(simulationData).then(res => {
+            updateMutation.mutateAsync(simulationData).then(res => {
                 unstable_batchedUpdates(() => {
                     dispatch(setSimulationDirty(false, state.currentIndex));
                     displayFeedback("success", `The simulation '${simulationData.name}' has been saved.`);
@@ -81,7 +97,7 @@ const SimulationManager = () => {
                 displayFeedback("error", "Error while saving the simulation...");
             })
         } else {
-            context.dataProvider.addSimulation(simulationData).then(res => {
+            addMutation.mutateAsync(simulationData).then(res => {
                 // res contains all the simulations
                 // The last one is the new one
                 const newSimulationFromDb = res[res.length-1];
@@ -101,7 +117,7 @@ const SimulationManager = () => {
                 displayFeedback("error", "Error while saving the simulation...");
             });
         } 
-    }, [displayFeedback, state, context.dataProvider]);
+    }, [displayFeedback, state, addMutation, updateMutation]);
 
     const onAdd = useCallback((name) => {
         unstable_batchedUpdates(() => {
@@ -117,7 +133,7 @@ const SimulationManager = () => {
 
         const removePromise =
             isFromDb(simulationToRemove) ?
-            context.dataProvider.removeSimulation(simulationToRemove) :
+            removeSimulation.mutateAsync(simulationToRemove) :
             Promise.resolve(null); // just remove from the store
 
         removePromise.then((res) => {

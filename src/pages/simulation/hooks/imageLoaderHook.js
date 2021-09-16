@@ -29,6 +29,7 @@ const useImageLoader = (user, simulations, listType) => {
     const queryClient = useQueryClient();
     const { data: interiors } = context.useFetchInteriors((images) => buildImages(images, false));
     const { data: userInteriors } = context.useFetchUserInteriors(user && user.uid, (images) => buildImages(images, true))
+    const removeUserInterior = context.useRemoveUserInterior();
     const images = useFetchSource(listType, user, (images) => images.map(image => {
         return {
             ...image,
@@ -92,10 +93,16 @@ const useImageLoader = (user, simulations, listType) => {
     }, [buildImage, allInteriors, queryClient, user]);
 
     const deleteUploadedInterior = useCallback((fileUrl) => {
-        queryClient.setQueryData(['userInteriors', user.uid], [
-            ...allInteriors.filter(interior => interior.uploaded === true && interior.src !== fileUrl)
-        ]);
-    }, [allInteriors, queryClient, user]);
+        // Extract the file name from the src
+        const fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+        removeUserInterior.mutateAsync(fileName).then(() => {
+            queryClient.setQueryData(['userInteriors', user.uid], [
+                ...allInteriors.filter(interior => interior.uploaded === true && interior.src !== fileUrl)
+            ]);
+        }).catch(err => {
+            // TODO
+        });
+    }, [allInteriors, queryClient, removeUserInterior, user]);
 
     const setSearchImages = useCallback((results) => {
         queryClient.setQueryData('searchResults', results);

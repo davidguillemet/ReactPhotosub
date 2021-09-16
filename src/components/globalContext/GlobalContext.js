@@ -7,13 +7,18 @@ import "firebase/storage";
 import axios from 'axios';
 import DataProvider from '../../dataProvider/dataprovider';
 
-import { useQuery } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 
 const GlobalContext = createContext(null);
+
+function userId() {
+    return firebase.auth().currentUser.uid;
+}
 
 const GlobalContextProvider = ({children}) => {
 
     const globalContext = useRef(null);
+    const queryClient = useQueryClient()
 
     // With React.StrictMode - to detet issues - it seems the App is rendered twice
     // but the globalContent ref is lost since it is not the same App instn-ance
@@ -61,9 +66,28 @@ const GlobalContextProvider = ({children}) => {
             useFetchDestinationImages: (year, title) => useQuery(['destinationimages', year, title], () => dataProvider.getDestinationImagesFromPath(year, title)),
             useFetchInteriors: (thenFunc) => useQuery('interiors', () => dataProvider.getInteriors().then(thenFunc)),
             useFetchUserInteriors: (uid, thenFunc) => useQuery(['userInteriors', uid], () => dataProvider.getUploadedInteriors(uid).then(thenFunc)),
+            useRemoveUserInterior: () => useMutation((fileName) => dataProvider.removeUploadedInterior(fileName)),
             useFetchDefaultSelection: (enabled, thenFunc) => useQuery('defaultSelection', () => dataProvider.getImageDefaultSelection().then(thenFunc), { enabled: enabled }),
             useFetchFavorites: (uid, enabled, thenFunc) => useQuery(['favorites', uid], () => dataProvider.getFavorites(uid).then(thenFunc), { enabled: enabled }),
-            useFetchSearchResults: (enabled, thenFunc) => useQuery('searchResults', () => Promise.resolve([]), { enabled: enabled })
+            useFetchSearchResults: (enabled, thenFunc) => useQuery('searchResults', () => Promise.resolve([]), { enabled: enabled }),
+            useFetchSimulations: (uid) => useQuery(['simulations', uid], () => dataProvider.getSimulations(uid), {
+                notifyOnChangePropsExclusions: ['data'] // Prevent re-render when data property changes (does ot work!)
+            }),
+            useAddSimulation: () => useMutation((newSimulation) => dataProvider.addSimulation(newSimulation), {
+                onSuccess: (data, variables) => {
+                    queryClient.setQueryData(['simulations', userId()], data)
+                }
+            }),
+            useUpdateSimulation: () => useMutation((simulation) => dataProvider.updateSimulation(simulation), {
+                onSuccess: (data, variables) => {
+                    queryClient.setQueryData(['simulations', userId()], data)
+                }
+            }),
+            useRemoveSimulation: () => useMutation((simulation) => dataProvider.removeSimulation(simulation), {
+                onSuccess: (data, variables) => {
+                    queryClient.setQueryData(['simulations', userId()], data)
+                }
+              }),
         }
     }
 
