@@ -87,7 +87,8 @@ const GlobalContextProvider = ({children}) => {
                 onSuccess: (data, variables) => {
                     queryClient.setQueryData(['simulations', userId()], data)
                 }
-              }),
+            }),
+            useFetchImageCount: () => useQuery('imageCount', () => dataProvider.getImageCount())
         }
     }
 

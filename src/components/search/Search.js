@@ -91,7 +91,7 @@ const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp}) 
                     flex: 1,
                     ml: 1
                 }}
-                placeholder={imageCount > 0  ? `Rechercher parmi ${imageCount} images...` : ""}
+                placeholder={imageCount !== undefined  ? `Rechercher parmi ${imageCount} images...` : ""}
                 autoFocus={true}
                 inputProps={{ 'aria-label': 'search google maps' }}
                 fullWidth
@@ -125,20 +125,14 @@ const Search = React.forwardRef(({
     const [ searchTimer, setSearchTimer ] = useState(null);
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
     const [ searchResult, setSearchResult] = useState(getInitialSearchResult())
-    const [ imageCount, setImageCount ] = useState(0);
     const [ searchConfig, setSearchConfig ] = useState({
         exact: false,
         page: 0,
         query: ""
     });
+    const { data: imageCount } = context.useFetchImageCount();
 
     const lastSearchProcessId = useRef(null);
-
-    useEffect(() => {
-        context.dataProvider.getImageCount().then(count => {
-            setImageCount(count);
-        });
-    }, [context.dataProvider]);
 
     useEffect(() => {
         setSearchConfig(oldConfig => {
