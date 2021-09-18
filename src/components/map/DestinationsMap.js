@@ -1,10 +1,12 @@
 
 /*global google*/
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouteMatch } from "react-router-dom";
 import {unstable_batchedUpdates} from 'react-dom';
 import { GoogleMap, InfoWindow, MarkerClusterer, useLoadScript } from '@react-google-maps/api';
 import { useGlobalContext } from '../globalContext';
 import { formatDate, getThumbnailSrc } from '../../utils';
+import { DestinationPath } from '../../navigation/routes';
 
 import LocationInfoWindow from './LocationInfoWindow';
 
@@ -16,47 +18,25 @@ const _defaultCenter = {
 
 const DestinationsMap = ({destinations}) => {
 
+    const isDestinationPage = useRouteMatch(DestinationPath);
+
     const context = useGlobalContext();
 
-    const locationMapRef = useRef(null);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [destinationsPerLocation, setDestinationsPerLocation] = useState([]);
     const [map, setMap] = React.useState(null)
     const [clusterer, setClusterer] = React.useState(null)
     const [openInfoWindow, setOpenInfoWindow] = useState(true);
 
-    // Another effect to get locations
-    useEffect(() => {
-
-        if (destinations.length === 1 && destinations[0].latitude) {
-            const destination = destinations[0];
-            const location = {
-                title: destination.location,
-                latitude: destination.latitude,
-                longitude: destination.longitude,
-                destinations: [ destination ]
-            }
-            unstable_batchedUpdates(() => {
-                setDestinationsPerLocation([ location ]);
-                setSelectedLocation(null);
-                setOpenInfoWindow(false);
+    const { data: locations} = context.useFetchLocations(
+        // Fetch locations only for the Destinations page
+        destinations !== null && isDestinationPage === null,
+        (items) => {
+            const locationMap = new Map();
+            items.forEach(location => {
+                locationMap.set(location.id, location);
             })
-            return;
-        }
 
-        const promise =
-            locationMapRef.current != null ?
-            Promise.resolve(locationMapRef.current) :
-            context.dataProvider.getLocations().then(items => {
-                const locationMap = new Map();
-                items.forEach(location => {
-                    locationMap.set(location.id, location);
-                })
-                locationMapRef.current = locationMap;
-                return locationMap;
-            });
-        
-        promise.then(locationMap => {
             const locations = new Map();
             destinations.forEach(destination => {
     
@@ -76,12 +56,40 @@ const DestinationsMap = ({destinations}) => {
                 locationInstance.destinations.push(modifiedDestination);    
             });
 
+            return locations;
+        }
+    );
+
+    // Another effect to get locations
+    useEffect(() => {
+
+        if (destinations !== null && isDestinationPage !== null) {
+            const destination = destinations[0];
+            const location = {
+                title: destination.location,
+                latitude: destination.latitude,
+                longitude: destination.longitude,
+                destinations: [ destination ]
+            }
             unstable_batchedUpdates(() => {
-                setDestinationsPerLocation([ ...locations.values() ]);
+                setDestinationsPerLocation([ location ]);
                 setSelectedLocation(null);
+                setOpenInfoWindow(false);
             })
+            return;
+        }
+    }, [destinations]);
+
+    useEffect(() => {
+
+        if (locations === undefined) {
+            return;
+        }
+        unstable_batchedUpdates(() => {
+            setDestinationsPerLocation([ ...locations.values() ]);
+            setSelectedLocation(null);
         })
-    }, [destinations, context.dataProvider])
+    }, [locations]);
 
     const handleMarkerClick = React.useCallback((location) => {
         if (openInfoWindow === true) {

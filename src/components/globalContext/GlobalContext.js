@@ -60,6 +60,7 @@ const GlobalContextProvider = ({children}) => {
             firebase,
             dataProvider,
             useFetchHomeSlideshow: () => useQuery('homeslideshow', () => dataProvider.getImageDefaultSelection()),
+            useFetchLocations: (enabled, thenFunc) => useQuery('locations', () => dataProvider.getLocations().then(thenFunc), { enabled: enabled }), 
             useFetchRegions: () => useQuery('regions', () => dataProvider.getRegions()),
             useFetchDestinations: () => useQuery('destinations', () => dataProvider.getDestinations()),
             useFetchDestinationHeader: (year, title) => useQuery(['destinationheader', year, title], () => dataProvider.getDestinationDetailsFromPath(year, title)),
