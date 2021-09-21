@@ -121,7 +121,7 @@ const LazyImage = ({ image, index, onClick, top, left, width }) => {
             />
 
             <FavoriteButton
-                path={`${image.path}/${image.name}`}
+                image={image}
                 color={'white'}
                 style={{
                     display: "block",

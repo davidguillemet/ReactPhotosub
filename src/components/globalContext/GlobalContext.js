@@ -18,7 +18,7 @@ function userId() {
 const GlobalContextProvider = ({children}) => {
 
     const globalContext = useRef(null);
-    const queryClient = useQueryClient()
+    const queryClient = useQueryClient();
 
     // With React.StrictMode - to detet issues - it seems the App is rendered twice
     // but the globalContent ref is lost since it is not the same App instn-ance
@@ -69,8 +69,8 @@ const GlobalContextProvider = ({children}) => {
             useFetchUserInteriors: (uid, thenFunc) => useQuery(['userInteriors', uid], () => dataProvider.getUploadedInteriors(uid).then(thenFunc)),
             useRemoveUserInterior: () => useMutation((fileName) => dataProvider.removeUploadedInterior(fileName)),
             useFetchDefaultSelection: (enabled, thenFunc) => useQuery('defaultSelection', () => dataProvider.getImageDefaultSelection().then(thenFunc), { enabled: enabled }),
-            useFetchFavorites: (uid, enabled, thenFunc) => useQuery(['favorites', uid], () => dataProvider.getFavorites(uid).then(thenFunc), { enabled: enabled }),
             useFetchSearchResults: (enabled, thenFunc) => useQuery('searchResults', () => Promise.resolve([]), { enabled: enabled }),
+
             useFetchSimulations: (uid) => useQuery(['simulations', uid], () => dataProvider.getSimulations(uid), {
                 notifyOnChangePropsExclusions: ['data'] // Prevent re-render when data property changes (does ot work!)
             }),
@@ -89,7 +89,11 @@ const GlobalContextProvider = ({children}) => {
                     queryClient.setQueryData(['simulations', userId()], data)
                 }
             }),
-            useFetchImageCount: () => useQuery('imageCount', () => dataProvider.getImageCount())
+            useFetchImageCount: () => useQuery('imageCount', () => dataProvider.getImageCount()),
+
+            useFetchFavorites: (uid, enabled, thenFunc) => useQuery(['favorites', uid], () => dataProvider.getFavorites(uid).then(thenFunc), { enabled: enabled }),
+            useAddFavorite: () => useMutation((path) => dataProvider.addFavorite(path)),
+            useRemoveFavorite: () => useMutation((path) => dataProvider.removeFavorite(path))
         }
     }
 

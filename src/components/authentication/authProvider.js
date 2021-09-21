@@ -1,60 +1,106 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AuthContext from './authContext';
 import { useGlobalContext } from '../globalContext/GlobalContext';
+import { useQueryClient } from 'react-query';
+
+const imagePath = (image) => `${image.path}/${image.name}`
 
 const AuthProvider = ({ children }) => {
 
     const context = useGlobalContext();
+    const queryClient = useQueryClient();
+    const addFavorite = context.useAddFavorite();
+    const removeFavorite = context.useRemoveFavorite();
 
-    const updateUserContext = useCallback((user, userData) => {
-        // Transform the favorites array as a Set
-        setUserContext(prevUserContext => {
-            const newUsercontext = {
-                ...prevUserContext,
-                user: user,
-                data: userData
-            };
-            if (userData !== null) {
-                newUsercontext.data.favorites = new Set(userData.favorites);
-            }
-            return newUsercontext;
+    const addUserFavorite = useCallback(favoriteImg => {
+
+        const path = imagePath(favoriteImg);
+        addFavorite.mutateAsync(path).then(() => {
+            setUserContext(prevUserContext => {
+                // Create new map by adding the new favorite
+                const newMap = new Map(prevUserContext.data.favorites);
+                newMap.set(path, favoriteImg);
+
+                // Set the new query data
+                queryClient.setQueryData(['favorites', prevUserContext.user.uid], Array.from(newMap.values()))
+
+                // Set the new state
+                return {
+                    ...prevUserContext,
+                    data: {
+                        ...prevUserContext.data,
+                        favorites: newMap
+                    }
+                };
+            });
         });
-    }, []);
 
-    const updateUserFavorites = useCallback(favorites => {
+    }, [addFavorite, queryClient])
+
+    const removeUserFavorite = useCallback(favoriteImg => {
+
+        const path = imagePath(favoriteImg);
+        removeFavorite.mutateAsync(path).then(() => {
+            setUserContext(prevUserContext => {
+                // Create new map by removing the favorite
+                const newMap = new Map(prevUserContext.data.favorites);
+                newMap.delete(path);
+
+                // Set the new query data
+                queryClient.setQueryData(['favorites', prevUserContext.user.uid], Array.from(newMap.values()))
+
+                // Set the new state
+                return {
+                    ...prevUserContext,
+                    data: {
+                        ...prevUserContext.data,
+                        favorites: newMap
+                    }
+                };
+            });
+        })
+
+    }, [removeFavorite, queryClient])
+
+    const initializeFavorites = useCallback(favorites => {
+        const favMap = favorites.reduce((acc, current) => { acc.set(imagePath(current), current); return acc; }, new Map());
         setUserContext(prevUserContext => {
             return {
                 ...prevUserContext,
                 data: {
-                    ...prevUserContext.data,
-                    favorites: new Set(favorites)
+                    favorites: favMap
                 }
             };
         });
-    }, []);
+    }, [])
 
     const [userContext, setUserContext] = useState({
         user: context.firebase.auth().currentUser,
         data: null,
-        updateUserContext: updateUserContext,
-        updateUserFavorites: updateUserFavorites
+        addUserFavorite: addUserFavorite,
+        removeUserFavorite: removeUserFavorite,
     });
 
-    useEffect(() => {
-        const unregisterAuthObserver = context.firebase.auth().onAuthStateChanged(newUser => {
+    const { data: favorites } = context.useFetchFavorites(userContext.user && userContext.user.uid, true);
 
-            if (newUser === null) {
-                updateUserContext(null, null);
-            } else {
-                newUser.getIdToken().then(token => {
-                    return context.dataProvider.getUserData(newUser.uid);
-                }).then(userData => {
-                    updateUserContext(newUser, userData);
-                });
-            }
+    useEffect(() => {
+        const unregisterAuthObserver = context.firebase.auth().onAuthStateChanged(user => {
+            setUserContext(prevUserContext => {
+                return {
+                    ...prevUserContext,
+                    user: user,
+                    data: null
+                };
+            });
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-    }, [updateUserContext, context.dataProvider, context.firebase]);
+    }, [context.firebase]);
+
+    useEffect(() => {
+        if (favorites !== undefined) {
+            initializeFavorites(favorites)
+        }
+    }, [initializeFavorites, favorites])
 
     return (
         <AuthContext.Provider value={userContext}>

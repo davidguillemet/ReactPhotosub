@@ -318,7 +318,7 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                                     <InfoOutlined fontSize='large'></InfoOutlined>
                                 }
                             </TooltipIconButton>
-                            <FavoriteButton fontSize='large' path={`${currentImage.path}/${currentImage.name}`} />
+                            <FavoriteButton fontSize='large' image={currentImage} />
                             <TooltipIconButton
                                 tooltip={fullScreen ? "Réduire" : "Plein écran"}
                                 onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}

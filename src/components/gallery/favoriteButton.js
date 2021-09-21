@@ -7,24 +7,21 @@ import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 
 import TooltipIconButton from '../tooltipIconButton';
 import { useAuthContext } from '../authentication';
-import { useGlobalContext } from '../globalContext';
 
-const FavoriteButton = ({fontSize = 'default', style, color, path }) => {
+const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
 
-    const context = useGlobalContext();
+    const path = `${image.path}/${image.name}`;
     const authContext = useAuthContext();
 
+    // TODO: create isInfavorites() method in authContext
     const isInFavorites = useMemo(() => authContext.data && authContext.data.favorites.has(path), [authContext.data, path]);
 
     function handleFavoriteClick() {
-        const updatePromise =
-            isInFavorites ?
-            context.dataProvider.removeFavorite :
-            context.dataProvider.addFavorite;
-
-        updatePromise(path).then(favorites => {
-            authContext.updateUserFavorites(favorites);
-        })
+        if (isInFavorites) {
+            authContext.removeUserFavorite(image);
+        } else {
+            authContext.addUserFavorite(image);
+        }
     }
 
     const buttonStyle = {...style};
