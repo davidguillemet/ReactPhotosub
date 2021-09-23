@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import AuthContext from './authContext';
 import { useGlobalContext } from '../globalContext/GlobalContext';
 import { useQueryClient } from 'react-query';
@@ -11,15 +11,16 @@ const AuthProvider = ({ children }) => {
     const queryClient = useQueryClient();
     const addFavorite = context.useAddFavorite();
     const removeFavorite = context.useRemoveFavorite();
+    const observers = useRef([]);
 
-    const addUserFavorite = useCallback(favoriteImg => {
+    const addUserFavorite = useCallback(favoriteImgArray => {
 
-        const path = imagePath(favoriteImg);
-        addFavorite.mutateAsync(path).then(() => {
+        const pathArray = favoriteImgArray.map(img => imagePath(img));
+        return addFavorite.mutateAsync(pathArray).then(() => {
             setUserContext(prevUserContext => {
                 // Create new map by adding the new favorite
                 const newMap = new Map(prevUserContext.data.favorites);
-                newMap.set(path, favoriteImg);
+                favoriteImgArray.forEach((favoriteImg, index) => newMap.set(pathArray[index], favoriteImg));
 
                 // Set the new query data
                 queryClient.setQueryData(['favorites', prevUserContext.user.uid], Array.from(newMap.values()))
@@ -33,6 +34,7 @@ const AuthProvider = ({ children }) => {
                     }
                 };
             });
+            observers.current.forEach(observer => observer(favoriteImgArray, 'add'));
         });
 
     }, [addFavorite, queryClient])
@@ -40,7 +42,7 @@ const AuthProvider = ({ children }) => {
     const removeUserFavorite = useCallback(favoriteImg => {
 
         const path = imagePath(favoriteImg);
-        removeFavorite.mutateAsync(path).then(() => {
+        return removeFavorite.mutateAsync(path).then(() => {
             setUserContext(prevUserContext => {
                 // Create new map by removing the favorite
                 const newMap = new Map(prevUserContext.data.favorites);
@@ -58,6 +60,7 @@ const AuthProvider = ({ children }) => {
                     }
                 };
             });
+            observers.current.forEach(observer => observer([favoriteImg], 'remove'));
         })
 
     }, [removeFavorite, queryClient])
@@ -74,11 +77,21 @@ const AuthProvider = ({ children }) => {
         });
     }, [])
 
+    const subscribeFavorites = useCallback((fn) => {
+        observers.current.push(fn);
+    }, []);
+
+    const unsubscribeFavorites = useCallback((fn) => {
+        observers.current = observers.current.filter(observer => observer !== fn);
+    }, []);
+
     const [userContext, setUserContext] = useState({
         user: context.firebase.auth().currentUser,
         data: null,
         addUserFavorite: addUserFavorite,
         removeUserFavorite: removeUserFavorite,
+        subscribeFavorites: subscribeFavorites,
+        unsubscribeFavorites: unsubscribeFavorites
     });
 
     const { data: favorites } = context.useFetchFavorites(userContext.user && userContext.user.uid, true);

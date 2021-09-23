@@ -17,11 +17,14 @@ const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
     const isInFavorites = useMemo(() => authContext.data && authContext.data.favorites.has(path), [authContext.data, path]);
 
     function handleFavoriteClick() {
-        if (isInFavorites) {
-            authContext.removeUserFavorite(image);
-        } else {
-            authContext.addUserFavorite(image);
-        }
+        const favoriteActionPromise =
+            isInFavorites ?
+            authContext.removeUserFavorite(image) :
+            authContext.addUserFavorite([image]);
+
+        favoriteActionPromise.catch(err => {
+            console.error(err);
+        })
     }
 
     const buttonStyle = {...style};

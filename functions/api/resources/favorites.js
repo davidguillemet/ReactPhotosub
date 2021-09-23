@@ -24,14 +24,15 @@ module.exports = function(config) {
         })
         // Add a favorite for a given user
         .post(async function(req, res, next) {
-            const newFavorite = req.body;
+            const favorites = req.body; // Path array
             try {
+                const queryArray = favorites.map((favorite) => `'${favorite}'`).join(",");
                 const result = await config.pool()
-                    .raw(`update user_data set favorites = array_append(favorites, '${newFavorite.path}') where uid = '${res.locals.uid}' returning favorites`);
+                    .raw(`update user_data set favorites = array_cat(favorites, ARRAY[${queryArray}]) where uid = '${res.locals.uid}' returning favorites`);
                 res.json(result.rows[0].favorites);
             } catch (err) {
-                config.logger.error(`Failed to add ${newFavorite.path} in favorites for user ${res.locals.uid}.`, err);
-                res.status(500).send(`Failed to add ${newFavorite.path} in favorites for user ${res.locals.uid}.`).end();
+                config.logger.error(`Failed to add favorites for user ${res.locals.uid}.`, err);
+                res.status(500).send(`Failed to add favorites for user ${res.locals.uid}.`).end();
             }
         })
         // Remove a favorite for a given user

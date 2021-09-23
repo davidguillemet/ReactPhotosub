@@ -60,8 +60,8 @@ DataProvider.prototype.getUserData = function(uid) {
     });
 };
 
-DataProvider.prototype.addFavorite = function(path) {
-    return this.axios.post('/favorites', { path: path })
+DataProvider.prototype.addFavorite = function(pathArray) {
+    return this.axios.post('/favorites', pathArray )
     .then(response => {
         return response.data;
     });

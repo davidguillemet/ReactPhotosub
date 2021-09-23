@@ -92,7 +92,7 @@ const GlobalContextProvider = ({children}) => {
             useFetchImageCount: () => useQuery('imageCount', () => dataProvider.getImageCount()),
 
             useFetchFavorites: (uid, enabled, thenFunc) => useQuery(['favorites', uid], () => dataProvider.getFavorites(uid).then(thenFunc), { enabled: enabled }),
-            useAddFavorite: () => useMutation((path) => dataProvider.addFavorite(path)),
+            useAddFavorite: () => useMutation((pathArray) => dataProvider.addFavorite(pathArray)),
             useRemoveFavorite: () => useMutation((path) => dataProvider.removeFavorite(path))
         }
     }
