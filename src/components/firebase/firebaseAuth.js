@@ -2,6 +2,7 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { useGlobalContext } from '../globalContext';
 import './firebaseui.css';
 import React, { useEffect, useState } from 'react';
+import Divider from '@material-ui/core/Divider';
 import Backdrop from '@material-ui/core/Backdrop';
 import Modal from '@material-ui/core/Modal';
 import Fade from '@material-ui/core/Fade';
@@ -119,6 +120,7 @@ const SignedInButton = ({user, handleLogout}) => {
                                         );
                                     })
                                 }
+                                <Divider />
                                 <MenuItem onClick={logout}>
                                     <ListItemIcon>
                                         <ExitToAppIcon fontSize="small" />
