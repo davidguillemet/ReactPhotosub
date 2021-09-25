@@ -5,7 +5,10 @@ module.exports = function(config) {
     config.app.route("/destinations")
         .get(function(req, res, next) {
             // See https://firebase.google.com/docs/storage/web/download-files
-            config.pool().select("destinations.*", "locations.region").from("destinations").join("locations", {"destinations.location": "locations.id"})
+            config.pool().select("destinations.*", "locations.region")
+                .from("destinations")
+                .join("locations", {"destinations.location": "locations.id"})
+                .orderBy("destinations.date", "desc")
                 .then((destinations) => {
                     destinations.forEach((destination) => {
                         // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
