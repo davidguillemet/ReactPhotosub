@@ -51,7 +51,7 @@ function getFinalColumnSelection(config) {
 }
 
 function getWhereFunctionFromSingleCriteria(builder, criteria) {
-    return builder.whereRaw("? = ANY (tags)", [criteria]).orWhere("caption", "like", "% " + criteria + " %");
+    return builder.orWhereRaw("? = ANY (tags)", [criteria]).orWhere("caption", "like", "% " + criteria + " %");
 }
 
 function getWhereFunctionFromCriteria(criteriaObject) {
