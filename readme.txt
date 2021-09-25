@@ -33,3 +33,6 @@ https://googleapis.dev/nodejs/storage/latest/
 # test des meta tags open graph (og:title, og:description, og:image)
 # see https://codeburst.io/og-tags-882fd6c7a94e
 ==> https://developers.facebook.com/tools/debug/
+
+// Download bucket content recursively and copy to static-storage
+gsutil cp -r "gs://photosub.appspot.com/2020/romblon" ./public/static-storage/2020
