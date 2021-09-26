@@ -47,10 +47,10 @@ module.exports = function(config) {
     // Get images for a specific destination from identifier
     config.app.route("/destination/:year/:title/images")
         .get(function(req, res, next) {
-            config.pool({i: "images"}).select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio").join("destinations", {
+            config.pool({i: "images"}).select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio", "i.create").join("destinations", {
                 "destinations.path": config.pool().raw("?", [`${req.params.year}/${req.params.title}`]),
                 "i.path": "destinations.path",
-            }).orderBy("i.name", "asc").then((images) => {
+            }).orderBy("i.create", "asc").then((images) => {
                 images.forEach((image) => {
                     // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
                     image.src = config.convertPathToUrl(image.path + "/" + image.name);

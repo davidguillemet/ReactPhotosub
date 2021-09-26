@@ -8,9 +8,9 @@ module.exports = function(config) {
         .get(async function(req, res, next) {
             try {
                 const images = await config.pool({i: "images"})
-                    .select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio")
+                    .select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio", "i.create")
                     .join(config.pool().raw(`user_data as u ON u.uid = '${res.locals.uid}' and concat(i.path, '/', i.name) = ANY(u.favorites)`))
-                    .orderBy("i.name", "asc");
+                    .orderBy("i.create", "desc"); // Last image first
 
                 images.forEach((image) => {
                     // Convert cover property from '2014/misool/DSC_456.jpg' to a real url

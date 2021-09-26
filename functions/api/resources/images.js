@@ -27,7 +27,8 @@ module.exports = function(config) {
             //     captionTags: [ "tag1", "tag2", ...],
             //     width: 600,
             //     height: 400,
-            //     sizeRatio: 1.5
+            //     sizeRatio: 1.5,
+            //     create: "2020-02-28T03:13:00.690Z
             // };
             const newImage = req.body;
             const fileFullPath = `${newImage.path}/${newImage.name}`;
