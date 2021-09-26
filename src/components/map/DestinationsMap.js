@@ -24,6 +24,7 @@ const DestinationsMap = ({destinations}) => {
 
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [destinationsPerLocation, setDestinationsPerLocation] = useState([]);
+    // eslint-disable-next-line no-unused-vars
     const [map, setMap] = React.useState(null)
     const [clusterer, setClusterer] = React.useState(null)
     const [openInfoWindow, setOpenInfoWindow] = useState(true);
@@ -78,7 +79,7 @@ const DestinationsMap = ({destinations}) => {
             })
             return;
         }
-    }, [destinations]);
+    }, [destinations, isDestinationPage]);
 
     useEffect(() => {
 
