@@ -67,8 +67,6 @@ module.exports = async function extractExif(file, fileContent) {
         sizeRatio: dimensions.width / dimensions.height,
     };
 
-    logger.info(`Successfuly build image details for ${file.name} in Finalize GCS trigger.`, newImageItem);
-
     // Send post request api-photosub/image to insert a new image item
     try {
         await axios.post(_baseApiUrl + "/api/image", newImageItem);

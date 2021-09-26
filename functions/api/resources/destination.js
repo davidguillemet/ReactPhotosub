@@ -19,13 +19,20 @@ module.exports = function(config) {
                     SELECT r.id, r.title, r.parent
                     FROM regions r
                     JOIN regionpath ON r.id = regionpath.parent
+                ),
+                prevDest AS (
+                    SELECT destinations.*, destination.date from destinations, destination where destinations.date < destination.date ORDER BY destinations.date DESC LIMIT 1
+                ),
+                nextDest AS (
+                    SELECT destinations.*, destination.date from destinations, destination where destinations.date > destination.date ORDER BY destinations.date ASC LIMIT 1
                 )
                 SELECT d.title, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link,
-                       ARRAY( select row_to_json(row) as region from (SELECT * FROM regionpath) row) as region_path from destination d`,
+                       ARRAY( select row_to_json(row) as region from (SELECT * FROM regionpath) row) as region_path,
+                       (select row_to_json(prevDest.*) from prevDest) as prev,
+                       (select row_to_json(nextDest.*) from nextDest) as next
+                from destination d`,
                 `${req.params.year}/${req.params.title}`)
                 .then((destinations) => {
-                    config.logger.info("Destinations:");
-                    config.logger.info(destinations);
                     const destination = destinations.rows[0];
                     destination.cover = config.convertPathToUrl(destination.path + "/" + destination.cover);
                     res.json(destination);
