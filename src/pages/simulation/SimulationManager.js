@@ -46,7 +46,7 @@ const SimulationManager = () => {
     const authContext = useAuthContext();
     const { data: fetchedSimulations } = context.useFetchSimulations(authContext.user && authContext.user.uid);
     const addMutation = context.useAddSimulation();
-    const updateMutation = context.useUpdateSimulation();
+    const updateSimulation = context.useUpdateSimulation();
     const removeSimulation = context.useRemoveSimulation();
     const simulationInitUser = useRef(undefined);
     /**
@@ -86,7 +86,7 @@ const SimulationManager = () => {
         }
         
         if (isFromDb(simulationData)) {
-            updateMutation.mutateAsync(simulationData).then(res => {
+            updateSimulation.mutateAsync(simulationData).then(res => {
                 unstable_batchedUpdates(() => {
                     dispatch(setSimulationDirty(false, state.currentIndex));
                     displayFeedback("success", `The simulation '${simulationData.name}' has been saved.`);
@@ -117,7 +117,7 @@ const SimulationManager = () => {
                 displayFeedback("error", "Error while saving the simulation...");
             });
         } 
-    }, [displayFeedback, state, addMutation, updateMutation]);
+    }, [displayFeedback, state, addMutation, updateSimulation]);
 
     const onAdd = useCallback((name) => {
         unstable_batchedUpdates(() => {
@@ -147,7 +147,7 @@ const SimulationManager = () => {
             displayFeedback("error", `Error while deleting the simulation '${simulationName}'`);
         });
 
-    }, [state, dispatch, displayFeedback, context.dataProvider]);
+    }, [state, dispatch, displayFeedback, removeSimulation]);
 
     const promptMessage = useMemo(() => {
         let message = "Des modifications sont en cours.\n"
