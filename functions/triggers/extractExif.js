@@ -32,6 +32,7 @@ module.exports = async function extractExif(file, fileContent) {
     const imageTitle = getObjectProperty(xmp.title, "value", "");
     const imageDescription = getObjectProperty(xmp.description, "value", "");
     const imageTags = getObjectProperty(xmp, "subject", null);
+    const creationDate = getObjectProperty(xmp, "CreateDate", null);
 
     let imageCaption = null;
     let captionTags = null;
@@ -65,6 +66,7 @@ module.exports = async function extractExif(file, fileContent) {
         width: dimensions.width,
         height: dimensions.height,
         sizeRatio: dimensions.width / dimensions.height,
+        create: creationDate,
     };
 
     // Send post request api-photosub/image to insert a new image item
