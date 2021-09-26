@@ -1,33 +1,65 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef, useMemo} from 'react';
 import Alert from '@material-ui/core/Alert';
-import { Grow, Snackbar } from '@material-ui/core';
+import { Grow, Snackbar, Stack } from '@material-ui/core';
 import LoadingButton from '@material-ui/lab/LoadingButton';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import UndoIcon from '@material-ui/icons/Undo';
 import { useAuthContext } from '../../components/authentication';
 import Gallery from '../../components/gallery';
-import { PageTitle, PageHeader } from '../../template/pageTypography';
+import { PageTitle, PageHeader, PageSubTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import { useGlobalContext } from '../../components/globalContext';
+import { withLoading, buildLoadingState } from '../../components/loading';
 
-const MySelectionContent = ({user, images}) => {
-    if (user === null) {
-        return (
-            <Alert severity="warning" elevation={4} variant="filled">Cette page n'est accessible qu'aux utilisateurs connectés</Alert>
-        );
-    }
+const getImageProps = (image) => {
+    // image path is "<year>/<name>"
+    const props = image.path.split('/');
+    return {
+        year: props[0],
+        name: props[1]
+    };
+}
+
+const groupFavoritesByYear = (images) => {
+    const imagesByYear = new Map();
+    images.forEach((image) => {
+        const imageProps = getImageProps(image);
+        let yearImages = imagesByYear.get(imageProps.year);
+        if (yearImages === undefined) {
+            yearImages = [];
+            imagesByYear.set(imageProps.year, yearImages);
+        }
+        yearImages.push(image);
+        // Sort by date
+        yearImages.sort((img1, img2) => { return img2.create > img1.create ? 1 : -1; });
+    });
+    return imagesByYear;
+}
+
+const MySelectionContent = withLoading(({images}) => {
+    const favoritesByYear = useMemo(() => groupFavoritesByYear(images), [images]);
 
     return (
         <React.Fragment>
         {
             images !== undefined &&
-            <PageHeader>{`${images.length} Image(s)`}</PageHeader>
+            <PageSubTitle sx={{mt: 0}}>{`${images.length} Image(s)`}</PageSubTitle>
         }
-        <Gallery images={images} style={{width: '100%'}} colWidth={300} margin={5} emptyMessage="Votre liste de favoris est vide."/>
+        {
+            Array.from(favoritesByYear.keys()).sort((year1, year2) => { return year2 > year1 ? 1 : -1; }).map((year) => {
+                const images = favoritesByYear.get(year);
+                return (
+                    <Stack sx={{width: '100%'}} key={year}>
+                        <PageHeader sx={{mb: 0, mt: 3}}>{year}</PageHeader>
+                        <Gallery images={images} style={{width: '100%'}} colWidth={300} margin={5} emptyMessage="Votre liste de favoris est vide."/>
+                    </Stack>
+                )
+            })
+        }
         </React.Fragment>
     );
-}
+}, [ buildLoadingState("images", [null, undefined]) ]);
 
 const MySelection = () => {
 
@@ -112,7 +144,11 @@ const MySelection = () => {
         <React.Fragment>
             <PageTitle>Ma Sélection</PageTitle>
             <VerticalSpacing factor={2} />
-            <MySelectionContent user={authContext.user} images={images}></MySelectionContent>
+            {
+                authContext.user === null ?
+                <Alert severity="warning" elevation={4} variant="filled">Cette page n'est accessible qu'aux utilisateurs connectés</Alert> :
+                <MySelectionContent images={images}></MySelectionContent>
+            }
             {
                 removedFavorites.length > 0 && 
                 <Snackbar
@@ -122,6 +158,7 @@ const MySelection = () => {
                     TransitionComponent={Grow}
                 />
             }
+
         </React.Fragment>
     );
 }
