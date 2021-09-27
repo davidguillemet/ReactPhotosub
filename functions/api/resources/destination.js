@@ -1,3 +1,11 @@
+function convertPath(destination, config) {
+    if (destination) {
+        destination.cover = config.convertPathToUrl(destination.path + "/" + destination.cover);
+        convertPath(destination.next, config);
+        convertPath(destination.prev, config);
+    }
+}
+
 module.exports = function(config) {
     // Get a specific destination head from identifier
     config.app.route("/destination/:year/:title/head")
@@ -21,10 +29,10 @@ module.exports = function(config) {
                     JOIN regionpath ON r.id = regionpath.parent
                 ),
                 prevDest AS (
-                    SELECT destinations.*, destination.date from destinations, destination where destinations.date < destination.date ORDER BY destinations.date DESC LIMIT 1
+                    SELECT destinations.* from destinations, destination where destinations.date < destination.date ORDER BY destinations.date DESC LIMIT 1
                 ),
                 nextDest AS (
-                    SELECT destinations.*, destination.date from destinations, destination where destinations.date > destination.date ORDER BY destinations.date ASC LIMIT 1
+                    SELECT destinations.* from destinations, destination where destinations.date > destination.date ORDER BY destinations.date ASC LIMIT 1
                 )
                 SELECT d.title, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link,
                        ARRAY( select row_to_json(row) as region from (SELECT * FROM regionpath) row) as region_path,
@@ -34,7 +42,7 @@ module.exports = function(config) {
                 `${req.params.year}/${req.params.title}`)
                 .then((destinations) => {
                     const destination = destinations.rows[0];
-                    destination.cover = config.convertPathToUrl(destination.path + "/" + destination.cover);
+                    convertPath(destination, config);
                     res.json(destination);
                 }).catch((err) => {
                     config.logger.error(`Failed to load destination with id = ${req.params.id}`, err);
