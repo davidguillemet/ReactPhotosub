@@ -1,9 +1,11 @@
+import { useState, useCallback } from 'react';
 import { formatDate } from '../../../utils';
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import Chip from "@material-ui/core/Chip";
 import React from "react";
 import DestinationLink from '../../../components/destinationLink';
+import { useIntersectionObserver } from '../../../components/hooks';
 
 const DestinationDetails = ({destination, regions}) => {
     return (
@@ -41,8 +43,17 @@ const DestinationDetails = ({destination, regions}) => {
 
 const Destination = ({destination, regions, itemWidth, margin, colIndex}) => {
 
+    const [isVisible, setIsVisible] = useState(false);
+
+    const onVisible = useCallback(() => {
+        setIsVisible(true);
+    }, []);
+
+    const containerRef = useIntersectionObserver(onVisible);
+
     return (
         <Box
+            ref={containerRef}
             sx={{
                 position: 'relative',
                 overflow: 'hidden',
@@ -52,15 +63,6 @@ const Destination = ({destination, regions, itemWidth, margin, colIndex}) => {
                 mb: `${margin}px`,
                 width: `${itemWidth}px`,
                 borderRadius: '5px',
-
-                // Translate the grid item on hover
-                transition: (theme) => theme.transitions.create(
-                    'transform',
-                    {
-                        duration: theme.transitions.duration.standard,
-                        easing: theme.transitions.easing.easeOut
-                    }
-                ),
 
                 // Scale image on hover
                 '& img': {
@@ -89,31 +91,38 @@ const Destination = ({destination, regions, itemWidth, margin, colIndex}) => {
                 },
                 '&:hover > a > div': {
                     bottom: 0
-                }
+                },
+
+                // Transition opacity on visible
+                opacity: isVisible ? 1 : 0,
+                transition: 'opacity 2000ms',
             }}
         >
-            <DestinationLink destination={destination}>
-                <img src={destination.cover} alt={destination.title} style={{
-                    height: '100%',
-                    width: '100%'
-                }}/>
-                <Box
-                    sx={{
-                        width: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-                        position: 'absolute',
-                        height: 'auto',
-                        paddingBottom: '5px',
-                        bottom: '-60px',
-                        color: 'white'
-                    }}
-                >
-                    <Typography variant="h5">{formatDate(new Date(destination.date))}</Typography>
-                    <DestinationDetails destination={destination} regions={regions} />
-                </Box>
-            </DestinationLink>
+            {
+                isVisible &&
+                <DestinationLink destination={destination}>
+                    <img src={destination.cover} alt={destination.title} style={{
+                        height: '100%',
+                        width: '100%'
+                    }}/>
+                    <Box
+                        sx={{
+                            width: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+                            position: 'absolute',
+                            height: 'auto',
+                            paddingBottom: '5px',
+                            bottom: '-60px',
+                            color: 'white'
+                        }}
+                    >
+                        <Typography variant="h5">{formatDate(new Date(destination.date))}</Typography>
+                        <DestinationDetails destination={destination} regions={regions} />
+                    </Box>
+                </DestinationLink>
+            }
         </Box>
     );
 }

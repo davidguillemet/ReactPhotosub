@@ -1,10 +1,11 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import Box from '@material-ui/core/Box';
-
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { getThumbnailSrc } from '../../../utils';
 import Destination from './Destination';
 import { withLoading, buildLoadingState } from '../../../components/loading';
 import { useResizeObserver } from '../../../components/hooks';
+import './destinationTileStyles.css';
 
 const _destinationsMargin = 7;
 const _destinationsBaseWidth = 300;
@@ -53,9 +54,15 @@ const DestinationsGrid = ({destinations, regionsByDestination}) => {
                 width: '100%'
             }}
         >
+            <TransitionGroup component={null}>
             {
                 adaptedDestinations.map((item, index) => {
                     return (
+                        <CSSTransition
+                        key={item.id}
+                        timeout={500}
+                        classNames="destinationTile"
+                        >                
                         <Destination
                             key={item.id}
                             destination={item}
@@ -64,9 +71,11 @@ const DestinationsGrid = ({destinations, regionsByDestination}) => {
                             margin={_destinationsMargin}
                             colIndex={index % galleryProps.columnsCount}
                         />
+                        </CSSTransition>
                     );
                 })
             }
+            </TransitionGroup>
         </Box>
     );
 }
