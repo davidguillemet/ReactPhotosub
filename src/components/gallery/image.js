@@ -61,7 +61,7 @@ const LazyImage = ({ image, index, onClick, top, left, width }) => {
     }, [image, width]);
     const imageRef = useIntersectionObserver(onVisible);
     const classes = useStyles();
-    
+
     const onLoad = event => {
         if (event.target.src !== placeHolder) {
             event.target.parentNode.classList.add('loaded');

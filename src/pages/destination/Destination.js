@@ -18,8 +18,9 @@ import LazyDialog from '../../dialogs/LazyDialog';
 import { withLoading, buildLoadingState } from '../../components/loading';
 import { useGlobalContext } from '../../components/globalContext';
 import DestinationLink from '../../components/destinationLink';
-import { grey } from '@material-ui/core/colors';
+import { lightBlue } from '@material-ui/core/colors';
 import { VerticalSpacing } from '../../template/spacing';
+import { useIntersectionObserver } from '../../components/hooks';
 
 const RegionChip = ({region}) => {
 
@@ -72,7 +73,7 @@ const NavigationItem = ({destination, type}) => {
                     alignItems: 'center',
                     py: 1,
                     "&:hover" : {
-                        bgcolor: grey[100]
+                        bgcolor: lightBlue[50]
                     }
                 }}
             >
@@ -93,7 +94,7 @@ const NavigationItem = ({destination, type}) => {
 
 const Navigation = ({destination}) => {
     return (
-        <Grow in={true}>
+        <Grow in={true} timeout={1000}>
             <Grid container spacing={{ xs: 1, md: 2}} sx={{width: '100%'}}>
                 <Grid item xs={6}>
                     <NavigationItem destination={destination.next} type="next"/>
@@ -106,12 +107,33 @@ const Navigation = ({destination}) => {
     )
 }
 
+const BottomNavigation = ({destination}) => {
+
+    const [isVisible, setIsVisible] = useState(false);
+
+    const onVisible = useCallback(() => {
+        setIsVisible(true);
+    }, []);
+
+    const navigationRef = useIntersectionObserver(onVisible);
+    
+    return (
+        <Box ref={navigationRef} sx={{width: '100%'}}>
+            {
+                isVisible &&
+                <Navigation destination={destination} />
+            }
+        </Box>
+    ) 
+}
+
 const DestinationDisplay = withLoading(({destination, year, title}) => {
 
     const context = useGlobalContext();
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [locationOpen, setLocationOpen] = useState(false);
     const { data: images } = context.useFetchDestinationImages(year, title);
+    const [ galleryIsReady, setGalleryIsReady ] = useState(false);
 
     const handleCloseLocation = useCallback(() => {
         setLocationOpen(false);
@@ -125,6 +147,9 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
         setSummaryOpen(open => !open);
     }, []);
 
+    const onGalleryIsReady = useCallback(() => {
+        setGalleryIsReady(true);
+    }, [])
 
     return (
         <React.Fragment>
@@ -158,11 +183,14 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
                 handleClose={handleCloseLocation}
             />
 
-            <Gallery images={images} style={{width: '100%'}} colWidth={350} margin={5}/>
+            <Gallery images={images} style={{width: '100%'}} colWidth={350} margin={5} onReady={onGalleryIsReady} />
 
             <VerticalSpacing factor={2} />
 
-            <Navigation destination={destination}/>
+            {
+                galleryIsReady &&
+                <BottomNavigation destination={destination} />
+            }
 
         </React.Fragment>
     );

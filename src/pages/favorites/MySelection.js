@@ -7,10 +7,11 @@ import CloseIcon from '@material-ui/icons/Close';
 import UndoIcon from '@material-ui/icons/Undo';
 import { useAuthContext } from '../../components/authentication';
 import Gallery from '../../components/gallery';
-import { PageTitle, PageHeader, PageSubTitle } from '../../template/pageTypography';
+import { PageTitle, PageSubTitle, BlockQuote } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import { useGlobalContext } from '../../components/globalContext';
 import { withLoading, buildLoadingState } from '../../components/loading';
+import { grey } from '@material-ui/core/colors';
 
 const getImageProps = (image) => {
     // image path is "<year>/<name>"
@@ -51,8 +52,8 @@ const MySelectionContent = withLoading(({images}) => {
                 const images = favoritesByYear.get(year);
                 return (
                     <Stack sx={{width: '100%'}} key={year}>
-                        <PageHeader sx={{mb: 0, mt: 3}}>{year}</PageHeader>
-                        <Gallery images={images} style={{width: '100%'}} colWidth={300} margin={5} emptyMessage="Votre liste de favoris est vide."/>
+                        <BlockQuote sx={{mb: 1, mt: 3, ml: 0, pl: 1, bgcolor: grey[200]}}>{year}</BlockQuote>
+                        <Gallery images={images} style={{width: '100%'}} colWidth={350} margin={5} emptyMessage="Votre liste de favoris est vide."/>
                     </Stack>
                 )
             })
@@ -143,7 +144,7 @@ const MySelection = () => {
     return (
         <React.Fragment>
             <PageTitle>Ma Sélection</PageTitle>
-            <VerticalSpacing factor={2} />
+            <VerticalSpacing factor={1} />
             {
                 authContext.user === null ?
                 <Alert severity="warning" elevation={4} variant="filled">Cette page n'est accessible qu'aux utilisateurs connectés</Alert> :

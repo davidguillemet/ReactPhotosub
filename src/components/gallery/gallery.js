@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/styles'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Alert from '@material-ui/core/Alert';
 import Box from '@material-ui/core/Box';
 import Zoom from '@material-ui/core/Zoom';
@@ -68,7 +68,7 @@ const MasonryLayout = withLoading(({images, imageWidth, columnsCount, margin, on
     );
 }, [ buildLoadingState("images", [null, undefined]), buildLoadingState("columnsCount", 0) ]);
 
-const Gallery = ({ images, style, colWidth, margin, emptyMessage = null}) => {
+const Gallery = ({ images, style, colWidth, margin, emptyMessage = null, onReady = null}) => {
     const classes = useStyles();
     const [expandedImageIndex, setExpandedImageIndex] = useState(null);
     const [expandedViewOpen, setExpandedViewOpen] = useState(false);
@@ -76,6 +76,7 @@ const Gallery = ({ images, style, colWidth, margin, emptyMessage = null}) => {
         imageWidth: colWidth,
         columnsCount: 0
     });
+    const isReady = useRef(false);
 
     const resizeObserver = useResizeObserver();
 
@@ -100,6 +101,13 @@ const Gallery = ({ images, style, colWidth, margin, emptyMessage = null}) => {
             columnsCount
         });
     }, [resizeObserver.width, colWidth, margin])
+
+    useEffect(() => {
+        if (isReady.current === false && masonryProps.columnsCount > 0 && onReady !== null) {
+            isReady.current = true;
+            onReady();
+        }
+    }, [masonryProps, onReady])
 
     if (images.length === 0 && emptyMessage !== null) {
         return (
