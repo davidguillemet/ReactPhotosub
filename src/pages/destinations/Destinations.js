@@ -11,11 +11,11 @@ import ToggleButtonGroup from '@material-ui/core/ToggleButtonGroup';
 
 import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
-import DestinationsGrid from './grid/DestinationsGrid';
 import DestinationsMap from '../../components/map';
 import RegionFilter from './RegionFilter';
 import useRegions from './RegionLoaderHook';
 import { useGlobalContext } from '../../components/globalContext';
+import DestinationGallery from './DestinationGallery';
 
 const useStyles = makeStyles(() => ({
     regionContainer: {
@@ -144,7 +144,10 @@ const Destinations = () => {
                         root: classes.tabPanel
                     }}
                 >
-                    <DestinationsGrid destinations={filteredDestinations} regionsByDestination={regionsByDestination} />
+                    <DestinationGallery
+                        destinations={filteredDestinations}
+                        regionsByDestination={regionsByDestination}
+                    />
                 </TabPanel>
                 <TabPanel 
                     value={VIEW_MAP}

@@ -20,7 +20,7 @@ import { useGlobalContext } from '../../components/globalContext';
 import DestinationLink from '../../components/destinationLink';
 import { lightBlue } from '@material-ui/core/colors';
 import { VerticalSpacing } from '../../template/spacing';
-import { useIntersectionObserver } from '../../components/hooks';
+import { useVisible } from '../../components/hooks';
 
 const RegionChip = ({region}) => {
 
@@ -109,13 +109,7 @@ const Navigation = ({destination}) => {
 
 const BottomNavigation = ({destination}) => {
 
-    const [isVisible, setIsVisible] = useState(false);
-
-    const onVisible = useCallback(() => {
-        setIsVisible(true);
-    }, []);
-
-    const navigationRef = useIntersectionObserver(onVisible);
+    const { isVisible, ref: navigationRef } = useVisible();
     
     return (
         <Box ref={navigationRef} sx={{width: '100%'}}>
