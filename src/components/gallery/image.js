@@ -1,17 +1,16 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import FavoriteButton from './favoriteButton';
 import { getThumbnailSrc } from '../../utils';
-import { useIntersectionObserver } from '../hooks';
+import { useVisible } from '../hooks';
 
 const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
 
 const useStyles = makeStyles(() => ({
     imageContainer: {
-        display: "block",
-        position: 'absolute',
+        position: 'relative',
         opacity: 0,
         transition: 'top 0.8s, left 0.8s, opacity 1.5s',
         overflow: "hidden",
@@ -53,14 +52,17 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const LazyImage = ({ image, index, onClick, top, left, width }) => {
-    const [imageSrc, setImageSrc] = useState(placeHolder);
-    const onVisible = useCallback(() => {
-        const updatedSrc = getThumbnailSrc(image, width);
-        setImageSrc(updatedSrc);
-    }, [image, width]);
-    const imageRef = useIntersectionObserver(onVisible);
+const LazyImage = ({ image, index, onClick, width }) => {
     const classes = useStyles();
+    const [imageSrc, setImageSrc] = useState(placeHolder);
+    const { isVisible, ref: imageRef } = useVisible();
+
+    useEffect(() => {
+        if (isVisible === true) {
+            const updatedSrc = getThumbnailSrc(image, width);
+            setImageSrc(updatedSrc);
+        }
+    }, [isVisible, image, width])
 
     const onLoad = event => {
         if (event.target.src !== placeHolder) {
@@ -78,21 +80,12 @@ const LazyImage = ({ image, index, onClick, top, left, width }) => {
         }
     }
 
-    // Build a CSS calculation for the image height
-    // This allow a correct layout when we resize the window while we are at not at the top of the page.
-    // If we don't use this calculation, the images at the top won't be loaded yet and the img height won't be known by the browser,
-    // that won't be able to layout correctly the top of the columns...
-    const imageHeight = width / image.sizeRatio;
-
     return (
         <div
             className={classes.imageContainer}
             style={{
-                top: top,
-                left: left,
                 maxWidth: width,
-                width: width,
-                height: imageHeight
+                width: width
             }}
         >
             <img
