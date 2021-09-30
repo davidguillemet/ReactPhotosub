@@ -10,7 +10,7 @@
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "12"
+    "node": "14"
   },
   "main": "index.js",
   "dependencies": {
@@ -27,7 +27,7 @@
     "knex": "^0.21.18",
     "nodemailer": "^6.6.3",
     "pg": "^8.5.1",
-    "sharp": "^0.28.3",
+    "sharp": "^0.29.1",
     "winston": "^3.3.3"
   },
   "devDependencies": {
