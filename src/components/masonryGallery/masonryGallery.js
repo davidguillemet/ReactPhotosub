@@ -17,7 +17,7 @@ const MasonryGallery = ({items, colWidth, heightProvider, margin, renderItem, em
 
     useEffect(() => {
         const containerWidth = resizeObserver.width;
-        const columnsCount = Math.floor((containerWidth + margin) / (colWidth + margin));
+        const columnsCount = Math.round((containerWidth + margin) / (colWidth + margin));
         const totalMargin = (columnsCount-1)*margin;
         const itemWidth = Math.round((containerWidth - totalMargin) / columnsCount);
         setMasonryProps({
