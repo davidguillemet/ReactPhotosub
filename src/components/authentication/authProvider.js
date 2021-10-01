@@ -98,16 +98,25 @@ const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const unregisterAuthObserver = context.firebase.auth().onAuthStateChanged(user => {
-            setUserContext(prevUserContext => {
-                return {
-                    ...prevUserContext,
-                    user: user,
-                    data: null
-                };
+
+            // Create user entry in user_data if first login
+            const userdataPromise =
+                user ?
+                context.dataProvider.getUserData(user.uid) : // user is signed in
+                Promise.resolve(null);          // user is signed out
+
+            userdataPromise.then(() => {
+                setUserContext(prevUserContext => {
+                    return {
+                        ...prevUserContext,
+                        user: user,
+                        data: null
+                    };
+                });
             });
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-    }, [context.firebase]);
+    }, [context]);
 
     useEffect(() => {
         if (favorites !== undefined) {
