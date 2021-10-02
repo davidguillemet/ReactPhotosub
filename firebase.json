@@ -11,14 +11,16 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [ {
-      "source": "/api/**",
-      "function": "mainapi"
-    },
-    {
-      "source": "**",
-      "destination": "/index.html"
-    } ]
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "function": "mainapi"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   },
   "storage": {
     "rules": "storage.rules"

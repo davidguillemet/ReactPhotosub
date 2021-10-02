@@ -30,8 +30,8 @@ const {logger} = require("../utils/logger");
 const extractExif = require("./extractExif");
 const {blurImage, deleteBlurryImage} = require("./blurImage");
 const {createThumbnails, deleteThumbnails, addSizeRatio} = require("./resizeImage");
+const {apiBaseUrl} = require("./config");
 
-const _baseApiUrl = "https://photosub.web.app";
 const _blurryFolder = "blurry";
 const _thumbsFolder = "thumbs";
 
@@ -45,7 +45,7 @@ exports.deleteFile = function(file) {
             name: filePathProps.base,
             path: filePathProps.dir,
         };
-        const promise = axios.delete(_baseApiUrl + "/api/image", {data: fileItemProps});
+        const promise = axios.delete(apiBaseUrl + "/api/image", {data: fileItemProps});
         promises.push(promise);
     }
 

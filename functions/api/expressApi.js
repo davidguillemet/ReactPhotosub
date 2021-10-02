@@ -30,7 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // Fix the CORS Error
-app.use(cors());
+app.use(cors({origin: true}));
 
 const resourceConfiguration = {
     app,

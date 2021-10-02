@@ -2,9 +2,9 @@ const sharp = require("sharp");
 const imageSize = require("buffer-image-size");
 const path = require("path");
 const {Storage} = require("@google-cloud/storage");
+const {unlink} = require("fs/promises");
 const os = require("os");
 const {logger} = require("../utils/logger");
-
 
 const ACTION_CREATE = "create";
 const ACTION_DELETE = "delete";
@@ -41,6 +41,8 @@ function createThumbnail(fileContent, bucket, width, tempResizedFilePath, resize
             return bucket.upload(tempResizedFilePath, {
                 destination: resizedFilePathInBucket,
             });
+        }).then(() => {
+            return unlink(tempResizedFilePath);
         }).catch((error) => {
             logger.error(`Failed to create resized file ${resizedFilePathInBucket}.`, error);
         });

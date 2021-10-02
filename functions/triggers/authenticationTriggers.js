@@ -1,11 +1,10 @@
 const axios = require("axios");
 const {logger} = require("../utils/logger");
-
-const _baseApiUrl = "https://photosub.web.app";
+const {apiBaseUrl} = require("./config");
 
 exports.deleteUser = async function(user) {
     try {
-        await axios.delete(_baseApiUrl + "/api/userdata", {
+        await axios.delete(apiBaseUrl + "/api/userdata", {
             data: {
                 uid: user.uid,
                 displayName: user.displayName,

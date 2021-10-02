@@ -3,9 +3,7 @@ const imageSize = require("buffer-image-size");
 const axios = require("axios");
 const {parse} = require("path");
 const {logger} = require("../utils/logger");
-
-// TODO read this base url from configuration or any other settings...
-const _baseApiUrl = "https://photosub.web.app";
+const {apiBaseUrl} = require("./config");
 
 module.exports = async function extractExif(file, fileContent) {
     let xmp = null;
@@ -71,7 +69,7 @@ module.exports = async function extractExif(file, fileContent) {
 
     // Send post request api-photosub/image to insert a new image item
     try {
-        await axios.post(_baseApiUrl + "/api/image", newImageItem);
+        await axios.post(apiBaseUrl + "/api/image", newImageItem);
         logger.info(`${file.name} has been inserted.`);
     } catch (error) {
         logger.error(`Failed to insert new image ${file.name}.`, error);
