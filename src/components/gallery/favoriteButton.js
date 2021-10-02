@@ -7,7 +7,6 @@ import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 
 import TooltipIconButton from '../tooltipIconButton';
 import { useAuthContext } from '../authentication';
-import { CircularProgress } from '@material-ui/core';
 
 const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
 

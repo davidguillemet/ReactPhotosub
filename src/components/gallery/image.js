@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import FavoriteButton from './favoriteButton';
 import { getThumbnailSrc } from '../../utils';
@@ -8,52 +8,7 @@ import { useVisible } from '../hooks';
 
 const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
 
-const useStyles = makeStyles(() => ({
-    imageContainer: {
-        position: 'relative',
-        opacity: 0,
-        transition: 'top 0.8s, left 0.8s, opacity 1.5s',
-        overflow: "hidden",
-        '&:hover div[class*="imageOverlay"]': {
-            opacity: 1,
-            transition: 'opacity 800ms'
-        },
-        '&:hover img[class*="lazyImage"]': {
-            opacity: 0.5,
-            transform: 'scale(1.1)',
-            transition: 'opacity 1s, transform 4s cubic-bezier(.17,.53,.29,1.01)'
-        },
-        '&.loaded': {
-            opacity: 1
-        }
-    },
-    lazyImage: {
-        display: 'block',
-        width: '100%',
-    },
-    imageOverlay: {
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignContent: "center",
-        alignItems: "center",
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        opacity: 0,
-        color: "#fff",
-        backgroundColor: 'rgba(0, 0, 0, 0.3)',
-        transition: 'opacity 800ms'
-    },
-    icon: {
-        color: 'white',
-    }
-}));
-
 const LazyImage = ({ image, index, onClick, width }) => {
-    const classes = useStyles();
     const [imageSrc, setImageSrc] = useState(placeHolder);
     const { isVisible, ref: imageRef } = useVisible();
 
@@ -81,15 +36,34 @@ const LazyImage = ({ image, index, onClick, width }) => {
     }
 
     return (
-        <div
-            className={classes.imageContainer}
-            style={{
+        <Box
+            sx={{
+                position: 'relative',
                 maxWidth: width,
-                width: width
+                width: width,
+                opacity: 0,
+                transition: 'top 0.8s, left 0.8s, opacity 1.5s',
+                overflow: "hidden",
+                '&:hover div#imageOverlay': {
+                    opacity: 1,
+                    transition: 'opacity 800ms'
+                },
+                '&:hover img#lazyImage': {
+                    opacity: 0.5,
+                    transform: 'scale(1.1)',
+                    transition: 'opacity 1s, transform 2s cubic-bezier(.17,.53,.29,1.01)'
+                },
+                '&.loaded': {
+                    opacity: 1
+                }
             }}
         >
             <img
-                className={classes.lazyImage}
+                id="lazyImage"
+                style={{
+                    display: 'block',
+                    width: '100%',
+                }}
                 ref={imageRef}
                 src={imageSrc}
                 alt="alt"
@@ -97,9 +71,27 @@ const LazyImage = ({ image, index, onClick, width }) => {
                 onError={onError}
             />
 
-            <div className={classes.imageOverlay}>
+            <Box
+                id="imageOverlay"
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    alignItems: "center",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    opacity: 0,
+                    color: "#fff",
+                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                    transition: 'opacity 800ms'
+                }
+            }>
                 <Typography variant="h6" align="center">{image.title}</Typography>
-            </div>
+            </Box>
 
             <ButtonBase
                 onClick={handleImageClick}
@@ -123,7 +115,7 @@ const LazyImage = ({ image, index, onClick, width }) => {
                     right: 10
                 }}
             />
-        </div>
+        </Box>
     );
 }
 
