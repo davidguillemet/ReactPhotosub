@@ -7,6 +7,7 @@ const ItemContainer = ({item, index, top, left, width, height, renderItem}) => {
 
     return (
         <Box
+            key={item.id}
             ref={containerRef}
             sx={{
                 display: 'block',

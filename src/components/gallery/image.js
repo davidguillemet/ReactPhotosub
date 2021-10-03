@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import ButtonBase from '@material-ui/core/ButtonBase';
@@ -11,6 +11,7 @@ const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAA
 const LazyImage = ({ image, index, onClick, width }) => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
     const { isVisible, ref: imageRef } = useVisible();
+    const loaded = useRef(false);
 
     useEffect(() => {
         if (isVisible === true) {
@@ -21,7 +22,9 @@ const LazyImage = ({ image, index, onClick, width }) => {
 
     const onLoad = event => {
         if (event.target.src !== placeHolder) {
+            // add class loaded and modify ref valeu to prevent one additional render
             event.target.parentNode.classList.add('loaded');
+            loaded.current = true;
         }
     }
     
@@ -37,11 +40,12 @@ const LazyImage = ({ image, index, onClick, width }) => {
 
     return (
         <Box
+            key={image.id}
             sx={{
                 position: 'relative',
                 maxWidth: width,
                 width: width,
-                opacity: 0,
+                opacity: loaded.current ? 1 : 0,
                 transition: 'top 0.8s, left 0.8s, opacity 1.5s',
                 overflow: "hidden",
                 '&:hover div#imageOverlay': {
