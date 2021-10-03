@@ -36,7 +36,16 @@ const Overlay = ({image, id}) => {
     )
 }
 
-const LazyImage = ({ image, index, onClick, width, withOverlay = true, withFavorite = true}) => {
+const LazyImage = ({
+    image,
+    index,
+    onClick,
+    width,
+    withOverlay = true,
+    withFavorite = true,
+    hoverEffect = true,
+    disabled = false
+}) => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
     const { isVisible, ref: imageRef } = useVisible();
     const loaded = useRef(false);
@@ -79,15 +88,19 @@ const LazyImage = ({ image, index, onClick, width, withOverlay = true, withFavor
                 '&.loaded': {
                     opacity: 1
                 },
-                [`&:hover div#${imageOverlayId}`]: {
-                    opacity: 1,
-                    transition: 'opacity 800ms'
-                },
-                [`&:hover img#${imageId}`]: {
-                    opacity: 0.5,
-                    transform: 'scale(1.1)',
-                    transition: 'opacity 1s, transform 2s cubic-bezier(.17,.53,.29,1.01)'
-                }
+                ...(
+                    hoverEffect && {
+                        [`&:hover div#${imageOverlayId}`]: {
+                            opacity: 1,
+                            transition: 'opacity 800ms'
+                        },
+                        [`&:hover img#${imageId}`]: {
+                            opacity: 0.5,
+                            transform: 'scale(1.1)',
+                            transition: 'opacity 1s, transform 2s cubic-bezier(.17,.53,.29,1.01)'
+                        }
+                    }
+                )
             }}
         >
             <img
@@ -95,6 +108,7 @@ const LazyImage = ({ image, index, onClick, width, withOverlay = true, withFavor
                 style={{
                     display: 'block',
                     width: '100%',
+                    opacity: disabled ? 0.7 : 1
                 }}
                 ref={imageRef}
                 src={imageSrc}
@@ -107,17 +121,20 @@ const LazyImage = ({ image, index, onClick, width, withOverlay = true, withFavor
                 withOverlay && <Overlay image={image} id={imageOverlayId} />
             }
 
-            <ButtonBase
-                onClick={handleImageClick}
-                style={{
-                    display: "block",
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%"
-                }}
-            />
+            {
+                disabled === false &&
+                <ButtonBase
+                    onClick={handleImageClick}
+                    style={{
+                        display: "block",
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%"
+                    }}
+                />
+            }
 
             {
                 withFavorite && 

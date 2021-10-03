@@ -1,15 +1,15 @@
+import { useMemo } from 'react';
 import { Fab } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
-import { getThumbnailSrc, THUMB_S } from '../../utils';
+import LazyImage from '../lazyImage';
 
 const Thumbnail = ({
     image,
     index,
     handleClick,
     active,
-    onLoadedCallback,
     imageHeight,
     imageBorderWidth = 3,
     imageBorderColor = "#000",
@@ -17,18 +17,10 @@ const Thumbnail = ({
     disabled,
     onDelete}) => {
 
-    function onClick() {
-        handleClick(index);
-    }
+    const imageWidth = useMemo(() => Math.round(imageHeight * image.sizeRatio), [image, imageHeight])
 
     function handleDelete() {
         onDelete(image.src);
-    }
-
-    function handleLoaded() {
-        if (onLoadedCallback) {
-            onLoadedCallback(image.id);
-        }
     }
 
     return (
@@ -45,17 +37,15 @@ const Thumbnail = ({
                 height: `${imageHeight + 2*imageBorderWidth}px`,
                 borderRadius: `${imageBorderRadius}px`
             }}>
-                <img
-                    alt=""
-                    src={getThumbnailSrc(image, imageHeight * image.sizeRatio, THUMB_S)}
-                    onLoad={handleLoaded}
-                    onClick={onClick}
-                    style={{
-                        height: imageHeight,
-                        cursor: 'pointer',
-                        borderRadius: imageBorderRadius >= 2 ? imageBorderRadius-2 : 0,
-                        opacity: disabled ? 0.7 : 1
-                    }}
+                <LazyImage
+                    image={image} 
+                    index={index}
+                    onClick={handleClick}
+                    width={imageWidth}
+                    withOverlay={false}
+                    withFavorite={false}
+                    hoverEffect={false}
+                    disabled={disabled}
                 />
                 {
                     image.uploaded &&

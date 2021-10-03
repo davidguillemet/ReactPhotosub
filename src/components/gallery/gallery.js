@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Alert from '@material-ui/core/Alert';
 import Dialog from '@material-ui/core/Dialog';
-import LazyImage from '../lazyImage/image';
+import LazyImage from '../lazyImage';
 import ExpandedView from './expandedView';
 import {unstable_batchedUpdates} from 'react-dom';
 import { withLoading, buildLoadingState } from '../../components/loading';

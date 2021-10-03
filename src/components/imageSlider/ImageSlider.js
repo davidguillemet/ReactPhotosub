@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {isMobile} from 'react-device-detect';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
@@ -27,6 +27,10 @@ const getThumbnailRectAt = (container, index) => {
     };
 };
 
+const getLastThumbnailRightPosition = (images, height, borderWidth) => {
+    return images.reduce((position, image) => position + Math.round(height*image.sizeRatio) + borderWidth*2, 0);
+}
+
 const ImageSlider = ({
     images,
     currentIndex,
@@ -44,8 +48,7 @@ const ImageSlider = ({
     hasNext = false}) => {
     
     const [thumnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
-    const [lastThumbRight, setLastThumbRight] = useState(0);
-    const loadedThumbnails = useRef(new Set());
+    const lastThumbRight = useMemo(() => getLastThumbnailRightPosition(images, imageHeight, imageBorderWidth), [images, imageHeight, imageBorderWidth]);
 
     const resizeObserver = useResizeObserver(true);
     
@@ -95,21 +98,6 @@ const ImageSlider = ({
     }, [scrollToThumbnail, onThumbnailClick, disabled]);
 
     useEffect(() => {
-        // The number of loaded thumbnails must be initialized
-        // with the number of common images between previous and new images
-        // based on their id property
-        if (images !== null) {
-            const newImageIdentifires = new Set(images.map(image => image.id));
-            loadedThumbnails.current.forEach(loadedImageId => {
-                if (newImageIdentifires.has(loadedImageId) === false) {
-                    loadedThumbnails.current.delete(loadedImageId);
-                }
-            });
-        }
-        setLastThumbRight(0);
-    }, [images]);
-
-    useEffect(() => {
         // Simulate click handle each time the current index changes
         if (currentIndex >= 0) {
             handleThumbnailClick(currentIndex, true);
@@ -122,14 +110,6 @@ const ImageSlider = ({
             scrollRight: lastThumbRight > resizeObserver.width + resizeObserver.scrollLeft
         });
     }, [resizeObserver.width, resizeObserver.scrollLeft, lastThumbRight]);
-
-    const onThumbnailLoadedCallback = useCallback((id) => {
-        loadedThumbnails.current.add(id);
-        if (loadedThumbnails.current.size === images.length) {
-            const lastThumbRect = getThumbnailRectAt(resizeObserver.element, images.length - 1);
-            setLastThumbRight(lastThumbRect.left + lastThumbRect.width);
-        }
-    }, [images, resizeObserver.element]);
 
     function handleThumbnailsScrollLeft() {
         resizeObserver.element.scrollBy({
@@ -158,12 +138,13 @@ const ImageSlider = ({
                 alignItems: 'center'
             }}>
 
-                { !isMobile &&
-                <Fade in={thumnailScrollActivation.scrollLeft}>
-                <IconButton onClick={handleThumbnailsScrollLeft} disabled={!thumnailScrollActivation.scrollLeft}>
-                    <ArrowBackIosRoundedIcon fontSize="large"/>
-                </IconButton>
-                </Fade>
+                {
+                    !isMobile &&
+                    <Fade in={thumnailScrollActivation.scrollLeft}>
+                    <IconButton onClick={handleThumbnailsScrollLeft} disabled={!thumnailScrollActivation.scrollLeft}>
+                        <ArrowBackIosRoundedIcon fontSize="large"/>
+                    </IconButton>
+                    </Fade>
                 }
 
                 {
@@ -200,7 +181,6 @@ const ImageSlider = ({
                                                 index={index}
                                                 handleClick={handleThumbnailClick}
                                                 active={currentIndex === index}
-                                                onLoadedCallback={onThumbnailLoadedCallback}
                                                 imageHeight={imageHeight}
                                                 imageBorderWidth={imageBorderWidth}
                                                 imageBorderColor={imageBorderColor}
@@ -232,12 +212,13 @@ const ImageSlider = ({
                     </Box>
                 }
 
-                { !isMobile &&
-                <Fade in={thumnailScrollActivation.scrollRight}>
-                <IconButton onClick={handleThumbnailsScrollRight} disabled={!thumnailScrollActivation.scrollRight}>
-                    <ArrowForwardIosRoundedIcon fontSize="large"/>
-                </IconButton>
-                </Fade>
+                {
+                    !isMobile &&
+                    <Fade in={thumnailScrollActivation.scrollRight}>
+                    <IconButton onClick={handleThumbnailsScrollRight} disabled={!thumnailScrollActivation.scrollRight}>
+                        <ArrowForwardIosRoundedIcon fontSize="large"/>
+                    </IconButton>
+                    </Fade>
                 }
 
             </Box>

@@ -29,7 +29,19 @@ module.exports = function(config) {
                 });
             }
 
-            res.status(200).send(`All thumbnails have been generated for ${fileName}.`).end();
+            // Get the metadata for the initial file that shoulc contain the size ration
+            try {
+                const initialUploadedFile = config.bucket.file(`userUpload/${res.locals.uid}/interiors/${fileProps.base}`);
+                initialUploadedFile.getMetadata().then((data) => {
+                    const metadata = data[0];
+                    res.json(metadata.metadata);
+                });
+            } catch (err) {
+                config.logger.error("Failed to check thumbnails status...", err);
+                res.status(500)
+                    .json(err)
+                    .end();
+            }
         });
 
     config.app.route("/uploadedInteriors")

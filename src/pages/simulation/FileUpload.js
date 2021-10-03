@@ -10,10 +10,12 @@ import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import { Typography } from '@material-ui/core';
 import { useGlobalContext } from '../../components/globalContext';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import ErrorIcon from '@material-ui/icons/Error';
 import './fileUploadStyles.css';
 
 const STEP_UPLOAD = "upload";
 const STEP_THUMBAILS = "thumbnail";
+const STEP_ERROR = "error";
 
 const UploadProgress = ({progress}) => {
     return (
@@ -61,6 +63,29 @@ const ThumbnailGeneration = () => {
     );
 }
 
+const ThumbnailError = () => {
+    return (
+        <Box style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center'
+        }}>
+            <ErrorIcon />
+            <HorizontalSpacing factor={1} />
+            <Typography
+                variant="caption"
+                style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: 200
+                }}>
+                Une erreur est survenue...
+            </Typography>
+        </Box>
+    );
+}
+
 const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
 
     const context = useGlobalContext();
@@ -72,6 +97,12 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
         // Task is stopped by the cleanup function above
         onCancel(file);
     }, [file, onCancel]);
+
+    useEffect(() => {
+        if (step === STEP_ERROR) {
+            setTimeout(() => handleCancel(), 5000);
+        }
+    }, [step, handleCancel]);
 
     useEffect(() => {
         // launch firebase upload
@@ -87,14 +118,19 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
             }, 
             (error) => {
                 // Handle unsuccessful uploads
+                console.error(error);
             }, 
             () => {
                 // Handle successful uploads on complete
                 // For instance, get the download URL: https://firebasestorage.googleapis.com/...
                 setStep(STEP_THUMBAILS);
-                context.dataProvider.waitForThumbnails(file.name).then(() => {
-                    onFileUploaded(file.name);
+                context.dataProvider.waitForThumbnails(file.name).then((fileProps) => {
+                    const { sizeRatio } = fileProps;
+                    onFileUploaded(file.name, sizeRatio);
                     onCancel(file);
+                }).catch(error => {
+                    console.error(error);
+                    setStep(STEP_ERROR);
                 });
             }
         );
@@ -129,7 +165,9 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
                 {
                     step === STEP_UPLOAD ?
                     <UploadProgress progress={progress} /> :
-                    <ThumbnailGeneration />
+                    step === STEP_THUMBAILS ?
+                    <ThumbnailGeneration /> :
+                    <ThumbnailError />
                 }
                 <HorizontalSpacing factor={2} />
             </Paper>
