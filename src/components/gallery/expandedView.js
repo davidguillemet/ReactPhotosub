@@ -47,7 +47,8 @@ const useStyles = makeStyles({
         transition: 'opacity 1s',
         '&.loaded': {
             opacity: 1
-        }
+        },
+        objectFit: 'contain' // Prevent portrait image being enlarged on chrome windows (at least)
     },
     expandedHeader: {
         opacity: 1,
