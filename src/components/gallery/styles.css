@@ -1,14 +1,9 @@
-.slide-enter {
-    opacity: 0;
+@keyframes favoriteUpdate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
 }
-.slide-enter-active {
-    opacity: 1;
-    transition: opacity 500ms ease-in;
-}
-.slide-exit {
-    opacity: 1;
-}
-.slide-exit-active {
-    opacity: 0;
-    transition: opacity 500ms ease-in;
-}
+  

@@ -1,12 +1,14 @@
 import React, { useMemo, useState } from 'react';
 import FavoriteIconOutlined from '@material-ui/icons/FavoriteBorderOutlined';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import AutorenewIcon from '@material-ui/icons/Autorenew';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 
 import TooltipIconButton from '../tooltipIconButton';
 import { useAuthContext } from '../authentication';
+import './styles.css';
 
 const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
 
@@ -33,7 +35,7 @@ const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
 
     const buttonStyle = {...style};
     let title = "Ajouter aux favoris";
-    if (isInFavorites) {
+    if (isInFavorites && updating === false) {
         title = 'Retirer des favoris';
         buttonStyle.color = 'red';
     } else if (color) {
@@ -62,11 +64,15 @@ const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
                     }        
                 </Box>
             }
-            onClick={authContext.user ? handleFavoriteClick : null}
+            onClick={authContext.user && updating === false ? handleFavoriteClick : null}
             style={buttonStyle}
             disabled={updating}
         >
             {
+                updating ?
+                <AutorenewIcon fontSize={fontSize} sx={{
+                    animation: 'favoriteUpdate 1.2s linear infinite' // see styles.css for favoriteUpdate
+                }}/> : 
                 isInFavorites ?
                 <FavoriteIcon fontSize={fontSize}/> :
                 <FavoriteIconOutlined fontSize={fontSize} />
