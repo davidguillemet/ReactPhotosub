@@ -35,6 +35,7 @@ const Thumbnail = ({
                 padding: `${imageBorderWidth}px`,
                 backgroundColor: active === true ? imageBorderColor : null,
                 height: `${imageHeight + 2*imageBorderWidth}px`,
+                width: `${imageWidth+2*imageBorderWidth}px`,
                 borderRadius: `${imageBorderRadius}px`
             }}>
                 <LazyImage

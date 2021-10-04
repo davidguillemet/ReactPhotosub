@@ -5,6 +5,10 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import FavoriteButton from '../gallery/favoriteButton';
 import { getThumbnailSrc } from '../../utils';
 import { useVisible } from '../hooks';
+import { grey } from '@material-ui/core/colors';
+import { styled } from '@material-ui/core/styles';
+
+const Image = styled('img')(({ theme }) => ({ }));
 
 const placeHolder = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=`;
 const imageOverlayId = "imageOverlay";
@@ -60,7 +64,7 @@ const LazyImage = ({
     const onLoad = event => {
         if (event.target.src !== placeHolder) {
             // add class loaded and modify ref valeu to prevent one additional render
-            event.target.parentNode.classList.add('loaded');
+            event.target.classList.add('loaded');
             loaded.current = true;
         }
     }
@@ -82,12 +86,10 @@ const LazyImage = ({
                 position: 'relative',
                 maxWidth: width,
                 width: width,
-                opacity: loaded.current ? 1 : 0,
-                transition: 'top 0.8s, left 0.8s, opacity 1.5s',
+                height: "100%",
+                bgcolor: grey[100],
+                transition: 'top 0.8s, left 0.8s',
                 overflow: "hidden",
-                '&.loaded': {
-                    opacity: 1
-                },
                 ...(
                     hoverEffect && {
                         [`&:hover div#${imageOverlayId}`]: {
@@ -103,16 +105,21 @@ const LazyImage = ({
                 )
             }}
         >
-            <img
+            <Image
                 id={imageId}
-                style={{
+                sx={{
                     display: 'block',
                     width: '100%',
-                    opacity: disabled ? 0.7 : 1
+                    height: '100%',
+                    opacity: loaded.current ? (disabled ? 0.7 : 1) : 0,
+                    transition: 'opacity 1.5s',
+                    '&.loaded': {
+                        opacity: 1
+                    }
                 }}
                 ref={imageRef}
                 src={imageSrc}
-                alt="alt"
+                alt=""
                 onLoad={onLoad}
                 onError={onError}
             />
