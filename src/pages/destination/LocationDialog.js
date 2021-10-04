@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {isMobile} from 'react-device-detect';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -7,6 +7,8 @@ import Button from '@material-ui/core/Button';
 import DestinationsMap from '../../components/map';
 
 const LocationDialog = ({destination, open, handleClose}) => {
+
+    const destinations = useMemo(() => [destination], [destination]);
 
     return (
         <Dialog
@@ -29,7 +31,7 @@ const LocationDialog = ({destination, open, handleClose}) => {
                 }}
             >
             { open &&
-                <DestinationsMap destinations={[destination]} />
+                <DestinationsMap destinations={destinations} />
             }
             </DialogContent>
             <DialogActions>

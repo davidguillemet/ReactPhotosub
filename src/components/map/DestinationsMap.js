@@ -79,7 +79,9 @@ const DestinationsMap = ({destinations}) => {
             })
             return;
         }
-    }, [destinations, isDestinationPage]);
+    // Don't need dependency with isDestinationPage
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [destinations]);
 
     useEffect(() => {
 
