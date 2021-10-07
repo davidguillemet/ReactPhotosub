@@ -10,7 +10,7 @@ const HeaderTypography = ({children, ...other}) => (<Typography variant="h4" {..
 const ParagraphTypography = ({children, ...other}) => (<Typography variant="h6" {...other}>{children}</Typography>);
 
 export const PageTitle = styled(TitleTypography)(({ theme }) => ({
-    fontWeight: "400",
+    fontWeight: "300",
     color: theme.palette.text.secondary,
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(3)

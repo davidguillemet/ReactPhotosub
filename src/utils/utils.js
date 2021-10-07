@@ -1,6 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
+
 export function formatDate(tripDate, locale) {
     const options = { year: 'numeric', month: 'long' };
+    const formatedDate = tripDate.toLocaleDateString(locale, options);
+    return formatedDate.charAt(0).toUpperCase() + formatedDate.slice(1);
+}
+
+export function formatDateShort(tripDate, locale) {
+    const options = { year: 'numeric', month: 'short' };
     const formatedDate = tripDate.toLocaleDateString(locale, options);
     return formatedDate.charAt(0).toUpperCase() + formatedDate.slice(1);
 }

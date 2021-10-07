@@ -35,7 +35,7 @@ const Overlay = ({image, id}) => {
                 transition: 'opacity 800ms'
             }
         }>
-            <Typography variant="h6" align="center">{image.title}</Typography>
+            <Typography variant="subtitle1" align="center">{image.title}</Typography>
         </Box>
     )
 }

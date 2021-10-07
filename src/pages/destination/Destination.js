@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useParams } from "react-router-dom";
+import {isMobile} from 'react-device-detect';
 import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
 import Grow from '@material-ui/core/Grow';
 import Stack from '@material-ui/core/Stack';
@@ -10,7 +11,7 @@ import Paper from '@material-ui/core/Paper';
 import ArrowBackIosNewIcon from '@material-ui/icons/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import Chip from '@material-ui/core/Chip';
-import { formatDate } from '../../utils';
+import { formatDate, formatDateShort } from '../../utils';
 import Gallery from '../../components/gallery';
 import { PageTitle, PageSubTitle, PageHeader, Paragraph } from '../../template/pageTypography';
 import LocationDialog from './LocationDialog';
@@ -78,14 +79,20 @@ const NavigationItem = ({destination, type}) => {
                 }}
             >
                 {
-                    type === "next" && <ArrowBackIosNewIcon sx={{mx: 1, fontSize: { xs: 30, md: 40 }}}></ArrowBackIosNewIcon>
+                    type === "next" && <ArrowBackIosNewIcon sx={{mx: 1, fontSize: { xs: 20, md: 40 }}}></ArrowBackIosNewIcon>
                 }
                 <Stack sx={{ alignItems: type === "next" ? "flex-start" : "flex-end"}}>
                     <PageHeader sx={{my: 0}}>{destination.title}</PageHeader>
-                    <Paragraph sx={{my: 0}}>{formatDate(new Date(destination.date))}</Paragraph>
+                    <Paragraph sx={{my: 0}}>
+                        {
+                            isMobile ?
+                            formatDateShort(new Date(destination.date)) :
+                            formatDate(new Date(destination.date))
+                        }
+                    </Paragraph>
                 </Stack>
                 {
-                    type === "prev" && <ArrowForwardIosIcon sx={{mx: 1, fontSize: { xs: 30, md: 40 }}}></ArrowForwardIosIcon>
+                    type === "prev" && <ArrowForwardIosIcon sx={{mx: 1, fontSize: { xs: 20, md: 40 }}}></ArrowForwardIosIcon>
                 }
             </Paper>
         </DestinationLink>

@@ -34,7 +34,7 @@ export const DestinationPath = "/destinations/:year/:title";
 export const routes = [
     // Main Meu in Sidebar : sidebar = true
     {
-        label: "Home",
+        label: "Accueil",
         path: HomePath,
         component: Home,
         icon: <HomeIcon />,
@@ -50,7 +50,7 @@ export const routes = [
         fullWidth: true
     },
     {
-        label: "Search",
+        label: "Recherche",
         path: SearchPath,
         component: Search,
         icon: <SearchIcon />,

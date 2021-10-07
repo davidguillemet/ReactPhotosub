@@ -5,9 +5,11 @@ import Chip from '@material-ui/core/Chip';
 import Paper from '@material-ui/core/Paper';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
+import ToggleButton from '@material-ui/core/ToggleButton';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import InfoOutlined from '@material-ui/icons/InfoOutlined';
 import InfoIcon from '@material-ui/icons/Info';
+import TranslateIcon from '@material-ui/icons/Translate';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
@@ -100,6 +102,62 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
                 }}
             />
         </TooltipIconButton>
+    );
+}
+
+const LANGUAGE_FRENCH = 0
+const LANGUAGE_ENGLISH = 1
+
+const ImageCaption = ({image}) => {
+    const [language, setLanguage] = useState(LANGUAGE_FRENCH);
+    const hasTitle = image.title.length > 0;
+    const hasDescription = image.description.length > 0;
+    const hasDetails = hasTitle || hasDescription;
+
+    return (
+        <Paper
+            elevation={4}
+            sx={{
+                position: 'relative',
+                mb: '5px',
+                pl: 1,
+                textAlign: 'center',
+                backgroundColor: '#edfeff'
+            }}
+        >
+        {
+            hasDetails ?
+            <Box sx={{
+                display: 'flex',
+                flex: 1,
+                flexDirection: 'row',
+                alignItems: 'center'
+            }}>
+                <Typography variant="subtitle1" sx={{ m: 1, flex: 1 }}>
+                    {
+                        language === LANGUAGE_FRENCH ?
+                        (hasTitle ? image.title : image.description) :
+                        image.description
+                    }
+                </Typography>
+                <ToggleButton
+                    sx={{
+                        m: 1
+                    }}
+                    size="small"
+                    value="check"
+                    selected={language === LANGUAGE_ENGLISH}
+                    disabled={!hasDescription}
+                    onChange={() => {
+                        setLanguage(prevLanguage => prevLanguage === LANGUAGE_ENGLISH ? LANGUAGE_FRENCH : LANGUAGE_ENGLISH);
+                    }}
+                    >
+                    <TranslateIcon fontSize="small" />
+                </ToggleButton>
+            </Box> :
+            <Typography variant="subtitle1" style={{ marginBottom: 0 }}>Aucune description</Typography>
+        }
+        </Paper>
     );
 }
 
@@ -217,9 +275,8 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
         event.target.classList.add('loaded');
     }
 
-    function currentImageHasDetails() {
-        return currentImage.title.length > 0 || currentImage.description.length > 0
-    }
+    const  toolbarIconSize = isMobile ? 'medium' : 'large';
+
     const slideRenderer = (params) => {
         const {index} = params;
 
@@ -302,7 +359,7 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                                 tooltip="Lancer le diaporama"
                                 onClick={handlePlayClick}
                             >
-                                <PlayArrowIcon fontSize='large'></PlayArrowIcon>
+                                <PlayArrowIcon fontSize={toolbarIconSize}></PlayArrowIcon>
                             </TooltipIconButton>
                     }
                     {
@@ -315,19 +372,19 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                             >
                                 {
                                     infoVisible ?
-                                    <InfoIcon fontSize='large'></InfoIcon> :
-                                    <InfoOutlined fontSize='large'></InfoOutlined>
+                                    <InfoIcon fontSize={toolbarIconSize}></InfoIcon> :
+                                    <InfoOutlined fontSize={toolbarIconSize}></InfoOutlined>
                                 }
                             </TooltipIconButton>
-                            <FavoriteButton fontSize='large' image={currentImage} />
+                            <FavoriteButton fontSize={toolbarIconSize} image={currentImage} />
                             <TooltipIconButton
                                 tooltip={fullScreen ? "Réduire" : "Plein écran"}
                                 onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}
                             >
                             {   
                                 fullScreen ?
-                                <FullscreenExitIcon fontSize='large' /> :
-                                <FullscreenIcon fontSize='large' />
+                                <FullscreenExitIcon fontSize={toolbarIconSize} /> :
+                                <FullscreenIcon fontSize={toolbarIconSize} />
                             }
                             </TooltipIconButton>
                         </React.Fragment>
@@ -359,7 +416,7 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                         <TooltipIconButton
                             tooltip="Fermer la visionneuse"
                             onClick={handleCloseClick}>
-                            <CloseIcon fontSize='large'></CloseIcon>
+                            <CloseIcon fontSize={toolbarIconSize}></CloseIcon>
                         </TooltipIconButton>
                     }
                 </Box>
@@ -421,25 +478,7 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                 <Box sx={{
                     px: 1
                 }}>
-                    <Paper
-                        elevation={4}
-                        style={{
-                            position: 'relative',
-                            marginBottom: 5,
-                            padding: 10,
-                            textAlign: 'center',
-                            backgroundColor: '#edfeff'
-                        }}
-                    >
-                    {
-                        currentImageHasDetails() ?
-                        <React.Fragment>
-                            <Typography variant="h4" style={{ margin: 0 }}>{currentImage.title}</Typography>
-                            <Typography variant="h5" style={{ marginBottom: 0 }}>{currentImage.description}</Typography>
-                        </React.Fragment> :
-                            <Typography variant="h5" style={{ marginBottom: 0 }}>Aucune description</Typography>
-                        }
-                    </Paper>
+                    <ImageCaption image={currentImage} />
                 </Box>
             </Collapse>
 

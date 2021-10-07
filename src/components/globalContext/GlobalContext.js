@@ -42,7 +42,7 @@ const GlobalContextProvider = ({children}) => {
 
         const axiosInstance = axios.create({
             baseURL: apiBaseUrl + '/api',
-            timeout: 5000,
+            timeout: 10000,
         });
         
         // configure axios to send an authentication token as soon as a user is connected

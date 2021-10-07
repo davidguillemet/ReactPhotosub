@@ -10,7 +10,7 @@ import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils';
 import { useGlobalContext } from '../../components/globalContext';
 import { useScrollBlock } from '../../utils';
 
-const _diaporamaInterval = 10000;
+const _diaporamaInterval = 5000;
 
 const MainImageStyled = styled('img')({
     display: 'block',
