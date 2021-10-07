@@ -275,7 +275,7 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
         event.target.classList.add('loaded');
     }
 
-    const  toolbarIconSize = isMobile ? 'medium' : 'large';
+    const toolbarIconSize = isMobile ? 'medium' : 'large';
 
     const slideRenderer = (params) => {
         const {index} = params;

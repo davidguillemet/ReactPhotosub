@@ -82,8 +82,8 @@ const NavigationItem = ({destination, type}) => {
                     type === "next" && <ArrowBackIosNewIcon sx={{mx: 1, fontSize: { xs: 20, md: 40 }}}></ArrowBackIosNewIcon>
                 }
                 <Stack sx={{ alignItems: type === "next" ? "flex-start" : "flex-end"}}>
-                    <PageHeader sx={{my: 0}}>{destination.title}</PageHeader>
-                    <Paragraph sx={{my: 0}}>
+                    <PageHeader sx={{my: 0, fontWeight: "300"}} variant={isMobile ? "h6" : "h4"}>{destination.title}</PageHeader>
+                    <Paragraph sx={{my: 0, fontWeight: "100"}}>
                         {
                             isMobile ?
                             formatDateShort(new Date(destination.date)) :
