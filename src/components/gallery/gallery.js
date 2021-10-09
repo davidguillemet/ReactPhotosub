@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import {isMobile} from 'react-device-detect';
 import Alert from '@material-ui/core/Alert';
 import Dialog from '@material-ui/core/Dialog';
 import LazyImage from '../lazyImage';
@@ -42,7 +43,7 @@ const Gallery = ({ images, colWidth, margin, emptyMessage = null, onReady = null
 
             <MasonryGallery
                 items={images}
-                colWidth={colWidth}
+                colWidth={isMobile?170:350}
                 heightProvider={(item, itemWidth) => itemWidth / item.sizeRatio}
                 margin={margin}
                 renderItem={renderItem}

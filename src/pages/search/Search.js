@@ -25,7 +25,7 @@ const SearchPage = () => {
             <PageTitle>Recherche</PageTitle>
             <Search
                 showExactSwitch={true}
-                galleryComponent={<Gallery colWidth={300} margin={5}/>}
+                galleryComponent={<Gallery />}
                 nextPageComponent={<NextPageButton />}
             />
         </React.Fragment>

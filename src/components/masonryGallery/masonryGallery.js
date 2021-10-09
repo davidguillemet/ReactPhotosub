@@ -6,7 +6,7 @@ import { useResizeObserver } from '../../components/hooks';
 import { withLoading, buildLoadingState } from '../../components/loading';
 import MasonryLayout from './masonryLayout';
 
-const MasonryGallery = ({items, colWidth, heightProvider, margin, renderItem, emptyMessage = null, onReady = null}) => {
+const MasonryGallery = ({items, colWidth, heightProvider, margin = 5, renderItem, emptyMessage = null, onReady = null}) => {
 
     const resizeObserver = useResizeObserver();
     const [masonryProps, setMasonryProps] = useState({

@@ -126,7 +126,7 @@ const ImageSlider = ({
     }
 
     return (
-        <Paper elevation={4} style={{
+        <Paper elevation={2} style={{
             ...style,
             display: 'flex',
             flexDirection: 'column',

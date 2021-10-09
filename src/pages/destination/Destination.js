@@ -184,7 +184,7 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
                 handleClose={handleCloseLocation}
             />
 
-            <Gallery images={images} style={{width: '100%'}} colWidth={350} margin={5} onReady={onGalleryIsReady} />
+            <Gallery images={images} onReady={onGalleryIsReady} />
 
             <VerticalSpacing factor={2} />
 

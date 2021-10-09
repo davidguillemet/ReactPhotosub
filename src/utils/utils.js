@@ -12,6 +12,32 @@ export function formatDateShort(tripDate, locale) {
     return formatedDate.charAt(0).toUpperCase() + formatedDate.slice(1);
 }
 
+function parseSingleDescription(desc) {
+    if (desc === null || desc === undefined || desc.length === 0) {
+        return null;
+    }
+    const captionRegExp = /([^(]+)(?:\(([^)]+)\))?,?/g;
+    let match = null;
+    const captionItems = [];
+    while ((match = captionRegExp.exec(desc)) !== null) {
+        const captions = match[1];
+        const captionsArray = captions.split(',').map(c => c.trim());
+        const scientificName = match[2];
+        captionItems.push({
+            vernacular: captionsArray,
+            scientific: scientificName
+        });
+    }
+    return captionItems;
+}
+
+export function parseImageDescription(image) {
+    return {
+        french: parseSingleDescription(image.title),
+        english: parseSingleDescription(image.description)
+    };
+}
+
 function debounce(fn, ms) {
     let timer
     return () => {

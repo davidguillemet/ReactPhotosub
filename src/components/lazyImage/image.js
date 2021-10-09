@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import FavoriteButton from '../gallery/favoriteButton';
@@ -7,6 +6,7 @@ import { getThumbnailSrc } from '../../utils';
 import { useVisible } from '../hooks';
 import { grey } from '@material-ui/core/colors';
 import { styled } from '@material-ui/core/styles';
+import ImageDescription from '../imageDescription';
 
 const Image = styled('img')(({ theme }) => ({ }));
 
@@ -35,7 +35,7 @@ const Overlay = ({image, id}) => {
                 transition: 'opacity 800ms'
             }
         }>
-            <Typography variant="subtitle1" align="center">{image.title}</Typography>
+            <ImageDescription image={image} />
         </Box>
     )
 }

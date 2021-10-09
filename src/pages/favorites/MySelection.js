@@ -53,7 +53,7 @@ const MySelectionContent = withLoading(({images}) => {
                 return (
                     <Stack sx={{width: '100%'}} key={year}>
                         <BlockQuote sx={{mb: 1, mt: 3, ml: 0, pl: 1, bgcolor: grey[200]}}>{year}</BlockQuote>
-                        <Gallery images={images} colWidth={350} margin={5} emptyMessage="Votre liste de favoris est vide."/>
+                        <Gallery images={images} emptyMessage="Votre liste de favoris est vide."/>
                     </Stack>
                 )
             })

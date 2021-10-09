@@ -1,6 +1,7 @@
 export {
     formatDate,
     formatDateShort,
+    parseImageDescription,
     resizeEffectHook,
     useEventListener,
     uniqueID,
