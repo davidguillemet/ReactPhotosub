@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { gsap } from "gsap";
 import Box from '@material-ui/core/Box';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import FavoriteButton from '../gallery/favoriteButton';
@@ -31,8 +32,7 @@ const Overlay = ({image, id}) => {
                 bottom: 0,
                 opacity: 0,
                 color: "#fff",
-                backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                transition: 'opacity 800ms'
+                backgroundColor: 'rgba(0, 0, 0, 0.3)'
             }
         }>
             <ImageDescription image={image} />
@@ -53,6 +53,8 @@ const LazyImage = ({
     const [imageSrc, setImageSrc] = useState(placeHolder);
     const { isVisible, ref: imageRef } = useVisible();
     const loaded = useRef(false);
+    const container = useRef();
+    const selector = gsap.utils.selector(container);
 
     useEffect(() => {
         if (isVisible === true) {
@@ -79,8 +81,19 @@ const LazyImage = ({
         }
     }
 
+    const onMouseEnter = () => {
+        gsap.to(selector(`#${imageOverlayId}`), { duration: 0.4, opacity: 1 });
+        gsap.to(selector(`#${imageId}`), { duration: 2.5, scale: 1.1, ease: "power4.out" });
+    };
+
+    const onMouseLeave = () => {
+        gsap.to(selector(`#${imageOverlayId}`), { duration: 0.4, opacity: 0 });
+        gsap.to(selector(`#${imageId}`), { duration: 2.5, scale: 1, ease: "power4.out"});
+    }
+
     return (
         <Box
+            ref={container}
             key={image.id}
             sx={{
                 position: 'relative',
@@ -90,20 +103,9 @@ const LazyImage = ({
                 bgcolor: grey[100],
                 transition: 'top 0.8s, left 0.8s',
                 overflow: "hidden",
-                ...(
-                    hoverEffect && {
-                        [`&:hover div#${imageOverlayId}`]: {
-                            opacity: 1,
-                            transition: 'opacity 800ms'
-                        },
-                        [`&:hover img#${imageId}`]: {
-                            opacity: 0.5,
-                            transform: 'scale(1.1)',
-                            transition: 'opacity 1s, transform 2s cubic-bezier(.17,.53,.29,1.01)'
-                        }
-                    }
-                )
             }}
+            onMouseEnter={hoverEffect ? onMouseEnter : null}
+            onMouseLeave={hoverEffect ? onMouseLeave : null}
         >
             <Image
                 id={imageId}

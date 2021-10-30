@@ -36,5 +36,8 @@ export default function useIntersectionObserver(onVisible) {
         intersectionObserver.current.unobserve(element.current);
     }, []);
 
-    return ref;
+    return {
+        ref: ref,
+        element: element.current
+    };
 };

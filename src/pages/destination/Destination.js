@@ -19,7 +19,6 @@ import LazyDialog from '../../dialogs/LazyDialog';
 import { withLoading, buildLoadingState } from '../../components/loading';
 import { useGlobalContext } from '../../components/globalContext';
 import DestinationLink from '../../components/destinationLink';
-import { lightBlue } from '@material-ui/core/colors';
 import { VerticalSpacing } from '../../template/spacing';
 import { useVisible } from '../../components/hooks';
 
@@ -72,10 +71,7 @@ const NavigationItem = ({destination, type}) => {
                     flexDirection: 'row',
                     justifyContent: type === "next" ? "flex-start" : "flex-end",
                     alignItems: 'center',
-                    py: 1,
-                    "&:hover" : {
-                        bgcolor: lightBlue[50]
-                    }
+                    py: 1
                 }}
             >
                 {

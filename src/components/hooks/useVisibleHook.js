@@ -8,7 +8,7 @@ export default function useVisibleHook() {
         setIsVisible(true);
     }, []);
 
-    const ref = useIntersectionObserver(onVisible);
+    const { ref, element } = useIntersectionObserver(onVisible);
 
-    return { isVisible, ref }
+    return { isVisible, ref, element }
 }

@@ -43,7 +43,7 @@ const Gallery = ({ images, colWidth, margin, emptyMessage = null, onReady = null
 
             <MasonryGallery
                 items={images}
-                colWidth={isMobile?170:350}
+                colWidth={isMobile ? 170 : 350}
                 heightProvider={(item, itemWidth) => itemWidth / item.sizeRatio}
                 margin={margin}
                 renderItem={renderItem}

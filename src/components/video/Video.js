@@ -47,7 +47,7 @@ const Player = ({src}) => {
             setLoaded(true);
         });
     }, [src]);
-    const frameRef = useIntersectionObserver(setVideoSrcCallback);
+    const { ref: frameRef } = useIntersectionObserver(setVideoSrcCallback);
 
     const onLoad = event => {
         event.target.classList.add('loaded');
