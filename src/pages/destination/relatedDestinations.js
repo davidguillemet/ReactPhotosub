@@ -17,6 +17,7 @@ function imageFromCover(destination) {
         src: destination.cover,
         // <destination title> (<destination date>)
         title: `${destination.title} (${dateFormater(new Date(destination.date))})`,
+        sizeRatio: 1.5, // Cover images are paysage only
         path: destination.path
     }
 }
