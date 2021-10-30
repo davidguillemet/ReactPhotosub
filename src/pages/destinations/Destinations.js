@@ -122,7 +122,9 @@ const Destinations = () => {
     }, [regionFilterSet, allDestinations, regionsByDestination]);
 
     const handleChangeDestinationView = (event, newValue) => {
-        setDestinationsView(newValue);
+        if (newValue !== null) {
+            setDestinationsView(newValue);
+        }
     };
 
     const handleRegionFilterChange = (regionSet) => {

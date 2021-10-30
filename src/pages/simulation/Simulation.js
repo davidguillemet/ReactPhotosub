@@ -160,6 +160,9 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     }, [user, addUploadedInterior]);
 
     const handleListType = (event, newListType) => {
+        if (newListType === null) {
+            return;
+        }
         unstable_batchedUpdates(() => {
             if (newListType !== LIST_SEARCH)
             {
