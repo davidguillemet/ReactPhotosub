@@ -6,7 +6,6 @@ import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
-import Fade from '@material-ui/core/Fade';
 import { withLoading, buildLoadingState } from '../loading';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -45,7 +44,8 @@ const ImageSlider = ({
     onDeleteUploaded,
     emptyComponent = null,
     onNextPage = null,
-    hasNext = false}) => {
+    hasNext = false,
+    renderOverlay = null}) => {
     
     const [thumnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
     const lastThumbRight = useMemo(() => getLastThumbnailRightPosition(images, imageHeight, imageBorderWidth), [images, imageHeight, imageBorderWidth]);
@@ -140,11 +140,9 @@ const ImageSlider = ({
 
                 {
                     !isMobile &&
-                    <Fade in={thumnailScrollActivation.scrollLeft}>
                     <IconButton onClick={handleThumbnailsScrollLeft} disabled={!thumnailScrollActivation.scrollLeft}>
                         <ArrowBackIosRoundedIcon fontSize="large"/>
                     </IconButton>
-                    </Fade>
                 }
 
                 {
@@ -187,6 +185,7 @@ const ImageSlider = ({
                                                 imageBorderRadius={imageBorderRadius}
                                                 disabled={disabled}
                                                 onDelete={onDeleteUploaded}
+                                                renderOverlay={renderOverlay}
                                             />
                                         </CSSTransition>
                                     );
@@ -214,11 +213,9 @@ const ImageSlider = ({
 
                 {
                     !isMobile &&
-                    <Fade in={thumnailScrollActivation.scrollRight}>
                     <IconButton onClick={handleThumbnailsScrollRight} disabled={!thumnailScrollActivation.scrollRight}>
                         <ArrowForwardIosRoundedIcon fontSize="large"/>
                     </IconButton>
-                    </Fade>
                 }
 
             </Box>

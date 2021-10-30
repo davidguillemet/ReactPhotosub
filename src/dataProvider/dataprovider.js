@@ -4,7 +4,7 @@ import {
     setDbIndex,
     getDbIndex
 } from './common';
-
+import qs from 'qs';
 
 function _addSimulationDbIndex(simulations) {
     simulations.forEach((simulation, index) => {
@@ -26,6 +26,20 @@ DataProvider.prototype.getDestinationProps = function(year, title, props) {
 
 DataProvider.prototype.getDestinations = function() {
     return this.axios.get("/destinations")
+    .then(response => {
+        return response.data;
+    });
+};
+
+DataProvider.prototype.getRelatedDestinations = function(regions) {
+    return this.axios.get("/destinations/related", {
+        params:{
+            region: regions.map(region => region.id)
+        },
+        paramsSerializer: function(params) {
+            return qs.stringify(params, {arrayFormat: 'repeat'})
+        }
+    })
     .then(response => {
         return response.data;
     });

@@ -46,8 +46,8 @@ const LazyImage = ({
     onClick,
     width,
     withOverlay = true,
+    renderOverlay = null,
     withFavorite = true,
-    hoverEffect = true,
     disabled = false
 }) => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
@@ -104,8 +104,8 @@ const LazyImage = ({
                 transition: 'top 0.8s, left 0.8s',
                 overflow: "hidden",
             }}
-            onMouseEnter={hoverEffect ? onMouseEnter : null}
-            onMouseLeave={hoverEffect ? onMouseLeave : null}
+            onMouseEnter={(withOverlay || renderOverlay) ? onMouseEnter : null}
+            onMouseLeave={(withOverlay || renderOverlay) ? onMouseLeave : null}
         >
             <Image
                 id={imageId}
@@ -127,7 +127,11 @@ const LazyImage = ({
             />
 
             {
-                withOverlay && <Overlay image={image} id={imageOverlayId} />
+                renderOverlay && renderOverlay(image)
+            }
+
+            {
+                withOverlay && renderOverlay === null && <Overlay image={image} id={imageOverlayId} />
             }
 
             {

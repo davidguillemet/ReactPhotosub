@@ -1,31 +1,30 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, lazy } from 'react';
 import { useParams } from "react-router-dom";
 import {isMobile} from 'react-device-detect';
-import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
-import Grow from '@material-ui/core/Grow';
 import Stack from '@material-ui/core/Stack';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import ArrowBackIosNewIcon from '@material-ui/icons/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import Chip from '@material-ui/core/Chip';
 import { formatDate, formatDateShort } from '../../utils';
 import Gallery from '../../components/gallery';
-import { PageTitle, PageSubTitle, PageHeader, Paragraph } from '../../template/pageTypography';
-import LocationDialog from './LocationDialog';
+import { PageTitle, PageHeader, Paragraph } from '../../template/pageTypography';
 import LazyDialog from '../../dialogs/LazyDialog';
 import { withLoading, buildLoadingState } from '../../components/loading';
 import { useGlobalContext } from '../../components/globalContext';
 import DestinationLink from '../../components/destinationLink';
 import { VerticalSpacing } from '../../template/spacing';
-import { useVisible } from '../../components/hooks';
+import DestinationsMap from '../../components/map';
+import lazyComponent from '../../components/lazyComponent';
+import RelatedDestinations from './relatedDestinations';
 
 const RegionChip = ({region}) => {
 
     return (
-        <Chip label={region.title} sx={{mx: 0.5, my: 0.5}} variant='outlined' />
+        <Chip label={region.title} sx={{m: 0, mr: 0.5, mt: 0.5}} color="primary" />
     )
 }
 
@@ -37,8 +36,9 @@ const RegionPath = ({regions}) => {
                 display: 'flex',
                 flexDirection: 'row',
                 flexWrap: 'wrap',
-                justifyContent: 'center',
-                my: 1
+                justifyContent: 'flex-start',
+                my: 1,
+                width: "100%"
             }}
         >
         { regions.slice(0).reverse().map(region => <RegionChip key={region.id} region={region} />) }
@@ -46,19 +46,7 @@ const RegionPath = ({regions}) => {
     );
 }
 
-const ImageCount = withLoading(({images}) => {
-    return (
-        <Chip
-            icon={<PhotoLibraryIcon />}
-            label={`${images.length} images`}
-            sx={{
-                px: 1
-            }}>
-        </Chip>
-    )
-}, [buildLoadingState("images", [null, undefined])], { size: 20, marginTop: 0 });
-
-const NavigationItem = ({destination, type}) => {
+const NavigationItem = ({destination, type, caption}) => {
     if (destination === null) {
         return null;
     }
@@ -69,17 +57,18 @@ const NavigationItem = ({destination, type}) => {
                 sx={{
                     display: 'flex',
                     flexDirection: 'row',
-                    justifyContent: type === "next" ? "flex-start" : "flex-end",
+                    justifyContent: type === "left" ? "flex-start" : "flex-end",
                     alignItems: 'center',
-                    py: 1
+                    py: 1,
+                    backgroundColor: (theme) => theme.palette.primary.light
                 }}
             >
                 {
-                    type === "next" && <ArrowBackIosNewIcon sx={{mx: 1, fontSize: { xs: 20, md: 40 }}}></ArrowBackIosNewIcon>
+                    type === "left" && <ArrowBackIcon sx={{mx: 1, fontSize: { xs: 20, md: 40, color: "white" }}} ></ArrowBackIcon>
                 }
-                <Stack sx={{ alignItems: type === "next" ? "flex-start" : "flex-end"}}>
-                    <PageHeader sx={{my: 0, fontWeight: "300"}} variant={isMobile ? "h6" : "h4"}>{destination.title}</PageHeader>
-                    <Paragraph sx={{my: 0, fontWeight: "100"}}>
+                <Stack sx={{ alignItems: type === "left" ? "flex-start" : "flex-end" }}>
+                    <PageHeader sx={{my: 0, fontWeight: "300", color: "white"}} variant={isMobile ? "h6" : "h4"}>{destination.title}</PageHeader>
+                    <Paragraph sx={{my: 0, fontWeight: "100", color: "white"}}>
                         {
                             isMobile ?
                             formatDateShort(new Date(destination.date)) :
@@ -88,61 +77,77 @@ const NavigationItem = ({destination, type}) => {
                     </Paragraph>
                 </Stack>
                 {
-                    type === "prev" && <ArrowForwardIosIcon sx={{mx: 1, fontSize: { xs: 20, md: 40 }}}></ArrowForwardIosIcon>
+                    type === "right" && <ArrowForwardIcon sx={{mx: 1, fontSize: { xs: 20, md: 40, color: "white" }}}></ArrowForwardIcon>
                 }
             </Paper>
         </DestinationLink>
     )
 }
 
-const Navigation = ({destination}) => {
+const Navigation = lazyComponent(({destination}) => {
     return (
-        <Grow in={true} timeout={1000}>
-            <Grid container spacing={{ xs: 1, md: 2}} sx={{width: '100%'}}>
-                <Grid item xs={6}>
-                    <NavigationItem destination={destination.next} type="next"/>
-                </Grid>
-                <Grid item xs={6}>
-                    <NavigationItem destination={destination.prev} type="prev"/>
-                </Grid>
+        <Grid container spacing={{ xs: 1, md: 2}} sx={{width: '100%'}}>
+            <Grid item xs={6}>
+                <NavigationItem destination={destination.next} type="left" caption="Suivant"/>  
             </Grid>
-        </Grow>
+            <Grid item xs={6}>
+                <NavigationItem destination={destination.prev} type="right" caption="Précédent"/>
+            </Grid>
+        </Grid>
     )
-}
+});
 
-const BottomNavigation = ({destination}) => {
+const DestinationDetails = ({destination}) => {
 
-    const { isVisible, ref: navigationRef } = useVisible();
-    
+    const [summaryOpen, setSummaryOpen] = useState(false);
+    const [hasSummary, setHasSummary] = useState(false);
+
+    const toggleOpenSummary = useCallback(() => {
+        setSummaryOpen(open => !open);
+    }, []);
+
+    useEffect(() => {
+        import(`../../dialogs/summaries/${destination.path}`)
+        .then(() => setHasSummary(true))
+        .catch(() => setHasSummary(false)); 
+    }, [destination]);
+
     return (
-        <Box ref={navigationRef} sx={{width: '100%'}}>
+        <Paper
+            elevation={4}
+            sx={{
+                position: "absolute",
+                left: 10,
+                bottom: 10,
+                py: 1,
+                px: isMobile ? 4 : 6,
+                backgroundColor: (theme) => theme.palette.primary.light,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start'
+            }}>
+            <PageTitle sx={{m: 0, color: "white"}}>{destination.title}</PageTitle>
+            <PageHeader sx={{m: 0, color: "white"}}>{formatDate(new Date(destination.date))}</PageHeader>
             {
-                isVisible &&
-                <Navigation destination={destination} />
+                hasSummary &&
+                <Button sx={{m: 0, mt: 1, px: 1}} size={isMobile ? "small": "medium"} onClick={toggleOpenSummary} variant="contained">Voir le Résumé</Button>
             }
-        </Box>
-    ) 
+            <LazyDialog
+                open={summaryOpen}
+                handleClose={toggleOpenSummary}
+                title={`${destination.title} - ${formatDate(new Date(destination.date))}`}
+                path={`summaries/${destination.path}`}
+            />
+        </Paper>
+    );
 }
 
 const DestinationDisplay = withLoading(({destination, year, title}) => {
 
     const context = useGlobalContext();
-    const [summaryOpen, setSummaryOpen] = useState(false);
-    const [locationOpen, setLocationOpen] = useState(false);
     const { data: images } = context.useFetchDestinationImages(year, title);
     const [ galleryIsReady, setGalleryIsReady ] = useState(false);
-
-    const handleCloseLocation = useCallback(() => {
-        setLocationOpen(false);
-    }, []);
-
-    const handleOpenLocation = () => {
-        setLocationOpen(true);
-    }
-
-    const toggleOpenSummary = useCallback(() => {
-        setSummaryOpen(open => !open);
-    }, []);
+    const destinations = useMemo(() => [destination], [destination]);
 
     const onGalleryIsReady = useCallback(() => {
         setGalleryIsReady(true);
@@ -150,43 +155,34 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
 
     return (
         <React.Fragment>
+
+            <RegionPath regions={destination.region_path}></RegionPath>
+
+            <Box sx={{ width: "100%", height: isMobile ? "300px" : "400px", position: "relative" }}>
+                <DestinationsMap destinations={destinations} />
+                <DestinationDetails destination={destination} />
+            </Box>
+
             <VerticalSpacing factor={2} />
 
             <Navigation destination={destination}/>
 
-            <PageTitle sx={{mb: 0}}>{destination.title}</PageTitle>
-            <PageSubTitle sx={{mt: 0, mb: 1}}>{formatDate(new Date(destination.date))}</PageSubTitle>
-            <RegionPath regions={destination.region_path}></RegionPath>
-            <ImageCount images={images}/>
-
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'row',
-            }}>
-                <Button sx={{m: 1}} onClick={toggleOpenSummary} variant="outlined">Voir le Résumé</Button>
-                <Button sx={{m: 1}} onClick={handleOpenLocation} variant="outlined">Voir le lieu</Button>
-            </Box>
-
-            <LazyDialog
-                open={summaryOpen}
-                handleClose={toggleOpenSummary}
-                title={`${destination.title} - ${formatDate(new Date(destination.date))}`}
-                path={`summaries/${destination.path}`}
-            />
-
-            <LocationDialog
-                destination={destination}
-                open={locationOpen}
-                handleClose={handleCloseLocation}
-            />
+            <VerticalSpacing factor={2} />
 
             <Gallery images={images} onReady={onGalleryIsReady} />
 
-            <VerticalSpacing factor={2} />
+            <VerticalSpacing factor={4} />
 
             {
                 galleryIsReady &&
-                <BottomNavigation destination={destination} />
+                <Navigation destination={destination} />
+            }
+
+            <VerticalSpacing factor={4} />
+
+            {
+                galleryIsReady &&
+                <RelatedDestinations destination={destination} />
             }
 
         </React.Fragment>

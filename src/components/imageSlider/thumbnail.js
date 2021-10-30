@@ -15,7 +15,8 @@ const Thumbnail = ({
     imageBorderColor = "#000",
     imageBorderRadius = 3,
     disabled,
-    onDelete}) => {
+    onDelete,
+    renderOverlay = null}) => {
 
     const imageWidth = useMemo(() => Math.round(imageHeight * image.sizeRatio), [image, imageHeight])
 
@@ -44,8 +45,8 @@ const Thumbnail = ({
                     onClick={handleClick}
                     width={imageWidth}
                     withOverlay={false}
+                    renderOverlay={renderOverlay}
                     withFavorite={false}
-                    hoverEffect={false}
                     disabled={disabled}
                 />
                 {
