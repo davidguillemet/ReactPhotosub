@@ -87,7 +87,7 @@ const SimulationImage = ({image, selected, border, dispatch, onClick, simulation
                 display: 'flex',
                 backgroundColor: border.color,
                 padding: border.width,
-                boxShadow: 'rgb(153 153 153) 5px 5px 5px'
+                boxShadow: 'rgb(0 0 0) 2px 2px 10px'
             }}
             bounds="parent"
             className={classes.container}
