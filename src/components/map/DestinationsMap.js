@@ -1,13 +1,18 @@
 
 /*global google*/
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import {isIOS} from 'react-device-detect';
 import { useRouteMatch } from "react-router-dom";
 import {unstable_batchedUpdates} from 'react-dom';
 import { GoogleMap, InfoWindow, MarkerClusterer, useJsApiLoader } from '@react-google-maps/api';
 import { useGlobalContext } from '../globalContext';
 import { formatDate, getThumbnailSrc } from '../../utils';
 import { DestinationPath } from '../../navigation/routes';
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import Box from '@material-ui/core/Box';
+import Fab from '@material-ui/core/Fab';
 
+import LocationDialog from './LocationDialog';
 import LocationInfoWindow from './LocationInfoWindow';
 
 const _infoCoverWidth = 150;
@@ -17,7 +22,40 @@ const _defaultCenter = {
     lng: -40
 }
 
-const DestinationsMap = ({destinations}) => {
+const CustomFullScreen = ({destinations}) => {
+    const [locationOpen, setLocationOpen] = useState(false);
+
+    const handleCloseLocation = useCallback(() => {
+        setLocationOpen(false);
+    }, []);
+
+    const handleOpenLocation = () => {
+        setLocationOpen(true);
+    }
+    return (
+        <React.Fragment>
+            <Fab
+                onClick={handleOpenLocation}
+                size="medium"
+                color="primary"
+                sx={{
+                    position: "absolute",
+                    top: 10,
+                    right: 10,
+                }}
+            >
+                <FullscreenIcon fontSize="large"/>
+            </Fab>
+            <LocationDialog
+                destinations={destinations}
+                open={locationOpen}
+                handleClose={handleCloseLocation}
+            />
+        </React.Fragment>
+    );
+}
+
+const DestinationsMap = ({destinations, isFullScreen = false}) => {
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
@@ -159,6 +197,12 @@ const DestinationsMap = ({destinations}) => {
     }
 
     return (
+        <Box sx={{
+            width: "100%",
+            height: "100%",
+            position: "relative"
+        }}
+        >
         <GoogleMap
             mapContainerStyle={{
                 width: '100%',
@@ -201,6 +245,12 @@ const DestinationsMap = ({destinations}) => {
                 </InfoWindow>
             }
         </GoogleMap>
+        {
+            /* GMAP Fullscreen tool is not supported on iOS */
+            /* Then, in this case, we create a custom button that opens a fullscreen dialog */
+            isFullScreen === false && isIOS && <CustomFullScreen destinations={destinations} />
+        }       
+        </Box>
     );
 }
 

@@ -4,11 +4,9 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
-import DestinationsMap from '../../components/map';
+import DestinationsMap from '.';
 
-const LocationDialog = ({destination, open, handleClose}) => {
-
-    const destinations = useMemo(() => [destination], [destination]);
+const LocationDialog = ({destinations, open, handleClose}) => {
 
     return (
         <Dialog
@@ -31,7 +29,7 @@ const LocationDialog = ({destination, open, handleClose}) => {
                 }}
             >
             { open &&
-                <DestinationsMap destinations={destinations} />
+                <DestinationsMap destinations={destinations} isFullScreen={true} />
             }
             </DialogContent>
             <DialogActions>
