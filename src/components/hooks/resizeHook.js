@@ -41,8 +41,12 @@ export default function useResizeObserver(watchScroll) {
   );
 
   useEffect(() => () => {
-    resizeObserver.current.disconnect();
-    element.current.removeEventListener('scroll', onScroll);
+    if (resizeObserver.current) {
+      resizeObserver.current.disconnect();
+    }
+    if (element.current) {
+      element.current.removeEventListener('scroll', onScroll);
+    }
   }, [onScroll]);
 
   return {

@@ -331,16 +331,14 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
             <VerticalSpacing factor={3} />
 
-            {
-                /* Wait for the background being initialized for new simulation */
-                <SimulationDisplay
-                    ref={resizeObserver.ref}
-                    simulations={simulations}
-                    simulationIndex={simulationIndex}
-                    dispatch={dispatch}
-                    onImageClick={handleSetCurrentImageId}
-                    seletedImage={currentImageId}/>
-            }
+            <SimulationDisplay
+                ref={resizeObserver.ref}
+                simulations={simulations}
+                simulationIndex={simulationIndex}
+                dispatch={dispatch}
+                onImageClick={handleSetCurrentImageId}
+                seletedImage={currentImageId}
+            />
 
         </React.Fragment>
     );

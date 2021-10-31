@@ -18,6 +18,12 @@ const _defaultCenter = {
 
 const DestinationsMap = ({destinations}) => {
 
+    const { isLoaded } = useLoadScript({
+        id: 'google-map-script',
+        // The google maps API keys are restricted (IP and HTTP referrer)
+        googleMapsApiKey: process.env.REACT_APP_GMAP_API_KEY
+    })
+
     const isDestinationPage = useRouteMatch(DestinationPath);
 
     const context = useGlobalContext();
@@ -85,14 +91,17 @@ const DestinationsMap = ({destinations}) => {
 
     useEffect(() => {
 
-        if (locations === undefined) {
+        if (locations === undefined || isDestinationPage !== null) {
+            // don't update destinationsPerLocation if
+            // - locations are not loaded
+            // - OR we are on a single destination page
             return;
         }
         unstable_batchedUpdates(() => {
             setDestinationsPerLocation([ ...locations.values() ]);
             setSelectedLocation(null);
         })
-    }, [locations]);
+    }, [locations, isDestinationPage]);
 
     const handleMarkerClick = React.useCallback((location) => {
         if (openInfoWindow === true) {
@@ -128,12 +137,6 @@ const DestinationsMap = ({destinations}) => {
         }
     }, [clusterer, destinationsPerLocation, handleMarkerClick])
     
-    const { isLoaded } = useLoadScript({
-        id: 'google-map-script',
-        // The google maps API keys are restricted (IP and HTTP referrer)
-        googleMapsApiKey: process.env.REACT_APP_GMAP_API_KEY
-    })
-
     const handleMapLoaded = React.useCallback((map) => {
         // Center in the middle of the atlantic ocean
         map.setCenter(_defaultCenter);

@@ -101,6 +101,7 @@ const DestinationDetails = ({destination}) => {
 
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [hasSummary, setHasSummary] = useState(false);
+    const formatedDate = useMemo(() => formatDate(new Date(destination.date)), [destination]);
 
     const toggleOpenSummary = useCallback(() => {
         setSummaryOpen(open => !open);
@@ -127,7 +128,7 @@ const DestinationDetails = ({destination}) => {
                 alignItems: 'flex-start'
             }}>
             <PageTitle sx={{m: 0, color: "white"}}>{destination.title}</PageTitle>
-            <PageHeader sx={{m: 0, color: "white"}}>{formatDate(new Date(destination.date))}</PageHeader>
+            <PageHeader sx={{m: 0, color: "white"}}>{formatedDate}</PageHeader>
             {
                 hasSummary &&
                 <Button sx={{m: 0, mt: 1, px: 1}} size={isMobile ? "small": "medium"} onClick={toggleOpenSummary} variant="contained">Voir le Résumé</Button>
@@ -135,7 +136,7 @@ const DestinationDetails = ({destination}) => {
             <LazyDialog
                 open={summaryOpen}
                 handleClose={toggleOpenSummary}
-                title={`${destination.title} - ${formatDate(new Date(destination.date))}`}
+                title={`${destination.title} - ${formatedDate}`}
                 path={`summaries/${destination.path}`}
             />
         </Paper>
