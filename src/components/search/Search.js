@@ -225,14 +225,14 @@ const Search = React.forwardRef(({
         })
     }
 
-    function handleNextPage() {
+    const handleNextPage = useCallback(() => {
         setSearchConfig(oldConfig => {
             return {
                 ...oldConfig,
                 page: oldConfig.page + 1
             }
         })
-    }
+    }, []);
 
     function onQueryChange(event) {
         if (searchTimer !== null) {
@@ -241,23 +241,8 @@ const Search = React.forwardRef(({
         setSearchTimer(setTimeout(setSearchQuery, 500, event.target.value.trim()));
     }
 
-    function renderNextPageComponent(component) {
-        const NextPageComponent = component;
-        return (
-            <NextPageComponent
-                onClick={handleNextPage}
-                count={searchResult.images.length}
-                loading={searchIsRunning}
-            />
-        )
-    }
-
-    function renderGalleryComponent(component) {
-        const GalleryComponent = component;
-        return (
-            <GalleryComponent images={searchResult.images} />
-        );
-    }
+    const GalleryComponent = galleryComponent;
+    const NextPageComponent = nextPageComponent;
 
     return (
         <React.Fragment>
@@ -297,10 +282,16 @@ const Search = React.forwardRef(({
             }
         </Box>
         {
-            galleryComponent && renderGalleryComponent(galleryComponent)
+            GalleryComponent &&
+            <GalleryComponent images={searchResult.images} />
         }
         {
-            searchResult.hasNext && nextPageComponent && renderNextPageComponent(nextPageComponent)
+            searchResult.hasNext && NextPageComponent &&
+            <NextPageComponent
+                onClick={handleNextPage}
+                count={searchResult.images.length}
+                loading={searchIsRunning}
+            />
         }
 
         <LazyDialog title={"Rechercher des images"} path="search/help" open={helpOpen} handleClose={toggleSearchHelpOpen} />

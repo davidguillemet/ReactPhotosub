@@ -1,5 +1,5 @@
 import React from 'react';
-import LoadingButton from "@material-ui/core/Button";
+import LoadingButton from "@material-ui/lab/LoadingButton";
 
 import Gallery from '../../components/gallery';
 import Search from '../../components/search';
@@ -9,16 +9,19 @@ const NextPageButton = ({
     onClick,
     loading,
     count       // The number of images currently displayed
-}) => (
-    <LoadingButton
-        loading={loading}
-        sx={{ mt: 3}}
-        variant="contained"
-        color="primary"
-        onClick={onClick}>
-            Résultats suivants
-    </LoadingButton>
-);
+}) => {
+
+    return (
+        <LoadingButton
+            loading={loading}
+            sx={{ mt: 3}}
+            variant="contained"
+            color="primary"
+            onClick={onClick}>
+                Résultats suivants
+        </LoadingButton>
+    );
+};
 
 const SearchPage = () => {
 
