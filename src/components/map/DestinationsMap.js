@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouteMatch } from "react-router-dom";
 import {unstable_batchedUpdates} from 'react-dom';
-import { GoogleMap, InfoWindow, MarkerClusterer, useLoadScript } from '@react-google-maps/api';
+import { GoogleMap, InfoWindow, MarkerClusterer, useJsApiLoader } from '@react-google-maps/api';
 import { useGlobalContext } from '../globalContext';
 import { formatDate, getThumbnailSrc } from '../../utils';
 import { DestinationPath } from '../../navigation/routes';
@@ -11,6 +11,7 @@ import { DestinationPath } from '../../navigation/routes';
 import LocationInfoWindow from './LocationInfoWindow';
 
 const _infoCoverWidth = 150;
+// Center in the middle of the atlantic ocean
 const _defaultCenter = {
     lat: 34,
     lng: -40
@@ -18,7 +19,7 @@ const _defaultCenter = {
 
 const DestinationsMap = ({destinations}) => {
 
-    const { isLoaded } = useLoadScript({
+    const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         // The google maps API keys are restricted (IP and HTTP referrer)
         googleMapsApiKey: process.env.REACT_APP_GMAP_API_KEY
@@ -138,9 +139,6 @@ const DestinationsMap = ({destinations}) => {
     }, [clusterer, destinationsPerLocation, handleMarkerClick])
     
     const handleMapLoaded = React.useCallback((map) => {
-        // Center in the middle of the atlantic ocean
-        map.setCenter(_defaultCenter);
-        map.setZoom(2);
         setMap(map)
     }, [])
     
@@ -166,6 +164,8 @@ const DestinationsMap = ({destinations}) => {
                 width: '100%',
                 height: '100%'
             }}
+            zoom={2}
+            center={_defaultCenter}
             onLoad={handleMapLoaded}
             onUnmount={handleMapUnmount}
             options={{
