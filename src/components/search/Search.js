@@ -241,6 +241,24 @@ const Search = React.forwardRef(({
         setSearchTimer(setTimeout(setSearchQuery, 500, event.target.value.trim()));
     }
 
+    function renderNextPageComponent(component) {
+        const NextPageComponent = component;
+        return (
+            <NextPageComponent
+                onClick={handleNextPage}
+                count={searchResult.images.length}
+                loading={searchIsRunning}
+            />
+        )
+    }
+
+    function renderGalleryComponent(component) {
+        const GalleryComponent = component;
+        return (
+            <GalleryComponent images={searchResult.images} />
+        );
+    }
+
     return (
         <React.Fragment>
         <Box 
@@ -278,9 +296,11 @@ const Search = React.forwardRef(({
                 />
             }
         </Box>
-        {galleryComponent && React.cloneElement(galleryComponent, {images: searchResult.images})}
         {
-            searchResult.hasNext && nextPageComponent && React.cloneElement(nextPageComponent, {onClick: handleNextPage, count: searchResult.images.length})
+            galleryComponent && renderGalleryComponent(galleryComponent)
+        }
+        {
+            searchResult.hasNext && nextPageComponent && renderNextPageComponent(nextPageComponent)
         }
 
         <LazyDialog title={"Rechercher des images"} path="search/help" open={helpOpen} handleClose={toggleSearchHelpOpen} />

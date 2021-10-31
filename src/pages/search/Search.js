@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from "@material-ui/core/Button";
+import LoadingButton from "@material-ui/core/Button";
 
 import Gallery from '../../components/gallery';
 import Search from '../../components/search';
@@ -7,15 +7,17 @@ import { PageTitle } from '../../template/pageTypography';
 
 const NextPageButton = ({
     onClick,
+    loading,
     count       // The number of images currently displayed
 }) => (
-    <Button
+    <LoadingButton
+        loading={loading}
         sx={{ mt: 3}}
         variant="contained"
         color="primary"
         onClick={onClick}>
-            Voir les images suivantes
-    </Button>
+            Résultats suivants
+    </LoadingButton>
 );
 
 const SearchPage = () => {
@@ -25,8 +27,8 @@ const SearchPage = () => {
             <PageTitle>Recherche</PageTitle>
             <Search
                 showExactSwitch={true}
-                galleryComponent={<Gallery />}
-                nextPageComponent={<NextPageButton />}
+                galleryComponent={Gallery}
+                nextPageComponent={NextPageButton}
             />
         </React.Fragment>
     );
