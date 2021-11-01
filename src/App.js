@@ -1,22 +1,22 @@
 import React from 'react';
 import { isIOS } from 'react-device-detect'
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Box from '@material-ui/core/Box';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import CloseIcon from '@material-ui/icons/Close';
+import CssBaseline from '@mui/material/CssBaseline';
+import Box from '@mui/material/Box';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 import logo from './assets/images/logo.jpg';
-import { styled, ThemeProvider } from '@material-ui/core/styles';
+import { styled, ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 
-import Hidden from '@material-ui/core/Hidden';
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
-import Divider from '@material-ui/core/Divider';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
+import Hidden from '@mui/material/Hidden';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import Divider from '@mui/material/Divider';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 
 import { BrowserRouter as Router } from "react-router-dom";
 import { withRouter } from "react-router";
@@ -88,13 +88,13 @@ const TopToolBar = withRouter(({open, handleDrawerOpen, location}) => {
           onClick={handleDrawerOpen}
           edge="start"
           sx={{ mr: 2, ...(open && { display: 'none' }) }}
-        >
+          size="large">
           <MenuIcon />
         </IconButton>
         <FirebaseSignin />
       </Toolbar>
     </AppBar>
-  )    
+  );    
 })
 
 function App(props) {
@@ -143,7 +143,7 @@ function App(props) {
           onClick={handleDrawerClose}
           edge="start"
           sx={{ ml: 1 }}
-        >
+          size="large">
           <CloseIcon />
         </IconButton>
       </DrawerHeader>
@@ -178,61 +178,63 @@ function App(props) {
 
   return (
     <div style={{ display: 'flex'}}>
-    <ThemeProvider theme={ResponsiveTheme}>
-    <ReactQueryClientProvider>
-    <GlobalContextProvider>
-    <AuthProvider>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={ResponsiveTheme}>
+      <ReactQueryClientProvider>
+      <GlobalContextProvider>
+      <AuthProvider>
 
-      <CssBaseline />
+        <CssBaseline />
 
-      <Router>
+        <Router>
 
-        <TopToolBar open={open} handleDrawerOpen={handleDrawerOpen} />
+          <TopToolBar open={open} handleDrawerOpen={handleDrawerOpen} />
 
-        <nav style={{
-              width: drawerWidth,
-              flexShrink: 0
-          }}
-        >
-        <Hidden smUp implementation="css">
-          <SwipeableDrawer
-            disableBackdropTransition={!isIOS}
-            disableDiscovery={isIOS}
-            container={container}
-            variant="temporary"
-            anchor="left"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            onOpen={handleDrawerToggle}
-            sx={{
-              '& .MuiPaper-root': {
-                width: drawerWidth
-              }
-            }}
-            ModalProps={{
-              keepMounted: true, // Better open performance on mobile.
+          <nav style={{
+                width: drawerWidth,
+                flexShrink: 0
             }}
           >
-            {drawerContent}
-          </SwipeableDrawer>
-        </Hidden>
-        </nav>
+          <Hidden smUp implementation="css">
+            <SwipeableDrawer
+              disableBackdropTransition={!isIOS}
+              disableDiscovery={isIOS}
+              container={container}
+              variant="temporary"
+              anchor="left"
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              onOpen={handleDrawerToggle}
+              sx={{
+                '& .MuiPaper-root': {
+                  width: drawerWidth
+                }
+              }}
+              ModalProps={{
+                keepMounted: true, // Better open performance on mobile.
+              }}
+            >
+              {drawerContent}
+            </SwipeableDrawer>
+          </Hidden>
+          </nav>
 
-        <Main open={open}>
-          <div id={scrollTopAnchor} />
-          <DrawerHeader />
-          <PageContent onHistoryChanged={handleHistoryChanged}/>
-          <Footer />
-        </Main>
+          <Main open={open}>
+            <div id={scrollTopAnchor} />
+            <DrawerHeader />
+            <PageContent onHistoryChanged={handleHistoryChanged}/>
+            <Footer />
+          </Main>
 
-      </Router>
+        </Router>
 
-      <ScrollTop {...props} anchorSelector={`#${scrollTopAnchor}`}></ScrollTop>
+        <ScrollTop {...props} anchorSelector={`#${scrollTopAnchor}`}></ScrollTop>
 
-    </AuthProvider>
-    </GlobalContextProvider>
-    </ReactQueryClientProvider>
-    </ThemeProvider>
+      </AuthProvider>
+      </GlobalContextProvider>
+      </ReactQueryClientProvider>
+      </ThemeProvider>
+    </StyledEngineProvider>
     </div>
   );
 }

@@ -8,9 +8,9 @@ import { GoogleMap, InfoWindow, MarkerClusterer, useJsApiLoader } from '@react-g
 import { useGlobalContext } from '../globalContext';
 import { formatDate, getThumbnailSrc } from '../../utils';
 import { DestinationPath } from '../../navigation/routes';
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
-import Box from '@material-ui/core/Box';
-import Fab from '@material-ui/core/Fab';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import Box from '@mui/material/Box';
+import Fab from '@mui/material/Fab';
 
 import LocationDialog from './LocationDialog';
 import LocationInfoWindow from './LocationInfoWindow';

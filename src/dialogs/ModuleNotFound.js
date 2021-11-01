@@ -1,4 +1,4 @@
-import { Alert } from "@material-ui/core";
+import { Alert } from "@mui/material";
 
 const ModuleNotFound = ({name}) => <Alert severity="error">{`Module '${name}' introuvable.` }</Alert>
 

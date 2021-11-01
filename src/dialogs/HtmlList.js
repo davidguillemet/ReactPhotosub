@@ -1,4 +1,4 @@
-import List from '@material-ui/core/List'
+import List from '@mui/material/List'
 
 const HtmlList = ({children}) => {
     return (

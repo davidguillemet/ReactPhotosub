@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import { gsap } from "gsap";
-import Box from '@material-ui/core/Box';
-import Chip from "@material-ui/core/Chip";
-import Typography from '@material-ui/core/Typography';
+import Box from '@mui/material/Box';
+import Chip from "@mui/material/Chip";
+import Typography from '@mui/material/Typography';
 import { formatDate, getThumbnailSrc } from '../../utils';
 import DestinationLink from '../../components/destinationLink';
 import MasonryGallery from '../../components/masonryGallery';

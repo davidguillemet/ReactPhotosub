@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import Button from '@material-ui/core/Button';
-import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
-import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
-import Box from '@material-ui/core/Box';
-import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import Button from '@mui/material/Button';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import CircularProgress from '@mui/material/CircularProgress';
 import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import { useGlobalContext } from '../../components/globalContext';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import ErrorIcon from '@material-ui/icons/Error';
+import ErrorIcon from '@mui/icons-material/Error';
 import './fileUploadStyles.css';
 
 const STEP_UPLOAD = "upload";
@@ -152,11 +152,7 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
                     alignItems: 'center'
                 }}
             >
-                <IconButton
-                    color="secondary"
-                    aria-label="menu"
-                    onClick={handleCancel}
-                >
+                <IconButton color="secondary" aria-label="menu" onClick={handleCancel} size="large">
                     <CancelOutlinedIcon />
                 </IconButton>
                 <Typography style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>{file.name}</Typography>

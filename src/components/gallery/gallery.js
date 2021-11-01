@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {isMobile} from 'react-device-detect';
-import Alert from '@material-ui/core/Alert';
-import Dialog from '@material-ui/core/Dialog';
+import Alert from '@mui/material/Alert';
+import Dialog from '@mui/material/Dialog';
 import LazyImage from '../lazyImage';
 import ExpandedView from './expandedView';
 import {unstable_batchedUpdates} from 'react-dom';

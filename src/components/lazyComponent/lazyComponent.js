@@ -1,5 +1,5 @@
 import { useVisible } from '../hooks';
-import Grow from '@material-ui/core/Grow';
+import Grow from '@mui/material/Grow';
 
 /**
  * 

@@ -1,11 +1,11 @@
 import React, { useEffect, useCallback } from 'react';
 import { Prompt } from "react-router-dom";
-import Stack from '@material-ui/core/Stack';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
-import LoadingButton from '@material-ui/lab/LoadingButton';
-import SendIcon from '@material-ui/icons/Send';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+import LoadingButton from '@mui/lab/LoadingButton';
+import SendIcon from '@mui/icons-material/Send';
 import { PageTitle } from '../../template/pageTypography';
 import FeedbackMessage from '../../components/feedback/Feedback';
 import { uniqueID } from '../../utils';

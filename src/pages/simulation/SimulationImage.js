@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import clsx from 'clsx';
 import { Rnd } from "react-rnd";
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import Button from '@material-ui/core/Button';
-import EditIcon from '@material-ui/icons/Edit';
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import { green, grey } from '@material-ui/core/colors';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Button from '@mui/material/Button';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { green, grey } from '@mui/material/colors';
 import { useEffect } from 'react';
 
 import {moveImage, resizeAndMoveImage, deleteImage} from './actions/SimulationActions';

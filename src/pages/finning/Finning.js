@@ -1,13 +1,13 @@
 import React from 'react';
 import { PageTitle, PageHeader, PageSubTitle, Paragraph, BlockQuote } from '../../template/pageTypography';
-import Box from '@material-ui/core/Box';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemButton from '@material-ui/core/ListItemButton';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import Link from '@material-ui/core/Link';
-import Divider from '@material-ui/core/Divider';
+import Box from '@mui/material/Box';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemButton from '@mui/material/ListItemButton';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import Link from '@mui/material/Link';
+import Divider from '@mui/material/Divider';
 
 import Video from '../../components/video';
 

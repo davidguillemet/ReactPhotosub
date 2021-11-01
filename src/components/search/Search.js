@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { styled } from '@material-ui/core/styles';
-import { green, orange } from '@material-ui/core/colors';
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
-import Box from "@material-ui/core/Box";
-import Chip from "@material-ui/core/Chip";
-import SearchIcon from '@material-ui/icons/Search';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { styled } from '@mui/material/styles';
+import { green, orange } from '@mui/material/colors';
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import SearchIcon from '@mui/icons-material/Search';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import InputBase from '@material-ui/core/InputBase';
-import Divider from '@material-ui/core/Divider';
-import HelpIcon from '@material-ui/icons/Help';
-import WarningIcon from '@material-ui/icons/Warning';
+import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import InputBase from '@mui/material/InputBase';
+import Divider from '@mui/material/Divider';
+import HelpIcon from '@mui/icons-material/Help';
+import WarningIcon from '@mui/icons-material/Warning';
 
 import { uniqueID } from '../../utils';
 import LazyDialog from '../../dialogs/LazyDialog';

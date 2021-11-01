@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
-import Paper from '@material-ui/core/Paper';
-import LockIcon from '@material-ui/icons/Lock';
+import Paper from '@mui/material/Paper';
+import LockIcon from '@mui/icons-material/Lock';
 
 import SimulationImage from './SimulationImage';
 

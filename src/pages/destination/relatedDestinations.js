@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from 'react';
 import { useHistory } from "react-router-dom";
-import Box from '@material-ui/core/Box';
+import Box from '@mui/material/Box';
 import lazyComponent from '../../components/lazyComponent';
 import { useGlobalContext } from '../../components/globalContext';
 import LabeledDivider from '../../components/labeledDivider/labeledDivider';
@@ -9,7 +9,7 @@ import { VerticalSpacing } from '../../template/spacing';
 import {isMobile} from 'react-device-detect';
 import { formatDate, formatDateShort } from '../../utils';
 import ImageDescription from '../../components/imageDescription/imageDescription';
-import Alert from '@material-ui/core/Alert';
+import Alert from '@mui/material/Alert';
 
 function imageFromCover(destination) {
     const dateFormater = isMobile ? formatDateShort : formatDate;

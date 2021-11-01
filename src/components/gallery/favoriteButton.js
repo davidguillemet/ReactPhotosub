@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import FavoriteIconOutlined from '@material-ui/icons/FavoriteBorderOutlined';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import AutorenewIcon from '@material-ui/icons/Autorenew';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import FavoriteIconOutlined from '@mui/icons-material/FavoriteBorderOutlined';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 import TooltipIconButton from '../tooltipIconButton';
 import { useAuthContext } from '../authentication';

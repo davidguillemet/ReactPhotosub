@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useState, useRef, useMemo} from 'react';
-import Alert from '@material-ui/core/Alert';
-import { Grow, Snackbar, Stack } from '@material-ui/core';
-import LoadingButton from '@material-ui/lab/LoadingButton';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import UndoIcon from '@material-ui/icons/Undo';
+import Alert from '@mui/material/Alert';
+import { Grow, Snackbar, Stack } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import UndoIcon from '@mui/icons-material/Undo';
 import { useAuthContext } from '../../components/authentication';
 import Gallery from '../../components/gallery';
 import { PageTitle, PageSubTitle, BlockQuote } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import { useGlobalContext } from '../../components/globalContext';
 import { withLoading, buildLoadingState } from '../../components/loading';
-import { grey } from '@material-ui/core/colors';
+import { grey } from '@mui/material/colors';
 
 const getImageProps = (image) => {
     // image path is "<year>/<name>"

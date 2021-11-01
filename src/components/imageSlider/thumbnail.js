@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { Fab } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
-import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
-import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
+import { Fab } from '@mui/material';
+import Box from '@mui/material/Box';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import LazyImage from '../lazyImage';
 
 const Thumbnail = ({

@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
-import Box from "@material-ui/core/Box";
-import Alert from '@material-ui/core/Alert';
+import Box from "@mui/material/Box";
+import Alert from '@mui/material/Alert';
 import { useResizeObserver } from '../../components/hooks';
 import { withLoading, buildLoadingState } from '../../components/loading';
 import MasonryLayout from './masonryLayout';

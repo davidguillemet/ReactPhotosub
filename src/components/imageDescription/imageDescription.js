@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import { parseImageDescription } from '../../utils';
 
 const ImageDescription = ({image, language = "french" }) => {

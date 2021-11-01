@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import {isMobile} from 'react-device-detect';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
-import Button from '@material-ui/core/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 import DestinationsMap from '.';
 
 const LocationDialog = ({destinations, open, handleClose}) => {

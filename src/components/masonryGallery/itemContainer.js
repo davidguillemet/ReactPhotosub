@@ -1,7 +1,7 @@
 import { useLayoutEffect } from 'react';
 import { gsap } from "gsap";
 import { useVisible } from '../hooks';
-import Box from '@material-ui/core/Box';
+import Box from '@mui/material/Box';
 
 const ItemContainer = ({item, index, top, left, width, height, renderItem, renderComponent, renderExtraParams}) => {
 

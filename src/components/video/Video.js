@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import Box from '@material-ui/core/Box';
+import Box from '@mui/material/Box';
 import { useIntersectionObserver } from '../hooks';
 import {unstable_batchedUpdates} from 'react-dom';
-import { styled } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 
 const Frame = styled('iframe')(({ theme }) => ({ }));
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import SummaryParagraph from '../SummaryParagraph';
 import HtmlList from '../HtmlList';
-import ListItem from '@material-ui/core/ListItem';
+import ListItem from '@mui/material/ListItem';
 
 const BoldItalic = ({children}) => (
     <span

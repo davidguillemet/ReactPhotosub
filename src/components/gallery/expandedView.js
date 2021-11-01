@@ -1,23 +1,23 @@
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import React, { useEffect, useState, useRef, useMemo } from 'react';
-import Box from '@material-ui/core/Box';
-import Chip from '@material-ui/core/Chip';
-import Paper from '@material-ui/core/Paper';
-import Collapse from '@material-ui/core/Collapse';
-import IconButton from '@material-ui/core/IconButton';
-import ToggleButton from '@material-ui/core/ToggleButton';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import InfoOutlined from '@material-ui/icons/InfoOutlined';
-import InfoIcon from '@material-ui/icons/Info';
-import TranslateIcon from '@material-ui/icons/Translate';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
-import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
-import StopIcon from '@material-ui/icons/Stop';
-import CloseIcon from '@material-ui/icons/CloseOutlined';
-import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
-import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
-import Typography from '@material-ui/core/Typography';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import Paper from '@mui/material/Paper';
+import Collapse from '@mui/material/Collapse';
+import IconButton from '@mui/material/IconButton';
+import ToggleButton from '@mui/material/ToggleButton';
+import CircularProgress from '@mui/material/CircularProgress';
+import InfoOutlined from '@mui/icons-material/InfoOutlined';
+import InfoIcon from '@mui/icons-material/Info';
+import TranslateIcon from '@mui/icons-material/Translate';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
+import StopIcon from '@mui/icons-material/Stop';
+import CloseIcon from '@mui/icons-material/CloseOutlined';
+import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
+import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
+import Typography from '@mui/material/Typography';
 import { useEventListener, getThumbnailSrc, THUMB_LARGEST } from '../../utils';
 import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
@@ -466,7 +466,7 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                         style={{
                             left: 10
                         }}
-                    >
+                        size="large">
                         <ArrowBackIosRoundedIcon fontSize='large' />
                     </IconButton>
                     <IconButton
@@ -474,7 +474,8 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
                         onClick={handleNextImage}
                         style={{
                             right: 10
-                        }}>
+                        }}
+                        size="large">
                         <ArrowForwardIosRoundedIcon fontSize='large' />
                     </IconButton>
                 </Collapse>

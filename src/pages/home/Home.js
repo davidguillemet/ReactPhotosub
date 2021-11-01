@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { styled } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 

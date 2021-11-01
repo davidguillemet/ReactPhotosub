@@ -1,6 +1,6 @@
 import React from 'react';
 import { VerticalSpacing } from '../template/spacing';
-import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogContentText from '@mui/material/DialogContentText';
 
 const SummaryParagraph = ({children, textAlign = 'justify'}) => {
     return (

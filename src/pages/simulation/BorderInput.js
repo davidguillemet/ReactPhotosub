@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { styled } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import InputBase from '@material-ui/core/InputBase';
-import Divider from '@material-ui/core/Divider';
-import RemoveOutlinedIcon from '@material-ui/icons/RemoveOutlined';
-import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
+import { styled } from '@mui/material/styles';
+import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import InputBase from '@mui/material/InputBase';
+import Divider from '@mui/material/Divider';
+import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 
 const StyledDivider = styled(Divider)(({theme}) => ({
     height: 28,

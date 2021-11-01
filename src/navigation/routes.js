@@ -1,14 +1,14 @@
 import { NavLink } from "react-router-dom";
-import HomeIcon from '@material-ui/icons/Home';
-import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
-import SearchIcon from '@material-ui/icons/Search';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
-import PanoramaIcon from '@material-ui/icons/Panorama';
-import MailOutlineIcon from '@material-ui/icons/MailOutline';
-import SvgIcon from '@material-ui/core/SvgIcon';
+import HomeIcon from '@mui/icons-material/Home';
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import SearchIcon from '@mui/icons-material/Search';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import PanoramaIcon from '@mui/icons-material/Panorama';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import SvgIcon from '@mui/material/SvgIcon';
 
-import { styled } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 
 import { lazy } from 'react';
 const Home = lazy(() => import("../pages/home"));

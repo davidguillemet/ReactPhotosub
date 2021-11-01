@@ -1,5 +1,5 @@
 import React from 'react';
-import LoadingButton from "@material-ui/lab/LoadingButton";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 import Gallery from '../../components/gallery';
 import Search from '../../components/search';

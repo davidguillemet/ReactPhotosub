@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
-import TabContext from '@material-ui/lab/TabContext';
-import TabPanel from '@material-ui/lab/TabPanel';
-import AppsIcon from '@material-ui/icons/Apps';
-import PublicIcon from '@material-ui/icons/Public';
-import { makeStyles } from '@material-ui/styles';
+import TabContext from '@mui/lab/TabContext';
+import TabPanel from '@mui/lab/TabPanel';
+import AppsIcon from '@mui/icons-material/Apps';
+import PublicIcon from '@mui/icons-material/Public';
+import { makeStyles } from '@mui/styles';
 
-import ToggleButton from '@material-ui/core/ToggleButton';
-import ToggleButtonGroup from '@material-ui/core/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';

@@ -1,13 +1,13 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {isMobile} from 'react-device-detect';
-import Box from '@material-ui/core/Box';
-import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
-import ArrowBackIosRoundedIcon from '@material-ui/icons/ArrowBackIosRounded';
-import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
+import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 import { withLoading, buildLoadingState } from '../loading';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { useResizeObserver } from '../../components/hooks';
@@ -140,7 +140,10 @@ const ImageSlider = ({
 
                 {
                     !isMobile &&
-                    <IconButton onClick={handleThumbnailsScrollLeft} disabled={!thumnailScrollActivation.scrollLeft}>
+                    <IconButton
+                        onClick={handleThumbnailsScrollLeft}
+                        disabled={!thumnailScrollActivation.scrollLeft}
+                        size="large">
                         <ArrowBackIosRoundedIcon fontSize="large"/>
                     </IconButton>
                 }
@@ -213,7 +216,10 @@ const ImageSlider = ({
 
                 {
                     !isMobile &&
-                    <IconButton onClick={handleThumbnailsScrollRight} disabled={!thumnailScrollActivation.scrollRight}>
+                    <IconButton
+                        onClick={handleThumbnailsScrollRight}
+                        disabled={!thumnailScrollActivation.scrollRight}
+                        size="large">
                         <ArrowForwardIosRoundedIcon fontSize="large"/>
                     </IconButton>
                 }

@@ -1,5 +1,5 @@
-import Divider from '@material-ui/core/Divider';
-import Box from '@material-ui/core/Box';
+import Divider from '@mui/material/Divider';
+import Box from '@mui/material/Box';
 import { PageHeader } from '../../template/pageTypography';
 
 const LabeledDivider = ({label}) => {

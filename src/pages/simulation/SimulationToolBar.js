@@ -1,11 +1,11 @@
 import React, { useCallback, useState, useMemo } from 'react';
-import Toolbar from '@material-ui/core/Toolbar';
-import Paper from '@material-ui/core/Paper';
-import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
-import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
-import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import LockOpenOutlinedIcon from '@material-ui/icons/LockOpenOutlined';
+import Toolbar from '@mui/material/Toolbar';
+import Paper from '@mui/material/Paper';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 
 import {unstable_batchedUpdates} from 'react-dom';
 

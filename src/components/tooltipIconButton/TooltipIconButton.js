@@ -1,7 +1,7 @@
-import { makeStyles } from '@material-ui/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import Zoom from '@material-ui/core/Zoom';
-import IconButton from '@material-ui/core/IconButton';
+import { makeStyles } from '@mui/styles';
+import Tooltip from '@mui/material/Tooltip';
+import Zoom from '@mui/material/Zoom';
+import IconButton from '@mui/material/IconButton';
 
 const useTooltipButtonStyles = makeStyles(() => ({
     tooltipLabel: {
@@ -50,7 +50,7 @@ const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style,
                 onClick={onClick}
                 disabled={disabled}
                 style={style}
-            >
+                size="large">
                 {children}
             </IconButton>
         </Tooltip>

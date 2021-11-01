@@ -2,23 +2,23 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { useGlobalContext } from '../globalContext';
 import './firebaseui.css';
 import React, { useEffect, useState } from 'react';
-import Divider from '@material-ui/core/Divider';
-import Backdrop from '@material-ui/core/Backdrop';
-import Modal from '@material-ui/core/Modal';
-import Fade from '@material-ui/core/Fade';
-import Chip from '@material-ui/core/Chip';
-import IconButton from '@material-ui/core/IconButton';
-import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import MenuItem from '@material-ui/core/MenuItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import Typography from '@material-ui/core/Typography';
-import Popper from '@material-ui/core/Popper';
-import Grow from '@material-ui/core/Grow';
-import Paper from '@material-ui/core/Paper';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import MenuList from '@material-ui/core/MenuList';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Divider from '@mui/material/Divider';
+import Backdrop from '@mui/material/Backdrop';
+import Modal from '@mui/material/Modal';
+import Fade from '@mui/material/Fade';
+import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Typography from '@mui/material/Typography';
+import Popper from '@mui/material/Popper';
+import Grow from '@mui/material/Grow';
+import Paper from '@mui/material/Paper';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import MenuList from '@mui/material/MenuList';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import { useAuthContext } from '../authentication';
 import { routes, NavigationLink } from '../../navigation/routes';
@@ -35,7 +35,7 @@ const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => (
             right: 10,
             color: 'white'
         }}
-    >
+        size="large">
         <AccountCircleOutlinedIcon />
     </IconButton>
 ))
