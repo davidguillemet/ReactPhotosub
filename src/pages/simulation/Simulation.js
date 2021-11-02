@@ -122,7 +122,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         dispatch(borderColor(newBorderColor, simulationIndex));
     }, [dispatch, simulationIndex]);
 
-    const handleSetCurrentImageId = useCallback((id) => {
+    const handleToggleCurrentImageId = useCallback((id) => {
         setCurrentImageId(prevCurrentId => {
             return prevCurrentId === id ? null : id;
         });
@@ -336,8 +336,8 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 simulations={simulations}
                 simulationIndex={simulationIndex}
                 dispatch={dispatch}
-                onImageClick={handleSetCurrentImageId}
-                seletedImage={currentImageId}
+                onToggleCurrentImageId={handleToggleCurrentImageId}
+                selectedImage={currentImageId}
             />
 
         </React.Fragment>

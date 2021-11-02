@@ -1,51 +1,54 @@
 import { useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import clsx from 'clsx';
 import { Rnd } from "react-rnd";
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Button from '@mui/material/Button';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { green, grey } from '@mui/material/colors';
+import { Box } from '@mui/system';
+import CheckIcon from '@mui/icons-material/Check';
 import { useEffect } from 'react';
 
-import {moveImage, resizeAndMoveImage, deleteImage} from './actions/SimulationActions';
+import { moveImage, resizeAndMoveImage } from './actions/SimulationActions';
 import { getThumbnailSrc } from '../../utils';
 
-const useStyle = makeStyles(() => ({
-    container: {
-        '&:hover div[class*="MuiButtonGroup"]': {
-            display: 'block'
-        }
-    },
-    selectdCheck: {
-        backgroundColor: green[500],
-        '&:hover': {
-            backgroundColor: green[600],
-        },
-    },
-    notSelectdCheck: {
-        backgroundColor: grey[500],
-        '&:hover': {
-            backgroundColor: grey[600],
-        },
-    },
-    buttonGroup: {
-        display: 'none',
-        position: 'absolute'
-    },
-    visibleButtonGroup: {
-        display: 'block'
-    }
-}));
-
+const SelectionMarker = ({imageBorderWidth}) => {
+    return (
+        <Box
+            sx={{
+                position: "absolute",
+                top: `${imageBorderWidth}px`,
+                left: `${imageBorderWidth}px`,
+                right: `${imageBorderWidth}px`,
+                bottom: `${imageBorderWidth}px`,
+                borderColor: theme => theme.palette.warning.light,
+                borderWidth: "5px",
+                borderStyle: "solid"
+            }}
+        >
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    position: "absolute",
+                    right: "3px",
+                    bottom: "3px",
+                    backgroundColor: theme => theme.palette.warning.light,
+                    borderRadius: '2px',
+                }}
+            >
+                <CheckIcon
+                    fontSize="medium"
+                    sx={{
+                        color: "white"
+                    }}
+                />
+            </Box>
+        </Box>
+    )
+}
 
 const SimulationImage = ({image, selected, border, dispatch, onClick, simulationIndex, locked}) => {
 
-    const classes = useStyle();
-
     const [position, setPosition] = useState(image.position);
     const [width, setWidth] = useState(image.width);
+    const [dragging, setDragging] = useState(false);
 
     useEffect(() => {
         setPosition(image.position);
@@ -55,17 +58,21 @@ const SimulationImage = ({image, selected, border, dispatch, onClick, simulation
         setWidth(image.width);
     }, [image.width]);
 
+    const onDragStart = (event) => {
+        setDragging(true);
+    }
     const onDragStop = (event, data) => {
         dispatch(moveImage(image.id, data.y, data.x, simulationIndex))
+        if (dragging === false) {
+            handleClick();
+        } else {
+            setDragging(false);
+        }
     };
 
     const onResizeStop = (e, direction, ref, delta, position) => {
         // Depending on the resize direction, we could have to change the position as well
         dispatch(resizeAndMoveImage(image.id, ref.offsetWidth, position.y, position.x, simulationIndex));
-    };
-
-    const onDelete = () => {
-        dispatch(deleteImage(image.id, simulationIndex));
     };
 
     const handleClick = () => {
@@ -90,7 +97,7 @@ const SimulationImage = ({image, selected, border, dispatch, onClick, simulation
                 boxShadow: 'rgb(0 0 0) 2px 2px 10px'
             }}
             bounds="parent"
-            className={classes.container}
+            onDrag={onDragStart}
             onDragStop={onDragStop}
             onResizeStop={onResizeStop}
             disableDragging={locked}
@@ -105,24 +112,11 @@ const SimulationImage = ({image, selected, border, dispatch, onClick, simulation
                     display: 'block'
                 }}
             />
+
+            {
+                selected && <SelectionMarker imageBorderWidth={border.width} />
+            }
             
-            <ButtonGroup
-                variant="contained"
-                color="secondary"
-                aria-label="outlined primary button group"
-                className={clsx(classes.buttonGroup, selected && classes.visibleButtonGroup)}
-                disabled={locked}
-            >
-                <Button
-                    className={selected ? classes.selectdCheck : classes.notSelectdCheck}
-                    onClick={handleClick}
-                    startIcon={<EditIcon />}>
-                </Button>
-                <Button
-                    onClick={onDelete}
-                    startIcon={<DeleteOutlineIcon />}>
-                </Button>
-            </ButtonGroup>
         </Rnd>
     );
 }

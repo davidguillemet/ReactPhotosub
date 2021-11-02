@@ -1,12 +1,42 @@
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import Paper from '@mui/material/Paper';
+import { Box } from '@mui/system';
+import Fab from '@mui/material/Fab';
 import LockIcon from '@mui/icons-material/Lock';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { deleteImage} from './actions/SimulationActions';
+
 
 import SimulationImage from './SimulationImage';
 
-const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispatch, seletedImage, onImageClick}, ref) => {
+const ImageTools = ({onDelete}) => {
+
+    return (
+        <Box sx={{
+            '& > :not(style)': { m: 1 },
+            position: "absolute",
+            top: 1,
+            right: 1
+        }}>
+            <Fab sx={{color: "white", backgroundColor: theme => theme.palette.warning.light}} aria-label="edit" size="small" onClick={onDelete}>
+                <DeleteIcon />
+            </Fab>
+        </Box>
+    );
+}
+
+const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispatch, selectedImage, onToggleCurrentImageId}, ref) => {
 
     const simulation = useMemo(() => simulations[simulationIndex], [simulations, simulationIndex]);
+
+    const onDeleteSelectedImage = useCallback(() => {
+        onToggleCurrentImageId(selectedImage);
+        dispatch(deleteImage(selectedImage, simulationIndex));
+    }, [selectedImage, simulationIndex, dispatch, onToggleCurrentImageId]);
+
+    const onImageClick = useCallback((id) => {
+        onToggleCurrentImageId(id);
+    }, [onToggleCurrentImageId])
 
     return (
         <Paper
@@ -43,7 +73,7 @@ const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispa
                                 image={image}
                                 border={simulation.border}
                                 dispatch={dispatch}
-                                selected={seletedImage === image.id}
+                                selected={selectedImage === image.id}
                                 onClick={onImageClick}
                                 simulationIndex={simulationIndex}
                                 locked={simulation.isLocked}
@@ -62,6 +92,10 @@ const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispa
                         left: 10
                     }}
                 />
+            }
+
+            {
+                selectedImage !== null && <ImageTools onDelete={onDeleteSelectedImage} />
             }
         </Paper>
     );
