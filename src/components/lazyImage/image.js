@@ -105,8 +105,8 @@ const LazyImage = ({
                 transition: 'top 0.8s, left 0.8s',
                 overflow: "hidden",
             }}
-            onMouseEnter={(withOverlay || renderOverlay) ? onMouseEnter : null}
-            onMouseLeave={(withOverlay || renderOverlay) ? onMouseLeave : null}
+            onMouseEnter={(withOverlay || renderOverlay) && isMobile === false? onMouseEnter : null}
+            onMouseLeave={(withOverlay || renderOverlay) && isMobile === false ? onMouseLeave : null}
         >
             <Image
                 id={imageId}
