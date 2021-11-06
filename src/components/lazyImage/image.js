@@ -155,10 +155,9 @@ const LazyImage = ({
                     image={image}
                     color={'white'}
                     style={{
-                        display: "block",
                         position: "absolute",
-                        bottom: 10,
-                        right: 10
+                        bottom: 0,
+                        right: 0
                     }}
                 />
             }

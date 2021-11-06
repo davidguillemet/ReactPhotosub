@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {unstable_batchedUpdates} from 'react-dom'
+import {isMobile} from 'react-device-detect';
 
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -84,6 +85,7 @@ export default function SimulationNameDialog({ open, action = "save", validation
     return (
         <div>
             <Dialog
+                fullScreen={isMobile}
                 fullWidth={true}
                 open={isOpen}
                 onClose={handleClose}

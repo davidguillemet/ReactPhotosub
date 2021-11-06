@@ -73,7 +73,7 @@ const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispa
                                 image={image}
                                 border={simulation.border}
                                 dispatch={dispatch}
-                                selected={selectedImage === image.id}
+                                selected={selectedImage === image.id && simulation.isLocked === false}
                                 onClick={onImageClick}
                                 simulationIndex={simulationIndex}
                                 locked={simulation.isLocked}
@@ -86,16 +86,18 @@ const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispa
                 simulation.isLocked &&
                 <LockIcon
                     fontSize='large'
-                    style={{
+                    sx={{
                         position: "absolute",
-                        top: 10,
-                        left: 10
+                        top: 1,
+                        left: 1,
+                        color: theme => theme.palette.warning.light
                     }}
                 />
             }
 
             {
-                selectedImage !== null && <ImageTools onDelete={onDeleteSelectedImage} />
+                selectedImage !== null && simulation.isLocked === false &&
+                <ImageTools onDelete={onDeleteSelectedImage} />
             }
         </Paper>
     );

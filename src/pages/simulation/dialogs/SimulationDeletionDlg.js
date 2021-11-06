@@ -1,3 +1,4 @@
+import {isMobile} from 'react-device-detect';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -21,6 +22,7 @@ export default function SimulationDeletionDialog({ open, name, onOpenChanged, on
     return (
         <div>
             <Dialog
+                fullScreen={isMobile}
                 fullWidth={true}
                 open={open}
                 onClose={handleClose}
@@ -28,7 +30,7 @@ export default function SimulationDeletionDialog({ open, name, onOpenChanged, on
                 <DialogTitle id="form-dialog-title">Suppression</DialogTitle>
                 <DialogContent>
                     <DialogContentText>{`Confirmez-vous la supression de la simulation '${name}' ?`}</DialogContentText>
-                    <DialogContentText>Cette action est irreversible.</DialogContentText>
+                    <DialogContentText>Attention, cette action est irreversible.</DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary" variant="outlined">

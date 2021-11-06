@@ -45,7 +45,8 @@ const ImageSlider = ({
     emptyComponent = null,
     onNextPage = null,
     hasNext = false,
-    renderOverlay = null}) => {
+    renderOverlay = null,
+    elevation = 2}) => {
     
     const [thumnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
     const lastThumbRight = useMemo(() => getLastThumbnailRightPosition(images, imageHeight, imageBorderWidth), [images, imageHeight, imageBorderWidth]);
@@ -126,7 +127,7 @@ const ImageSlider = ({
     }
 
     return (
-        <Paper elevation={2} style={{
+        <Paper elevation={elevation} sx={{
             ...style,
             display: 'flex',
             flexDirection: 'column',

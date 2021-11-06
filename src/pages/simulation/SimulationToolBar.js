@@ -2,10 +2,12 @@ import React, { useCallback, useState, useMemo } from 'react';
 import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
+import Divider from '@mui/material/Divider';
 
 import {unstable_batchedUpdates} from 'react-dom';
 
@@ -103,14 +105,21 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
     }
 
     return (
+        <React.Fragment>
+        <SimulationSplitButton
+            simulations={simulations}
+            currentIndex={currentIndex}
+            onSelectionChange={onSelectionChange}
+        />
         <Paper
             sx={{
-                width: '95%',
-                maxWidth: 450,
                 borderWidth: '1px',
                 borderColor: 'text.disabled',
                 borderStyle: 'solid',
-                zIndex: 'app bar'
+                zIndex: 'app bar',
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center"
             }}
             elevation={0}
         >
@@ -131,12 +140,20 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
 
             <Toolbar variant="dense">
                 <TooltipIconButton
-                    tooltip={`Sauvegarder "${simulation.name}"`}
+                    tooltip={"Sauvegarder"}
                     onClick={handleSave}
                     disabled={isDirty(simulation) === false}
                     edge="start"
                 >
                     <SaveOutlinedIcon />
+                </TooltipIconButton>
+
+                <TooltipIconButton
+                    tooltip={'Renommer'}
+                    onClick={onRenameCurrent}
+                    edge="start"
+                >
+                    <DriveFileRenameOutlineIcon />
                 </TooltipIconButton>
 
                 <TooltipIconButton
@@ -148,7 +165,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                 </TooltipIconButton>
 
                 <TooltipIconButton
-                    tooltip={simulation.isLocked ? `Déverrouiller "${simulation.name}"`: `Verrouiller "${simulation.name}"`}
+                    tooltip={simulation.isLocked ? "Déverrouiller": "Verrouiller"}
                     onClick={handleToggleLock}
                     edge="start"
                 >
@@ -159,29 +176,25 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     }
                 </TooltipIconButton>
 
-                <SimulationSplitButton
-                    simulations={simulations}
-                    currentIndex={currentIndex}
-                    onSelectionChange={onSelectionChange}
-                    onRenameCurrent={onRenameCurrent}
-                />
+                <Divider orientation="vertical" flexItem />
 
                 <TooltipIconButton
-                    tooltip={`Supprimer "${simulation.name}"`}
+                    tooltip={"Supprimer"}
                     onClick={() => setDeletionDlgOpen(true)}
                     disabled={simulations.length === 1 && isFromDb(simulations[0]) === false}
                     style={{
                         marginLeft: 0,
                         marginRight: -12
                     }}
-                    edge="start"
                 >
                     <DeleteOutlineOutlinedIcon />
                 </TooltipIconButton>
 
             </Toolbar>
+
         </Paper>
-    );
+    </React.Fragment>
+);
 };
 
 export default SimulationToolBar;

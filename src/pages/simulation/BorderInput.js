@@ -62,6 +62,7 @@ const BorderInput = ({value, onChange, width, disabled}) => {
                 flex: 1,
             }}
             fullWidth
+            readOnly
             value={inputValue}
             inputProps={{
                 style: { textAlign: 'center' }

@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import {isMobile} from 'react-device-detect';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
+import { FormLabel } from '@mui/material';
 import Select from '@mui/material/Select';
 
 import ToggleButton from '@mui/material/ToggleButton';
@@ -189,7 +191,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     }, []);
 
     return (
-        <React.Fragment>
+        <Box sx={{ maxWidth: 1200, width: '100%'}}>
 
             <Typography variant="h4" style={{fontWeight: "100"}}>1. Sélectionnez une ambiance</Typography>
             {
@@ -206,12 +208,14 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 currentIndex={currentInteriorIndex}
                 onThumbnailClick={onInteriorClick}
                 style={{
-                    maxWidth: 1200,
-                    width: '100%',
-                    marginLeft: '-10px',
-                    marginRight: '-10px'
+                    borderWidth: 0,
+                    mx: {
+                        "xs": -1,
+                        "sm": 0
+                    } 
                 }}
-                imageHeight={120}
+                elevation={0}
+                imageHeight={isMobile ? 100 : 120}
                 imageBorderWidth={3}
                 imageBorderRadius={5}
                 disabled={simulation.isLocked}
@@ -258,10 +262,13 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 currentIndex={-1}
                 onThumbnailClick={onSelectImage}
                 style={{
-                    maxWidth: 1200,
-                    width: '100%'
+                    mx: {
+                        "xs": -1,
+                        "sm": 0
+                    } 
                 }}
-                imageHeight={120}
+                elevation={0}
+                imageHeight={isMobile ? 100 : 120}
                 imageBorderWidth={3}
                 imageBorderRadius={5}
                 disabled={simulation.isLocked}
@@ -271,64 +278,91 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
             />
 
             <VerticalSpacing factor={3} />
-
-            <Box style={{
-                display: 'flex',
-                alignItems: 'center'}}>
-                <Typography variant="h5" style={{fontWeight: "100"}}>Epaisseur du cadre</Typography>
-                <HorizontalSpacing factor={2} />
-                <BorderInput
-                    value={simulation.border.width}
-                    onChange={handleBorderWidthChange}
-                    width={160}
-                    disabled={simulation.isLocked}
-                />
-            </Box>
-
-            <VerticalSpacing factor={3} />
-
-            <Box style={{
-                display: 'flex',
-                alignItems: 'center'}}>
-                <Typography variant="h5" style={{fontWeight: "100"}}>Couleur du cadre</Typography>
-                <HorizontalSpacing factor={2} />
-                <FormControl
-                    variant="outlined"
+            
+            <FormControl 
+                component="fieldset" 
+                variant="outlined"
+                sx={{
+                    width: "100%",
+                    borderStyle: "solid",
+                    borderWidth: 1,
+                    borderColor: theme => theme.palette.text.disabled,
+                    borderRadius: "5px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    py: 2
+                }}
+            >
+                <FormLabel 
+                    component="legend"
                     sx={{
-                        display: 'flex',
-                        flexWrap: 'wrap'               
+                        padding: "5px",
+                        color: theme => theme.palette.text.secondary
                     }}
                 >
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={simulation.border.color}
-                        onChange={handleBorderColorChange}
-                        disabled={simulation.isLocked}
-                    >
-                        {
-                            borderColors.map((color, index) => {
-                                return (
-                                    <MenuItem
-                                        key={index}
-                                        value={color}>
-                                        <Box
-                                            style={{
-                                                width: 20,
-                                                height: 20,
-                                                backgroundColor: color,
-                                                border: '1px solid black',
-                                                borderRadius: 3
-                                            }}
-                                        />
-                                    </MenuItem>
-                                );
-                            })
-                        }
-                    </Select>
-                </FormControl>
-            </Box>
+                    <Typography variant="h4" style={{fontWeight: "100"}}>3. Configurez le Cadre</Typography>
+                </FormLabel>
 
+                <Box style={{
+                    display: 'flex',
+                    alignItems: 'center'}}>
+                    <Typography variant="h5" style={{fontWeight: "100"}}>Epaisseur</Typography>
+                    <HorizontalSpacing factor={2} />
+                    <BorderInput
+                        value={simulation.border.width}
+                        onChange={handleBorderWidthChange}
+                        width={160}
+                        disabled={simulation.isLocked}
+                    />
+                </Box>
+
+                <VerticalSpacing factor={3} />
+
+                <Box style={{
+                    display: 'flex',
+                    alignItems: 'center'}}>
+                    <Typography variant="h5" style={{fontWeight: "100"}}>Couleur</Typography>
+                    <HorizontalSpacing factor={2} />
+                    <FormControl
+                        variant="outlined"
+                        sx={{
+                            display: 'flex',
+                            flexWrap: 'wrap'               
+                        }}
+                    >
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={simulation.border.color}
+                            onChange={handleBorderColorChange}
+                            disabled={simulation.isLocked}
+                        >
+                            {
+                                borderColors.map((color, index) => {
+                                    return (
+                                        <MenuItem
+                                            key={index}
+                                            value={color}>
+                                            <Box
+                                                style={{
+                                                    width: 20,
+                                                    height: 20,
+                                                    backgroundColor: color,
+                                                    border: '1px solid black',
+                                                    borderRadius: 3
+                                                }}
+                                            />
+                                        </MenuItem>
+                                    );
+                                })
+                            }
+                        </Select>
+                    </FormControl>
+                </Box>
+            
+            </FormControl>
+            
             <VerticalSpacing factor={3} />
 
             <SimulationDisplay
@@ -340,7 +374,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 selectedImage={currentImageId}
             />
 
-        </React.Fragment>
+        </Box>
     );
 };
 

@@ -1,18 +1,12 @@
-import React, { useState, useRef, useCallback } from 'react';
-import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import React from 'react';
+import {isMobile} from 'react-device-detect';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import NewReleasesOutlinedIcon from '@mui/icons-material/NewReleasesOutlined';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import Grow from '@mui/material/Grow';
-import Paper from '@mui/material/Paper';
-import Popper from '@mui/material/Popper';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import MenuList from '@mui/material/MenuList';
-import Divider from '@mui/material/Divider';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import ListItemText from '@mui/material/ListItemText';
 
 import { isFromDb, isDirty } from '../../dataProvider';
 
@@ -24,137 +18,60 @@ const DirtyIcon = ({simulation}) => {
             <NewReleasesOutlinedIcon fontSize="small" />;
 }
 
-const SimulationSplitButtonItem = ({simulation, index, selected, onClick}) => {
+const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange}) => {
 
-    const handleMenuItemClick = useCallback(() => {
-        onClick(index)
-    }, [index, onClick]);
-
-    return (
-        <MenuItem
-            key={simulation.id}
-            disabled={false}
-            selected={selected}
-            onClick={handleMenuItemClick}
-        >
-            {simulation.name}
-            {
-                isDirty(simulation) &&
-                <ListItemIcon sx={{ ml: 1 }}>
-                    <DirtyIcon simulation={simulation} />
-                </ListItemIcon>            
-            }
-        </MenuItem>
-    );
-};
-
-const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange, onRenameCurrent}) => {
-
-    const [open, setOpen] = useState(false);
-    const anchorRef = useRef(null);
-    const simulation = simulations[currentIndex];
-
-    const handleMenuItemClick = useCallback((simulationIndex) => {
-        onSelectionChange(simulationIndex);
-        setOpen(false);
-    }, [onSelectionChange]);
-
-    const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
-    }
-
-    const handleClose = (event) => {
-        if (anchorRef.current && anchorRef.current.contains(event.target)) {
-          return;
-        }
-        setOpen(false);
-    };
-
-    const handleSaveNew = () => {
-        // TODO
+    const handleChange = (event) => {
+        onSelectionChange(event.target.value);
     };
 
     const splitButtonDisabled = simulations.length === 0 || (simulations.length === 1 && isFromDb(simulations[0]) === false);
+    const selectMaxWidth = 450;
 
     return (
-        <Grid container direction="column" alignItems="center">
-            <Grid item xs={12} sx={{ width: '100%'}}>
-                <ButtonGroup
-                    variant="contained"
-                    color="info"
-                    ref={anchorRef}
-                    aria-label="split button"
-                    sx={{
-                        width: '100%',
-                        borderWidth: '1px',
-                        borderColor: 'text.disabled',
-                        borderStyle: 'solid',
-                        boxShadow: 'unset'
-                    }}
-                >
-                    <Button
-                        onClick={handleToggle}
-                        sx={{
-                            textTransform: 'none',
-                            width: '100%'
-                        }}
-                        disabled={splitButtonDisabled}
-                        endIcon={<DirtyIcon simulation={simulation} />}
-                    >
-                        {simulations[currentIndex].name}
-                    </Button>
-                    <Button
-                        color="info"
-                        size="small"
-                        aria-controls={open ? 'split-button-menu' : undefined}
-                        aria-expanded={open ? 'true' : undefined}
-                        aria-label="select merge strategy"
-                        aria-haspopup="menu"
-                        onClick={handleToggle}
-                        disabled={splitButtonDisabled}
-                    >
-                        <ArrowDropDownIcon />
-                    </Button>
-                </ButtonGroup>
-                <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition>
-                    {({ TransitionProps, placement }) => (
-                        <Grow
-                            {...TransitionProps}
-                            style={{
-                                transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
+        <FormControl sx={{ m: 1, width: '95%', maxWidth: selectMaxWidth }}>
+            <Select
+                value={currentIndex}
+                onChange={handleChange}
+                disabled={splitButtonDisabled}
+                sx={{
+                    "& .MuiListItemText-primary": {
+                        textOverflow: "ellipsis",
+                        overflow: "hidden"
+                    },
+                    "& .MuiOutlinedInput-input": {
+                        display: "flex",
+                        alignItems: "center"
+                    },
+                    "& .MuiListItemIcon-root": {
+                        minWidth: "unset"
+                    }
+                }}
+            >
+                {
+                    simulations.map((simulation, index) => (
+                        <MenuItem
+                            value={index}
+                            key={index}
+                            sx={{
+                                maxWidth: selectMaxWidth,
+                                "& .MuiListItemText-primary": {
+                                    textOverflow: "ellipsis",
+                                    overflow: "hidden"
+                                }
                             }}
                         >
-                            <Paper>
-                                <ClickAwayListener onClickAway={handleClose}>
-                                    <MenuList id="split-button-menu">
-                                        {simulations.map((simulation, index) => (
-                                            <SimulationSplitButtonItem
-                                                key={index}
-                                                simulation={simulation}
-                                                index={index}
-                                                selected={index === currentIndex}
-                                                onClick={handleMenuItemClick}
-                                            />
-                                        ))}
-                                        <Divider />
-                                        {
-                                            simulations.length > 0 && currentIndex >= 0 &&
-                                            <React.Fragment>
-                                                {
-                                                    isDirty(simulation) &&
-                                                    <MenuItem onClick={handleSaveNew}>{`Enregistrer "${simulations[currentIndex].name}" en tant que nouvelle simulation`}</MenuItem>
-                                                }
-                                                <MenuItem onClick={onRenameCurrent}>{`Renommer la simulation "${simulations[currentIndex].name}"`}</MenuItem>
-                                            </React.Fragment>
-                                        }
-                                    </MenuList>
-                                </ClickAwayListener>
-                            </Paper>
-                        </Grow>
-                    )}
-                </Popper>
-            </Grid>
-        </Grid>
+                            <ListItemText primary={simulation.name}/>
+                            {
+                                isDirty(simulation) &&
+                                <ListItemIcon sx={{ ml: 1 }}>
+                                    <DirtyIcon simulation={simulation} />
+                                </ListItemIcon>            
+                            }
+                        </MenuItem>
+                    ))
+                }
+            </Select>
+        </FormControl>
     );
 };
 
