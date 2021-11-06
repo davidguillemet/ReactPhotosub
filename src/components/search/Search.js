@@ -79,9 +79,13 @@ const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp}) 
         <Paper component="form" sx={{
             display: 'flex',
             alignItems: 'center',
-            width: '100%',    
+            width: '100%',
+            borderStyle: "solid",
+            borderWidth: "1px",
+            borderColor: theme => theme.palette.divider,
             py: '2px',
-            px: '4px'
+            px: '4px',
+            m: 0
         }}>
             <SearcIconButton disabled={true}>
                 <StatusIcon searchIsRunning={running}/>

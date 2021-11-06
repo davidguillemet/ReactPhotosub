@@ -256,11 +256,14 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
             {
                 listType === LIST_SEARCH &&
-                <Search
-                    showExactSwitch={false}
-                    onResult={handleSearchResult}
-                    pageIndex={searchResult.page}
-                />
+                <React.Fragment>
+                    <VerticalSpacing factor={2} />
+                    <Search
+                        showExactSwitch={false}
+                        onResult={handleSearchResult}
+                        pageIndex={searchResult.page}
+                    />
+                </React.Fragment>
             }
 
             <VerticalSpacing factor={2} />
