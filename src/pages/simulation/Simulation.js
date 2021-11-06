@@ -6,6 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import { FormLabel } from '@mui/material';
 import Select from '@mui/material/Select';
+import Slider from '@mui/material/Slider';
 
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -24,7 +25,7 @@ import ImageSlider from '../../components/imageSlider';
 import SimulationDisplay from './SimulationDisplay';
 import FileUpload from './FileUpload';
 
-import {setBackground, resize, borderWidth, borderColor, addImage, setImage} from './actions/SimulationActions';
+import {setBackground, resize, borderWidth, borderColor, shadow, addImage, setImage} from './actions/SimulationActions';
 
 import { useResizeObserver } from '../../components/hooks';
 import Search, { getInitialSearchResult } from '../../components/search';
@@ -124,6 +125,10 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         dispatch(borderColor(newBorderColor, simulationIndex));
     }, [dispatch, simulationIndex]);
 
+    const handleShadowChange = useCallback((event, newValue) => {
+        dispatch(shadow(newValue, simulationIndex));
+    }, [dispatch, simulationIndex])
+
     const handleToggleCurrentImageId = useCallback((id) => {
         setCurrentImageId(prevCurrentId => {
             return prevCurrentId === id ? null : id;
@@ -208,11 +213,13 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 currentIndex={currentInteriorIndex}
                 onThumbnailClick={onInteriorClick}
                 style={{
-                    borderWidth: 0,
                     mx: {
                         "xs": -1,
                         "sm": 0
-                    } 
+                    },
+                    borderWidth: "1px",
+                    borderStyle: "solid",
+                    borderColor: theme => theme.palette.divider
                 }}
                 elevation={0}
                 imageHeight={isMobile ? 100 : 120}
@@ -265,7 +272,10 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     mx: {
                         "xs": -1,
                         "sm": 0
-                    } 
+                    },
+                    borderWidth: "1px",
+                    borderStyle: "solid",
+                    borderColor: theme => theme.palette.divider
                 }}
                 elevation={0}
                 imageHeight={isMobile ? 100 : 120}
@@ -286,19 +296,20 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     width: "100%",
                     borderStyle: "solid",
                     borderWidth: 1,
-                    borderColor: theme => theme.palette.text.disabled,
+                    borderColor: theme => theme.palette.divider,
                     borderRadius: "5px",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    py: 2
+                    py: 1,
+                    px: 2
                 }}
             >
                 <FormLabel 
                     component="legend"
                     sx={{
                         padding: "5px",
-                        color: theme => theme.palette.text.secondary
+                        color: theme => theme.palette.text.primary
                     }}
                 >
                     <Typography variant="h4" style={{fontWeight: "100"}}>3. Configurez le Cadre</Typography>
@@ -306,13 +317,15 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
                 <Box style={{
                     display: 'flex',
-                    alignItems: 'center'}}>
-                    <Typography variant="h5" style={{fontWeight: "100"}}>Epaisseur</Typography>
-                    <HorizontalSpacing factor={2} />
+                    alignItems: 'center',
+                    justifyContent: "center",
+                    width: "100%"}}>
+                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>Epaisseur:</Typography>
+                    <HorizontalSpacing factor={isMobile ? 2 : 6} />
                     <BorderInput
                         value={simulation.border.width}
                         onChange={handleBorderWidthChange}
-                        width={160}
+                        width={140}
                         disabled={simulation.isLocked}
                     />
                 </Box>
@@ -321,9 +334,12 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
                 <Box style={{
                     display: 'flex',
-                    alignItems: 'center'}}>
-                    <Typography variant="h5" style={{fontWeight: "100"}}>Couleur</Typography>
-                    <HorizontalSpacing factor={2} />
+                    alignItems: 'center',
+                    justifyContent: "center",
+                    width: "100%"}}
+                >
+                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>Couleur:</Typography>
+                    <HorizontalSpacing factor={isMobile ? 2 : 6} />
                     <FormControl
                         variant="outlined"
                         sx={{
@@ -337,6 +353,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                             value={simulation.border.color}
                             onChange={handleBorderColorChange}
                             disabled={simulation.isLocked}
+                            sx={{ width: 140}}
                         >
                             {
                                 borderColors.map((color, index) => {
@@ -345,12 +362,14 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                                             key={index}
                                             value={color}>
                                             <Box
-                                                style={{
-                                                    width: 20,
-                                                    height: 20,
+                                                sx={{
+                                                    width: "20px",
+                                                    height: "20px",
                                                     backgroundColor: color,
-                                                    border: '1px solid black',
-                                                    borderRadius: 3
+                                                    borderWidth: '1px',
+                                                    borderStyle: "solid",
+                                                    borderColor: theme => theme.palette.divider,
+                                                    borderRadius: "3px"
                                                 }}
                                             />
                                         </MenuItem>
@@ -359,6 +378,28 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                             }
                         </Select>
                     </FormControl>
+                </Box>
+
+                <VerticalSpacing factor={3} />
+
+                <Box style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: "center",
+                    width: "100%"}}
+                >
+                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>Ombre:</Typography>
+                    <HorizontalSpacing factor={isMobile ? 2 : 6} />
+                    <Slider
+                        value={simulation.shadow}
+                        onChange={handleShadowChange}
+                        step={1}
+                        min={0}
+                        max={24}
+                        sx={{
+                            width: 120
+                        }}
+                    />
                 </Box>
             
             </FormControl>

@@ -15,6 +15,7 @@ export const ACTION_DELETE_IMAGE = 'simulation:deleteImage';
 export const ACTION_ADD_IMAGE = 'simulation:addImage';
 export const ACTION_BORDER_WIDTH = 'simulation:borderWidth';
 export const ACTION_BORDER_COLOR = 'simulation:borderColor';
+export const ACTION_SHADOW = 'simulation:shadow';
 export const ACTION_SET_SIMULATION_DBINDEX = 'simulation:setDbIndex';
 export const ACTION_SET_SIMULATION_DIRTY = 'simulation:setDirty';
 export const ACTION_TOGGLE_LOCK = 'simulation:toggleLock';
@@ -48,8 +49,9 @@ function _initSimulation(name, simulations, containerWidth) {
         images: [],
         border: {
             color: "#FFFFFF",
-            width: 5
+            width: 0
         },
+        shadow: 0,
         [TRANSIENT_PROPERTY_IS_DIRTY]: false
     };
 }
@@ -162,6 +164,12 @@ function simulationReducer(state, action) {
                     width: state.border.width,
                     color: action.color
                 },
+                [TRANSIENT_PROPERTY_IS_DIRTY]: true
+            }
+        case ACTION_SHADOW:
+            return {
+                ...state,
+                shadow: action.shadow,
                 [TRANSIENT_PROPERTY_IS_DIRTY]: true
             }
         case ACTION_SET_SIMULATION_DBINDEX:

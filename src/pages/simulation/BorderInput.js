@@ -53,7 +53,7 @@ const BorderInput = ({value, onChange, width, disabled}) => {
             width: width
         }}>
         <StyledIconButton onClick={decrementWidth} disabled={isDisabled}>
-            <RemoveOutlinedIcon />
+            <RemoveOutlinedIcon fontSize="small"/>
         </StyledIconButton>
         <StyledDivider orientation="vertical" />
         <InputBase
@@ -70,7 +70,7 @@ const BorderInput = ({value, onChange, width, disabled}) => {
         />
         <StyledDivider orientation="vertical" />
         <StyledIconButton onClick={incrementWidth} disabled={isDisabled}>
-            <AddOutlinedIcon />
+            <AddOutlinedIcon fontSize="small"/>
         </StyledIconButton>
       </Paper>
     );

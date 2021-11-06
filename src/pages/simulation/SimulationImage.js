@@ -3,6 +3,7 @@ import { Rnd } from "react-rnd";
 import { Box } from '@mui/system';
 import CheckIcon from '@mui/icons-material/Check';
 import { useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 
 import { moveImage, resizeAndMoveImage } from './actions/SimulationActions';
 import { getThumbnailSrc } from '../../utils';
@@ -44,7 +45,10 @@ const SelectionMarker = ({imageBorderWidth}) => {
     )
 }
 
-const SimulationImage = ({image, selected, border, dispatch, onClick, simulationIndex, locked}) => {
+const StyledRnd = styled(Rnd)(({ theme }) => ({ }));
+
+
+const SimulationImage = ({image, selected, border, shadowFactor, dispatch, onClick, simulationIndex, locked}) => {
 
     const [position, setPosition] = useState(image.position);
     const [width, setWidth] = useState(image.width);
@@ -80,7 +84,7 @@ const SimulationImage = ({image, selected, border, dispatch, onClick, simulation
     };
 
     return (
-        <Rnd
+        <StyledRnd
             position={{
                 x: position.left,
                 y: position.top
@@ -90,11 +94,11 @@ const SimulationImage = ({image, selected, border, dispatch, onClick, simulation
                 height: 'auto'
             }}
             lockAspectRatio={true}
-            style={{
+            sx={{
                 display: 'flex',
                 backgroundColor: border.color,
-                padding: border.width,
-                boxShadow: 'rgb(0 0 0) 2px 2px 10px'
+                padding: `${border.width}px`,
+                boxShadow: theme => theme.shadows[shadowFactor]
             }}
             bounds="parent"
             onDrag={onDragStart}
@@ -117,7 +121,7 @@ const SimulationImage = ({image, selected, border, dispatch, onClick, simulation
                 selected && <SelectionMarker imageBorderWidth={border.width} />
             }
             
-        </Rnd>
+        </StyledRnd>
     );
 }
 

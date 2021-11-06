@@ -72,6 +72,7 @@ const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispa
                                 key={image.id}
                                 image={image}
                                 border={simulation.border}
+                                shadowFactor={simulation.shadow}
                                 dispatch={dispatch}
                                 selected={selectedImage === image.id && simulation.isLocked === false}
                                 onClick={onImageClick}
@@ -88,8 +89,8 @@ const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispa
                     fontSize='large'
                     sx={{
                         position: "absolute",
-                        top: 1,
-                        left: 1,
+                        top: 10,
+                        left: 5,
                         color: theme => theme.palette.warning.light
                     }}
                 />

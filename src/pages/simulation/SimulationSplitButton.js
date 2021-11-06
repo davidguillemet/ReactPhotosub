@@ -1,5 +1,4 @@
 import React from 'react';
-import {isMobile} from 'react-device-detect';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import NewReleasesOutlinedIcon from '@mui/icons-material/NewReleasesOutlined';
 import MenuItem from '@mui/material/MenuItem';
@@ -14,8 +13,8 @@ const DirtyIcon = ({simulation}) => {
     return isDirty(simulation) === false ?
             null :
             isFromDb(simulation) ?
-            <ErrorOutlineIcon fontSize="small" /> :
-            <NewReleasesOutlinedIcon fontSize="small" />;
+            <ErrorOutlineIcon fontSize="small" sx={{color: theme => theme.palette.warning.light}} /> :
+            <NewReleasesOutlinedIcon fontSize="small" sx={{color: theme => theme.palette.warning.light}} />;
 }
 
 const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange}) => {
@@ -25,7 +24,7 @@ const SimulationSplitButton = ({simulations, currentIndex, onSelectionChange}) =
     };
 
     const splitButtonDisabled = simulations.length === 0 || (simulations.length === 1 && isFromDb(simulations[0]) === false);
-    const selectMaxWidth = 450;
+    const selectMaxWidth = 700;
 
     return (
         <FormControl sx={{ m: 1, width: '95%', maxWidth: selectMaxWidth }}>

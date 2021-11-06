@@ -10,6 +10,7 @@ import {
     ACTION_ADD_IMAGE,
     ACTION_BORDER_WIDTH,
     ACTION_BORDER_COLOR,
+    ACTION_SHADOW,
     ACTION_SET_SIMULATION_DBINDEX,
     ACTION_SET_SIMULATION_DIRTY,
     ACTION_TOGGLE_LOCK,
@@ -85,6 +86,14 @@ export function borderColor(borderColor, simulationIndex) {
     return {
         type: ACTION_BORDER_COLOR,
         color: borderColor,
+        simulationIndex: simulationIndex
+    };
+}
+
+export function shadow(shadowfactor, simulationIndex) {
+    return {
+        type: ACTION_SHADOW,
+        shadow: shadowfactor,
         simulationIndex: simulationIndex
     };
 }

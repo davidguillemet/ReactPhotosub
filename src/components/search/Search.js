@@ -256,7 +256,9 @@ const Search = React.forwardRef(({
                 maxWidth: '700px',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center'
+                alignItems: 'center',
+                marginLeft: "auto",
+                marginRight: "auto"
             }}
         >
             <SearchInput

@@ -114,9 +114,8 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
         <Paper
             sx={{
                 borderWidth: '1px',
-                borderColor: 'text.disabled',
+                borderColor: theme => theme.palette.divider,
                 borderStyle: 'solid',
-                zIndex: 'app bar',
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center"
@@ -157,14 +156,6 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                 </TooltipIconButton>
 
                 <TooltipIconButton
-                    tooltip="Ajouter une simulation"
-                    onClick={handleAdd}
-                    edge="start"
-                >
-                    <AddOutlinedIcon />
-                </TooltipIconButton>
-
-                <TooltipIconButton
                     tooltip={simulation.isLocked ? "Déverrouiller": "Verrouiller"}
                     onClick={handleToggleLock}
                     edge="start"
@@ -176,6 +167,14 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     }
                 </TooltipIconButton>
 
+                <TooltipIconButton
+                    tooltip="Ajouter une simulation"
+                    onClick={handleAdd}
+                    edge="start"
+                >
+                    <AddOutlinedIcon />
+                </TooltipIconButton>
+
                 <Divider orientation="vertical" flexItem />
 
                 <TooltipIconButton
@@ -183,7 +182,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     onClick={() => setDeletionDlgOpen(true)}
                     disabled={simulations.length === 1 && isFromDb(simulations[0]) === false}
                     style={{
-                        marginLeft: 0,
+                        marginLeft: 10,
                         marginRight: -12
                     }}
                 >
