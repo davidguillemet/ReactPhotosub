@@ -112,7 +112,6 @@ const DestinationGallery = ({destinations, regionsByDestination}) => {
             items={destinations}
             colWidth={350}
             heightProvider={(item, itemWidth) => itemWidth / (600/400)} // We could get the cover ratio with a join in the SQL query
-            margin={7}
             renderComponent={DestinationContent}
             renderExtraParams={regionsByDestination}
         />

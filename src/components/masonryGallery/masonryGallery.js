@@ -1,16 +1,18 @@
 
 import { useState, useEffect, useRef } from 'react';
+import {isMobile} from 'react-device-detect';
 import Box from "@mui/material/Box";
 import Alert from '@mui/material/Alert';
 import { useResizeObserver } from '../../components/hooks';
 import { withLoading, buildLoadingState } from '../../components/loading';
 import MasonryLayout from './masonryLayout';
 
+const _margin = isMobile ? 2 : 5;
+
 const MasonryGallery = ({
     items,
     colWidth,
     heightProvider,
-    margin = 5,
     renderItem = null,
     renderComponent = null,
     renderExtraParams = null,
@@ -27,14 +29,14 @@ const MasonryGallery = ({
 
     useEffect(() => {
         const containerWidth = resizeObserver.width;
-        const columnsCount = Math.round((containerWidth + margin) / (colWidth + margin));
-        const totalMargin = (columnsCount-1)*margin;
+        const columnsCount = Math.round((containerWidth + _margin) / (colWidth + _margin));
+        const totalMargin = (columnsCount-1)*_margin;
         const itemWidth = Math.round((containerWidth - totalMargin) / columnsCount);
         setMasonryProps({
             itemWidth,
             columnsCount
         });
-    }, [resizeObserver.width, colWidth, margin])
+    }, [resizeObserver.width, colWidth])
 
     useEffect(() => {
         if (isReady.current === false && masonryProps.columnsCount > 0 && onReady !== null) {
@@ -57,7 +59,7 @@ const MasonryGallery = ({
                 itemWidth={masonryProps.itemWidth}
                 heightProvider={heightProvider}
                 columnsCount={masonryProps.columnsCount}
-                margin={margin}
+                margin={_margin}
                 renderItem={renderItem}
                 renderComponent={renderComponent}
                 renderExtraParams={renderExtraParams}

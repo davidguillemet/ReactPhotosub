@@ -8,7 +8,7 @@ import {unstable_batchedUpdates} from 'react-dom';
 import { withLoading, buildLoadingState } from '../../components/loading';
 import MasonryGallery from '../masonryGallery';
 
-const Gallery = ({ images, colWidth, margin, emptyMessage = null, onReady = null}) => {
+const Gallery = ({ images, emptyMessage = null, onReady = null}) => {
     const [expandedImageIndex, setExpandedImageIndex] = useState(null);
     const [expandedViewOpen, setExpandedViewOpen] = useState(false);
 
@@ -45,7 +45,6 @@ const Gallery = ({ images, colWidth, margin, emptyMessage = null, onReady = null
                 items={images}
                 colWidth={isMobile ? 170 : 350}
                 heightProvider={(item, itemWidth) => itemWidth / item.sizeRatio}
-                margin={margin}
                 renderItem={renderItem}
                 onReady={onReady}
             />
