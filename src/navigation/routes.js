@@ -25,7 +25,7 @@ export const HomePath = "/";
 export const DestinationsPath = "/destinations";
 export const SearchPath = "/search";
 export const FinningPath = "/finning";
-export const SimulationPath = "/simulation";
+export const SimulationPath = "/composition";
 export const AboutPath = "/about";
 export const ContactPath = "/contact";
 export const FavoritesPath = "/favorites";
@@ -66,7 +66,7 @@ export const routes = [
         fullWidth: false
     },
     {
-        label: "Simulateur",
+        label: "Composition",
         path: SimulationPath,
         component: SimulationManager,
         icon: <PanoramaIcon />,

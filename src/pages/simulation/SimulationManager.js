@@ -89,12 +89,12 @@ const SimulationManager = () => {
             updateSimulation.mutateAsync(simulationData).then(res => {
                 unstable_batchedUpdates(() => {
                     dispatch(setSimulationDirty(false, state.currentIndex));
-                    displayFeedback("success", `The simulation '${simulationData.name}' has been saved.`);
+                    displayFeedback("success", `la composition '${simulationData.name}' a été sauvegardée.`);
                 });
             }).catch (err => {
-                console.error(`error while saving the simulation '${simulationData.name}':`);
+                console.error(`error while saving the composition '${simulationData.name}':`);
                 console.error(err);
-                displayFeedback("error", "Error while saving the simulation...");
+                displayFeedback("error", `Une erreur est survenue lors de la sauvegarde de la composition '${simulationData.name}'`);
             })
         } else {
             addMutation.mutateAsync(simulationData).then(res => {
@@ -103,18 +103,18 @@ const SimulationManager = () => {
                 const newSimulationFromDb = res[res.length-1];
                 const dbIndex = getDbIndex(newSimulationFromDb);
                 if (dbIndex !== res.length - 1) {
-                    const message = `The dbindex of the new simulation should be ${res.length - 1}`;
+                    const message = `The dbindex of the new composition should be ${res.length - 1}`;
                     console.error(message);
                     throw new Error(message);
                 }
                 unstable_batchedUpdates(() => {
                     dispatch(setSimulationDbIndex(dbIndex, state.currentIndex));
-                    displayFeedback("success", `The simulation '${simulationData.name}' has been saved.`);
+                    displayFeedback("success", `La composition '${simulationData.name}' a été sauvegardée.`);
                 });
             }).catch (err => {
-                console.error(`error while saving the simulation '${simulationData.name}':`);
+                console.error(`error while saving the coposition '${simulationData.name}':`);
                 console.error(err);
-                displayFeedback("error", "Error while saving the simulation...");
+                displayFeedback("error", `Une erreur est survenue lors de la sauvegarde de la composition '${simulationData.name}'`);
             });
         } 
     }, [displayFeedback, state, addMutation, updateSimulation]);
@@ -122,7 +122,7 @@ const SimulationManager = () => {
     const onAdd = useCallback((name) => {
         unstable_batchedUpdates(() => {
             dispatch(addSimulation(name));
-            displayFeedback("success", `The simulation '${name}' has been added.`);
+            displayFeedback("success", `La composition '${name}' a été ajoutée.`);
         });
     }, [dispatch, displayFeedback]);
 
@@ -139,12 +139,12 @@ const SimulationManager = () => {
         removePromise.then((res) => {
             unstable_batchedUpdates(() => {
                 dispatch(deleteSimulation(state.currentIndex, res));
-                displayFeedback("success", `The simulation '${simulationToRemove.name}' has been removed.`);
+                displayFeedback("success", `La composition '${simulationToRemove.name}' a été supprimée.`);
             });
         }).catch (err => {
-            console.error(`Error while deleting the simulation '${simulationName}'`);
+            console.error(`Error while deleting the composition '${simulationName}'`);
             console.error(err);
-            displayFeedback("error", `Error while deleting the simulation '${simulationName}'`);
+            displayFeedback("error", `Une erreur est survenue lors de la suppression de la composition '${simulationName}'`);
         });
 
     }, [state, dispatch, displayFeedback, removeSimulation]);
@@ -172,7 +172,7 @@ const SimulationManager = () => {
 
             <FeedbackMessage severity={feedback.severity} message={feedback.message} key={feedback.key}/>
 
-            <PageTitle>Simulateur</PageTitle>
+            <PageTitle>Composition</PageTitle>
 
             {
                 authContext.user && state &&
