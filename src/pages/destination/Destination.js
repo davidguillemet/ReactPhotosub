@@ -96,7 +96,7 @@ const NavigationItem = ({destination, type, caption}) => {
 
 const Navigation = lazyComponent(({destination}) => {
     return (
-        <Grid container spacing={{ xs: 1, md: 2}} sx={{width: '100%'}}>
+        <Grid container spacing={{ xs: 0.5, md: 1}} sx={{width: '100%'}}>
             <Grid item xs={6}>
                 <NavigationItem destination={destination.next} type="left" caption="Suivant"/>  
             </Grid>
