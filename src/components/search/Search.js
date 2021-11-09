@@ -256,7 +256,7 @@ const Search = React.forwardRef(({
                 '& > *': {
                     m: 0.5,
                 },
-                width: '95%',
+                width: '100%',
                 maxWidth: '700px',
                 display: 'flex',
                 flexDirection: 'column',
