@@ -11,7 +11,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Chip from '@mui/material/Chip';
 import { formatDate, formatDateShort } from '../../utils';
 import Gallery from '../../components/gallery';
-import { PageTitle, PageHeader, Paragraph } from '../../template/pageTypography';
+import { PageSubTitle, PageHeader, Paragraph } from '../../template/pageTypography';
 import LazyDialog from '../../dialogs/LazyDialog';
 import { withLoading, buildLoadingState } from '../../components/loading';
 import { useGlobalContext } from '../../components/globalContext';
@@ -50,6 +50,14 @@ const NavigationItem = ({destination, type, caption}) => {
     if (destination === null) {
         return null;
     }
+
+    const noWrapAndEllipsis = {
+        whiteSpace: "nowrap",
+        width: "100%",
+        overflow: "hidden",
+        textOverflow: "ellipsis"
+    };
+
     return (
         <DestinationLink destination={destination}>
             <Paper
@@ -59,16 +67,18 @@ const NavigationItem = ({destination, type, caption}) => {
                     flexDirection: 'row',
                     justifyContent: type === "left" ? "flex-start" : "flex-end",
                     alignItems: 'center',
+                    width: "100%",
                     py: 1,
+                    px: 1,
                     backgroundColor: (theme) => theme.palette.primary.light
                 }}
             >
                 {
-                    type === "left" && <ArrowBackIcon sx={{mx: 1, fontSize: { xs: 20, md: 40, color: "white" }}} ></ArrowBackIcon>
+                    type === "left" && <ArrowBackIcon sx={{mx: 1, fontSize: { xs: 20, md: 40} , color: "white", ml: 0 }} ></ArrowBackIcon>
                 }
-                <Stack sx={{ alignItems: type === "left" ? "flex-start" : "flex-end" }}>
-                    <PageHeader sx={{my: 0, fontWeight: "300", color: "white"}} variant={isMobile ? "h6" : "h4"}>{destination.title}</PageHeader>
-                    <Paragraph sx={{my: 0, fontWeight: "100", color: "white"}}>
+                <Stack sx={{ alignItems: type === "left" ? "flex-start" : "flex-end", width: "100%", overflow: "hidden" }}>
+                    <PageHeader sx={{my: 0, fontWeight: "300", color: "white", textAlign: type, ...noWrapAndEllipsis}} variant={isMobile ? "h6" : "h4"}>{destination.title}</PageHeader>
+                    <Paragraph sx={{my: 0, fontWeight: "100", color: "white", textAlign: type, ...noWrapAndEllipsis}}>
                         {
                             isMobile ?
                             formatDateShort(new Date(destination.date)) :
@@ -77,7 +87,7 @@ const NavigationItem = ({destination, type, caption}) => {
                     </Paragraph>
                 </Stack>
                 {
-                    type === "right" && <ArrowForwardIcon sx={{mx: 1, fontSize: { xs: 20, md: 40, color: "white" }}}></ArrowForwardIcon>
+                    type === "right" && <ArrowForwardIcon sx={{mx: 1, fontSize: { xs: 20, md: 40 }, color: "white", mr: 0 }}></ArrowForwardIcon>
                 }
             </Paper>
         </DestinationLink>
@@ -121,13 +131,13 @@ const DestinationDetails = ({destination}) => {
                 left: 10,
                 bottom: 10,
                 py: 1,
-                px: isMobile ? 4 : 6,
+                px: isMobile ? 1 : 4,
                 backgroundColor: (theme) => theme.palette.primary.light,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start'
             }}>
-            <PageTitle sx={{m: 0, color: "white"}}>{destination.title}</PageTitle>
+            <PageSubTitle sx={{m: 0, color: "white", whiteSpace: "nowrap", fontWeight: 300}}>{destination.title}</PageSubTitle>
             <PageHeader sx={{m: 0, color: "white"}}>{formatedDate}</PageHeader>
             {
                 hasSummary &&
