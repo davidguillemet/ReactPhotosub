@@ -18,6 +18,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import { uniqueID } from '../../utils';
 import LazyDialog from '../../dialogs/LazyDialog';
 import { useGlobalContext } from '../globalContext';
+import { Paragraph } from '../../template/pageTypography';
 
 const _pageSize = 10;
 
@@ -73,7 +74,7 @@ const ResultStatus= ({searchResult}) => {
     return null;
 }
 
-const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp}) => {
+const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp, showResultCount}) => {
 
     return (
         <Paper component="form" sx={{
@@ -109,7 +110,10 @@ const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp}) 
                 }}
                 orientation="vertical"
             />
-            <ResultStatus searchResult={searchResult} />
+            {
+                showResultCount &&
+                <ResultStatus searchResult={searchResult} />
+            }
             <SearcIconButton onClick={onOpenHelp}>
                 <HelpIcon />
             </SearcIconButton>
@@ -272,6 +276,7 @@ const Search = React.forwardRef(({
                 hasError={false}
                 onChange={onQueryChange}
                 onOpenHelp={toggleSearchHelpOpen}
+                showResultCount={GalleryComponent === null}
             />
             { 
                 showExactSwitch && 
@@ -289,7 +294,13 @@ const Search = React.forwardRef(({
         </Box>
         {
             GalleryComponent &&
-            <GalleryComponent images={searchResult.images} />
+            <React.Fragment>
+                {
+                    searchResult.totalCount >= 0 &&
+                    <Paragraph>{`${searchResult.totalCount} Résultat(s)`}</Paragraph>
+                }
+                <GalleryComponent images={searchResult.images} />
+            </React.Fragment>
         }
         {
             searchResult.hasNext && NextPageComponent &&
