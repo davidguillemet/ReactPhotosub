@@ -25,7 +25,13 @@ module.exports = function(config) {
 
     config.app.route("/destinations/related")
         .get(function(req, res, next) {
-            const regions = req.query.region;
+            const region = req.query.region;
+            // If only one region, region parameter is not an array...
+            const regions =
+                Array.isArray(region) ?
+                    region :
+                    [region];
+
             config.pool().select("destinations.*", "locations.region")
                 .from("destinations")
                 .join("locations", {"destinations.location": "locations.id"})
