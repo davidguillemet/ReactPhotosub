@@ -8,7 +8,7 @@ import {unstable_batchedUpdates} from 'react-dom';
 import { withLoading, buildLoadingState } from '../../components/loading';
 import MasonryGallery from '../masonryGallery';
 
-const Gallery = ({ images, emptyMessage = null, onReady = null}) => {
+const Gallery = ({ images, emptyMessage = null, onReady = null, displayDestination = true }) => {
     const [expandedImageIndex, setExpandedImageIndex] = useState(null);
     const [expandedViewOpen, setExpandedViewOpen] = useState(false);
 
@@ -54,7 +54,12 @@ const Gallery = ({ images, emptyMessage = null, onReady = null}) => {
                 onClose={onCloseModal}
                 fullScreen={true}
             >
-                <ExpandedView images={images} index={expandedImageIndex} onClose={onCloseModal} />
+                <ExpandedView
+                    images={images}
+                    index={expandedImageIndex}
+                    onClose={onCloseModal}
+                    displayDestination={displayDestination}
+                />
             </Dialog>
         </React.Fragment>
     );

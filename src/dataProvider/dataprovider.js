@@ -59,6 +59,10 @@ DataProvider.prototype.getLocations = function() {
     });
 };
 
+DataProvider.prototype.getDestinationDescFromPath = function(year, title) {
+    return this.getDestinationProps(year, title, "desc");
+};
+
 DataProvider.prototype.getDestinationDetailsFromPath = function(year, title) {
     return this.getDestinationProps(year, title, "head");
 };

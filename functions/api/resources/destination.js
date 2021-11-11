@@ -6,8 +6,31 @@ function convertPath(destination, config) {
     }
 }
 
+function getDestinationPath(req) {
+    return `${req.params.year}/${req.params.title}`;
+}
+
 module.exports = function(config) {
-    // Get a specific destination head from identifier
+    // Get minimal destinatination info to get the desc (title, date, cover, location)
+    // Get a specific destination head from identifier, including region path
+    config.app.route("/destination/:year/:title/desc")
+        .get(function(req, res, next) {
+            config.pool()
+                .select("*")
+                .from("destinations")
+                .where("path", getDestinationPath(req))
+                .then((destinations) => {
+                    const destination = destinations[0];
+                    convertPath(destination, config);
+                    res.json(destination);
+                }).catch((err) => {
+                    config.logger.error(`Failed to load destination from path = ${getDestinationPath(req)}`, err);
+                    res.status(500)
+                        .send(`Failed to load destination from path = ${getDestinationPath(req)}`)
+                        .end();
+                });
+        });
+
     config.app.route("/destination/:year/:title/head")
         .get(function(req, res, next) {
             config.pool().raw(
@@ -38,8 +61,7 @@ module.exports = function(config) {
                        ARRAY( select row_to_json(row) as region from (SELECT * FROM regionpath) row) as region_path,
                        (select row_to_json(prevDest.*) from prevDest) as prev,
                        (select row_to_json(nextDest.*) from nextDest) as next
-                from destination d`,
-                `${req.params.year}/${req.params.title}`)
+                from destination d`, getDestinationPath(req))
                 .then((destinations) => {
                     const destination = destinations.rows[0];
                     convertPath(destination, config);
@@ -56,7 +78,7 @@ module.exports = function(config) {
     config.app.route("/destination/:year/:title/images")
         .get(function(req, res, next) {
             config.pool({i: "images"}).select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio", "i.create").join("destinations", {
-                "destinations.path": config.pool().raw("?", [`${req.params.year}/${req.params.title}`]),
+                "destinations.path": config.pool().raw("?", [getDestinationPath(req)]),
                 "i.path": "destinations.path",
             }).orderBy("i.create", "asc").then((images) => {
                 images.forEach((image) => {

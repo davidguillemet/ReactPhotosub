@@ -5,11 +5,9 @@ import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
-import ToggleButton from '@mui/material/ToggleButton';
 import CircularProgress from '@mui/material/CircularProgress';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import InfoIcon from '@mui/icons-material/Info';
-import TranslateIcon from '@mui/icons-material/Translate';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
@@ -17,11 +15,10 @@ import StopIcon from '@mui/icons-material/Stop';
 import CloseIcon from '@mui/icons-material/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
-import Typography from '@mui/material/Typography';
 import { useEventListener, getThumbnailSrc, THUMB_LARGEST } from '../../utils';
 import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
-import ImageDescription from '../imageDescription';
+import ImageInfo from './imageInfo';
 
 import TooltipIconButton from '../../components/tooltipIconButton';
 import { HorizontalSpacing } from '../../template/spacing';
@@ -106,70 +103,7 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
     );
 }
 
-const LANGUAGE_FRENCH = "french"
-const LANGUAGE_ENGLISH = "english"
-
-const ImageCaption = ({image}) => {
-    const [language, setLanguage] = useState(LANGUAGE_FRENCH);
-    const hasTitle = image.title.length > 0;
-    const hasDescription = image.description.length > 0;
-    const hasDetails = hasTitle || hasDescription;
-    const hasTranslation = image.description !== image.title && image.description.length > 0;
-
-    return (
-        <Paper
-            elevation={0}
-            sx={{
-                position: 'relative',
-                mx: 1,
-                my: 1,
-                pl: 1,
-                textAlign: 'center',
-                borderWidth: "1px",
-                borderStyle: "solid",
-                borderColor: theme => theme.palette.grey[400]
-            }}
-        >
-        {
-            hasDetails ?
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center'
-            }}>
-                <Box sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    flex: 1,
-                    m: 1
-                }}>
-                    <ImageDescription image={image} language={language} />
-                </Box>
-                {
-                    hasTranslation && 
-                    <ToggleButton
-                        sx={{
-                            m: 1
-                        }}
-                        size="small"
-                        value="check"
-                        selected={language === LANGUAGE_ENGLISH}
-                        disabled={!hasDescription}
-                        onChange={() => {
-                            setLanguage(prevLanguage => prevLanguage === LANGUAGE_ENGLISH ? LANGUAGE_FRENCH : LANGUAGE_ENGLISH);
-                        }}
-                        >
-                        <TranslateIcon fontSize="small" />
-                    </ToggleButton>
-                }
-            </Box> :
-            <Typography variant="subtitle1" style={{ marginBottom: 0 }}>Aucune description</Typography>
-        }
-        </Paper>
-    );
-}
-
-const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
+const ExpandedView = React.forwardRef(({ images, index, onClose, displayDestination = true }, ref) => {
 
     const [currentIndex, setCurrentIndex] = useState(index);
     const [infoVisible, setInfoVisible] = useState(false);
@@ -484,7 +418,7 @@ const ExpandedView = React.forwardRef(({ images, index, onClose }, ref) => {
             </Box>
 
             <Collapse in={infoVisible}>
-                <ImageCaption image={currentImage} />
+                <ImageInfo image={currentImage} displayDestination={displayDestination} />
             </Collapse>
 
             <Collapse in={!isPlaying && !fullScreen}>

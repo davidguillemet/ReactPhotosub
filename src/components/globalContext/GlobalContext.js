@@ -37,7 +37,7 @@ const GlobalContextProvider = ({children}) => {
     if (globalContext.current === null) {
         const apiBaseUrl =
             process.env.REACT_APP_USE_FUNCTIONS_EMULATOR === 'true' ?
-            'http://localhost:5001/photosub/us-central1/mainapi':
+            'http://localhost:5003/photosub/us-central1/mainapi':
             '';
 
         const axiosInstance = axios.create({
@@ -64,6 +64,7 @@ const GlobalContextProvider = ({children}) => {
             useFetchRegions: () => useQuery('regions', () => dataProvider.getRegions()),
             useFetchDestinations: () => useQuery('destinations', () => dataProvider.getDestinations()),
             useFetchRelatedDestinations: (regions) => useQuery(['related', ...regions], () => dataProvider.getRelatedDestinations(regions)),
+            useFetchDestinationDesc: (year, title) => useQuery(['destinationdesc', year, title], () => dataProvider.getDestinationDescFromPath(year, title)),
             useFetchDestinationHeader: (year, title) => useQuery(['destinationheader', year, title], () => dataProvider.getDestinationDetailsFromPath(year, title)),
             useFetchDestinationImages: (year, title) => useQuery(['destinationimages', year, title], () => dataProvider.getDestinationImagesFromPath(year, title)),
             useFetchInteriors: (thenFunc) => useQuery('interiors', () => dataProvider.getInteriors().then(thenFunc)),

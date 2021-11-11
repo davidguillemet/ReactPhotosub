@@ -180,7 +180,7 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
 
             <VerticalSpacing factor={2} />
 
-            <Gallery images={images} onReady={onGalleryIsReady} />
+            <Gallery images={images} onReady={onGalleryIsReady} displayDestination={false} />
 
             <VerticalSpacing factor={4} />
 
