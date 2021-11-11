@@ -66,17 +66,7 @@ const RelatedDestinations = lazyComponent(({destination}) => {
                     backgroundColor: 'rgba(0, 0, 0, 0.3)'
                 }}
             >
-                <Box sx={{
-                        borderColor: "white",
-                        borderWidth: "2px",
-                        borderStyle: "solid",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        p: 2
-                    }}>
-                    <ImageDescription image={image} />
-                </Box>
+                <ImageDescription image={image} />
             </Box>
         )
     }, []);

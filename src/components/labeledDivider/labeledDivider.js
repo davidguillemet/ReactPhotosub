@@ -1,6 +1,20 @@
-import Divider from '@mui/material/Divider';
 import Box from '@mui/material/Box';
 import { PageHeader } from '../../template/pageTypography';
+
+const Separator = () => {
+    return (
+        <Box
+            sx={{
+                flex: 1,
+                mx: 2,
+                height: "1px",
+                borderTopWidth: "2px",
+                borderTopStyle: "solid",
+                borderTopColor: theme => theme.palette.divider
+            }}
+        />
+    );
+}
 
 const LabeledDivider = ({label}) => {
     return (
@@ -12,9 +26,9 @@ const LabeledDivider = ({label}) => {
                 alignItems: "center"
             }}
         >
-            <Box sx={{ flex: 1, mx: 2, height: "1px", borderTop: "1px solid grey"}} />
-            <PageHeader sx={{my: 0}}>{label}</PageHeader>
-            <Box sx={{ flex: 1, mx: 2, height: "1px", borderTop: "1px solid grey"}} />
+            <Separator />
+            <PageHeader sx={{my: 0, color: theme => theme.palette.text.disabled, fontWeight: "400"}}>{label}</PageHeader>
+            <Separator />
         </Box>
     )
 };
