@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {isMobile} from 'react-device-detect';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
@@ -15,6 +14,8 @@ import { useResizeObserver } from '../../components/hooks';
 import Thumbnail from './thumbnail';
 import './style.css';
 
+const _naxtPageButtonWidth = 60;
+
 const getThumbnailRectAt = (container, index) => {
     if (container === null || index > container.children.length - 1) {
         return null;
@@ -26,8 +27,9 @@ const getThumbnailRectAt = (container, index) => {
     };
 };
 
-const getLastThumbnailRightPosition = (images, height, spacing) => {
-    return images.reduce((position, image) => position + Math.round(height*image.sizeRatio) + spacing, 0);
+const getLastThumbnailRightPosition = (images, height, spacing, hasNext) => {
+    const initialValue = hasNext ? (_naxtPageButtonWidth + spacing) : 0;
+    return images.reduce((position, image) => position + Math.round(height*image.sizeRatio) + spacing, initialValue );
 }
 
 const ImageSlider = ({
@@ -45,7 +47,7 @@ const ImageSlider = ({
     renderOverlay = null}) => {
     
     const [thumnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
-    const lastThumbRight = useMemo(() => getLastThumbnailRightPosition(images, imageHeight, spacing), [images, imageHeight, spacing]);
+    const lastThumbRight = useMemo(() => getLastThumbnailRightPosition(images, imageHeight, spacing, hasNext), [images, imageHeight, spacing, hasNext]);
 
     const resizeObserver = useResizeObserver(true);
     
@@ -193,6 +195,11 @@ const ImageSlider = ({
                         onClick={onNextPage}
                         sx={{
                             height: `${imageHeight}px`,
+                            minWidth: `${_naxtPageButtonWidth}px`,
+                            px: 1,
+                            '& .MuiButton-startIcon': {
+                                mr: 0
+                            }
                         }}
                         startIcon={<MoreHorizIcon />}
                     >
