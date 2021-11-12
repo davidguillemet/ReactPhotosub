@@ -195,6 +195,7 @@ const ImageSlider = ({
                         onClick={onNextPage}
                         sx={{
                             height: `${imageHeight}px`,
+                            mr: `${spacing}px`,
                             minWidth: `${_naxtPageButtonWidth}px`,
                             px: 1,
                             '& .MuiButton-startIcon': {

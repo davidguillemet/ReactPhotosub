@@ -239,7 +239,7 @@ const ExpandedView = React.forwardRef(({ images, index, onClose, displayDestinat
                     alignItems: 'center',
                     width: '100%',
                     height: '100%',
-                    padding: (fullScreen || isMobile) ? 0 : 10,
+                    padding: 0,
                     overflow: 'hidden'
                 }}
             >
@@ -418,11 +418,20 @@ const ExpandedView = React.forwardRef(({ images, index, onClose, displayDestinat
             </Box>
 
             <Collapse in={infoVisible}>
-                <ImageInfo image={currentImage} displayDestination={displayDestination} />
+                <ImageInfo
+                    style={{
+                        mb: fullScreen ? 1 : 0
+                    }}
+                    image={currentImage}
+                    displayDestination={displayDestination}
+                />
             </Collapse>
 
             <Collapse in={!isPlaying && !fullScreen}>
                 <ImageSlider
+                    style={{
+                        my: 1,
+                    }}
                     images={images}
                     currentIndex={currentIndex}
                     onThumbnailClick={setCurrentIndex}
