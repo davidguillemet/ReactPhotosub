@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {isMobile} from 'react-device-detect';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 import { withLoading, buildLoadingState } from '../loading';
@@ -50,6 +50,8 @@ const ImageSlider = ({
     const lastThumbRight = useMemo(() => getLastThumbnailRightPosition(images, imageHeight, spacing, hasNext), [images, imageHeight, spacing, hasNext]);
 
     const resizeObserver = useResizeObserver(true);
+
+    const [searchRunning, setSearchRunning] = useState(false);
     
     const scrollToThumbnail = useCallback((index) => {
 
@@ -110,6 +112,10 @@ const ImageSlider = ({
         });
     }, [resizeObserver.width, resizeObserver.scrollLeft, lastThumbRight]);
 
+    useEffect(() => {
+        setSearchRunning(false);
+    }, [images]);
+
     function handleThumbnailsScrollLeft() {
         resizeObserver.element.scrollBy({
             left: -resizeObserver.width,
@@ -123,6 +129,13 @@ const ImageSlider = ({
             behavior: 'smooth'
         });
     }
+
+    const handleNextSearchPage = useCallback(() => {
+        if (onNextPage !== null) {
+            onNextPage();
+            setSearchRunning(true);
+        }
+    }, [onNextPage]);
 
     return (
         <Box
@@ -189,10 +202,11 @@ const ImageSlider = ({
                 }
                 {   
                     hasNext &&
-                    <Button
+                    <LoadingButton
+                        loading={searchRunning}
                         variant="outlined"
                         size="large"
-                        onClick={onNextPage}
+                        onClick={handleNextSearchPage}
                         sx={{
                             height: `${imageHeight}px`,
                             mr: `${spacing}px`,
@@ -204,7 +218,7 @@ const ImageSlider = ({
                         }}
                         startIcon={<MoreHorizIcon />}
                     >
-                    </Button>
+                    </LoadingButton>
                 }
             </Box>
 
