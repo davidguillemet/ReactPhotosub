@@ -1,7 +1,7 @@
 import { Suspense, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import { Switch, Route, withRouter } from "react-router-dom";
+import { Switch, Route, useHistory } from "react-router-dom";
 import { routes } from '../../navigation/routes';
 import { Loading } from '../../components/loading';
 
@@ -21,7 +21,8 @@ const RouteComponent = ({route}) => {
     }
 }
 
-const PageContent = ({history, onHistoryChanged}) => {
+const PageContent = ({onHistoryChanged}) => {
+    const history = useHistory();
 
     useEffect(() => history.listen(() => {
         onHistoryChanged();
@@ -67,4 +68,4 @@ const PageContent = ({history, onHistoryChanged}) => {
     );
 };
 
-export default withRouter(PageContent);
+export default PageContent;

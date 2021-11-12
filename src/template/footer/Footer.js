@@ -1,7 +1,7 @@
 import React from 'react';
+import { useLocation } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import { withRouter } from "react-router";
 
 function SocialMedia() {
     return (null);
@@ -25,8 +25,9 @@ const Copyright = ({isHome}) => {
 
 const StyledFooter = styled('footer')``;
 
-const Footer = withRouter(({location}) => {
+const Footer = () => {
 
+    const location = useLocation();
     const isHome = location.pathname === '/';
 
     return (
@@ -43,6 +44,6 @@ const Footer = withRouter(({location}) => {
             <Copyright isHome={isHome}/>
         </StyledFooter>
     )
-});
+};
 
 export default Footer;

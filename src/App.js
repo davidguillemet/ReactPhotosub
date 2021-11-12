@@ -18,8 +18,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 
-import { BrowserRouter as Router } from "react-router-dom";
-import { withRouter } from "react-router";
+import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import { routes, NavigationLink } from './navigation/routes';
 import { FirebaseSignin } from './components/firebase';
 import { AuthProvider } from './components/authentication';
@@ -70,8 +69,9 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-start',
 }));
 
-const TopToolBar = withRouter(({ open, handleDrawerOpen, location }) => {
+const TopToolBar = ({ open, handleDrawerOpen }) => {
 
+    const location = useLocation();
     const transparent = location.pathname === '/';
 
     return (
@@ -96,7 +96,7 @@ const TopToolBar = withRouter(({ open, handleDrawerOpen, location }) => {
             </Toolbar>
         </AppBar>
     );
-})
+};
 
 function App(props) {
 
