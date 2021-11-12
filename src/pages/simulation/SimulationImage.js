@@ -1,49 +1,13 @@
 import { useState } from 'react';
 import { Rnd } from "react-rnd";
-import { Box } from '@mui/system';
-import CheckIcon from '@mui/icons-material/Check';
 import { useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 
 import { moveImage, resizeAndMoveImage } from './actions/SimulationActions';
 import { getThumbnailSrc } from '../../utils';
 
-const SelectionMarker = ({imageBorderWidth}) => {
-    return (
-        <Box
-            sx={{
-                position: "absolute",
-                top: `${imageBorderWidth}px`,
-                left: `${imageBorderWidth}px`,
-                right: `${imageBorderWidth}px`,
-                bottom: `${imageBorderWidth}px`,
-                borderColor: theme => theme.palette.warning.light,
-                borderWidth: "5px",
-                borderStyle: "solid"
-            }}
-        >
-            <Box
-                sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    position: "absolute",
-                    right: "3px",
-                    bottom: "3px",
-                    backgroundColor: theme => theme.palette.warning.light,
-                    borderRadius: '2px',
-                }}
-            >
-                <CheckIcon
-                    fontSize="medium"
-                    sx={{
-                        color: "white"
-                    }}
-                />
-            </Box>
-        </Box>
-    )
-}
+import SelectionMarker from '../../components/selectionMarker';
+
 
 const StyledRnd = styled(Rnd)(({ theme }) => ({ }));
 
@@ -118,7 +82,7 @@ const SimulationImage = ({image, selected, border, shadowFactor, dispatch, onCli
             />
 
             {
-                selected && <SelectionMarker imageBorderWidth={border.width} />
+                selected && <SelectionMarker imageBorderWidth={border.width} withCheck={true} />
             }
             
         </StyledRnd>

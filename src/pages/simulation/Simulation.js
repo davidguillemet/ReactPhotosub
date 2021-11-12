@@ -216,15 +216,9 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     mx: {
                         "xs": -1,
                         "sm": 0
-                    },
-                    borderWidth: "1px",
-                    borderStyle: "solid",
-                    borderColor: theme => theme.palette.divider
+                    }
                 }}
-                elevation={0}
                 imageHeight={isMobile ? 100 : 120}
-                imageBorderWidth={3}
-                imageBorderRadius={5}
                 disabled={simulation.isLocked}
                 onDeleteUploaded={deleteUploadedInterior}
             />
@@ -275,15 +269,9 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     mx: {
                         "xs": -1,
                         "sm": 0
-                    },
-                    borderWidth: "1px",
-                    borderStyle: "solid",
-                    borderColor: theme => theme.palette.divider
+                    }
                 }}
-                elevation={0}
                 imageHeight={isMobile ? 100 : 120}
-                imageBorderWidth={3}
-                imageBorderRadius={5}
                 disabled={simulation.isLocked}
                 emptyComponent={<EmptySimulationImages type={listType} images={images} searchResult={searchResult} />}
                 onNextPage={handleNextSearchPage}

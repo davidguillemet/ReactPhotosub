@@ -26,8 +26,8 @@ const getThumbnailRectAt = (container, index) => {
     };
 };
 
-const getLastThumbnailRightPosition = (images, height, borderWidth) => {
-    return images.reduce((position, image) => position + Math.round(height*image.sizeRatio) + borderWidth*2, 0);
+const getLastThumbnailRightPosition = (images, height, spacing) => {
+    return images.reduce((position, image) => position + Math.round(height*image.sizeRatio) + spacing, 0);
 }
 
 const ImageSlider = ({
@@ -36,20 +36,16 @@ const ImageSlider = ({
     onThumbnailClick,
     style,
     imageHeight = 60,
-    imageBorderWidth = 3,
-    indicatorHeight = 14,
-    imageBorderColor = "#000",
-    imageBorderRadius = 3,
+    spacing = 5,
     disabled,
     onDeleteUploaded,
     emptyComponent = null,
     onNextPage = null,
     hasNext = false,
-    renderOverlay = null,
-    elevation = 2}) => {
+    renderOverlay = null}) => {
     
     const [thumnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
-    const lastThumbRight = useMemo(() => getLastThumbnailRightPosition(images, imageHeight, imageBorderWidth), [images, imageHeight, imageBorderWidth]);
+    const lastThumbRight = useMemo(() => getLastThumbnailRightPosition(images, imageHeight, spacing), [images, imageHeight, spacing]);
 
     const resizeObserver = useResizeObserver(true);
     
@@ -127,107 +123,93 @@ const ImageSlider = ({
     }
 
     return (
-        <Paper elevation={elevation} sx={{
-            ...style,
-            display: 'flex',
-            flexDirection: 'column',
-        }}>
-
-            <Box sx={{
+        <Box
+            sx={{
+                ...style,
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center'
-            }}>
+            }}
+        >
+            {
+                !isMobile &&
+                <IconButton
+                    onClick={handleThumbnailsScrollLeft}
+                    disabled={!thumnailScrollActivation.scrollLeft}
+                    size="large">
+                    <ArrowBackIosRoundedIcon fontSize="large"/>
+                </IconButton>
+            }
 
+            <Box
+                ref={resizeObserver.ref}
+                className="hideScroll" 
+                sx={{
+                    flex: 1,
+                    overflowY: 'hidden',
+                    overflowX: 'auto',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'flex-start',
+                    height: `${imageHeight}px`,
+                    mx: 0
+                }}
+            >
                 {
-                    !isMobile &&
-                    <IconButton
-                        onClick={handleThumbnailsScrollLeft}
-                        disabled={!thumnailScrollActivation.scrollLeft}
-                        size="large">
-                        <ArrowBackIosRoundedIcon fontSize="large"/>
-                    </IconButton>
+                    images.length === 0 && emptyComponent !== null ?
+                    emptyComponent :
+                    <TransitionGroup component={null}>
+                    {
+                        images.map((image, index) => { 
+                            return (
+                                <CSSTransition
+                                    key={image.id}
+                                    timeout={500}
+                                    classNames="thumbnail"
+                                >                
+                                    <Thumbnail
+                                        key={image.id}
+                                        image={image}
+                                        index={index}
+                                        handleClick={handleThumbnailClick}
+                                        selected={currentIndex === index}
+                                        imageHeight={imageHeight}
+                                        spacing={spacing}
+                                        disabled={disabled}
+                                        onDelete={onDeleteUploaded}
+                                        renderOverlay={renderOverlay}
+                                    />
+                                </CSSTransition>
+                            );
+                        })
+                    }
+                    </TransitionGroup>
                 }
-
-                {
-                    <Box
-                        ref={resizeObserver.ref}
-                        className="hideScroll" 
+                {   
+                    hasNext &&
+                    <Button
+                        variant="outlined"
+                        size="large"
+                        onClick={onNextPage}
                         sx={{
-                            flex: 1,
-                            overflowY: 'hidden',
-                            overflowX: 'auto',
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'flex-start',
-                            height: `${imageHeight + 2*imageBorderWidth + indicatorHeight}px`,
-                            mt: `${indicatorHeight / 2}px`,
-                            mx: `${2*imageBorderWidth}px`
+                            height: `${imageHeight}px`,
                         }}
+                        startIcon={<MoreHorizIcon />}
                     >
-                        {
-                            images.length === 0 && emptyComponent !== null ?
-                            emptyComponent :
-                            <TransitionGroup component={null}>
-                            {
-                                images.map((image, index) => { 
-                                    return (
-                                        <CSSTransition
-                                            key={image.id}
-                                            timeout={500}
-                                            classNames="thumbnail"
-                                        >                
-                                            <Thumbnail
-                                                key={image.id}
-                                                image={image}
-                                                index={index}
-                                                handleClick={handleThumbnailClick}
-                                                active={currentIndex === index}
-                                                imageHeight={imageHeight}
-                                                imageBorderWidth={imageBorderWidth}
-                                                imageBorderColor={imageBorderColor}
-                                                imageBorderRadius={imageBorderRadius}
-                                                disabled={disabled}
-                                                onDelete={onDeleteUploaded}
-                                                renderOverlay={renderOverlay}
-                                            />
-                                        </CSSTransition>
-                                    );
-                                })
-                            }
-                            </TransitionGroup>
-                        }
-                        {
-                            hasNext &&
-                            <Button
-                                variant="outlined"
-                                size="large"
-                                onClick={onNextPage}
-                                sx={{
-                                    height: `${imageHeight}px`,
-                                    mt: `${imageBorderWidth}px`,
-                                    ml: `${imageBorderWidth}px`
-                                }}
-                                startIcon={<MoreHorizIcon />}
-                            >
-                            </Button>
-                        }
-                    </Box>
+                    </Button>
                 }
-
-                {
-                    !isMobile &&
-                    <IconButton
-                        onClick={handleThumbnailsScrollRight}
-                        disabled={!thumnailScrollActivation.scrollRight}
-                        size="large">
-                        <ArrowForwardIosRoundedIcon fontSize="large"/>
-                    </IconButton>
-                }
-
             </Box>
 
-        </Paper>
+            {
+                !isMobile &&
+                <IconButton
+                    onClick={handleThumbnailsScrollRight}
+                    disabled={!thumnailScrollActivation.scrollRight}
+                    size="large">
+                    <ArrowForwardIosRoundedIcon fontSize="large"/>
+                </IconButton>
+            }
+        </Box>
     );
 }
 export default withLoading(ImageSlider, [buildLoadingState("images", [null, undefined])]);

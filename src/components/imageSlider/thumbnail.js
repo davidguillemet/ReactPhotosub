@@ -1,19 +1,17 @@
 import { useMemo } from 'react';
 import { Fab } from '@mui/material';
 import Box from '@mui/material/Box';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import LazyImage from '../lazyImage';
+import SelectionMarker from '../selectionMarker';
 
 const Thumbnail = ({
     image,
     index,
     handleClick,
-    active,
+    selected,
     imageHeight,
-    imageBorderWidth = 3,
-    imageBorderColor = "#000",
-    imageBorderRadius = 3,
+    spacing,
     disabled,
     onDelete,
     renderOverlay = null}) => {
@@ -25,59 +23,44 @@ const Thumbnail = ({
     }
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-            }}>
-            <Box sx={{
-                position: 'relative',
-                padding: `${imageBorderWidth}px`,
-                backgroundColor: active === true ? imageBorderColor : null,
-                height: `${imageHeight + 2*imageBorderWidth}px`,
-                width: `${imageWidth+2*imageBorderWidth}px`,
-                borderRadius: `${imageBorderRadius}px`
-            }}>
-                <LazyImage
-                    image={image} 
-                    index={index}
-                    onClick={handleClick}
-                    width={imageWidth}
-                    withOverlay={false}
-                    renderOverlay={renderOverlay}
-                    withFavorite={false}
-                    disabled={disabled}
-                />
-                {
-                    image.uploaded &&
-                    <Fab
-                        size="small"
-                        color="secondary"
-                        disabled={image.deletable}
-                        onClick={handleDelete}
-                        style={{
-                            position: 'absolute',
-                            top: 5,
-                            right: 5
-                        }}
-                    >
-                        <DeleteOutlineOutlinedIcon />
-                    </Fab>
-                }
-            </Box>
+        <Box sx={{
+            position: 'relative',
+            p: 0,
+            mr: `${spacing}px`,
+            ml: index === 0 ? `${spacing}px` : 0,
+            height: `${imageHeight}px`,
+            width: `${imageWidth}px`,
+        }}>
+            <LazyImage
+                image={image} 
+                index={index}
+                onClick={handleClick}
+                width={imageWidth}
+                withOverlay={false}
+                renderOverlay={renderOverlay}
+                withFavorite={false}
+                disabled={disabled}
+            />
             {
-                active === true &&
-                <ArrowDropUpIcon
-                    color="primary"
-                    fontSize="large"
+                image.uploaded &&
+                <Fab
+                    size="small"
+                    color="secondary"
+                    disabled={image.deletable}
+                    onClick={handleDelete}
                     style={{
-                        position: 'relative',
-                        top: -10,
-                        zIndex: 5
+                        position: 'absolute',
+                        top: 5,
+                        right: 5
                     }}
-                />
+                >
+                    <DeleteOutlineOutlinedIcon />
+                </Fab>
             }
+            {
+                selected && <SelectionMarker imageBorderWidth={0} withCheck={false} />
+            }
+
         </Box>
     );
 };

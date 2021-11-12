@@ -80,12 +80,12 @@ const RelatedDestinations = lazyComponent(({destination}) => {
                 currentIndex={-1}
                 onThumbnailClick={onSelectDestination}
                 style={{
-                    width: '100%',
-                    border: "none"
+                    mx: {
+                        "xs": -1,
+                        "sm": 0
+                    }
                 }}
                 imageHeight={isMobile ? 120 : 150}
-                imageBorderWidth={3}
-                imageBorderRadius={5}
                 emptyComponent={<EmptyRelatedDestinations/>}
                 renderOverlay={renderOverlay}
             />
