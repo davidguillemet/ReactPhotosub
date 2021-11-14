@@ -34,8 +34,18 @@ const _sizes = [
 exports.thumbnailSizes = _sizes;
 
 function createThumbnail(fileContent, bucket, width, tempResizedFilePath, resizedFilePathInBucket) {
+    const resizeOptions = {
+        // No enlargement if the image size is less than specified thumbnail
+        withoutEnlargement: true,
+
+        // Used to preserve aspect ratio and resize the image to be as large as possible
+        // while ensuring its dimensions are less than or equal to both those specified
+        // -> With the same value for width and height, we ensire to resize the longest edge
+        //    from this specified value
+        fit: "inside",
+    };
     return sharp(fileContent)
-        .resize(width, null, {withoutEnlargement: true}) // No enlargement if the image size is less than specified thumbnail
+        .resize(width, width, resizeOptions)
         .toFile(tempResizedFilePath)
         .then(() => {
             return bucket.upload(tempResizedFilePath, {
