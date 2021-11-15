@@ -114,48 +114,33 @@ const getSlideSrc = (image, availableWidth, availableHeight) => {
     return getThumbnailSrc(image, availableWidth, availableHeight);
 }
 
-const SlideRenderer = ({image}) => {
+const SlideRenderer = ({image, containerWidth, containerHeight}) => {
 
-    const resizeObserver = useResizeObserver();
-
-    const slideSrc = useMemo(() => getSlideSrc(image, resizeObserver.width, resizeObserver.height), [image, resizeObserver.width, resizeObserver.height]);
+    const slideSrc = useMemo(() => getSlideSrc(image, containerWidth, containerHeight), [image, containerWidth, containerHeight]);
 
     function onImageLoaded(event) {
         event.target.classList.add('loaded');
     }
 
     return (
-        <Box
-            ref={resizeObserver.ref}
-            key={image.id}
-            style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100%',
-                height: '100%',
-                padding: 0,
-                overflow: 'hidden'
-        }}>
-            <StyleImage
-                alt=""
-                onLoad={onImageLoaded}
-                src={slideSrc}
-                sx={{
-                    display: 'block',
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    width: 'auto',
-                    height: 'auto',
-                    opacity: 0,
-                    transition: 'opacity 1s',
-                    '&.loaded': {
-                        opacity: 1
-                    },
-                    objectFit: 'contain' // Prevent portrait image being enlarged on chrome windows (at least)
-                }}
-            />
-        </Box>
+        <StyleImage
+            alt=""
+            onLoad={onImageLoaded}
+            src={slideSrc}
+            sx={{
+                display: 'block',
+                maxWidth: '100%',
+                maxHeight: '100%',
+                width: 'auto',
+                height: 'auto',
+                opacity: 0,
+                transition: 'opacity 1s',
+                '&.loaded': {
+                    opacity: 1
+                },
+                objectFit: 'contain' // Prevent portrait image being enlarged on chrome windows (at least)
+            }}
+        />
     );
 }
 
@@ -167,7 +152,9 @@ const ExpandedView = React.forwardRef(({ images, index, onClose, displayDestinat
     const [fullScreen, setFullScreen] = useState(false);
     const headerBarRef = useRef(null);
     const hideHeaderTimeout = useRef(null);
-          
+
+    const slideContainerResizeObserver = useResizeObserver();
+
     const classes = useStyles();
 
     useEventListener('keydown', handleKeyDown);
@@ -283,7 +270,12 @@ const ExpandedView = React.forwardRef(({ images, index, onClose, displayDestinat
         }
 
         return (
-            <SlideRenderer key={image.id} image={image} />
+            <SlideRenderer
+                key={image.id}
+                image={image}
+                containerWidth={slideContainerResizeObserver.width}
+                containerHeight={slideContainerResizeObserver.height}
+            />
         );
     };
 
@@ -400,7 +392,8 @@ const ExpandedView = React.forwardRef(({ images, index, onClose, displayDestinat
             
             { /* IMAGE BOX WITH NAVIGATION BUTTONS */}
             <Box
-                style={{
+                ref={slideContainerResizeObserver.ref}
+                sx={{
                     position: 'relative',
                     display: 'flex',
                     flex: 1,
@@ -418,6 +411,15 @@ const ExpandedView = React.forwardRef(({ images, index, onClose, displayDestinat
                     }}
                     containerStyle={{
                         height: '100%'
+                    }}
+                    slideStyle={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '100%',
+                        height: '100%',
+                        padding: 0,
+                        overflow: 'hidden'
                     }}
                     index={currentIndex}
                     onChangeIndex={setCurrentIndex}
