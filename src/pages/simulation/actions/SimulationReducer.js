@@ -56,14 +56,18 @@ function _initSimulation(name, simulations, containerWidth) {
     };
 }
 
-function initImage(src, containerWidth) {
+function initImage(src, aspectRatio, containerWidth) {
 
-    const imageInitialWidth = containerWidth / 3;
+    const imageLongestEdge = containerWidth / 3;
+    const width =
+        aspectRatio > 1 ?
+        imageLongestEdge :
+        imageLongestEdge * aspectRatio;
     const image = {
-        width: imageInitialWidth,
+        width: width,
         position: {
             top: 0,
-            left: (containerWidth - imageInitialWidth) / 2
+            left: (containerWidth - width) / 2
         },
         src: src,
         id: uniqueID()
@@ -145,7 +149,7 @@ function simulationReducer(state, action) {
         case ACTION_ADD_IMAGE:
             return {
                 ...state,
-                images: [ ...state.images, initImage(action.src, action.containerWidth) ],
+                images: [ ...state.images, initImage(action.src, action.aspectRatio, action.containerWidth) ],
                 [TRANSIENT_PROPERTY_IS_DIRTY]: true
             }
         case ACTION_BORDER_WIDTH:

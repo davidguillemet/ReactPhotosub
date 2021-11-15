@@ -145,14 +145,14 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     const onSelectImage = useCallback((index) => {
 
-        const imageSrc = images[index].src;
+        const image = images[index];
         if (currentImageId === null) {
-            dispatch(addImage(imageSrc, resizeObserver.width, simulationIndex));
+            dispatch(addImage(image.src, image.sizeRatio, resizeObserver.width, simulationIndex));
         } else {
             // Update image :
             // - How to know the index ??
             // - How to update the image in the reducer ??
-            dispatch(setImage(imageSrc, currentImageId, simulationIndex));
+            dispatch(setImage(image.src, currentImageId, simulationIndex));
         }
 
     }, [images, currentImageId, dispatch, simulationIndex, resizeObserver.width]);

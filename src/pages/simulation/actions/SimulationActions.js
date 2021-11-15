@@ -98,10 +98,11 @@ export function shadow(shadowfactor, simulationIndex) {
     };
 }
 
-export function addImage(imageSrc, containerWidth, simulationIndex) {
+export function addImage(imageSrc, aspectRatio, containerWidth, simulationIndex) {
     return {
         type: ACTION_ADD_IMAGE,
         src: imageSrc,
+        aspectRatio: aspectRatio,
         containerWidth: containerWidth,
         simulationIndex: simulationIndex
     };
