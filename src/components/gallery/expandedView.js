@@ -1,5 +1,6 @@
 import { makeStyles } from '@mui/styles';
 import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
@@ -15,10 +16,11 @@ import StopIcon from '@mui/icons-material/Stop';
 import CloseIcon from '@mui/icons-material/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
-import { useEventListener, getThumbnailSrc, THUMB_LARGEST } from '../../utils';
+import { useEventListener, getThumbnailSrc } from '../../utils';
 import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
 import ImageInfo from './imageInfo';
+import { useResizeObserver } from '../../components/hooks';
 
 import TooltipIconButton from '../../components/tooltipIconButton';
 import { HorizontalSpacing } from '../../template/spacing';
@@ -58,6 +60,8 @@ const useStyles = makeStyles({
         }
     }
 });
+
+const StyleImage = styled('img')(({ theme }) => ({ }));
 
 function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
     const [progress, setProgress] = useState(0);
@@ -100,6 +104,58 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
                 }}
             />
         </TooltipIconButton>
+    );
+}
+
+const getSlideSrc = (image, availableWidth, availableHeight) => {
+    if (availableWidth === 0 || availableHeight === null) {
+        return null;
+    }
+    return getThumbnailSrc(image, availableWidth, availableHeight);
+}
+
+const SlideRenderer = ({image}) => {
+
+    const resizeObserver = useResizeObserver();
+
+    const slideSrc = useMemo(() => getSlideSrc(image, resizeObserver.width, resizeObserver.height), [image, resizeObserver.width, resizeObserver.height]);
+
+    function onImageLoaded(event) {
+        event.target.classList.add('loaded');
+    }
+
+    return (
+        <Box
+            ref={resizeObserver.ref}
+            key={image.id}
+            style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                height: '100%',
+                padding: 0,
+                overflow: 'hidden'
+        }}>
+            <StyleImage
+                alt=""
+                onLoad={onImageLoaded}
+                src={slideSrc}
+                sx={{
+                    display: 'block',
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    opacity: 0,
+                    transition: 'opacity 1s',
+                    '&.loaded': {
+                        opacity: 1
+                    },
+                    objectFit: 'contain' // Prevent portrait image being enlarged on chrome windows (at least)
+                }}
+            />
+        </Box>
     );
 }
 
@@ -213,10 +269,6 @@ const ExpandedView = React.forwardRef(({ images, index, onClose, displayDestinat
         setCurrentIndex(newIndex);
     }
 
-    function onImageLoaded(event) {
-        event.target.classList.add('loaded');
-    }
-
     const toolbarIconSize = isMobile ? 'medium' : 'large';
 
     const slideRenderer = (params) => {
@@ -231,25 +283,7 @@ const ExpandedView = React.forwardRef(({ images, index, onClose, displayDestinat
         }
 
         return (
-            <Box
-                key={image.id}
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: '100%',
-                    height: '100%',
-                    padding: 0,
-                    overflow: 'hidden'
-                }}
-            >
-                <img
-                    alt=""
-                    onLoad={onImageLoaded}
-                    src={getThumbnailSrc(image, THUMB_LARGEST)}
-                    className={classes.mainImage}
-                />
-        </Box>
+            <SlideRenderer key={image.id} image={image} />
         );
     };
 

@@ -188,7 +188,7 @@ function _getThumbSrc(src, fileSuffix) {
 
 function getThumbnailFromSpec(image, sizeSpec) {
     if (typeof image === 'string') {
-        // image is a strign and not an image object
+        // image is a string and not an image object
         // -> just return the converted url
         return _getThumbSrc(image, sizeSpec.fileSuffix);
     }
@@ -198,17 +198,37 @@ function getThumbnailFromSpec(image, sizeSpec) {
     return image[sizeSpec.propertyName];
 }
 
-export function getThumbnailSrc(image, width, defaultSize) {
-    
-    for (const sizeSpec of _thumbnailSpecs) {
-        if (sizeSpec.maxSize >= width) {
-            return getThumbnailFromSpec(image, sizeSpec);
+export function getThumbnailSrc(image, containerWidth, containerHeight) {
+
+    let actualWidth = containerWidth;
+    let longestEdge = actualWidth;
+    if (image.sizeRatio !== undefined) {
+
+        let actualHeight = null;
+        if (containerHeight !== undefined ) {
+            // Check if the image height, based on the available width is less or equal than available height
+            actualHeight = actualWidth / image.sizeRatio;
+            if (actualHeight > containerHeight) {
+                // make the image fitting the max available height
+                actualHeight = containerHeight;
+                // and compute the corresponding width
+                actualWidth = actualHeight * image.sizeRatio;
+            }
+        }
+
+        // Update longest edge
+        if (image.sizeRatio > 1) {
+            // Landscape -> longest edge = width
+            longestEdge = actualWidth;
+        } else {
+            // Portrait  -> longest edge = height
+            // -> compute actuelHeight if not already known (containerHeight is undefined)
+            longestEdge = actualHeight || (actualWidth / image.sizeRatio);
         }
     }
 
-    if (defaultSize !== undefined && defaultSize !== null) {
-        const sizeSpec = _thumbnailSpecs.find(spec => spec.maxSize === defaultSize);
-        if (sizeSpec !== undefined) {
+    for (const sizeSpec of _thumbnailSpecs) {
+        if (sizeSpec.maxSize >= longestEdge) {
             return getThumbnailFromSpec(image, sizeSpec);
         }
     }
