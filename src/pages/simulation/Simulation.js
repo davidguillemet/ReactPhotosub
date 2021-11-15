@@ -57,13 +57,14 @@ const EmptySimulationImages = ({type, images, searchResult}) => {
             "info" : "warning";
 
         return (
-            <Box style={{
+            <Box sx={{
                 display: 'flex',
                 flexDirection: 'row',
                 width: '100%',
                 height: '100%',
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
+                px: 1
             }}>
                 <Alert severity={severity} elevation={4} variant="filled">{message}</Alert>
             </Box>
