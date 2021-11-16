@@ -299,7 +299,7 @@ const Search = React.forwardRef(({
                     searchResult.totalCount >= 0 &&
                     <Paragraph>{`${searchResult.totalCount} Résultat(s)`}</Paragraph>
                 }
-                <GalleryComponent images={searchResult.images} />
+                <GalleryComponent images={searchResult.images} hasNext={searchResult.hasNext} onNextPage={handleNextPage} />
             </React.Fragment>
         }
         {

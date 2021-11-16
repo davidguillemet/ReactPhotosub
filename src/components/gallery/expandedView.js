@@ -144,7 +144,13 @@ const SlideRenderer = ({image, containerWidth, containerHeight}) => {
     );
 }
 
-const ExpandedView = React.forwardRef(({ images, index, onClose, displayDestination = true }, ref) => {
+const ExpandedView = React.forwardRef(({
+    images,
+    index,
+    onClose,
+    displayDestination = true ,
+    hasNext = false,
+    onNextPage = null}, ref) => {
 
     const [currentIndex, setCurrentIndex] = useState(index);
     const [infoVisible, setInfoVisible] = useState(false);
@@ -471,6 +477,8 @@ const ExpandedView = React.forwardRef(({ images, index, onClose, displayDestinat
                     images={images}
                     currentIndex={currentIndex}
                     onThumbnailClick={setCurrentIndex}
+                    hasNext={hasNext}
+                    onNextPage={onNextPage}
                 />
             </Collapse>
         </Box>
