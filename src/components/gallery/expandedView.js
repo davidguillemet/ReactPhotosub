@@ -189,6 +189,9 @@ const ExpandedView = React.forwardRef(({
         headerBarRef.current.classList.add('hidden');
     }
 
+    const toolbarIconSize = isMobile ? 'medium' : 'large';
+    const playable = images.length > 1;
+
     function handleKeyDown(event) {
         switch (event.code) { // or event.key or event.keyCode as integer
             case "ArrowLeft":
@@ -198,6 +201,9 @@ const ExpandedView = React.forwardRef(({
                 handleNextImage();
                 break;
             case "Space":
+                if (playable === false) {
+                    break;
+                }
                 if (isPlaying) {
                     handleStopClick();
                 } else {
@@ -261,8 +267,6 @@ const ExpandedView = React.forwardRef(({
         const newIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
         setCurrentIndex(newIndex);
     }
-
-    const toolbarIconSize = isMobile ? 'medium' : 'large';
 
     const slideRenderer = (params) => {
         const {index} = params;
@@ -332,6 +336,7 @@ const ExpandedView = React.forwardRef(({
                             <TooltipIconButton
                                 tooltip="Lancer le diaporama"
                                 onClick={handlePlayClick}
+                                disabled={playable === false}
                             >
                                 <PlayArrowIcon fontSize={toolbarIconSize}></PlayArrowIcon>
                             </TooltipIconButton>
