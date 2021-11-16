@@ -7,9 +7,9 @@ import { withLoading, buildLoadingState } from '../loading';
 
 const DestinationLinkContent = withLoading(({destination}) => {
     return (
-        <Typography variant="body2" >{destination.title} - {formatDateShort(new Date(destination.date))}</Typography>
+        <Typography variant="body2" sx={{ mb: 0.5}}>{destination.title} - {formatDateShort(new Date(destination.date))}</Typography>
     );
-}, [buildLoadingState("destination", [null, undefined])]);
+}, [buildLoadingState("destination", [null, undefined])], { size: 16, marginTop: 0 });
 
 const ImageDestinationLink = ({image}) => {
 
