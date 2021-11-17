@@ -64,6 +64,7 @@ const Gallery = ({
                 <ExpandedView
                     images={images}
                     index={expandedImageIndex}
+                    onChangeIndex={setExpandedImageIndex}
                     onClose={onCloseModal}
                     displayDestination={displayDestination}
                     hasNext={hasNext}

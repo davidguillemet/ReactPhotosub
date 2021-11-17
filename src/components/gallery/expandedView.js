@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -147,6 +147,7 @@ const SlideRenderer = ({image, containerWidth, containerHeight}) => {
 const ExpandedView = React.forwardRef(({
     images,
     index,
+    onChangeIndex = null,
     onClose,
     displayDestination = true ,
     hasNext = false,
@@ -178,6 +179,13 @@ const ExpandedView = React.forwardRef(({
     useEffect(() => {
         setCurrentIndex(index);
     }, [index, images])
+
+    const handleThumbnailClick = useCallback((index) => {
+        setCurrentIndex(index);
+        if (onChangeIndex) {
+            onChangeIndex(index);
+        }
+    }, [onChangeIndex]);
 
     function handleMouseMove() {
         headerBarRef.current.classList.remove('hidden');
@@ -260,12 +268,12 @@ const ExpandedView = React.forwardRef(({
 
     function handlePreviousImage() {
         const newIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
-        setCurrentIndex(newIndex);
+        handleThumbnailClick(newIndex);
     }
 
     function handleNextImage() {
         const newIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
-        setCurrentIndex(newIndex);
+        handleThumbnailClick(newIndex);
     }
 
     const slideRenderer = (params) => {
@@ -433,7 +441,7 @@ const ExpandedView = React.forwardRef(({
                         overflow: 'hidden'
                     }}
                     index={currentIndex}
-                    onChangeIndex={setCurrentIndex}
+                    onChangeIndex={handleThumbnailClick}
                     slideRenderer={slideRenderer}
                     slideCount={images.length}
                 />
@@ -481,7 +489,7 @@ const ExpandedView = React.forwardRef(({
                     }}
                     images={images}
                     currentIndex={currentIndex}
-                    onThumbnailClick={setCurrentIndex}
+                    onThumbnailClick={handleThumbnailClick}
                     hasNext={hasNext}
                     onNextPage={onNextPage}
                 />
