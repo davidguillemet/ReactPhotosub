@@ -130,7 +130,6 @@ const Search = React.forwardRef(({
 
     const context = useGlobalContext();
     const [ helpOpen, setHelpOpen ] = useState(false);
-    const [ searchTimer, setSearchTimer ] = useState(null);
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
     const [ searchResult, setSearchResult] = useState(getInitialSearchResult())
     const [ searchConfig, setSearchConfig ] = useState({
@@ -139,6 +138,7 @@ const Search = React.forwardRef(({
         query: ""
     });
     const { data: imageCount } = context.useFetchImageCount();
+    const searchTimer = useRef(null);
 
     const lastSearchProcessId = useRef(null);
 
@@ -243,10 +243,10 @@ const Search = React.forwardRef(({
     }, []);
 
     function onQueryChange(event) {
-        if (searchTimer !== null) {
-            clearTimeout(searchTimer);
+        if (searchTimer.current !== null) {
+            clearTimeout(searchTimer.current);
         }
-        setSearchTimer(setTimeout(setSearchQuery, 500, event.target.value.trim()));
+        searchTimer.current = setTimeout(setSearchQuery, 500, event.target.value.trim());
     }
 
     const GalleryComponent = galleryComponent;
