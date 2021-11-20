@@ -140,6 +140,10 @@ const DestinationDetails = ({destination}) => {
             <PageSubTitle sx={{m: 0, color: "white", whiteSpace: "nowrap", fontWeight: 300}}>{destination.title}</PageSubTitle>
             <PageHeader sx={{m: 0, color: "white"}}>{formatedDate}</PageHeader>
             {
+                destination.link &&
+                <Chip color="primary" size="small" label={destination.location} component="a" href={destination.link} clickable target="_blank" />
+            }
+            {
                 hasSummary &&
                 <Button sx={{m: 0, mt: 1, px: 1}} size={isMobile ? "small": "medium"} onClick={toggleOpenSummary} variant="contained">Voir le Résumé</Button>
             }
