@@ -1,63 +1,25 @@
-import React, { useCallback, useEffect, useState, useRef, useMemo} from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import Alert from '@mui/material/Alert';
-import { Grow, Snackbar, Stack } from '@mui/material';
+import { Grow, Snackbar } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import UndoIcon from '@mui/icons-material/Undo';
 import { useAuthContext } from '../../components/authentication';
 import Gallery from '../../components/gallery';
-import { PageTitle, PageSubTitle, BlockQuote } from '../../template/pageTypography';
+import { PageTitle, PageSubTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import { useGlobalContext } from '../../components/globalContext';
 import { withLoading, buildLoadingState } from '../../components/loading';
-import { grey } from '@mui/material/colors';
-
-const getImageProps = (image) => {
-    // image path is "<year>/<name>"
-    const props = image.path.split('/');
-    return {
-        year: props[0],
-        name: props[1]
-    };
-}
-
-const groupFavoritesByYear = (images) => {
-    const imagesByYear = new Map();
-    images.forEach((image) => {
-        const imageProps = getImageProps(image);
-        let yearImages = imagesByYear.get(imageProps.year);
-        if (yearImages === undefined) {
-            yearImages = [];
-            imagesByYear.set(imageProps.year, yearImages);
-        }
-        yearImages.push(image);
-        // Sort by date
-        yearImages.sort((img1, img2) => { return img2.create > img1.create ? 1 : -1; });
-    });
-    return imagesByYear;
-}
 
 const MySelectionContent = withLoading(({images}) => {
-    const favoritesByYear = useMemo(() => groupFavoritesByYear(images), [images]);
-
     return (
         <React.Fragment>
         {
             images !== undefined &&
             <PageSubTitle sx={{mt: 0}}>{`${images.length} Image(s)`}</PageSubTitle>
         }
-        {
-            Array.from(favoritesByYear.keys()).sort((year1, year2) => { return year2 > year1 ? 1 : -1; }).map((year) => {
-                const images = favoritesByYear.get(year);
-                return (
-                    <Stack sx={{width: '100%'}} key={year}>
-                        <BlockQuote sx={{mb: 1, mt: 3, ml: 0, pl: 1, bgcolor: grey[200]}}>{year}</BlockQuote>
-                        <Gallery images={images} emptyMessage="Votre liste de favoris est vide."/>
-                    </Stack>
-                )
-            })
-        }
+        <Gallery images={images} groupBy="year" emptyMessage="Votre liste de favoris est vide."/>
         </React.Fragment>
     );
 }, [ buildLoadingState("images", [null, undefined]) ]);

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect, lazy } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useParams } from "react-router-dom";
 import {isMobile} from 'react-device-detect';
 import Stack from '@mui/material/Stack';
@@ -184,7 +184,7 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
 
             <VerticalSpacing factor={2} />
 
-            <Gallery images={images} onReady={onGalleryIsReady} displayDestination={false} />
+            <Gallery images={images} onReady={onGalleryIsReady} displayDestination={false} sort="asc" />
 
             <VerticalSpacing factor={4} />
 
