@@ -21,6 +21,7 @@ import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
 import ImageInfo from './imageInfo';
 import { useResizeObserver } from '../../components/hooks';
+import { useScrollBlock } from '../../utils';
 
 import TooltipIconButton from '../../components/tooltipIconButton';
 import { HorizontalSpacing } from '../../template/spacing';
@@ -38,19 +39,6 @@ const useStyles = makeStyles({
         position: 'absolute',
         top: '50%',
         transform: 'translateY(-50%)'
-    },
-    mainImage: {
-        display: 'block',
-        maxWidth: '100%',
-        maxHeight: '100%',
-        width: 'auto',
-        height: 'auto',
-        opacity: 0,
-        transition: 'opacity 1s',
-        '&.loaded': {
-            opacity: 1
-        },
-        objectFit: 'contain' // Prevent portrait image being enlarged on chrome windows (at least)
     },
     expandedHeader: {
         opacity: 1,
@@ -161,12 +149,21 @@ const ExpandedView = React.forwardRef(({
     const hideHeaderTimeout = useRef(null);
 
     const slideContainerResizeObserver = useResizeObserver();
+    const [blockScroll, allowScroll] = useScrollBlock();
 
     const classes = useStyles();
 
     useEventListener('keydown', handleKeyDown);
 
     const currentImage = useMemo(() => images[currentIndex], [images, currentIndex]);
+
+    // Deactivate scroll on expanded view
+    useEffect(() => {
+        blockScroll();
+        return () => {
+            allowScroll();
+        }
+    }, [allowScroll, blockScroll]);
 
     // Make sure to clear the timeout on unmount
     useEffect(() => {
