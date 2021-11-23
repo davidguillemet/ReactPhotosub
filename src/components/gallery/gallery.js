@@ -174,7 +174,7 @@ const Gallery = ({
                     // don't render ExpandedView if expandedImageIndex is null, otherwise we get a runtime error
                     expandedImageIndex !== null &&
                     <ExpandedView
-                        images={images}
+                        images={allImages}
                         index={expandedImageIndex}
                         onChangeIndex={setExpandedImageIndex}
                         onClose={onCloseModal}
