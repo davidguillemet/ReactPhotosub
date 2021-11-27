@@ -37,3 +37,8 @@ https://googleapis.dev/nodejs/storage/latest/
 
 // Download bucket content recursively and copy to static-storage
 gsutil cp -r "gs://photosub.appspot.com/2020/romblon" ./public/static-storage/2020
+
+// Insert new Destination
+insert into destinations (title, date, location, path, cover)
+VALUES ('Anilao', '2016-02-14', 3, '2016/anilao', 'DSC_6734.jpg')
+
