@@ -79,7 +79,6 @@ const SocialIcons = () => (
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-evenly",
-            my: 2,
             flex: 1
         }}
     >
