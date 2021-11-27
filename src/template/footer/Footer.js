@@ -2,10 +2,8 @@ import React from 'react';
 import { useLocation } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-
-function SocialMedia() {
-    return (null);
-}
+import Box from '@mui/material/Box';
+import SocialIcons from '../../components/socialIcons';
 
 const Copyright = ({isHome}) => {
     return (
@@ -40,7 +38,9 @@ const Footer = () => {
             backgroundColor: (theme) => isHome ? 'rgba(0,0,0,0.3)' : theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
             zIndex: (theme) => theme.zIndex.appBar
         }}>
-            <SocialMedia />
+            <Box sx={{ display: "flex", width: "240px" }} >
+                <SocialIcons />
+            </Box>
             <Copyright isHome={isHome}/>
         </StyledFooter>
     )
