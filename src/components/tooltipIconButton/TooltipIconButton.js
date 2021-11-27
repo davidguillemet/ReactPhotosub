@@ -3,26 +3,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Zoom from '@mui/material/Zoom';
 import IconButton from '@mui/material/IconButton';
 
-const useTooltipButtonStyles = makeStyles(() => ({
-    tooltipLabel: {
-        fontSize: 16
-    },
-    tooltipPlacementBottom: {
-        backgroundColor: 'black',
-        bottom: 15
-    },
-    tooltipPlacementTop: {
-        backgroundColor: 'black',
-        top: 15
-    },
-    arrow: {
-        color: 'black',
-    }
-}));
-
 const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style, edge = false}) => {
-
-    const classes = useTooltipButtonStyles();
 
     return (
         <Tooltip
@@ -30,12 +11,6 @@ const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style,
             placement="bottom"
             TransitionComponent={Zoom}
             arrow
-            classes={{
-                tooltip: classes.tooltipLabel,
-                tooltipPlacementBottom: classes.tooltipPlacementBottom,
-                tooltipPlacementTop: classes.tooltipPlacementTop,
-                arrow: classes.arrow
-            }}
         >
             <IconButton
                 edge={edge}

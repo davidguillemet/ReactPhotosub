@@ -4,6 +4,19 @@ const theme = createTheme({
     pageWidth: {
         maxWidth: '800px',
         width: '98%'
+    },
+    components: {
+        MuiTooltip: {
+            styleOverrides: {
+                tooltip: {
+                    fontSize: "16px",
+                    backgroundColor: "black"
+                },
+                arrow: {
+                    color: "black"
+                }
+            }
+        }
     }
 });
 
