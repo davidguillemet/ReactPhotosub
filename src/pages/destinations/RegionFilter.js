@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import FormHelperText from '@mui/material/FormHelperText';
 import Chip from '@mui/material/Chip';
@@ -8,10 +7,12 @@ import {unstable_batchedUpdates} from 'react-dom';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 
+import { withLoading, buildLoadingState } from '../../components/loading';
+
 const StyledListItem = styled('li')(({theme}) => ({
 }));
 
-const RegionFilter = ({hierarchy, onChange}) => {
+const RegionFilterUI = ({hierarchy, onChange}) => {
 
     const [filter, setFilter] = useState([]);
     const [options, setOptions] = useState([]);
@@ -27,7 +28,12 @@ const RegionFilter = ({hierarchy, onChange}) => {
             setOptions(hierarchy.filter(region => region.parent === parentId))
         });
         if (onChange) {
-            onChange(new Set(newValue.map(region => region.id)));
+            const regionSet = new Set();
+            // Add the last element only
+            if (newValue.length > 0) {
+                regionSet.add(newValue[newValue.length - 1].id);
+            }
+            onChange(regionSet);
         }
     };
 
@@ -97,6 +103,15 @@ const RegionFilter = ({hierarchy, onChange}) => {
                     />
                 </StyledListItem>
             )}
+            renderTags={(tagValue, getTagProps) =>
+                tagValue.map((option, index) => (
+                    <Chip
+                        label={option.title}
+                        {...getTagProps({ index })}
+                        disabled={index < tagValue.length - 1}
+                    />
+                ))
+            }
             onChange={handleChange}
             value={filter}
         />
@@ -107,4 +122,31 @@ const RegionFilter = ({hierarchy, onChange}) => {
     )
 }
 
-export default RegionFilter;
+function removeUnusedRegions (initialHierarchy, regionsByDestination) {
+
+    // Build a Set that contains all destination regions:
+    const regionSet = new Set();
+    regionsByDestination.forEach((regions, key, map) => {
+        regions.forEach((region) => {
+            regionSet.add(region.id);
+        })
+    });
+
+    const finalHierarchy = [];
+    initialHierarchy.forEach(region => {
+        if (regionSet.has(region.id)) {
+            finalHierarchy.push(region)
+        }
+    });
+
+    return finalHierarchy;
+}
+
+const RegionFilter = ({hierarchy, onChange, regionsByDestination}) => {
+
+    const consolidatedHierarchy = useMemo(() => removeUnusedRegions(hierarchy, regionsByDestination), [hierarchy, regionsByDestination]);
+
+    return <RegionFilterUI hierarchy={consolidatedHierarchy} onChange={onChange} />
+}
+
+export default withLoading(RegionFilter, [buildLoadingState("regionsByDestination", null)]);

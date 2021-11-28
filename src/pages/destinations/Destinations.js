@@ -135,7 +135,7 @@ const Destinations = () => {
         <React.Fragment>
             <PageTitle>Toutes Les Destinations</PageTitle>
             <VerticalSpacing factor={2} />
-            <RegionFilter hierarchy={regionHierarchy} onChange={handleRegionFilterChange} />
+            <RegionFilter hierarchy={regionHierarchy} onChange={handleRegionFilterChange} regionsByDestination={regionsByDestination}/>
             <VerticalSpacing factor={2} />
             <DisplayModeSelector listType={destinationsView} onChange={handleChangeDestinationView} />
             <VerticalSpacing factor={2} />
