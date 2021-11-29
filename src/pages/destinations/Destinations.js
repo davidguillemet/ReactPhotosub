@@ -9,7 +9,7 @@ import { makeStyles } from '@mui/styles';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
-import { PageTitle } from '../../template/pageTypography';
+import { PageTitle, Paragraph } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import DestinationsMap from '../../components/map';
 import RegionFilter from './RegionFilter';
@@ -136,6 +136,10 @@ const Destinations = () => {
             <PageTitle>Toutes Les Destinations</PageTitle>
             <VerticalSpacing factor={2} />
             <RegionFilter hierarchy={regionHierarchy} onChange={handleRegionFilterChange} regionsByDestination={regionsByDestination}/>
+            {
+                filteredDestinations &&
+                <Paragraph>{`${filteredDestinations.length} Destination(s)`}</Paragraph>
+            }
             <VerticalSpacing factor={2} />
             <DisplayModeSelector listType={destinationsView} onChange={handleChangeDestinationView} />
             <VerticalSpacing factor={2} />
