@@ -40,6 +40,11 @@ const sameUsers = (user1, user2) => {
     return (user1.uid === user2.uid);
 }
 
+const initialState = {
+    simulations: [],
+    currentIndex: -1
+};
+
 const SimulationManager = () => {
 
     const context = useGlobalContext();
@@ -55,7 +60,7 @@ const SimulationManager = () => {
      *  currentIndex: <integer>
      * }
      */
-    const [state, dispatch] = useReducer(simulationsReducer, null);
+    const [state, dispatch] = useReducer(simulationsReducer, initialState);
     const [feedback, setFeedback] = useState({
         severity: "success",
         message: null,
@@ -188,16 +193,13 @@ const SimulationManager = () => {
 
             <VerticalSpacing factor={3} />
 
-            {
-                state &&
-                <Simulation
-                    simulations={state.simulations}
-                    simulationIndex={state.currentIndex}
-                    user={authContext.user}
-                    dispatch={dispatch}
-                    key={simulationKey}
-                />
-            }
+            <Simulation
+                simulations={state.simulations}
+                simulationIndex={state.currentIndex}
+                user={authContext.user}
+                dispatch={dispatch}
+                key={simulationKey}
+            />
 
         </React.Fragment>
     );
