@@ -180,7 +180,7 @@ const SimulationManager = () => {
             <PageTitle>Composition</PageTitle>
 
             {
-                authContext.user && state &&
+                authContext.user &&
                 <SimulationToolBar
                     simulations={state.simulations}
                     currentIndex={state.currentIndex}

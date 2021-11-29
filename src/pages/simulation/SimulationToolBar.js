@@ -20,6 +20,7 @@ import TooltipIconButton from '../../components/tooltipIconButton';
 
 import {simulationHasName} from './actions/SimulationReducer';
 import { setCurrentSimulationIndex, toggleLock, rename } from './actions/SimulationActions';
+import { withLoading, buildLoadingState } from '../../components/loading';
 
 const NAME_DIALOG_ACTION_NEW = "new";
 const NAME_DIALOG_ACTION_SAVE = "save";
@@ -196,4 +197,4 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
 );
 };
 
-export default SimulationToolBar;
+export default withLoading(SimulationToolBar, [buildLoadingState("currentIndex", -1)]);
