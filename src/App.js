@@ -297,6 +297,7 @@ const AppContent = (props) => {
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
+                    overflowX: "hidden",
                     minHeight: '100vh',
                     flexGrow: 1,
                     paddingBottom: 0,
