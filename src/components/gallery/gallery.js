@@ -99,6 +99,7 @@ const GroupGallery = ({images, onReady, renderItem}) => (
 
 const Gallery = ({
     images,
+    count = null,
     emptyMessage = null,
     onReady = null,
     displayDestination = true,
@@ -175,6 +176,7 @@ const Gallery = ({
                     expandedImageIndex !== null &&
                     <ExpandedView
                         images={allImages}
+                        count={count || allImages.length}
                         index={expandedImageIndex}
                         onChangeIndex={setExpandedImageIndex}
                         onClose={onCloseModal}

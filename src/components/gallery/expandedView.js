@@ -1,8 +1,10 @@
 import { makeStyles } from '@mui/styles';
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import {unstable_batchedUpdates} from 'react-dom';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import Dialog from '@mui/material/Dialog';
 import Paper from '@mui/material/Paper';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -57,8 +59,8 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
     const timerRef = useRef(null);
 
     React.useEffect(() => {
-        const progressStep = 5; // step is 5%
-        const stepInterval = duration * 5 / 100;
+        const progressStep = 2; // step is 2%
+        const stepInterval = duration * progressStep / 100;
         // TODO : clear the timer on stop click
         timerRef.current = setInterval(() => {
             setProgress((prevProgress) => {
@@ -85,7 +87,7 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
             tooltip={"Arrêter le diaporama"}
             onClick={handleClick}
         >
-            <StopIcon fontSize='large'></StopIcon>
+            <StopIcon fontSize='medium'></StopIcon>
             <CircularProgress variant="determinate" value={progress} style={{
                 position: "absolute",
                 margin: 'auto'
@@ -134,6 +136,7 @@ const SlideRenderer = ({image, containerWidth, containerHeight}) => {
 
 const ExpandedView = React.forwardRef(({
     images,
+    count,
     index,
     onChangeIndex = null,
     onClose,
@@ -147,6 +150,8 @@ const ExpandedView = React.forwardRef(({
     const [fullScreen, setFullScreen] = useState(false);
     const headerBarRef = useRef(null);
     const hideHeaderTimeout = useRef(null);
+
+    const waitingForNextPage = useRef(false);
 
     const slideContainerResizeObserver = useResizeObserver();
     const [blockScroll, allowScroll] = useScrollBlock();
@@ -167,15 +172,19 @@ const ExpandedView = React.forwardRef(({
 
     // Make sure to clear the timeout on unmount
     useEffect(() => {
-        if (!isPlaying) {
-            clearTimeout(hideHeaderTimeout.current);
-        }
         return () => clearTimeout(hideHeaderTimeout.current);
-    }, [isPlaying]);
+    }, []);
 
     useEffect(() => {
         setCurrentIndex(index);
     }, [index, images])
+
+    useEffect(() => {
+        if (waitingForNextPage.current === true) {
+            waitingForNextPage.current = false;
+            setCurrentIndex(index => index + 1);
+        }
+    }, [images])
 
     const handleThumbnailClick = useCallback((index) => {
         setCurrentIndex(index);
@@ -184,18 +193,18 @@ const ExpandedView = React.forwardRef(({
         }
     }, [onChangeIndex]);
 
-    function handleMouseMove() {
+    const hideHeaderBar = useCallback(() => {
+        headerBarRef.current.classList.add('hidden');
+    }, []);
+
+    const handleMouseMove = useCallback(() => {
         headerBarRef.current.classList.remove('hidden');
         clearTimeout(hideHeaderTimeout.current);
         hideHeaderTimeout.current = setTimeout(hideHeaderBar, 3000);
-    }
-
-    function hideHeaderBar() {
-        headerBarRef.current.classList.add('hidden');
-    }
+    }, [hideHeaderBar]);
 
     const toolbarIconSize = isMobile ? 'medium' : 'large';
-    const playable = images.length > 1;
+    const playable = count > 1;
 
     function handleKeyDown(event) {
         switch (event.code) { // or event.key or event.keyCode as integer
@@ -229,60 +238,60 @@ const ExpandedView = React.forwardRef(({
         }
     }
 
-    function cancelHideHeaderBar() {
+    const cancelHideHeaderBar = () => {
         headerBarRef.current.classList.remove('hidden');
         clearTimeout(hideHeaderTimeout.current);
     }
 
-    function handleClickFullScreen() {
-        hideHeaderBar();
+    const handleClickFullScreen = () => {
+        handleMouseMove();
         setFullScreen(true);
     }
 
-    function handleClickExitFullScreen() {
+    const handleClickExitFullScreen = () => {
         cancelHideHeaderBar();
         setFullScreen(false);
     }
 
-    function handlePlayClick() {
-        hideHeaderBar();
-        setInfoVisible(false);
-        setIsPlaying(true);
+    const handlePlayClick = () => {
+        handleMouseMove();
+        unstable_batchedUpdates(() => {
+            setInfoVisible(false);
+            setIsPlaying(true);
+        })
     }
 
-    function handleStopClick() {
+    const handleStopClick = () => {
         cancelHideHeaderBar();
         setIsPlaying(false);
     }
 
-    function handleInfoClick() {
+    const handleInfoClick = () => {
         setInfoVisible(!infoVisible);
     }
 
-    function handleCloseClick() {
+    const handleCloseClick = () => {
         onClose();
     }
 
-    function handlePreviousImage() {
-        const newIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
-        handleThumbnailClick(newIndex);
+    const handlePreviousImage = () => {
+        if (currentIndex > 0) {
+            handleThumbnailClick(currentIndex - 1);
+        }
     }
 
-    function handleNextImage() {
-        const newIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
-        handleThumbnailClick(newIndex);
+    const handleNextImage = () => {
+        if (currentIndex < images.length - 1) {
+            handleThumbnailClick(currentIndex + 1);
+        } else if (currentIndex < count - 1 && hasNext && onNextPage) {
+            waitingForNextPage.current = true;
+            onNextPage();
+        }
     }
 
     const slideRenderer = (params) => {
         const {index} = params;
-
-        let image = null;
-        const modulo = index % images.length;
-        if (index >= 0) {
-            image = images[modulo];
-        } else {
-            image = images[images.length + modulo]; // modulo is less than 0
-        }
+        const image = images[index];
 
         return (
             <SlideRenderer
@@ -294,9 +303,11 @@ const ExpandedView = React.forwardRef(({
         );
     };
 
+    const floatingHeader = (isPlaying || fullScreen);
+
     return (
         <Box
-            onMouseMove={(isPlaying || fullScreen) ? handleMouseMove : null}
+            onMouseMove={floatingHeader ? handleMouseMove : null}
             style={{
                 display: 'flex',
                 flex: 1,
@@ -311,15 +322,18 @@ const ExpandedView = React.forwardRef(({
             <Paper
                 elevation={4}
                 ref={headerBarRef}
-                className={classes.expandedHeader}
                 sx={{
                     display: 'flex',
                     flexDirection: 'row',
                     transition: 'opacity 1s',
-                    width: (isPlaying || fullScreen) ? "auto" : "100%",
-                    position: (isPlaying || fullScreen) ? "absolute" : "relative",
-                    zIndex: (isPlaying || fullScreen) ? 100 : 1,
-                    ...((isPlaying || fullScreen) && {
+                    opacity: 1,
+                    '&.hidden' : {
+                        opacity: 0
+                    },
+                    width: floatingHeader ? "auto" : "100%",
+                    position: floatingHeader ? "absolute" : "relative",
+                    zIndex: floatingHeader ? 100 : 1,
+                    ...(floatingHeader && {
                         position: 'absolute',
                         left: '50%',
                         transform: 'translateX(-50%)'
@@ -383,7 +397,7 @@ const ExpandedView = React.forwardRef(({
                         alignItems: 'center'
                     }}
                 >
-                    <Chip label={`${currentIndex + 1} / ${images.length}`} />
+                    <Chip label={`${currentIndex + 1} / ${count}`} />
                 </Box>
                 <Box
                     style={{
@@ -444,28 +458,52 @@ const ExpandedView = React.forwardRef(({
                 />
 
 
-                { !isMobile && 
-                <Collapse in={!isPlaying}>
-                    <IconButton
-                        className={classes.navigationButton}
-                        onClick={handlePreviousImage}
-                        style={{
-                            left: 10
-                        }}
-                        size="large">
-                        <ArrowBackIosRoundedIcon fontSize='large' />
-                    </IconButton>
-                    <IconButton
-                        className={classes.navigationButton}
-                        onClick={handleNextImage}
-                        style={{
-                            right: 10
-                        }}
-                        size="large">
-                        <ArrowForwardIosRoundedIcon fontSize='large' />
-                    </IconButton>
-                </Collapse>
+                {
+                    !isMobile && 
+                    <Collapse in={!isPlaying}>
+                        <IconButton
+                            className={classes.navigationButton}
+                            disabled={currentIndex === 0}
+                            onClick={handlePreviousImage}
+                            style={{
+                                left: 10
+                            }}
+                            size="large">
+                            <ArrowBackIosRoundedIcon fontSize='large' />
+                        </IconButton>
+                    </Collapse>
                 }
+
+                { /* if mobile, show the button if it's the last of the current page */
+                    (!isMobile || (currentIndex === images.length - 1 && images.length < count)) &&
+                    <Collapse in={!isPlaying}>
+                        <IconButton
+                            className={classes.navigationButton}
+                            disabled={currentIndex === count - 1}
+                            onClick={handleNextImage}
+                            style={{
+                                right: 10
+                            }}
+                            size="large">
+                            <ArrowForwardIosRoundedIcon fontSize='large' />
+                        </IconButton>
+                    </Collapse>
+                }
+
+                { /* OVerlay when waiting for the next page */ }
+                <Dialog
+                    open={waitingForNextPage.current}
+                    PaperProps={{
+                        sx: {
+                            backgroundColor: 'transparent',
+                            textAlign: 'center',
+                            overflow: 'hidden',
+                            boxShadow: 'unset'
+                        }
+                    }}
+                >
+                    <CircularProgress thickness={5} size={60}/>
+                </Dialog>
 
             </Box>
 
