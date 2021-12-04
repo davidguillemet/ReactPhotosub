@@ -77,7 +77,7 @@ const ResultStatus= ({searchResult}) => {
 const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp, showResultCount}) => {
 
     return (
-        <Paper component="form" sx={{
+        <Paper sx={{
             display: 'flex',
             alignItems: 'center',
             width: '100%',
