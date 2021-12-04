@@ -176,10 +176,6 @@ const ExpandedView = React.forwardRef(({
     }, []);
 
     useEffect(() => {
-        setCurrentIndex(index);
-    }, [index, images])
-
-    useEffect(() => {
         if (waitingForNextPage.current === true) {
             waitingForNextPage.current = false;
             setCurrentIndex(index => index + 1);
