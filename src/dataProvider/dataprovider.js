@@ -31,10 +31,12 @@ DataProvider.prototype.getDestinations = function() {
     });
 };
 
-DataProvider.prototype.getRelatedDestinations = function(regions) {
+DataProvider.prototype.getRelatedDestinations = function(regions, macro, wide) {
     return this.axios.get("/destinations/related", {
         params:{
-            region: regions.map(region => region.id)
+            region: regions.map(region => region.id),
+            macro: macro,
+            wide: wide
         },
         paramsSerializer: function(params) {
             return qs.stringify(params, {arrayFormat: 'repeat'})

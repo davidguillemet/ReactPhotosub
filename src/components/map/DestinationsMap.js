@@ -76,37 +76,10 @@ const DestinationsMap = ({destinations, isFullScreen = false}) => {
 
     const { data: locations} = context.useFetchLocations(
         // Fetch locations only for the Destinations page
-        destinations !== null && isDestinationPage === null,
-        (items) => {
-            const locationMap = new Map();
-            items.forEach(location => {
-                locationMap.set(location.id, location);
-            })
-
-            const locations = new Map();
-            destinations.forEach(destination => {
-    
-                const modifiedDestination = {
-                    ...destination,
-                    date: formatDate(new Date(destination.date)),
-                    cover: getThumbnailSrc(destination.cover, _infoCoverWidth)
-                };
-                let locationInstance;
-                if (locations.has(destination.location)) {
-                    locationInstance = locations.get(destination.location);
-                } else {
-                    locationInstance = { ...locationMap.get(destination.location) }
-                    locationInstance.destinations = [];
-                    locations.set(destination.location, locationInstance);
-                }
-                locationInstance.destinations.push(modifiedDestination);    
-            });
-
-            return locations;
-        }
+        destinations !== null && isDestinationPage === null
     );
 
-    // Another effect to get locations
+    // Set destinations per location for the single destination page
     useEffect(() => {
 
         if (destinations !== null && isDestinationPage !== null) {
@@ -128,6 +101,7 @@ const DestinationsMap = ({destinations, isFullScreen = false}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [destinations]);
 
+    // Set destinations per location for the destinations page
     useEffect(() => {
 
         if (locations === undefined || isDestinationPage !== null) {
@@ -136,11 +110,38 @@ const DestinationsMap = ({destinations, isFullScreen = false}) => {
             // - OR we are on a single destination page
             return;
         }
+
+        const locationMap = new Map();
+        locations.forEach(location => {
+            locationMap.set(location.id, location);
+        })
+
+        const destinationsPerlocation = new Map();
+        destinations.forEach(destination => {
+
+            const modifiedDestination = {
+                ...destination,
+                date: formatDate(new Date(destination.date)),
+                cover: getThumbnailSrc(destination.cover, _infoCoverWidth)
+            };
+            let locationInstance;
+            if (destinationsPerlocation.has(destination.location)) {
+                locationInstance = destinationsPerlocation.get(destination.location);
+            } else {
+                locationInstance = { ...locationMap.get(destination.location) }
+                locationInstance.destinations = [];
+                destinationsPerlocation.set(destination.location, locationInstance);
+            }
+            locationInstance.destinations.push(modifiedDestination);    
+        });
+
         unstable_batchedUpdates(() => {
-            setDestinationsPerLocation([ ...locations.values() ]);
+            setDestinationsPerLocation([ ...destinationsPerlocation.values() ]);
             setSelectedLocation(null);
         })
-    }, [locations, isDestinationPage]);
+    // Don't need dependency with isDestinationPage
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [destinations, locations]);
 
     const handleMarkerClick = React.useCallback((location) => {
         if (openInfoWindow === true) {

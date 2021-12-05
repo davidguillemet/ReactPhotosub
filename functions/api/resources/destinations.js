@@ -54,10 +54,16 @@ module.exports = function(config) {
                     region :
                     [region];
 
+            const macro = req.query.macro;
+            const wide = req.query.wide;
+
             config.pool().select("destinations.*", "locations.region")
                 .from("destinations")
                 .join("locations", {"destinations.location": "locations.id"})
                 .whereIn("locations.region", regions)
+                .andWhere((builder) => {
+                    builder.where("destinations.macro", macro).orWhere("destinations.wide", wide);
+                })
                 .orderBy("destinations.date", "desc")
                 .then((destinations) => {
                     destinations.forEach((destination) => {

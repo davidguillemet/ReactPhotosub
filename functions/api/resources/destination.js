@@ -12,7 +12,6 @@ function getDestinationPath(req) {
 
 module.exports = function(config) {
     // Get minimal destinatination info to get the desc (title, date, cover, location)
-    // Get a specific destination head from identifier, including region path
     config.app.route("/destination/:year/:title/desc")
         .get(function(req, res, next) {
             config.pool()
@@ -31,12 +30,13 @@ module.exports = function(config) {
                 });
         });
 
+    // Get a specific destination head from identifier, including region path
     config.app.route("/destination/:year/:title/head")
         .get(function(req, res, next) {
             config.pool().raw(
                 `WITH RECURSIVE destination AS (
                     SELECT
-                    d.title, d.date, d.cover, d.path, d.id,
+                    d.title, d.date, d.cover, d.path, d.id, d.macro, d.wide,
                     l.title as location, l.longitude, l.latitude, l.link, l.region
                     from locations l, destinations d
                     where l.id = d.location and d.path = ?
@@ -57,7 +57,7 @@ module.exports = function(config) {
                 nextDest AS (
                     SELECT destinations.* from destinations, destination where destinations.date > destination.date ORDER BY destinations.date ASC LIMIT 1
                 )
-                SELECT d.title, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link,
+                SELECT d.title, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link, d.macro, d.wide,
                        ARRAY( select row_to_json(row) as region from (SELECT * FROM regionpath) row) as region_path,
                        (select row_to_json(prevDest.*) from prevDest) as prev,
                        (select row_to_json(nextDest.*) from nextDest) as next

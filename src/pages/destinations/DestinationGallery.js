@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 import { formatDateShort, getThumbnailSrc } from '../../utils';
 import DestinationLink from '../../components/destinationLink';
 import MasonryGallery from '../../components/masonryGallery';
-import { withLoading, buildLoadingState } from '../../components/loading';
 
 const DestinationDetails = ({destination, regions}) => {
     return (
@@ -118,7 +117,4 @@ const DestinationGallery = ({destinations, regionsByDestination}) => {
     )
 }
 
-export default withLoading(DestinationGallery, [
-    buildLoadingState("destinations", [null, undefined]),
-    buildLoadingState("regionsByDestination", null)
-]);
+export default DestinationGallery;

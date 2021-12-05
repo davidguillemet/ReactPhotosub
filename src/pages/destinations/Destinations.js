@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { unstable_batchedUpdates } from 'react-dom';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
 import AppsIcon from '@mui/icons-material/Apps';
@@ -16,6 +15,7 @@ import RegionFilter from './RegionFilter';
 import useRegions from './RegionLoaderHook';
 import { useGlobalContext } from '../../components/globalContext';
 import DestinationGallery from './DestinationGallery';
+import { buildLoadingState, withLoading } from '../../components/loading';
 
 const useStyles = makeStyles(() => ({
     regionContainer: {
@@ -35,6 +35,9 @@ const useStyles = makeStyles(() => ({
 
 const VIEW_GRID = 'grid';
 const VIEW_MAP = 'map';
+
+const MACRO_TYPE = 'macro';
+const WIDE_ANGLE_TYPE = 'wide';
 
 function getRegionPath(regionId, regionMap) {
 
@@ -69,57 +72,71 @@ const DisplayModeSelector = ({listType, onChange}) => {
     );
 }
 
-const Destinations = () => {
+const PictureTypeSelector = ({destinationTypes, onChange}) => {
 
-    const context = useGlobalContext();
+    return (
+        <ToggleButtonGroup
+            color="primary"
+            value={destinationTypes}
+            onChange={onChange}
+        >
+            <ToggleButton value={MACRO_TYPE}>Macro</ToggleButton>
+            <ToggleButton value={WIDE_ANGLE_TYPE}>Ambiance</ToggleButton>
+        </ToggleButtonGroup>
+    );
+}
+
+const DestinationsComponent = withLoading(({
+    allDestinations,
+    regionsByDestination,
+    regionHierarchy
+}) => {
+
     const classes = useStyles();
 
-    const [filteredDestinations, setFilteredDestinations] = useState(null);
-    const [regionsByDestination, setRegionsByDestination] = useState(null);
+    const [filteredDestinations, setFilteredDestinations] = useState(allDestinations);
+    const [destinationTypes, setDestinationTypes] = useState(() => [MACRO_TYPE, WIDE_ANGLE_TYPE]);
     const [destinationsView, setDestinationsView] = useState(VIEW_GRID);
-    const [regionHierarchy, regionMap] = useRegions();
     const [regionFilterSet, setRegionFilterSet] = useState(null);
 
-    // Fetch Destinations
-    const { data: allDestinations } = context.useFetchDestinations();
-    
     useEffect(() => {
-        if (regionMap === null || allDestinations === undefined) {
-            // Wait for the regions and destinations being loaded
-            return;
+
+        const filterDestinationsByRegion = (destinations) => {
+            if (!destinations) return null;
+            if (regionFilterSet === null || regionFilterSet.size === 0) {
+                return destinations;
+            }
+            return destinations.filter(destination => regionsByDestination.get(destination.id).find(destRegion => regionFilterSet.has(destRegion.id)))
         }
 
-        // Build the regions map by destination (destination id -> region list)
-        const regionsByDestination = new Map();
-        allDestinations.forEach(destination => {
-            regionsByDestination.set(destination.id, getRegionPath(destination.region, regionMap));
-        });
-        
-        // Needs regionsByDestination to update destination cards
-        unstable_batchedUpdates(() => {
-            setRegionsByDestination(regionsByDestination);
-            setFilteredDestinations(allDestinations);
-        });
-
-    }, [allDestinations, regionMap])
-
-    useEffect(() => {
-        if (allDestinations === undefined || regionsByDestination === null || regionFilterSet === null) {
-            return;
+        const filterDestinationsByKeyword = (destinations) => {
+            return destinations;
         }
 
-        // filter by region
-        const resultsByRegion =
-            regionFilterSet.size === 0 ?
-            allDestinations :
-            allDestinations.filter(destination => regionsByDestination.get(destination.id).find(destRegion => regionFilterSet.has(destRegion.id)))
+        const filterDestinationsByType = (destinations) => {
+            if (!destinations) return null;
+            return destinations.filter(destination => destinationTypes.reduce(
+                (currentValue, typePropertyName) => currentValue || destination[typePropertyName],
+                false)
+            );
+        }
 
-        // filter by keyword
-        // TODO
-        const resultsByRegionAndKeyword = resultsByRegion;
+        const filters = [
+            filterDestinationsByRegion,
+            filterDestinationsByKeyword,
+            filterDestinationsByType
+        ];
 
-        setFilteredDestinations(resultsByRegionAndKeyword);
-    }, [regionFilterSet, allDestinations, regionsByDestination]);
+        setFilteredDestinations(filters.reduce((currentDestinations, filter) => filter(currentDestinations), allDestinations));
+
+    }, [regionFilterSet, destinationTypes, allDestinations, regionsByDestination]);
+
+    const handleChangeDestinationTypes = (event, newValues) => {
+        if (newValues.length > 0)
+        {
+            setDestinationTypes(newValues);
+        }
+    };
 
     const handleChangeDestinationView = (event, newValue) => {
         if (newValue !== null) {
@@ -133,7 +150,7 @@ const Destinations = () => {
 
     return (
         <React.Fragment>
-            <PageTitle>Toutes Les Destinations</PageTitle>
+            <PictureTypeSelector destinationTypes={destinationTypes} onChange={handleChangeDestinationTypes} /> 
             <VerticalSpacing factor={2} />
             <RegionFilter hierarchy={regionHierarchy} onChange={handleRegionFilterChange} regionsByDestination={regionsByDestination}/>
             {
@@ -169,6 +186,51 @@ const Destinations = () => {
             </TabContext>
         </React.Fragment>
     )
-};
+}, [
+    buildLoadingState("allDestinations", [null, undefined]),
+    buildLoadingState("regionsByDestination", [null]),
+    buildLoadingState("regionHierarchy", [null]),
+]);
 
-export default Destinations;
+const DestinationsController = () => {
+
+    const context = useGlobalContext();
+
+    const [regionsByDestination, setRegionsByDestination] = useState(null);
+
+    // Fetch Destinations & Regions
+    const { data: allDestinations } = context.useFetchDestinations();
+    const [regionHierarchy, regionMap] = useRegions();
+
+    useEffect(() => {
+        if (regionMap === null || allDestinations === undefined) {
+            // Wait for the regions and destinations being loaded
+            return;
+        }
+
+        // Build the regions map by destination (destination id -> region list)
+        const regionsByDestination = new Map();
+        allDestinations.forEach(destination => {
+            regionsByDestination.set(destination.id, getRegionPath(destination.region, regionMap));
+        });
+        
+        // Needs regionsByDestination to update destination cards
+        setRegionsByDestination(regionsByDestination);
+
+    }, [allDestinations, regionMap])
+
+    return (
+        <React.Fragment>
+            <PageTitle>Toutes Les Destinations</PageTitle>
+            <VerticalSpacing factor={2} />
+            <DestinationsComponent
+                allDestinations={allDestinations}
+                regionsByDestination={regionsByDestination}
+                regionHierarchy={regionHierarchy}
+            />
+        </React.Fragment>
+    )
+
+}
+
+export default DestinationsController;

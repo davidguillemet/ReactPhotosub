@@ -7,8 +7,6 @@ import {unstable_batchedUpdates} from 'react-dom';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 
-import { withLoading, buildLoadingState } from '../../components/loading';
-
 const StyledListItem = styled('li')(({theme}) => ({
 }));
 
@@ -78,7 +76,7 @@ const RegionFilterUI = ({hierarchy, onChange}) => {
             renderInput={(params) => (
                 <TextField
                     {...params}
-                    label="Filtrer par régions"
+                    label="Filtre par régions"
                 />
             )}
             renderOption={(props, option, { selected }) => (
@@ -149,4 +147,4 @@ const RegionFilter = ({hierarchy, onChange, regionsByDestination}) => {
     return <RegionFilterUI hierarchy={consolidatedHierarchy} onChange={onChange} />
 }
 
-export default withLoading(RegionFilter, [buildLoadingState("regionsByDestination", null)]);
+export default RegionFilter;
