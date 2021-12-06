@@ -268,7 +268,7 @@ const AppContent = (props) => {
             <Box
                 component="nav"
                 //sx={{ width: { lg: (open ? drawerWidth : miniDrawerWidth) }, flexShrink: { lg: 0 } }}
-                sx={{ width: { lg: miniDrawerWidth }, flexShrink: { lg: 0 } }}
+                sx={{ width: { lg: (isHomePage ? 0 : miniDrawerWidth) }, flexShrink: { lg: 0 } }}
             >
                 <SwipeableDrawer
                     disableBackdropTransition={!isIOS}
