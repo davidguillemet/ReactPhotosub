@@ -174,6 +174,22 @@ const AppContent = (props) => {
         return false;
     }
 
+    const MenuItemIcon = ({route, variant, children}) => {
+        if (variant === "permanent") {
+            return (
+                <Tooltip
+                    title={route.label}
+                    arrow
+                    placement="right"
+                >
+                    {children}
+                </Tooltip>
+            )
+        } else {
+            return children;
+        }
+    }
+
     const DrawerContent = ({open, handleClose, variant = "temporary"}) => (
         <div>
             <DrawerHeader>
@@ -214,15 +230,11 @@ const AppContent = (props) => {
                         return (
                             <NavigationLink key={index} to={route.path} isActive={isLinkActive}>
                                 <ListItem button>
-                                    <Tooltip
-                                        title={route.label}
-                                        arrow
-                                        placement="right"
-                                    >
+                                    <MenuItemIcon variant={variant} route={route}>
                                         <ListItemIcon>
                                             {route.icon}
                                         </ListItemIcon>
-                                    </Tooltip>
+                                    </MenuItemIcon>
                                     <ListItemText primary={route.label} />
                                 </ListItem>
                             </NavigationLink>
