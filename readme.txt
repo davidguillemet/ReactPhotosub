@@ -42,3 +42,25 @@ gsutil cp -r "gs://photosub.appspot.com/2020/romblon" ./public/static-storage/20
 insert into destinations (title, date, location, path, cover)
 VALUES ('Anilao', '2016-02-14', 3, '2016/anilao', 'DSC_6734.jpg')
 
+// Create destinations view with region path
+DROP VIEW IF EXISTS destinations_with_regionpath;
+CREATE VIEW destinations_with_regionpath AS (
+    SELECT destinations.*, (
+        WITH RECURSIVE regionpath AS (
+                SELECT
+                reg.id, reg.title, reg.parent
+                FROM regions reg
+                WHERE reg.id = locations.region
+                UNION ALL
+                SELECT r.id, r.title, r.parent
+                FROM regions r
+                JOIN regionpath ON r.id = regionpath.parent
+            )
+        SELECT ARRAY(select json_build_object('id', id, 'title', title, 'parent', parent) from regionpath)
+    ) as regionpath
+    from locations, destinations
+    where locations.id = destinations.location
+);
+select * from destinations_with_regionpath;
+
+

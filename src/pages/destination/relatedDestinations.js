@@ -41,7 +41,7 @@ const RelatedDestinations = lazyComponent(({destination}) => {
 
     const history = useHistory();
     const context = useGlobalContext();
-    const { data: related } = context.useFetchRelatedDestinations(destination.region_path, destination.macro, destination.wide);
+    const { data: related } = context.useFetchRelatedDestinations(destination.regionpath, destination.macro, destination.wide);
     const images = useMemo(() => related !== undefined ? related.filter(dest => dest.id !== destination.id).map(dest => imageFromCover(dest)) : null, [related, destination]);
 
     const onSelectDestination = (index) => {

@@ -12,7 +12,6 @@ import { PageTitle, Paragraph } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import DestinationsMap from '../../components/map';
 import RegionFilter from './RegionFilter';
-import useRegions from './RegionLoaderHook';
 import { useGlobalContext } from '../../components/globalContext';
 import DestinationGallery from './DestinationGallery';
 import { buildLoadingState, withLoading } from '../../components/loading';
@@ -38,19 +37,6 @@ const VIEW_MAP = 'map';
 
 const MACRO_TYPE = 'macro';
 const WIDE_ANGLE_TYPE = 'wide';
-
-function getRegionPath(regionId, regionMap) {
-
-    const regionList = [];
-    let parentId = regionId;
-    do {
-        const region = regionMap.get(parentId);
-        regionList.push(region);
-        parentId = region.parent;
-    } while (parentId !== null)
-
-    return regionList.reverse();
-}
 
 const DisplayModeSelector = ({listType, onChange}) => {
 
@@ -86,15 +72,11 @@ const PictureTypeSelector = ({destinationTypes, onChange}) => {
     );
 }
 
-const DestinationsComponent = withLoading(({
-    allDestinations,
-    regionsByDestination,
-    regionHierarchy
-}) => {
+const DestinationsComponent = withLoading(({destinations}) => {
 
     const classes = useStyles();
 
-    const [filteredDestinations, setFilteredDestinations] = useState(allDestinations);
+    const [filteredDestinations, setFilteredDestinations] = useState(destinations);
     const [destinationTypes, setDestinationTypes] = useState(() => [MACRO_TYPE, WIDE_ANGLE_TYPE]);
     const [destinationsView, setDestinationsView] = useState(VIEW_GRID);
     const [regionFilterSet, setRegionFilterSet] = useState(null);
@@ -106,7 +88,7 @@ const DestinationsComponent = withLoading(({
             if (regionFilterSet === null || regionFilterSet.size === 0) {
                 return destinations;
             }
-            return destinations.filter(destination => regionsByDestination.get(destination.id).find(destRegion => regionFilterSet.has(destRegion.id)))
+            return destinations.filter(destination => destination.regionpath.find(region => regionFilterSet.has(region.id)))
         }
 
         const filterDestinationsByKeyword = (destinations) => {
@@ -127,9 +109,9 @@ const DestinationsComponent = withLoading(({
             filterDestinationsByType
         ];
 
-        setFilteredDestinations(filters.reduce((currentDestinations, filter) => filter(currentDestinations), allDestinations));
+        setFilteredDestinations(filters.reduce((currentDestinations, filter) => filter(currentDestinations), destinations));
 
-    }, [regionFilterSet, destinationTypes, allDestinations, regionsByDestination]);
+    }, [regionFilterSet, destinationTypes, destinations]);
 
     const handleChangeDestinationTypes = (event, newValues) => {
         if (newValues.length > 0)
@@ -152,7 +134,7 @@ const DestinationsComponent = withLoading(({
         <React.Fragment>
             <PictureTypeSelector destinationTypes={destinationTypes} onChange={handleChangeDestinationTypes} /> 
             <VerticalSpacing factor={2} />
-            <RegionFilter hierarchy={regionHierarchy} onChange={handleRegionFilterChange} regionsByDestination={regionsByDestination}/>
+            <RegionFilter destinations={destinations} onChange={handleRegionFilterChange} />
             {
                 filteredDestinations &&
                 <Paragraph>{`${filteredDestinations.length} Destination(s)`}</Paragraph>
@@ -167,10 +149,7 @@ const DestinationsComponent = withLoading(({
                         root: classes.tabPanel
                     }}
                 >
-                    <DestinationGallery
-                        destinations={filteredDestinations}
-                        regionsByDestination={regionsByDestination}
-                    />
+                    <DestinationGallery destinations={filteredDestinations} />
                 </TabPanel>
                 <TabPanel 
                     value={VIEW_MAP}
@@ -187,8 +166,7 @@ const DestinationsComponent = withLoading(({
         </React.Fragment>
     )
 }, [
-    buildLoadingState("allDestinations", [null, undefined]),
-    buildLoadingState("regionsByDestination", [null]),
+    buildLoadingState("destinations", [null, undefined]),
     buildLoadingState("regionHierarchy", [null]),
 ]);
 
@@ -196,38 +174,14 @@ const DestinationsController = () => {
 
     const context = useGlobalContext();
 
-    const [regionsByDestination, setRegionsByDestination] = useState(null);
-
     // Fetch Destinations & Regions
-    const { data: allDestinations } = context.useFetchDestinations();
-    const [regionHierarchy, regionMap] = useRegions();
-
-    useEffect(() => {
-        if (regionMap === null || allDestinations === undefined) {
-            // Wait for the regions and destinations being loaded
-            return;
-        }
-
-        // Build the regions map by destination (destination id -> region list)
-        const regionsByDestination = new Map();
-        allDestinations.forEach(destination => {
-            regionsByDestination.set(destination.id, getRegionPath(destination.region, regionMap));
-        });
-        
-        // Needs regionsByDestination to update destination cards
-        setRegionsByDestination(regionsByDestination);
-
-    }, [allDestinations, regionMap])
+    const { data: destinations } = context.useFetchDestinations();
 
     return (
         <React.Fragment>
             <PageTitle>Toutes Les Destinations</PageTitle>
             <VerticalSpacing factor={2} />
-            <DestinationsComponent
-                allDestinations={allDestinations}
-                regionsByDestination={regionsByDestination}
-                regionHierarchy={regionHierarchy}
-            />
+            <DestinationsComponent destinations={destinations} />
         </React.Fragment>
     )
 

@@ -34,22 +34,12 @@ module.exports = function(config) {
     config.app.route("/destination/:year/:title/head")
         .get(function(req, res, next) {
             config.pool().raw(
-                `WITH RECURSIVE destination AS (
+                `WITH destination AS (
                     SELECT
-                    d.title, d.date, d.cover, d.path, d.id, d.macro, d.wide,
+                    d.title, d.date, d.cover, d.path, d.id, d.macro, d.wide, d.regionpath,
                     l.title as location, l.longitude, l.latitude, l.link, l.region
-                    from locations l, destinations d
+                    from locations l, destinations_with_regionpath d
                     where l.id = d.location and d.path = ?
-                ),
-                regionpath AS (
-                    SELECT
-                    regions.id, regions.title, regions.parent
-                    FROM regions, destination
-                    WHERE regions.id = destination.region
-                    UNION ALL
-                    SELECT r.id, r.title, r.parent
-                    FROM regions r
-                    JOIN regionpath ON r.id = regionpath.parent
                 ),
                 prevDest AS (
                     SELECT destinations.* from destinations, destination where destinations.date < destination.date ORDER BY destinations.date DESC LIMIT 1
@@ -57,8 +47,7 @@ module.exports = function(config) {
                 nextDest AS (
                     SELECT destinations.* from destinations, destination where destinations.date > destination.date ORDER BY destinations.date ASC LIMIT 1
                 )
-                SELECT d.title, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link, d.macro, d.wide,
-                       ARRAY( select row_to_json(row) as region from (SELECT * FROM regionpath) row) as region_path,
+                SELECT d.title, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link, d.macro, d.wide, d.regionpath,
                        (select row_to_json(prevDest.*) from prevDest) as prev,
                        (select row_to_json(nextDest.*) from nextDest) as next
                 from destination d`, getDestinationPath(req))

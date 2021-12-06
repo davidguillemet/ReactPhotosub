@@ -5,10 +5,9 @@ module.exports = function(config) {
     config.app.route("/destinations")
         .get(function(req, res, next) {
             // See https://firebase.google.com/docs/storage/web/download-files
-            config.pool().select("destinations.*", "locations.region")
-                .from("destinations")
-                .join("locations", {"destinations.location": "locations.id"})
-                .orderBy("destinations.date", "desc")
+            config.pool().select("d.*")
+                .from({d: "destinations_with_regionpath"})
+                .orderBy("d.date", "desc")
                 .then((destinations) => {
                     destinations.forEach((destination) => {
                         // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
@@ -23,28 +22,6 @@ module.exports = function(config) {
                 });
         });
 
-    // To compare the complete region path instead of the location region only,
-    // We can create a view that contains all destinations with the full region path as an array of region identifier
-    // -> but doing this is equivalent as checking of the highest level region is the same or not...
-    // DROP VIEW IF EXISTS destinationwithregionpath;
-    // CREATE VIEW destinationwithregionpath AS (
-    //     SELECT destinations.*, (
-    //         WITH RECURSIVE regionpath AS (
-    //                 SELECT
-    //                 reg.id, reg.title, reg.parent
-    //                 FROM regions reg
-    //                 WHERE reg.id = locations.region
-    //                 UNION ALL
-    //                 SELECT r.id, r.title, r.parent
-    //                 FROM regions r
-    //                 JOIN regionpath ON r.id = regionpath.parent
-    //             )
-    //         SELECT ARRAY(select id from regionpath)
-    //     ) as regionpath
-    //     from locations, destinations
-    //     where locations.id = destinations.location
-    // );
-    // select * from destinationwithregionpath;
     config.app.route("/destinations/related")
         .get(function(req, res, next) {
             const region = req.query.region;
@@ -56,15 +33,18 @@ module.exports = function(config) {
 
             const macro = req.query.macro;
             const wide = req.query.wide;
+            // Only compare the root region (South-east asia, sousth-africa, ...)
+            const rootRegion = regions[regions.length - 1];
 
-            config.pool().select("destinations.*", "locations.region")
-                .from("destinations")
-                .join("locations", {"destinations.location": "locations.id"})
-                .whereIn("locations.region", regions)
+            config.pool().select("destinations_with_regionpath.*")
+                .from("destinations_with_regionpath")
+                // destinations_with_regionpath.regionpath is the region array from lowest to highest level [raja, indo, asie]
+                // To get related regions we test if the last element of regionpath (e.g. asie) is the same as the last element of the specified region path (req.query.region)
+                .whereRaw("(destinations_with_regionpath.regionpath[array_length(destinations_with_regionpath.regionpath, 1)]::json->>'id')::INTEGER = ?", [rootRegion])
                 .andWhere((builder) => {
-                    builder.where("destinations.macro", macro).orWhere("destinations.wide", wide);
+                    builder.where("destinations_with_regionpath.macro", macro).orWhere("destinations_with_regionpath.wide", wide);
                 })
-                .orderBy("destinations.date", "desc")
+                .orderBy("destinations_with_regionpath.date", "desc")
                 .then((destinations) => {
                     destinations.forEach((destination) => {
                         // Convert cover property from '2014/misool/DSC_456.jpg' to a real url

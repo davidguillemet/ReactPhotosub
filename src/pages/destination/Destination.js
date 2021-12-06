@@ -171,7 +171,7 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
     return (
         <React.Fragment>
 
-            <RegionPath regions={destination.region_path}></RegionPath>
+            <RegionPath regions={destination.regionpath}></RegionPath>
 
             <Box sx={{ width: "100%", height: isMobile ? "300px" : "400px", position: "relative" }}>
                 <DestinationsMap destinations={destinations} />

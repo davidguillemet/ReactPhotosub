@@ -8,7 +8,7 @@ import { formatDateShort, getThumbnailSrc } from '../../utils';
 import DestinationLink from '../../components/destinationLink';
 import MasonryGallery from '../../components/masonryGallery';
 
-const DestinationDetails = ({destination, regions}) => {
+const DestinationDetails = ({destination}) => {
     return (
         <React.Fragment>
             <Typography variant="h5">{`${destination.title} - ${formatDateShort(new Date(destination.date))}`}</Typography>
@@ -19,7 +19,7 @@ const DestinationDetails = ({destination, regions}) => {
                     justifyContent: 'center'
                 }}
             >
-                {regions.map((region, index) => {
+                {destination.regionpath.slice(0).reverse().map((region, index) => {
                     return (
                         <Chip
                             size="small"
@@ -45,7 +45,6 @@ const DestinationDetails = ({destination, regions}) => {
 const DestinationContent = ({item, index, width, params}) => {
 
     const destination = item;
-    const regionsByDestination = params;
 
     const container = useRef();
     const selector = gsap.utils.selector(container);
@@ -97,14 +96,14 @@ const DestinationContent = ({item, index, width, params}) => {
                 }}
                 className="details"
             >
-                <DestinationDetails destination={destination} regions={regionsByDestination.get(destination.id)} />
+                <DestinationDetails destination={destination} />
             </Box>
         </DestinationLink>
         </Box>
     );
 }
 
-const DestinationGallery = ({destinations, regionsByDestination}) => {
+const DestinationGallery = ({destinations}) => {
 
     return (
         <MasonryGallery
@@ -112,7 +111,6 @@ const DestinationGallery = ({destinations, regionsByDestination}) => {
             colWidth={350}
             heightProvider={(item, itemWidth) => itemWidth / (600/400)} // We could get the cover ratio with a join in the SQL query
             renderComponent={DestinationContent}
-            renderExtraParams={regionsByDestination}
         />
     )
 }

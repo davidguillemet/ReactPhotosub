@@ -120,31 +120,23 @@ const RegionFilterUI = ({hierarchy, onChange}) => {
     )
 }
 
-function removeUnusedRegions (initialHierarchy, regionsByDestination) {
+const compareRegions = (a, b) => a.title === b.title ? 0 : a.title < b.title ? -1 : 1;
 
-    // Build a Set that contains all destination regions:
-    const regionSet = new Set();
-    regionsByDestination.forEach((regions, key, map) => {
-        regions.forEach((region) => {
-            regionSet.add(region.id);
-        })
+function buildRegionHierarchy(destinations) {
+    const regionMap = new Map();
+    destinations.forEach(destination => {
+        destination.regionpath.forEach(region => {
+            regionMap.set(region.id, region);
+        });
     });
-
-    const finalHierarchy = [];
-    initialHierarchy.forEach(region => {
-        if (regionSet.has(region.id)) {
-            finalHierarchy.push(region)
-        }
-    });
-
-    return finalHierarchy;
+    return Array.from(regionMap.values()).sort(compareRegions);
 }
 
-const RegionFilter = ({hierarchy, onChange, regionsByDestination}) => {
+const RegionFilter = ({destinations, onChange}) => {
 
-    const consolidatedHierarchy = useMemo(() => removeUnusedRegions(hierarchy, regionsByDestination), [hierarchy, regionsByDestination]);
+    const hierarchy = useMemo(() => buildRegionHierarchy(destinations), [destinations]);
 
-    return <RegionFilterUI hierarchy={consolidatedHierarchy} onChange={onChange} />
+    return <RegionFilterUI hierarchy={hierarchy} onChange={onChange} />
 }
 
 export default RegionFilter;
