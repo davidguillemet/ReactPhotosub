@@ -1,3 +1,4 @@
+import React from 'react';
 import { styled } from '@mui/material/styles';
 import SvgIcon from '@mui/material/SvgIcon';
 import Box from '@mui/material/Box';
@@ -8,9 +9,9 @@ const StyledSvgIcon = styled(SvgIcon)(({ theme }) => ({
     color: theme.palette.grey[500]
 }));
 
-const ExternalLink = (props) => (
-    <Link target="_blank" rel="noreferrer" {...props} />
-) 
+const ExternalLink = React.forwardRef((props, ref) => (
+    <Link target="_blank" rel="noreferrer" {...props} ref={ref} />
+));
 
 export const FlickrIcon = () => (
     <StyledSvgIcon viewBox="0 0 34 34">
