@@ -4,13 +4,13 @@ import Box from '@mui/material/Box';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 
-import {unstable_batchedUpdates} from 'react-dom';
-
-import { uniqueID, shuffleArray, getBlurrySrc, isBlurrySrc } from '../../utils';
+import { uniqueID, shuffleArray } from '../../utils';
 import { useGlobalContext } from '../../components/globalContext';
 import { useScrollBlock } from '../../utils';
+import { buildLoadingState, withLoading } from '../../components/loading';
 
 const _diaporamaInterval = 5000;
+const _transitionDuration = 2000;
 
 const MainImageStyled = styled('img')({
     display: 'block',
@@ -24,9 +24,10 @@ const MainImageStyled = styled('img')({
 const MainImage = ({images, currentImageIndex, handleImageLoaded}) => {
 
     let currentImageSrc = "/home_initial.jpg";
+
     if (images !== null && currentImageIndex >= 0) {
-        const currentImage = images[currentImageIndex];
-        currentImageSrc = currentImage.isLoaded ? currentImage.src : currentImage.blurrySrc
+        const currentImage = images[currentImageIndex % images.length];
+        currentImageSrc = currentImage.src;
     }
 
     return (
@@ -38,78 +39,66 @@ const MainImage = ({images, currentImageIndex, handleImageLoaded}) => {
     )
 };
 
-const Home = () => {
-    const context = useGlobalContext();
-    const [images, setImages] = useState(null);
-    const [currentImageIndex, setCurrentImageIndex] = useState(-1);
+const Home = withLoading(({images, currentIndex}) => {
+    const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
     const [blockScroll, allowScroll] = useScrollBlock();
     const diaporamaTimeoutRef = useRef(null);
-
-    const { isLoading, data } = context.useFetchHomeSlideshow();
-    
-    useEffect(() => {
-        if (isLoading) {
-            return;
-        }
-        unstable_batchedUpdates(() => {
-            setImages(shuffleArray(data).map(image => {
-                return {
-                    ...image,
-                    blurrySrc: getBlurrySrc(image.src),
-                    id: uniqueID()
-                }
-            }));
-            setCurrentImageIndex(-1); // change to image #0 after first round
-        })
-    }, [isLoading, data]);
 
     useEffect(() => {
         blockScroll();
         return () => {
             allowScroll();
-            clearTimeout(diaporamaTimeoutRef.current);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            clearTimeout(diaporamaTimeoutRef.current);
+        }
     }, []);
 
     const handleNextImage = useCallback(() => {
         if (images === null) {
             return;
         }
-        setCurrentImageIndex(prevIndex => {
-            if (prevIndex >= images.length - 1) {
-                return 0;
-            }
-            return prevIndex + 1;
-        });
+        setCurrentImageIndex(prevIndex => prevIndex + 1);
     }, [images]);
 
-    useEffect(() => {
-        // Images have just been loaded
-        // Start the slideswho with a first reduced timeout
-        diaporamaTimeoutRef.current = setTimeout(handleNextImage, _diaporamaInterval/2);
+    const nextImage = useCallback(() => {
+        diaporamaTimeoutRef.current = setTimeout(handleNextImage, _diaporamaInterval);
     }, [handleNextImage]);
 
-    const handleImageLoaded = (event) => {
+    const handleImageLoaded = useCallback((event) => {
         event.target.classList.add('loaded');
-        if (isBlurrySrc(event.target.src)) {
-            // We just loaded the blurry version, now load the normal version
-            event.target.src = images[currentImageIndex].src
-        } else if (images !== null) {
-            if (currentImageIndex >= 0)
-            {
-                images[currentImageIndex].isLoaded = true;
+        nextImage();
+    }, [nextImage]);
+
+    useEffect(() => {
+        const visibilityListener = () => {
+            switch(document.visibilityState) {
+                case "hidden":
+                    // Stop diaporama
+                    if (typeof diaporamaTimeoutRef.current === 'number') {
+                        clearTimeout(diaporamaTimeoutRef.current);
+                    }
+                    break;
+                case "visible":
+                    // Start Diaporama again
+                    nextImage();
+                    break;
+                default:
             }
-            diaporamaTimeoutRef.current = setTimeout(handleNextImage, _diaporamaInterval);
         }
-    };
+        document.addEventListener("visibilitychange", visibilityListener);
+    }, [nextImage]);
 
     return (
         <React.Fragment>
             <TransitionGroup component={null}>
                 <CSSTransition
                     key={currentImageIndex}
-                    timeout={2000}
+                    timeout={_transitionDuration}
                     classNames="slide"
                 >
                     <Box
@@ -136,6 +125,27 @@ const Home = () => {
             </TransitionGroup>
         </React.Fragment>
     )
-};
+}, [buildLoadingState("images", null)]);
 
-export default Home;
+const HomeController = () => {
+    const context = useGlobalContext();
+    const [images, setImages] = useState(null);
+    const { data } = context.useFetchHomeSlideshow();
+    useEffect(() => {
+        if (data === undefined) {
+            return;
+        }
+        setImages(shuffleArray(data).map(image => {
+            return {
+                ...image,
+                id: uniqueID()
+            }
+        }));
+    }, [data]);
+
+    return (
+        <Home images={images} currentIndex={-1} />
+    )
+}
+
+export default HomeController;
