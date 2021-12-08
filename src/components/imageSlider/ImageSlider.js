@@ -44,7 +44,8 @@ const ImageSlider = ({
     emptyComponent = null,
     onNextPage = null,
     hasNext = false,
-    renderOverlay = null}) => {
+    renderOverlay = null,
+    resetScrollOnChangeImages = false}) => {
     
     const [thumnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
     const lastThumbRight = useMemo(() => getLastThumbnailRightPosition(images, imageHeight, spacing, hasNext), [images, imageHeight, spacing, hasNext]);
@@ -114,7 +115,13 @@ const ImageSlider = ({
 
     useEffect(() => {
         setSearchRunning(false);
-    }, [images]);
+        if (resetScrollOnChangeImages === true && resizeObserver.element !== null) {
+            resizeObserver.element.scrollTo({
+                left: 0,
+                behavior: 'smooth'
+            });
+        }
+    }, [images, resizeObserver.element, resetScrollOnChangeImages]);
 
     function handleThumbnailsScrollLeft() {
         resizeObserver.element.scrollBy({

@@ -265,6 +265,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
             <VerticalSpacing factor={2} />
             <ImageSlider
                 images={images}
+                resetScrollOnChangeImages={listType !== LIST_SEARCH}
                 currentIndex={-1}
                 onThumbnailClick={onSelectImage}
                 style={{
