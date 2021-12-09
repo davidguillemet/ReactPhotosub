@@ -1,10 +1,10 @@
 import List from '@mui/material/List'
 
-const HtmlList = ({children}) => {
+const HtmlList = ({children, listStyle = "disc"}) => {
     return (
         <List dense={true} sx={{
             "&.MuiList-root" : {
-                listStyleType: "disc",
+                listStyleType: listStyle,
                 listStylePosition: "outside",
                 ml: 3
             },

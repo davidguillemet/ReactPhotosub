@@ -4,7 +4,7 @@ import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import SearchIcon from '@mui/icons-material/Search';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import PanoramaIcon from '@mui/icons-material/Panorama';
+import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import SvgIcon from '@mui/material/SvgIcon';
 
@@ -69,7 +69,7 @@ export const routes = [
         label: "Composition",
         path: SimulationPath,
         component: SimulationManager,
-        icon: <PanoramaIcon />,
+        icon: <ViewQuiltIcon />,
         sidebar: true,
         fullWidth: true
     },

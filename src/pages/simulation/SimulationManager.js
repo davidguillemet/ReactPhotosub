@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo, useReducer, useRef } from 'react';
-
+import Button from '@mui/material/Button';
+import InfoIcon from '@mui/icons-material/Info';
 import { Prompt } from "react-router-dom";
 
 import {unstable_batchedUpdates} from 'react-dom';
@@ -9,6 +10,7 @@ import { VerticalSpacing } from '../../template/spacing';
 import { isFromDb, isDirty, getDbIndex } from '../../dataProvider';
 import SimulationToolBar from './SimulationToolBar';
 import Simulation from './Simulation';
+import LazyDialog from '../../dialogs/LazyDialog';
 
 import FeedbackMessage from '../../components/feedback';
 import { useAuthContext } from '../../components/authentication';
@@ -54,6 +56,8 @@ const SimulationManager = () => {
     const updateSimulation = context.useUpdateSimulation();
     const removeSimulation = context.useRemoveSimulation();
     const simulationInitUser = useRef(undefined);
+    const [helpOpen, setHelpOpen] = useState(false);
+
     /**
      * state = {
      *  simulations: <array>,
@@ -164,6 +168,10 @@ const SimulationManager = () => {
         return message;
     }, [authContext.user]);
 
+    const toggleHelpOpen = useCallback(() => {
+        setHelpOpen(open => !open);
+    }, []);
+
     const hasDirty = state !== null && state.simulations.find(simulation => isDirty(simulation)) !== undefined;
 
     // Add a simulation property to the simulation to recreate the component from scratch when the user changes
@@ -173,11 +181,11 @@ const SimulationManager = () => {
     return (
         <React.Fragment>
 
-            <Prompt when={hasDirty} message={promptMessage} />
-
-            <FeedbackMessage severity={feedback.severity} message={feedback.message} key={feedback.key}/>
-
             <PageTitle>Composition</PageTitle>
+
+            <Button variant="contained" startIcon={<InfoIcon />} onClick={toggleHelpOpen}>Qu'est-ce que c'est?</Button>
+
+            <VerticalSpacing factor={2} />
 
             {
                 authContext.user &&
@@ -200,6 +208,12 @@ const SimulationManager = () => {
                 dispatch={dispatch}
                 key={simulationKey}
             />
+
+            <Prompt when={hasDirty} message={promptMessage} />
+
+            <FeedbackMessage severity={feedback.severity} message={feedback.message} key={feedback.key}/>
+
+            <LazyDialog title={"Composition Murale"} path="simulation/help" open={helpOpen} handleClose={toggleHelpOpen} />
 
         </React.Fragment>
     );
