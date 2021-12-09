@@ -15,6 +15,7 @@ import RegionFilter from './RegionFilter';
 import { useGlobalContext } from '../../components/globalContext';
 import DestinationGallery from './DestinationGallery';
 import { buildLoadingState, withLoading } from '../../components/loading';
+import { isMobile } from 'react-device-detect';
 
 const useStyles = makeStyles(() => ({
     regionContainer: {
@@ -35,8 +36,9 @@ const useStyles = makeStyles(() => ({
 const VIEW_GRID = 'grid';
 const VIEW_MAP = 'map';
 
-const MACRO_TYPE = 'macro';
-const WIDE_ANGLE_TYPE = 'wide';
+const TYPE_MACRO = 'macro';
+const TYPE_WIDE_ANGLE = 'wide';
+const TYPE_ALL = 'all';
 
 const DisplayModeSelector = ({listType, onChange}) => {
 
@@ -58,16 +60,19 @@ const DisplayModeSelector = ({listType, onChange}) => {
     );
 }
 
-const PictureTypeSelector = ({destinationTypes, onChange}) => {
+const PictureTypeSelector = ({destinationType, onChange}) => {
 
     return (
         <ToggleButtonGroup
+            size={isMobile ? "small" : "medium"}
             color="primary"
-            value={destinationTypes}
+            value={destinationType}
             onChange={onChange}
+            exclusive
         >
-            <ToggleButton value={MACRO_TYPE}>Macro</ToggleButton>
-            <ToggleButton value={WIDE_ANGLE_TYPE}>Ambiance</ToggleButton>
+            <ToggleButton value={TYPE_ALL}>Tout</ToggleButton>
+            <ToggleButton value={TYPE_MACRO}>Macro</ToggleButton>
+            <ToggleButton value={TYPE_WIDE_ANGLE}>Ambiance</ToggleButton>
         </ToggleButtonGroup>
     );
 }
@@ -77,7 +82,7 @@ const DestinationsComponent = withLoading(({destinations}) => {
     const classes = useStyles();
 
     const [filteredDestinations, setFilteredDestinations] = useState(destinations);
-    const [destinationTypes, setDestinationTypes] = useState(() => [MACRO_TYPE, WIDE_ANGLE_TYPE]);
+    const [destinationType, setDestinationType] = useState(() => TYPE_ALL);
     const [destinationsView, setDestinationsView] = useState(VIEW_GRID);
     const [regionFilterSet, setRegionFilterSet] = useState(null);
 
@@ -97,10 +102,7 @@ const DestinationsComponent = withLoading(({destinations}) => {
 
         const filterDestinationsByType = (destinations) => {
             if (!destinations) return null;
-            return destinations.filter(destination => destinationTypes.reduce(
-                (currentValue, typePropertyName) => currentValue || destination[typePropertyName],
-                false)
-            );
+            return destinations.filter(destination => destinationType === TYPE_ALL || destination[destinationType]);
         }
 
         const filters = [
@@ -111,13 +113,10 @@ const DestinationsComponent = withLoading(({destinations}) => {
 
         setFilteredDestinations(filters.reduce((currentDestinations, filter) => filter(currentDestinations), destinations));
 
-    }, [regionFilterSet, destinationTypes, destinations]);
+    }, [regionFilterSet, destinationType, destinations]);
 
-    const handleChangeDestinationTypes = (event, newValues) => {
-        if (newValues.length > 0)
-        {
-            setDestinationTypes(newValues);
-        }
+    const handleChangeDestinationTypes = (event, newType) => {
+        setDestinationType(newType);
     };
 
     const handleChangeDestinationView = (event, newValue) => {
@@ -132,7 +131,7 @@ const DestinationsComponent = withLoading(({destinations}) => {
 
     return (
         <React.Fragment>
-            <PictureTypeSelector destinationTypes={destinationTypes} onChange={handleChangeDestinationTypes} /> 
+            <PictureTypeSelector destinationType={destinationType} onChange={handleChangeDestinationTypes} /> 
             <VerticalSpacing factor={2} />
             <RegionFilter destinations={destinations} onChange={handleRegionFilterChange} />
             {
