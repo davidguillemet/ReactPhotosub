@@ -116,7 +116,9 @@ const DestinationsComponent = withLoading(({destinations}) => {
     }, [regionFilterSet, destinationType, destinations]);
 
     const handleChangeDestinationTypes = (event, newType) => {
-        setDestinationType(newType);
+        if (newType !== null) {
+            setDestinationType(newType);
+        }
     };
 
     const handleChangeDestinationView = (event, newValue) => {
