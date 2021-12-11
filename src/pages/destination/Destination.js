@@ -6,8 +6,8 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Chip from '@mui/material/Chip';
 import { formatDate, formatDateShort } from '../../utils';
 import Gallery from '../../components/gallery';
@@ -24,7 +24,7 @@ import RelatedDestinations from './relatedDestinations';
 const RegionChip = ({region}) => {
 
     return (
-        <Chip label={region.title} sx={{m: 0, mr: 0.5, mt: 0.5}} color="primary" />
+        <Chip label={region.title} sx={{m: 0, mr: 0.5, mt: 0.5}} color="primary" variant="outlined"/>
     )
 }
 
@@ -61,7 +61,7 @@ const NavigationItem = ({destination, type, caption}) => {
     return (
         <DestinationLink destination={destination}>
             <Paper
-                elevation={4}
+                elevation={1}
                 sx={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -70,15 +70,36 @@ const NavigationItem = ({destination, type, caption}) => {
                     width: "100%",
                     py: 1,
                     px: 1,
-                    backgroundColor: (theme) => theme.palette.primary.light
+                    borderRadius: 0,
+                    borderStyle: "solid",
+                    borderWidth: "1px",
+                    borderColor: (theme) => theme.palette.grey[200]
                 }}
             >
                 {
-                    type === "left" && <ArrowBackIcon sx={{mx: 1, fontSize: { xs: 20, md: 40} , color: "white", ml: 0 }} ></ArrowBackIcon>
+                    type === "left" &&
+                    <ArrowBackIosIcon sx={{
+                            mx: 1,
+                            fontSize: { xs: 20, md: 40},
+                            ml: 0,
+                            color: theme => theme.palette.text.disabled
+                        }}
+                    />
                 }
                 <Stack sx={{ alignItems: type === "left" ? "flex-start" : "flex-end", width: "100%", overflow: "hidden" }}>
-                    <PageHeader sx={{my: 0, fontWeight: "300", color: "white", textAlign: type, ...noWrapAndEllipsis}} variant={isMobile ? "h6" : "h4"}>{destination.title}</PageHeader>
-                    <Paragraph sx={{my: 0, fontWeight: "100", color: "white", textAlign: type, ...noWrapAndEllipsis}}>
+                    <PageHeader
+                        sx={{
+                            my: 0,
+                            fontWeight: "300",
+                            textAlign: type,
+                            color: theme => theme.palette.text.disabled,
+                            ...noWrapAndEllipsis
+                        }}
+                        variant={isMobile ? "h6" : "h4"}
+                    >
+                        {destination.title}
+                    </PageHeader>
+                    <Paragraph sx={{my: 0, fontWeight: "100", textAlign: type, ...noWrapAndEllipsis}}>
                         {
                             isMobile ?
                             formatDateShort(new Date(destination.date)) :
@@ -87,7 +108,13 @@ const NavigationItem = ({destination, type, caption}) => {
                     </Paragraph>
                 </Stack>
                 {
-                    type === "right" && <ArrowForwardIcon sx={{mx: 1, fontSize: { xs: 20, md: 40 }, color: "white", mr: 0 }}></ArrowForwardIcon>
+                    type === "right" &&
+                    <ArrowForwardIosIcon sx={{
+                        mx: 1,
+                        fontSize: { xs: 20, md: 40 },
+                        mr: 0,
+                        color: theme => theme.palette.text.disabled
+                    }} />
                 }
             </Paper>
         </DestinationLink>
