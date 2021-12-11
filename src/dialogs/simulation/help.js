@@ -27,10 +27,10 @@ const help = () => (
     <ListItem>Sauvegardez votre composition et donnez-lui un nom pour la retrouver plus tard <b>(*)</b></ListItem>
 </HtmlList>
 </SummaryParagraph>
-<SummaryParagraph>Vous pouvez ajouter autant d'images que vous le souhaitez à votre composition en répétant l'étape n°2</SummaryParagraph>
+<SummaryParagraph>Vous pouvez ajouter autant d'images que vous le souhaitez à votre composition en répétant les étapes 2 et 3.</SummaryParagraph>
 <SummaryParagraph>Cliquez simplement sur une image de votre composition pour l'activer et:
     <HtmlList>
-        <ListItem><b>la modifier</b> en sélectionnant une nouvelle image comme décrit à l'étape n°2</ListItem>
+        <ListItem><b>la modifier</b> en sélectionnant et modifiant une nouvelle image comme décrit à l'étape n°2</ListItem>
         <ListItem><b>la supprimer</b> en cliquant sur <DeleteIcon sx={{position: "relative", top: "6px"}}/></ListItem>
     </HtmlList>
 </SummaryParagraph>
