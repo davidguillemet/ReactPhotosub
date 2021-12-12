@@ -7,6 +7,8 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
+import Slide from '@mui/material/Slide';
 //ximport logo from './assets/images/logo.jpg';
 import { styled, ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 
@@ -97,12 +99,24 @@ const AppBar = styled(MuiAppBar, {
 
 //const Image = styled('img')(({ theme }) => ({ }));
 
+function HideOnScroll(props) {
+    const { children } = props;
+    const trigger = useScrollTrigger();
+
+    return (
+        <Slide appear={false} direction="down" in={!trigger}>
+            {children}
+        </Slide>
+    );
+}
+
 const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
 
     const location = useLocation();
     const transparent = location.pathname === '/';
 
     return (
+        <HideOnScroll>
         <AppBar
             position="fixed"
             open={open}
@@ -112,23 +126,13 @@ const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
         >
             <Toolbar>
                 {
-                    open ?
-                    <IconButton
-                        color="inherit"
-                        aria-label="close drawer"
-                        onClick={handleDrawerClose}
-                        edge="start"
-                        sx={{ ml: "-18px" }}
-                        size="large">
-                        <CloseIcon />
-                    </IconButton>
-                    :
+                    !open &&
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
                         onClick={handleDrawerOpen}
                         edge="start"
-                        sx={{ ml: "-18px", mr: 2, ...(open && { display: 'none' }) }}
+                        sx={{ ml: "-21px", mr: 2, ...(open && { display: 'none' }) }}
                         size="large">
                         <MenuIcon />
                     </IconButton>
@@ -136,6 +140,7 @@ const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
                 <FirebaseSignin />
             </Toolbar>
         </AppBar>
+        </HideOnScroll>
     );
 };
 
@@ -193,15 +198,30 @@ const AppContent = (props) => {
     const DrawerContent = ({open, handleClose, variant = "temporary"}) => (
         <div>
             <DrawerHeader>
-                <IconButton
-                    color="inherit"
-                    aria-label="close drawer"
-                    onClick={handleClose}
-                    edge="start"
-                    sx={{ ml: 1 }}
-                    size="large">
-                    <CloseIcon />
-                </IconButton>
+                {
+                    variant === "temporary" && open &&
+                    <IconButton
+                        color="inherit"
+                        aria-label="close drawer"
+                        onClick={handleClose}
+                        edge="start"
+                        sx={{ ml: "-5px" }}
+                        size="large">
+                        <CloseIcon />
+                    </IconButton>
+                }
+                {
+                    variant === 'permanent' &&
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={handleDrawerOpen}
+                        edge="start"
+                        sx={{ ml: "-5px", ...(open && { display: 'none' }) }}
+                        size="large">
+                        <MenuIcon />
+                    </IconButton>
+                }
             </DrawerHeader>
             <Divider variant="middle" />
             { /* 
