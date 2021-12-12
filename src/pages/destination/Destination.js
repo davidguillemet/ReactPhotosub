@@ -61,7 +61,7 @@ const NavigationItem = ({destination, type, caption}) => {
     return (
         <DestinationLink destination={destination}>
             <Paper
-                elevation={1}
+                elevation={2}
                 sx={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -70,7 +70,6 @@ const NavigationItem = ({destination, type, caption}) => {
                     width: "100%",
                     py: 1,
                     px: 1,
-                    borderRadius: 0,
                     borderStyle: "solid",
                     borderWidth: "1px",
                     borderColor: (theme) => theme.palette.grey[200]
@@ -81,8 +80,7 @@ const NavigationItem = ({destination, type, caption}) => {
                     <ArrowBackIosIcon sx={{
                             mx: 1,
                             fontSize: { xs: 20, md: 40},
-                            ml: 0,
-                            color: theme => theme.palette.text.disabled
+                            ml: 0
                         }}
                     />
                 }
@@ -92,7 +90,6 @@ const NavigationItem = ({destination, type, caption}) => {
                             my: 0,
                             fontWeight: "300",
                             textAlign: type,
-                            color: theme => theme.palette.text.disabled,
                             ...noWrapAndEllipsis
                         }}
                         variant={isMobile ? "h6" : "h4"}
@@ -112,8 +109,7 @@ const NavigationItem = ({destination, type, caption}) => {
                     <ArrowForwardIosIcon sx={{
                         mx: 1,
                         fontSize: { xs: 20, md: 40 },
-                        mr: 0,
-                        color: theme => theme.palette.text.disabled
+                        mr: 0
                     }} />
                 }
             </Paper>
