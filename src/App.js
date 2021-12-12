@@ -112,12 +112,17 @@ function HideOnScroll(props) {
 
 const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
 
+    const scrollTrigger = useScrollTrigger({
+        disableHysteresis: true,
+        threshold: 0
+    });
     const location = useLocation();
     const transparent = location.pathname === '/';
 
     return (
         <HideOnScroll>
         <AppBar
+            elevation={scrollTrigger ? 4 : 0}
             position="fixed"
             open={open}
             sx={{
