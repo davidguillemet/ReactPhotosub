@@ -1,9 +1,7 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {isMobile} from 'react-device-detect';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
 import DestinationsMap from '.';
 
 const LocationDialog = ({destinations, open, handleClose}) => {
@@ -29,12 +27,9 @@ const LocationDialog = ({destinations, open, handleClose}) => {
                 }}
             >
             { open &&
-                <DestinationsMap destinations={destinations} isFullScreen={true} />
+                <DestinationsMap destinations={destinations} isFullScreen={true} onClose={handleClose} />
             }
             </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose} variant="outlined" size={ isMobile ? "small" : "large"}>Fermer</Button>
-            </DialogActions>
         </Dialog>
     )
 }

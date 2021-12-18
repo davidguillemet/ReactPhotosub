@@ -9,6 +9,7 @@ import { useGlobalContext } from '../globalContext';
 import { formatDate, getThumbnailSrc } from '../../utils';
 import { DestinationPath } from '../../navigation/routes';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
 
@@ -22,7 +23,7 @@ const _defaultCenter = {
     lng: -40
 }
 
-const CustomFullScreen = ({destinations}) => {
+const CustomFullScreen = ({destinations, fullScreen, onClose}) => {
     const [locationOpen, setLocationOpen] = useState(false);
 
     const handleCloseLocation = useCallback(() => {
@@ -32,19 +33,23 @@ const CustomFullScreen = ({destinations}) => {
     const handleOpenLocation = () => {
         setLocationOpen(true);
     }
+
     return (
         <React.Fragment>
             <Fab
-                onClick={handleOpenLocation}
+                onClick={fullScreen ? onClose : handleOpenLocation}
                 size="medium"
-                color="primary"
                 sx={{
                     position: "absolute",
-                    top: 10,
-                    right: 10,
+                    top: 6,
+                    right: 6,
                 }}
             >
-                <FullscreenIcon fontSize="large"/>
+                {
+                    fullScreen ?
+                    <FullscreenExitIcon /> :
+                    <FullscreenIcon />
+                }
             </Fab>
             <LocationDialog
                 destinations={destinations}
@@ -55,7 +60,7 @@ const CustomFullScreen = ({destinations}) => {
     );
 }
 
-const DestinationsMap = ({destinations, isFullScreen = false}) => {
+const DestinationsMap = ({destinations, isFullScreen = false, onClose}) => {
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
@@ -249,7 +254,7 @@ const DestinationsMap = ({destinations, isFullScreen = false}) => {
         {
             /* GMAP Fullscreen tool is not supported on iOS */
             /* Then, in this case, we create a custom button that opens a fullscreen dialog */
-            isFullScreen === false && isIOS && <CustomFullScreen destinations={destinations} />
+            isIOS && <CustomFullScreen fullScreen={isFullScreen} onClose={onClose} destinations={destinations} />
         }       
         </Box>
     );
