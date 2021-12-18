@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Rnd } from "react-rnd";
 import { useEffect } from 'react';
 import { styled } from '@mui/material/styles';
@@ -16,7 +16,7 @@ const SimulationImage = ({image, selected, border, shadowFactor, dispatch, onCli
 
     const [position, setPosition] = useState(image.position);
     const [width, setWidth] = useState(image.width);
-    const [dragging, setDragging] = useState(false);
+    const dragging = useRef(false);
 
     useEffect(() => {
         setPosition(image.position);
@@ -27,14 +27,14 @@ const SimulationImage = ({image, selected, border, shadowFactor, dispatch, onCli
     }, [image.width]);
 
     const onDragStart = (event) => {
-        setDragging(true);
+        dragging.current = true;
     }
     const onDragStop = (event, data) => {
         dispatch(moveImage(image.id, data.y, data.x, simulationIndex))
-        if (dragging === false) {
+        if (dragging.current === false) {
             handleClick();
         } else {
-            setDragging(false);
+            dragging.current = false;
         }
     };
 
