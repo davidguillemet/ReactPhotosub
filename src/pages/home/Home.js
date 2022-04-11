@@ -7,9 +7,8 @@ import './styles.css';
 import { uniqueID, shuffleArray } from '../../utils';
 import { useGlobalContext } from '../../components/globalContext';
 import { useScrollBlock } from '../../utils';
-import { buildLoadingState, withLoading } from '../../components/loading';
 
-const _diaporamaInterval = 5000;
+const _diaporamaInterval = 6000;
 const _transitionDuration = 2000;
 
 const MainImageStyled = styled('img')({
@@ -39,10 +38,12 @@ const MainImage = ({images, currentImageIndex, handleImageLoaded}) => {
     )
 };
 
-const Home = withLoading(({images, currentIndex}) => {
+const Home = ({images, currentIndex}) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
+    const [initialTimeoutCommpleted, setinitialTimeoutCommpleted] = useState(false);
     const [blockScroll, allowScroll] = useScrollBlock();
     const diaporamaTimeoutRef = useRef(null);
+    const initialTimeout = useRef(null);
 
     useEffect(() => {
         blockScroll();
@@ -53,10 +54,25 @@ const Home = withLoading(({images, currentIndex}) => {
     }, []);
 
     useEffect(() => {
+        // Just create a first timeout to display the first image a few seconds...
+        initialTimeout.current = setTimeout(() => {
+            setinitialTimeoutCommpleted(true);
+        }, 3000);
+    }, []);
+
+    useEffect(() => {
         return () => {
             clearTimeout(diaporamaTimeoutRef.current);
         }
     }, []);
+
+    useEffect(() => {
+        // Just display the next image when all images are loaded and the first one
+        // has been displayed a few seconds
+        if (images !== null && initialTimeoutCommpleted === true) {
+            setCurrentImageIndex(prevIndex => prevIndex + 1);
+        }
+    }, [images, initialTimeoutCommpleted]);
 
     const handleNextImage = useCallback(() => {
         if (images === null) {
@@ -125,7 +141,7 @@ const Home = withLoading(({images, currentIndex}) => {
             </TransitionGroup>
         </React.Fragment>
     )
-}, [buildLoadingState("images", null)]);
+};
 
 const HomeController = () => {
     const context = useGlobalContext();
