@@ -4,6 +4,7 @@ import Container from '@mui/material/Container';
 import { Switch, Route, useHistory } from "react-router-dom";
 import { routes } from '../../navigation/routes';
 import { Loading } from '../../components/loading';
+import NotFound from '../../pages/notFound';
 
 const RouteComponent = ({route}) => {
     const Component = route.component;
@@ -53,15 +54,16 @@ const PageContent = ({onHistoryChanged}) => {
         >
             <Suspense fallback={<Loading />}>
                 <Switch>
-                {
-                    routes.map((route, index) => {
-                        return (
-                        <Route key={index} exact strict path={route.path}>
-                            <RouteComponent route={route} />
-                        </Route>
-                        );
-                    })
-                }
+                    {
+                        routes.map((route, index) => {
+                            return (
+                            <Route key={index} exact strict path={route.path}>
+                                <RouteComponent route={route} />
+                            </Route>
+                            );
+                        })
+                    }
+                    <Route path="*" component={NotFound} />
                 </Switch>
             </Suspense>
         </Container>

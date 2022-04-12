@@ -20,6 +20,7 @@ import { VerticalSpacing } from '../../template/spacing';
 import DestinationsMap from '../../components/map';
 import lazyComponent from '../../components/lazyComponent';
 import RelatedDestinations from './relatedDestinations';
+import NotFound from '../notFound';
 
 const RegionChip = ({region}) => {
 
@@ -230,8 +231,12 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
 const Destination = () => {
     const context = useGlobalContext();
     const { year, title } = useParams();
-    const { data } = context.useFetchDestinationHeader(year, title);
-    return <DestinationDisplay destination={data} year={year} title={title} />
+    const { data, isError} = context.useFetchDestinationHeader(year, title);
+    if (isError === true) {
+        return <NotFound />
+    } else {
+        return <DestinationDisplay destination={data} year={year} title={title} />
+    }
 };
 
 export default Destination;
