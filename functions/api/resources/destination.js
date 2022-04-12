@@ -1,8 +1,14 @@
 function convertPath(destination, config) {
     if (destination) {
         destination.cover = config.convertPathToUrl(destination.path + "/" + destination.cover);
-        convertPath(destination.next, config);
-        convertPath(destination.prev, config);
+        if (destination.next) {
+            convertPath(destination.next, config);
+        }
+        if (destination.prev) {
+            convertPath(destination.prev, config);
+        }
+    } else {
+        throw new Error("Unknown destination");
     }
 }
 
@@ -23,7 +29,7 @@ module.exports = function(config) {
                     convertPath(destination, config);
                     res.json(destination);
                 }).catch((err) => {
-                    config.logger.error(`Failed to load destination from path = ${getDestinationPath(req)}`, err);
+                    config.logger.error(`Failed to load destination from path = '${getDestinationPath(req)}':`, err);
                     res.status(500)
                         .send(`Failed to load destination from path = ${getDestinationPath(req)}`)
                         .end();
@@ -56,7 +62,7 @@ module.exports = function(config) {
                     convertPath(destination, config);
                     res.json(destination);
                 }).catch((err) => {
-                    config.logger.error(`Failed to load destination with id = ${req.params.id}`, err);
+                    config.logger.error(`Failed to load destination path = '${getDestinationPath(req)}':`, err);
                     res.status(500)
                         .send("Failed to load destination.")
                         .end();
