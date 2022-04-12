@@ -39,8 +39,12 @@ https://googleapis.dev/nodejs/storage/latest/
 gsutil cp -r "gs://photosub.appspot.com/2020/romblon" ./public/static-storage/2020
 
 // Insert new Destination
-insert into destinations (title, date, location, path, cover)
-VALUES ('Anilao', '2016-02-14', 3, '2016/anilao', 'DSC_6734.jpg')
+insert into destinations (title, date, location, path, cover, macro, wide)
+VALUES ('Anilao', '2016-02-14', 3, '2016/anilao', 'DSC_6734.jpg', true, false)
+
+// Insert new location
+insert into locations (title, region, latitude, longitude, link)
+VALUES ('Phocea Mexico', 1, 24.183915161569107, -110.30225921922795, 'https://myphocea.com/plongee-mexique')
 
 // Create destinations view with region path
 DROP VIEW IF EXISTS destinations_with_regionpath;
