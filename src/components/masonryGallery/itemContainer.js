@@ -40,7 +40,7 @@ const ItemContainer = ({item, index, top, left, width, height, renderItem, rende
                 maxWidth: width,
                 width: width,
                 height: height,
-                //opacity: 0
+                opacity: 0
             }}
         >
             { displayItem() }
