@@ -12,6 +12,13 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "redirects": [
+      {
+        "source" : "/images/phocagallery/:year*/:location*/:image*",
+        "destination": "https://storage.googleapis.com/photosub.appspot.com/legacy/:year/:location/:image",
+        "type": 301
+      }
+    ],
     "rewrites": [
       {
         "source": "/api/**",
