@@ -36,6 +36,11 @@ const _blurryFolder = "blurry";
 const _thumbsFolder = "thumbs";
 
 exports.deleteFile = function(file) {
+    if (isLegacyImage(file) === true) {
+        // nothing to do for a legacy image
+        return Promise.resolve();
+    }
+
     const promises = [];
 
     if (mustExtractExif(file)) {
@@ -67,12 +72,17 @@ exports.deleteFile = function(file) {
 };
 
 exports.newFile = function(file) {
+    if (isLegacyImage(file) === true) {
+        // nothing to do for a legacy image
+        logger.info(`legacy image ${file.name} is not processed.`);
+        return Promise.resolve();
+    }
     if (mustExtractExif(file) === false &&
         mustResizeImage(file) === false &&
         mustBlurImage(file) === false) {
         // nothing to do for a file tat is not an image or that is an interior image
         logger.info(`${file.name} is not processed.`);
-        return;
+        return Promise.resolve();
     }
 
     const storage = new Storage();
@@ -130,6 +140,10 @@ function mustBlurImage(file) {
 
 function isAnImage(file) {
     return file.contentType.startsWith("image/");
+}
+
+function isLegacyImage(file) {
+    return file.name.startsWith("legacy/");
 }
 
 function isInHomeSlideshow(file) {
