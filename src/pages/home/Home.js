@@ -38,7 +38,7 @@ const MainImage = ({images, currentImageIndex, handleImageLoaded}) => {
     )
 };
 
-const Home = ({images, currentIndex}) => {
+const Home = ({images, currentIndex, subscribeDrawer}) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
     const [initialTimeoutCommpleted, setinitialTimeoutCommpleted] = useState(false);
     const [blockScroll, allowScroll] = useScrollBlock();
@@ -85,6 +85,12 @@ const Home = ({images, currentIndex}) => {
         diaporamaTimeoutRef.current = setTimeout(handleNextImage, _diaporamaInterval);
     }, [handleNextImage]);
 
+    const stopSlideshow = useCallback(() => {
+        if (typeof diaporamaTimeoutRef.current === 'number') {
+            clearTimeout(diaporamaTimeoutRef.current);
+        }
+    }, []);
+
     const handleImageLoaded = useCallback((event) => {
         event.target.classList.add('loaded');
         nextImage();
@@ -95,9 +101,7 @@ const Home = ({images, currentIndex}) => {
             switch(document.visibilityState) {
                 case "hidden":
                     // Stop diaporama
-                    if (typeof diaporamaTimeoutRef.current === 'number') {
-                        clearTimeout(diaporamaTimeoutRef.current);
-                    }
+                    stopSlideshow()
                     break;
                 case "visible":
                     // Start Diaporama again
@@ -107,7 +111,21 @@ const Home = ({images, currentIndex}) => {
             }
         }
         document.addEventListener("visibilitychange", visibilityListener);
-    }, [nextImage]);
+    }, [nextImage, stopSlideshow]);
+
+    const onDrawerAction = useCallback((open) => {
+        if (open === true) {
+            // Stop slideshow
+            stopSlideshow();
+        } else {
+            // Start slideshow
+            nextImage();
+        }
+    }, [nextImage, stopSlideshow]);
+
+    useEffect(() => {
+        subscribeDrawer(onDrawerAction);
+    }, [subscribeDrawer, onDrawerAction]);
 
     return (
         <React.Fragment>
@@ -143,7 +161,7 @@ const Home = ({images, currentIndex}) => {
     )
 };
 
-const HomeController = () => {
+const HomeController = ({subscribeDrawer}) => {
     const context = useGlobalContext();
     const [images, setImages] = useState(null);
     const { data } = context.useFetchHomeSlideshow();
@@ -160,7 +178,7 @@ const HomeController = () => {
     }, [data]);
 
     return (
-        <Home images={images} currentIndex={-1} />
+        <Home images={images} currentIndex={-1} subscribeDrawer={subscribeDrawer} />
     )
 }
 

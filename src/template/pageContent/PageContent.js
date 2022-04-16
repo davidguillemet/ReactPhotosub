@@ -6,23 +6,23 @@ import { routes } from '../../navigation/routes';
 import { Loading } from '../../components/loading';
 import NotFound from '../../pages/notFound';
 
-const RouteComponent = ({route}) => {
+const RouteComponent = ({route, subscribeDrawer}) => {
     const Component = route.component;
     if (route.fullWidth) {
-        return <Component />
+        return <Component subscribeDrawer={subscribeDrawer} />
     } else {
         return (
             <Box sx={{
                 width: (theme) => theme.pageWidth.width,
                 maxWidth: (theme) => route.maxWidth || theme.pageWidth.maxWidth,
             }}>
-                <Component />
+                <Component subscribeDrawer={subscribeDrawer} />
             </Box>
         )
     }
 }
 
-const PageContent = ({onHistoryChanged}) => {
+const PageContent = ({onHistoryChanged, subscribeDrawer}) => {
     const history = useHistory();
 
     useEffect(() => history.listen(() => {
@@ -58,7 +58,7 @@ const PageContent = ({onHistoryChanged}) => {
                         routes.map((route, index) => {
                             return (
                             <Route key={index} exact strict path={route.path}>
-                                <RouteComponent route={route} />
+                                <RouteComponent route={route} subscribeDrawer={subscribeDrawer} />
                             </Route>
                             );
                         })

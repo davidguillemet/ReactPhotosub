@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import { isIOS } from 'react-device-detect'
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
@@ -151,6 +151,10 @@ const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
 
 const AppContent = (props) => {
 
+    const drawerSubscriptions = useRef([]);
+    const subscribeDrawer = useCallback((func) => {
+        drawerSubscriptions.current.push(func);
+    }, []);
     const location = useLocation();
     const isHomePage = location.pathname === '/';
 
@@ -158,10 +162,12 @@ const AppContent = (props) => {
 
     const handleDrawerOpen = () => {
         setOpen(true);
+        drawerSubscriptions.current.forEach(func => func(true));
     };
 
     const handleDrawerClose = () => {
         setOpen(false);
+        drawerSubscriptions.current.forEach(func => func(false));
     };
 
     const handleHistoryChanged = () => {
@@ -343,7 +349,7 @@ const AppContent = (props) => {
             >
                 <div id={scrollTopAnchor} />
                 <DrawerHeader />
-                <PageContent onHistoryChanged={handleHistoryChanged} />
+                <PageContent onHistoryChanged={handleHistoryChanged} subscribeDrawer={subscribeDrawer} />
                 <Footer />
             </Box>
 
