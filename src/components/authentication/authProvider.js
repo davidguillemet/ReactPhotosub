@@ -88,6 +88,7 @@ const AuthProvider = ({ children }) => {
     const [userContext, setUserContext] = useState({
         user: context.firebase.auth().currentUser,
         data: null,
+        admin: false,
         addUserFavorite: addUserFavorite,
         removeUserFavorite: removeUserFavorite,
         subscribeFavorites: subscribeFavorites,
@@ -105,12 +106,13 @@ const AuthProvider = ({ children }) => {
                 context.dataProvider.getUserData(user.uid) : // user is signed in
                 Promise.resolve(null);          // user is signed out
 
-            userdataPromise.then(() => {
+            userdataPromise.then((userData) => {
                 setUserContext(prevUserContext => {
                     return {
                         ...prevUserContext,
                         user: user,
-                        data: null
+                        data: null,
+                        admin: userData?.admin
                     };
                 });
             });

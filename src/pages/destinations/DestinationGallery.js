@@ -7,6 +7,9 @@ import Typography from '@mui/material/Typography';
 import { formatDateShort, getThumbnailSrc } from '../../utils';
 import DestinationLink from '../../components/destinationLink';
 import MasonryGallery from '../../components/masonryGallery';
+import { IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import { useAuthContext } from '../../components/authentication';
 
 const DestinationDetails = ({destination}) => {
     return (
@@ -45,6 +48,7 @@ const DestinationDetails = ({destination}) => {
 const DestinationContent = ({item, index, width, params}) => {
 
     const destination = item;
+    const authContext = useAuthContext();
 
     const container = useRef();
     const selector = gsap.utils.selector(container);
@@ -98,6 +102,12 @@ const DestinationContent = ({item, index, width, params}) => {
             >
                 <DestinationDetails destination={destination} />
             </Box>
+            {
+                authContext.admin === true &&
+                <IconButton sx={{position: "absolute", top: 0, right: 0}} aria-label="edit">
+                    <EditIcon sx={{color: "white"}}/>
+                </IconButton>
+            }
         </DestinationLink>
         </Box>
     );

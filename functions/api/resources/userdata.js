@@ -5,13 +5,14 @@ module.exports = function(config) {
             try {
                 // get only favorite identifiers for the current user
                 // -> we will fetch simulations on demand
-                const dataArray = await config.pool("user_data").select("favorites").where("uid", req.params.uid);
+                const dataArray = await config.pool("user_data").select("favorites", "admin").where("uid", req.params.uid);
                 let data = null;
                 if (dataArray.length === 0) {
                     // No entry for current user yet.
                     // insert an empty one
                     data = {
                         uid: req.params.uid,
+                        admin: false,
                         favorites: [], // favorites is an array field that we initialize with an empty array
                         simulations: "[]", // simulations is a jsonb field that we initialize with an empty array
                     };
