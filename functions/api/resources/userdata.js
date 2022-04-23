@@ -37,7 +37,7 @@ module.exports = function(config) {
                         // No entry for current user yet.
                         // insert an empty one
                         data = {
-                            uid: req.params.uid,
+                            uid: uid,
                             favorites: [], // favorites is an array field that we initialize with an empty array
                             simulations: "[]", // simulations is a jsonb field that we initialize with an empty array
                         };
