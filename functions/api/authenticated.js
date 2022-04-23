@@ -20,7 +20,7 @@ async function isAuthenticated(request, response, next) {
 
     try {
         const decodedToken = await admin.auth().verifyIdToken(token);
-        response.locals = {...response.locals, uid: decodedToken.uid, role: decodedToken.role, email: decodedToken.email};
+        response.locals = {...response.locals, uid: decodedToken.uid, roles: decodedToken.roles, email: decodedToken.email};
         return next();
     } catch (err) {
         console.error(`${err.code} -  ${err.message}`);
@@ -28,4 +28,29 @@ async function isAuthenticated(request, response, next) {
     }
 }
 
-module.exports = isAuthenticated;
+function isAuthorized(requiredRoles) {
+    return async (request, response, next) => {
+        const {roles} = response.locals;
+        if (!roles) {
+            return response.status(403).send({message: "No Role assigned", locals: response.locals});
+        }
+
+        let allRoles = true;
+        requiredRoles.forEach((requiredRole) => {
+            if (!roles.includes(requiredRole)) {
+                allRoles = false;
+            }
+        });
+
+        if (allRoles === true) {
+            return next();
+        }
+
+        return response.status(403).send({message: "All required roles are not assigned"});
+    };
+}
+
+module.exports = {
+    isAuthenticated,
+    isAuthorized,
+};

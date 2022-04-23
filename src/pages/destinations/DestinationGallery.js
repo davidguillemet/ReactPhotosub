@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import {isMobile} from 'react-device-detect';
 import { gsap } from "gsap";
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Chip from "@mui/material/Chip";
 import Typography from '@mui/material/Typography';
 import { formatDateShort, getThumbnailSrc } from '../../utils';
@@ -9,7 +10,12 @@ import DestinationLink from '../../components/destinationLink';
 import MasonryGallery from '../../components/masonryGallery';
 import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useAuthContext } from '../../components/authentication';
+import EditDestinationDialog from './EditDestinationDialog';
+import {unstable_batchedUpdates} from 'react-dom';
+import { useGlobalContext } from '../../components/globalContext';
 
 const DestinationDetails = ({destination}) => {
     return (
@@ -49,6 +55,7 @@ const DestinationContent = ({item, index, width, params}) => {
 
     const destination = item;
     const authContext = useAuthContext();
+    const { onEdit, onDelete } = params;
 
     const container = useRef();
     const selector = gsap.utils.selector(container);
@@ -63,6 +70,14 @@ const DestinationContent = ({item, index, width, params}) => {
         gsap.to(selector(".image"), { scale: 1, ease: "bounce.out" });
     };
 
+    const onEditDestination = () => {
+        onEdit(destination);
+    }
+
+    const onDeleteDestination = () => {
+        onDelete(destination);
+    }
+
     return (
         <Box
             ref={container}
@@ -76,52 +91,107 @@ const DestinationContent = ({item, index, width, params}) => {
             onMouseEnter={isMobile ? null : onMouseEnter}
             onMouseLeave={isMobile ? null : onMouseLeave}
         >
-        <DestinationLink destination={destination}>
-            <img
-                className="image"
-                src={getThumbnailSrc(destination.cover, width)}
-                alt={destination.title}
-                style={{
-                    height: '100%',
-                    width: '100%',
-                }}
-            />
-            <Box
-                sx={{
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-                    position: 'absolute',
-                    height: 'auto',
-                    paddingBottom: '5px',
-                    bottom: isMobile ? '0px' : '-30px',
-                    color: 'white'
-                }}
-                className="details"
-            >
-                <DestinationDetails destination={destination} />
-            </Box>
+            <DestinationLink destination={destination}>
+                <img
+                    className="image"
+                    src={getThumbnailSrc(destination.cover, width)}
+                    alt={destination.title}
+                    style={{
+                        height: '100%',
+                        width: '100%',
+                    }}
+                />
+                <Box
+                    sx={{
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+                        position: 'absolute',
+                        height: 'auto',
+                        paddingBottom: '5px',
+                        bottom: isMobile ? '0px' : '-30px',
+                        color: 'white'
+                    }}
+                    className="details"
+                >
+                    <DestinationDetails destination={destination} />
+                </Box>
+            </DestinationLink>
             {
                 authContext.admin === true &&
-                <IconButton sx={{position: "absolute", top: 0, right: 0}} aria-label="edit">
-                    <EditIcon sx={{color: "white"}}/>
-                </IconButton>
+                <Stack direction="row" sx={{position: "absolute", top: 0, right: 0}}>
+                    <IconButton aria-label="edit" onClick={onEditDestination}>
+                        <EditIcon sx={{color: "white"}}/>
+                    </IconButton>
+                    <IconButton aria-label="remove" onClick={onDeleteDestination}>
+                        <DeleteIcon sx={{color: "white"}}/>
+                    </IconButton>
+                </Stack>
             }
-        </DestinationLink>
         </Box>
     );
 }
 
 const DestinationGallery = ({destinations}) => {
 
+    const context = useGlobalContext();
+    const authContext = useAuthContext();
+    const deleteDestinationMutation = context.useDeleteDestination();
+
+    const [editIsOpen, setEditIsOpen] = React.useState(false);
+    const [destinationToEdit, setDestinationToEdit] = React.useState(null);
+
+    const onEditDestination = (destination) => {
+        unstable_batchedUpdates(() => {
+            setEditIsOpen(true);
+            setDestinationToEdit(destination);
+        });
+    }
+
+    const onNewDestination = () => {
+        unstable_batchedUpdates(() => {
+            setEditIsOpen(true);
+            setDestinationToEdit(null);
+        });
+    }
+
+    const onDeleteDestination = (destination) => {
+        deleteDestinationMutation.mutateAsync(destination);
+    }
+
+    const onCloseDestinationEditor = () => {
+        unstable_batchedUpdates(() => {
+            setEditIsOpen(false);
+            setDestinationToEdit(null);
+        });
+    };
+
     return (
-        <MasonryGallery
-            items={destinations}
-            colWidth={350}
-            heightProvider={(item, itemWidth) => itemWidth / (600/400)} // We could get the cover ratio with a join in the SQL query
-            renderComponent={DestinationContent}
-        />
+        <React.Fragment>
+            {
+                authContext.admin === true &&
+                <IconButton aria-label="new" size="large" onClick={onNewDestination}>
+                    <AddCircleOutlineIcon fontSize="large" />
+                </IconButton>
+            }
+
+            <MasonryGallery
+                items={destinations}
+                colWidth={350}
+                heightProvider={(item, itemWidth) => itemWidth / (600/400)} // We could get the cover ratio with a join in the SQL query
+                renderComponent={DestinationContent}
+                renderExtraParams={{
+                    onEdit: onEditDestination,
+                    onDelete: onDeleteDestination
+                }}
+            />
+            <EditDestinationDialog
+                open={editIsOpen}
+                destination={destinationToEdit}
+                onClose={onCloseDestinationEditor}
+            />
+        </React.Fragment>
     )
 }
 

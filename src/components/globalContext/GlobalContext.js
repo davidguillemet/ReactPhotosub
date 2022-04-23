@@ -47,8 +47,9 @@ const GlobalContextProvider = ({children}) => {
         
         // configure axios to send an authentication token as soon as a user is connected
         axiosInstance.interceptors.request.use(async function (config) {
-            if (firebase.auth().currentUser) {
-                const token = await firebase.auth().currentUser.getIdToken(false);
+            const currentUSer = firebase.auth().currentUser;
+            if (currentUSer) {
+                const token = await currentUSer.getIdToken(false);
                 config.headers.Authorization = `Bearer ${token}`;
             }
             return config;
@@ -59,10 +60,28 @@ const GlobalContextProvider = ({children}) => {
         globalContext.current = {
             firebase,
             dataProvider,
+            queryClient,
             useFetchHomeSlideshow: () => useQuery('homeslideshow', () => dataProvider.getImageDefaultSelection()),
             useFetchLocations: (enabled) => useQuery('locations', () => dataProvider.getLocations(), { enabled: enabled }), 
             useFetchRegions: () => useQuery('regions', () => dataProvider.getRegions()),
             useFetchDestinations: () => useQuery('destinations', () => dataProvider.getDestinations()),
+            useAddDestination: () => useMutation((destination) => dataProvider.createDestination(destination), {
+                onSuccess: (data) => {
+                    queryClient.setQueryData(['destinations'], data)
+                }
+            }),
+            useDeleteDestination: () => useMutation((destination) => dataProvider.deleteDestination(destination.id), {
+                onSuccess: ({id}) => {
+                    const prevDestinations = queryClient.getQueryData(['destinations']);
+                    const newDestinations = prevDestinations.filter(d => d.id !== id);
+                    queryClient.setQueryData(['destinations'], newDestinations);
+                }
+            }),
+            useUpdateDestination: () => useMutation((destination) => dataProvider.updateDestination(destination), {
+                onSuccess: ({data}) => {
+                    queryClient.setQueryData(['destinations'], data)
+                }
+            }),
             useFetchRelatedDestinations: (regions, macro, wide) => useQuery(['related', ...regions, macro, wide], () => dataProvider.getRelatedDestinations(regions, macro, wide)),
             useFetchDestinationDesc: (year, title) => useQuery(['destinationdesc', year, title], () => dataProvider.getDestinationDescFromPath(year, title)),
             useFetchDestinationHeader: (year, title) => useQuery(['destinationheader', year, title], () => dataProvider.getDestinationDetailsFromPath(year, title)),
@@ -95,7 +114,9 @@ const GlobalContextProvider = ({children}) => {
 
             useFetchFavorites: (uid, enabled, thenFunc) => useQuery(['favorites', uid], () => dataProvider.getFavorites(uid).then(thenFunc), { enabled: enabled }),
             useAddFavorite: () => useMutation((pathArray) => dataProvider.addFavorite(pathArray)),
-            useRemoveFavorite: () => useMutation((path) => dataProvider.removeFavorite(path))
+            useRemoveFavorite: () => useMutation((path) => dataProvider.removeFavorite(path)),
+
+            useFetchImageFolders: () => useQuery(['imageFolders'], () => dataProvider.getImageFolders())
         }
     }
 

@@ -72,20 +72,21 @@ module.exports = function(config) {
     // Get images for a specific destination from identifier
     config.app.route("/destination/:year/:title/images")
         .get(function(req, res, next) {
-            config.pool({i: "images"}).select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio", "i.create").join("destinations", {
-                "destinations.path": config.pool().raw("?", [getDestinationPath(req)]),
-                "i.path": "destinations.path",
-            }).orderBy("i.create", "asc").then((images) => {
-                images.forEach((image) => {
-                    // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
-                    image.src = config.convertPathToUrl(image.path + "/" + image.name);
+            config.pool({i: "images"})
+                .select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio", "i.create")
+                .where("i.path", getDestinationPath(req))
+                .orderBy("i.create", "asc")
+                .then((images) => {
+                    images.forEach((image) => {
+                        // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
+                        image.src = config.convertPathToUrl(image.path + "/" + image.name);
+                    });
+                    res.json(images);
+                }).catch((err) => {
+                    config.logger.error(`Failed to load destination with id = ${req.params.id}`, err);
+                    res.status(500)
+                        .send("Failed to load destination.")
+                        .end();
                 });
-                res.json(images);
-            }).catch((err) => {
-                config.logger.error(`Failed to load destination with id = ${req.params.id}`, err);
-                res.status(500)
-                    .send("Failed to load destination.")
-                    .end();
-            });
         });
 };

@@ -73,8 +73,26 @@ DataProvider.prototype.getDestinationImagesFromPath = function(year, title) {
     return this.getDestinationProps(year, title, "images");
 };
 
-DataProvider.prototype.getUserData = function(uid) {
-    return this.axios.get(`/userdata/${uid}`)
+DataProvider.prototype.updateDestination = function(destination) {
+    return this.axios.put('/admin/destinations', destination);
+}
+
+DataProvider.prototype.createDestination = function(destination) {
+    return this.axios.post('/admin/destinations', destination)
+    .then(response => {
+        return response.data; // contains the new destination
+    });
+}
+
+DataProvider.prototype.deleteDestination = function(destinationId) {
+    return this.axios.delete('/admin/destinations', {data: { id: destinationId } })
+    .then(response => {
+        return response.data; // contains the new destination
+    });
+}
+
+DataProvider.prototype.getUserData = function() {
+    return this.axios.get(`/userdata`)
     .then(response => {
         return response.data;
     });
@@ -95,6 +113,8 @@ DataProvider.prototype.removeFavorite = function(path) {
 };
 
 DataProvider.prototype.getFavorites = function(uid) {
+    // NOTE: this request shoudl not be triggered...
+    // the query data is initialized when getting user data at login time
     if (uid === null) {
         return Promise.resolve([]);
     }
@@ -201,6 +221,13 @@ DataProvider.prototype.sendMessage = function(messageProperties) {
     return this.axios.post('/message', {
         ...messageProperties
     }).then(response => {
+        return response.data;
+    })
+}
+
+DataProvider.prototype.getImageFolders = function() {
+    return this.axios.get('/images/folders')
+    .then(response => {
         return response.data;
     })
 }

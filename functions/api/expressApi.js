@@ -6,7 +6,7 @@ require("dotenv").config();
 const express = require("express");
 const {logger/* , makeExpressLoggerMiddleware */} = require("../utils/logger");
 const {convertPathToUrl, bucket, settings} = require("../utils/firebase");
-const isAuthenticated = require("./authenticated");
+const {isAuthenticated, isAuthorized} = require("./authenticated");
 const cors = require("cors");
 
 // Get a connection pool for postgreSql
@@ -40,6 +40,7 @@ const resourceConfiguration = {
     settings,
     logger,
     isAuthenticated,
+    isAuthorized,
 };
 
 require("./resources/destinations")(resourceConfiguration);

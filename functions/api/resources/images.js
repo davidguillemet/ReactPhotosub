@@ -1,4 +1,22 @@
 module.exports = function(config) {
+    config.app.route("/images/folders")
+        .get(function(req, res, next) {
+            // select distinct path
+            // from images
+            // where path not in (select distinct path from destinations)
+            config.pool("images")
+                .distinct("path")
+                .orderBy("path", "asc")
+                .then((result) => {
+                    res.json(result);
+                }).catch((err) => {
+                    config.logger.error("Failed to get image folders.", err);
+                    res.status(500)
+                        .send("Unable to get image folders.")
+                        .end();
+                });
+        });
+
     // Get number of images
     config.app.route("/images")
         .get(function(req, res, next) {

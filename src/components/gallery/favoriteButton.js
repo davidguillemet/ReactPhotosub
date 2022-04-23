@@ -17,7 +17,7 @@ const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
     const [ updating, setUpdating ] = useState(false);
 
     // TODO: create isInfavorites() method in authContext
-    const isInFavorites = useMemo(() => authContext.data && authContext.data.favorites.has(path), [authContext.data, path]);
+    const isInFavorites = useMemo(() => authContext.data?.favorites && authContext.data.favorites.has(path), [authContext.data, path]);
 
     function handleFavoriteClick() {
         setUpdating(true);
