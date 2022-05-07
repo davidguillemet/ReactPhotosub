@@ -1,7 +1,7 @@
 import React from 'react';
 
 const AuthContext = React.createContext({
-    user: null,
+    user: undefined,
     data: null,
     admin: false
 });

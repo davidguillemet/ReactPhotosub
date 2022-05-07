@@ -49,30 +49,33 @@ module.exports = function(config) {
                             image.src = config.convertPathToUrl(image.path + "/" + image.name);
                         });
                     }
-                    return res.json(data);
+                    res.json(data);
                 }).catch((err) => {
                     config.logger.error(`Failed to load user data for uid ${uid}.`, err);
-                    res.status(500)
-                        .send(`Unable to load user data for uid ${uid}.`)
-                        .end();
+                    res.status(500).send({error: err}).end();
                 });
         });
 
     config.app.route("/userdata")
         .delete(async function(req, res, next) {
-        // {
-        //     uid: "xxxxxxxxxx",
-        //     displayName: "cccccccc"
-        // }
+            // {
+            //     uid: "xxxxxxxxxx",
+            //     displayName: "cccccccc"
+            // }
+            // 1. Delete uploaded interiors
             const userInfo = req.body;
-            try {
-                await config.pool("user_data").where({
+            config.bucket.deleteFiles({
+                prefix: `userUpload/${userInfo.uid}`,
+                delimiter: "/",
+            }).then((filesResponse) => {
+                return config.pool("user_data").where({
                     uid: userInfo.uid,
                 }).delete();
+            }).then(() => {
                 res.status(200).send(`Successfully deleting data for user ${userInfo.displayName}.`).end();
-            } catch (err) {
+            }).catch((err) => {
                 config.logger.error(`Failed to remove data for user ${userInfo.displayName}.`, err);
                 res.status(500).send(`Error while deleting data for user ${userInfo.displayName}.`).end();
-            }
+            });
         });
 };

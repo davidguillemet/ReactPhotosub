@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import Alert from '@mui/material/Alert';
 import { Grow, Snackbar } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import IconButton from '@mui/material/IconButton';
@@ -8,9 +7,8 @@ import UndoIcon from '@mui/icons-material/Undo';
 import { useAuthContext } from '../../components/authentication';
 import Gallery from '../../components/gallery';
 import { PageTitle, PageSubTitle } from '../../template/pageTypography';
-import { VerticalSpacing } from '../../template/spacing';
 import { useGlobalContext } from '../../components/globalContext';
-import { withLoading, buildLoadingState } from '../../components/loading';
+import { withLoading, buildLoadingState, withUser } from '../../components/hoc';
 
 const MySelectionContent = withLoading(({images}) => {
     return (
@@ -24,7 +22,7 @@ const MySelectionContent = withLoading(({images}) => {
     );
 }, [ buildLoadingState("images", [null, undefined]) ]);
 
-const MySelection = () => {
+const MySelection = withUser(() => {
 
     const context = useGlobalContext();
     const authContext = useAuthContext();
@@ -106,12 +104,7 @@ const MySelection = () => {
     return (
         <React.Fragment>
             <PageTitle>Ma Sélection</PageTitle>
-            <VerticalSpacing factor={1} />
-            {
-                authContext.user === null ?
-                <Alert severity="warning" elevation={4} variant="filled">Cette page n'est accessible qu'aux utilisateurs connectés</Alert> :
-                <MySelectionContent images={images}></MySelectionContent>
-            }
+            <MySelectionContent images={images}></MySelectionContent>
             {
                 removedFavorites.length > 0 && 
                 <Snackbar
@@ -124,6 +117,6 @@ const MySelection = () => {
 
         </React.Fragment>
     );
-}
+});
 
 export default MySelection;

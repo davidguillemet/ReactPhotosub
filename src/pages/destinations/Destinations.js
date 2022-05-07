@@ -14,7 +14,7 @@ import DestinationsMap from '../../components/map';
 import RegionFilter from './RegionFilter';
 import { useGlobalContext } from '../../components/globalContext';
 import DestinationGallery from './DestinationGallery';
-import { buildLoadingState, withLoading } from '../../components/loading';
+import { buildLoadingState, withLoading } from '../../components/hoc';
 import { isMobile } from 'react-device-detect';
 
 const useStyles = makeStyles(() => ({

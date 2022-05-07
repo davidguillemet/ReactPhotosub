@@ -1,7 +1,7 @@
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { useGlobalContext } from '../globalContext';
 import './firebaseui.css';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Divider from '@mui/material/Divider';
 import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
@@ -22,6 +22,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import { useAuthContext } from '../authentication';
 import { routes, NavigationLink } from '../../navigation/routes';
+import { Loading } from '../hoc';
 
 const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => (
     <IconButton
@@ -47,10 +48,21 @@ const NotSignedInButton = ({handleSignIn}) => {
     );
 };
 
-const SignedInButton = ({user, handleLogout}) => {
+const SignedInButton = ({handleLogout}) => {
 
+    const authContext = useAuthContext();
+    const [userDisplayName, setUserDisplayName] = React.useState(authContext.user.displayName);
     const [menuOpen, setMenuOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
+
+    const onUserUpdated = useCallback(() => {
+        setUserDisplayName(authContext.user.displayName);
+    }, [authContext.user]);
+
+    useEffect(() => {
+        const unregisterUserObserver = authContext.registerUserObserver(onUserUpdated);
+        return () => unregisterUserObserver();
+    }, [onUserUpdated, authContext]);
 
     const handleToggle = () => {
         setMenuOpen((prevOpen) => !prevOpen);
@@ -82,7 +94,7 @@ const SignedInButton = ({user, handleLogout}) => {
                 ref={anchorRef}
                 variant="outlined"
                 avatar={<AccountCircleOutlinedIcon />}
-                label={user.displayName}
+                label={userDisplayName}
                 onClick={handleToggle}
                 deleteIcon={<MoreVertIcon />}
                 onDelete={handleToggle}
@@ -146,18 +158,18 @@ const FirebaseAuth = (props) => {
 
     // Listen to the Firebase Auth state and set the local state.
     useEffect(() => {
-        const unregisterAuthObserver = context.firebase.auth().onAuthStateChanged(newUser => {
+        const unregisterAuthObserver = context.firebaseAuth.onAuthStateChanged(newUser => {
             setIsLogin(false);
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-    }, [context.firebase]);
+    }, [context.firebaseAuth]);
 
     function handleSignIn(event) {
         setIsLogin(true);
     }
 
     function logout() {
-        context.firebase.auth().signOut();
+        context.firebaseAuth.signOut();
     }
 
     function onCloseModal() {
@@ -183,9 +195,11 @@ const FirebaseAuth = (props) => {
     return (
         <React.Fragment>
             {
+                authContext.user === undefined ?
+                <Loading size={20}/> :
                 authContext.user === null ?
                 <NotSignedInButton handleSignIn={handleSignIn} /> :
-                <SignedInButton user={authContext.user} handleLogout={logout}/>
+                <SignedInButton  handleLogout={logout}/>
             }
 
             <Modal
@@ -201,7 +215,7 @@ const FirebaseAuth = (props) => {
             >
                 <Fade in={isLogin}>
                     <div style={{display: 'flex', flex: 1}}>
-                        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={context.firebase.auth()} />
+                        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={context.firebaseAuth} />
                     </div>
                 </Fade>
             </Modal>

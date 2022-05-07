@@ -15,7 +15,7 @@ const createUnixSocketPool = (config) => {
         connection.host = configFunctions.postgresql.host;
         connection.port = configFunctions.postgresql.port;
 
-        if (configFunctions.env === "remote-dev") {
+        /* if (configFunctions.env === "remote-dev") {
             // Connect to Google Cloud instance from local env
             const fs = require("fs");
             const pathToCertificates = __dirname + "/../../../gcp/postgresql/";
@@ -25,7 +25,7 @@ const createUnixSocketPool = (config) => {
                 key: fs.readFileSync(pathToCertificates + "client-key.pem"),
                 cert: fs.readFileSync(pathToCertificates + "client-cert.pem"),
             };
-        }
+        } */
     } else {
         connection.host = `/cloudsql/photosub:${configFunctions.postgresql.region}:${configFunctions.postgresql.instance}`;
     }

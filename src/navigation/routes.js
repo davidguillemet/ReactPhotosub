@@ -6,6 +6,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import SvgIcon from '@mui/material/SvgIcon';
 
 import { styled } from '@mui/material/styles';
@@ -20,6 +21,7 @@ const SimulationManager = lazy(() => import("../pages/simulation"));
 const About = lazy(() => import("../pages/about"));
 const Contact = lazy(() => import("../pages/contact"));
 const MySelection = lazy(() => import("../pages/favorites"));
+const MyProfile = lazy(() => import("../pages/profile"));
 
 export const HomePath = "/";
 export const DestinationsPath = "/destinations";
@@ -29,6 +31,7 @@ export const SimulationPath = "/composition";
 export const AboutPath = "/about";
 export const ContactPath = "/contact";
 export const FavoritesPath = "/favorites";
+export const ProfilPath = "/profil";
 export const DestinationPath = "/destinations/:year/:title";
 
 export const routes = [
@@ -98,6 +101,14 @@ export const routes = [
         icon: <FavoriteIcon fontSize="small" />,
         private: true,
         fullWidth: true
+    },
+    {
+        label: "Mon Profil",
+        path: ProfilPath,
+        component: MyProfile,
+        icon: <AccountBoxIcon fontSize="small" />,
+        private: true,
+        fullWidth: false
     },
     // Sub-pages, not directly accessible (for Router Switch) (private and sidebar are undefined)
     {

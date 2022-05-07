@@ -4,6 +4,7 @@
 require("dotenv").config();
 
 const express = require("express");
+const compression = require("compression");
 const {logger/* , makeExpressLoggerMiddleware */} = require("../utils/logger");
 const {convertPathToUrl, bucket, settings} = require("../utils/firebase");
 const {isAuthenticated, isAuthorized} = require("./authenticated");
@@ -22,6 +23,8 @@ const {pool} = require("../utils/pool-postgresql");
 const app = express();
 
 // app.use(mw);
+
+app.use(compression());
 
 // support parsing of application/json type post data
 app.use(express.json());
@@ -55,6 +58,7 @@ require("./resources/bucket")(resourceConfiguration);
 require("./resources/uploadedInteriors")(resourceConfiguration);
 require("./resources/search")(resourceConfiguration);
 require("./resources/message")(resourceConfiguration);
+require("./resources/user")(resourceConfiguration);
 
 app.get("/status", (req, res) => res.send("Working!"));
 
@@ -62,7 +66,7 @@ app.get("/status", (req, res) => res.send("Working!"));
 // just add a try/catch in a route handler and call next in a promise catch statement:
 // promise.then((...) => { ... }).catch(next);
 // -> https://www.robinwieruch.de/node-express-error-handling
-// be cacthed here and we will send an internal server error http 500
+// be catch here and we will send an internal server error http 500
 // response with the error message as the response body
 app.use((error, req, res, next) => {
     return res.status(500).json({error: error.toString()});

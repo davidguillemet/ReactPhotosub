@@ -16,6 +16,7 @@ import { useAuthContext } from '../../components/authentication';
 import EditDestinationDialog from './EditDestinationDialog';
 import {unstable_batchedUpdates} from 'react-dom';
 import { useGlobalContext } from '../../components/globalContext';
+import ConfirmDialog from '../../dialogs/ConfirmDialog';
 
 const DestinationDetails = ({destination}) => {
     return (
@@ -140,6 +141,7 @@ const DestinationGallery = ({destinations}) => {
     const deleteDestinationMutation = context.useDeleteDestination();
 
     const [editIsOpen, setEditIsOpen] = React.useState(false);
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
     const [destinationToEdit, setDestinationToEdit] = React.useState(null);
 
     const onEditDestination = (destination) => {
@@ -156,8 +158,15 @@ const DestinationGallery = ({destinations}) => {
         });
     }
 
-    const onDeleteDestination = (destination) => {
-        deleteDestinationMutation.mutateAsync(destination);
+    const onDeleteDestination = () => {
+        return deleteDestinationMutation.mutateAsync(destinationToEdit);
+    }
+
+    const onClickDeleteDestination = (destination) => {
+        unstable_batchedUpdates(() => {
+            setConfirmDeleteOpen(true);
+            setDestinationToEdit(destination);
+        })
     }
 
     const onCloseDestinationEditor = () => {
@@ -183,13 +192,23 @@ const DestinationGallery = ({destinations}) => {
                 renderComponent={DestinationContent}
                 renderExtraParams={{
                     onEdit: onEditDestination,
-                    onDelete: onDeleteDestination
+                    onDelete: onClickDeleteDestination
                 }}
             />
             <EditDestinationDialog
                 open={editIsOpen}
                 destination={destinationToEdit}
                 onClose={onCloseDestinationEditor}
+            />
+            <ConfirmDialog
+                open={confirmDeleteOpen}
+                onOpenChanged={setConfirmDeleteOpen}
+                onValidate={onDeleteDestination}
+                title="Supprimer la destination"
+                dialogContent={[
+                    `Confirmez-vous la supression de la destination '${destinationToEdit?.title}'?`,
+                    'Attention, cette action est irreversible.'
+                ]}
             />
         </React.Fragment>
     )

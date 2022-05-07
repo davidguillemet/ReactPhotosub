@@ -20,6 +20,10 @@ const GlobalContextProvider = ({children}) => {
     const globalContext = useRef(null);
     const queryClient = useQueryClient();
 
+    const isDev = () => {
+        return process.env.NODE_ENV === "development"
+    }
+
     // With React.StrictMode - to detet issues - it seems the App is rendered twice
     // but the globalContent ref is lost since it is not the same App instn-ance
     if (!firebase.apps.length) {
@@ -35,6 +39,12 @@ const GlobalContextProvider = ({children}) => {
     }
 
     if (globalContext.current === null) {
+
+        const firebaseAuth = firebase.auth();
+        if (isDev()) {
+            firebaseAuth.useEmulator("http://localhost:9099");
+        }
+
         const apiBaseUrl =
             process.env.REACT_APP_USE_FUNCTIONS_EMULATOR === 'true' ?
             'http://localhost:5003/photosub/us-central1/mainapi':
@@ -42,23 +52,36 @@ const GlobalContextProvider = ({children}) => {
 
         const axiosInstance = axios.create({
             baseURL: apiBaseUrl + '/api',
-            timeout: 10000,
+            timeout: isDev() ? 1200000 /* 20mn in case of debug */ : 10000 /* 10s */,
         });
-        
+
         // configure axios to send an authentication token as soon as a user is connected
         axiosInstance.interceptors.request.use(async function (config) {
-            const currentUSer = firebase.auth().currentUser;
+            const currentUSer = firebaseAuth.currentUser;
             if (currentUSer) {
-                const token = await currentUSer.getIdToken(false);
+                const token = await currentUSer.getIdToken(true);
                 config.headers.Authorization = `Bearer ${token}`;
             }
             return config;
         });
 
+        // Error handling interceptor
+        axiosInstance.interceptors.response.use(
+            res => res,
+            err => {
+                if (err.response && err.response.status === 500 && err.response.data?.error) {
+                    // response content should look like { error: { code: "...", message: "..." } }
+                    throw new Error(err.response.data.error.message, { cause: err.response.data?.error });
+                }
+                throw err;
+            }
+        );
+
         const dataProvider = new DataProvider(axiosInstance);
 
         globalContext.current = {
             firebase,
+            firebaseAuth,
             dataProvider,
             queryClient,
             useFetchHomeSlideshow: () => useQuery('homeslideshow', () => dataProvider.getImageDefaultSelection()),

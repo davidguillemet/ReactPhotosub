@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import {unstable_batchedUpdates} from 'react-dom';
 import Stack from '@mui/material/Stack';
 import ReCAPTCHA from 'react-google-recaptcha';
 import FormField from './FormField';
@@ -13,6 +14,17 @@ export const FIELD_TYPE_EMAIL = 'email';
 export const FIELD_TYPE_SWITCH = 'switch';
 export const FIELD_TYPE_DATE = 'date';
 export const FIELD_TYPE_SELECT = 'select';
+export const FIELD_TYPE_CHECK_BOX = 'checkbox';
+export const FIELD_TYPE_PASSWORD = 'password';
+
+const getValuesFromFields = (fields, initialValues) => {
+    return fields.reduce((values, field) => {
+        return {
+            ...values,
+            [field.id]: initialValues ? initialValues[field.id] : field.default
+        }
+    }, {/* empty map */})
+}
 
 const Form = ({
     fields,
@@ -20,21 +32,24 @@ const Form = ({
     submitAction,
     useCaptcha = false,
     onCancel = null,
-    submitCaption = "Envoyer"}) => {
+    submitCaption = "Envoyer",
+    validationMessage = "Les modifications ont été enregistrées avec succès.",
+    readOnly = false}) => {
 
-    const [values, setValues] = React.useState(fields.reduce((values, field) => {
-        return {
-            ...values,
-            [field.id]: initialValues ? initialValues[field.id] : field.default
-        }
-    }, {/* empty map */}));
+    const [values, setValues] = React.useState(() => getValuesFromFields(fields, initialValues));
+
+    useEffect(() => {
+        setValues(getValuesFromFields(fields, initialValues));
+    }, [fields, initialValues]);
 
     const [sending, setSending] = React.useState(false);
     const [isValid, setIsValid] = React.useState(false);
+    const [isDirty, setIsDirty] = React.useState(false);
 
     const [result, setResult] = React.useState({
         status: 'success',
-        message: null
+        message: null,
+        key: null // uniqueID()
     })
 
     const onCaptchaChange = React.useCallback((value) => {
@@ -74,19 +89,19 @@ const Form = ({
         field.isDirty = true;
 
         let fieldValue = null;
-        if (field.type === FIELD_TYPE_SWITCH) {
+        if (field.type === FIELD_TYPE_SWITCH || field.type === FIELD_TYPE_CHECK_BOX) {
             fieldValue = event.target.checked;
         } else {
             fieldValue = event.target.value;
             if (typeof fieldValue === "string") {
                 fieldValue = fieldValue.trim();
                 if (field.type === FIELD_TYPE_EMAIL) {
-                    field.error = !validateEmail(fieldValue);
+                    field.error = (field.required || fieldValue.length === 0) && !validateEmail(fieldValue);
                 } else {
-                    field.error = fieldValue.length === 0;
+                    field.error = field.required && fieldValue.length === 0;
                 }
             } else if (event.target.value === undefined || event.target.value === null) {
-                field.error = true;
+                field.error = field.required;
             }
         }
 
@@ -96,13 +111,16 @@ const Form = ({
             field.dependencies.forEach(dep => dependencies[dep] = "");
         }
 
-        setValues(oldValues => {
-            return {
-                ...oldValues,
-                [fieldId]: fieldValue,
-                ...dependencies
-            }
-        })
+        unstable_batchedUpdates(() => {
+            setIsDirty(true);
+            setValues(oldValues => {
+                return {
+                    ...oldValues,
+                    [fieldId]: fieldValue,
+                    ...dependencies
+                }
+            })
+        });
     }
 
     const onSubmit = (e) => {
@@ -111,17 +129,25 @@ const Form = ({
         const formValues = {
             ...values
         };
+        // Remove readonly field values
+        fields.forEach(f => { if (f.readOnly) delete formValues[f.id]; });
+
         submitAction(formValues)
         .then(() => {
             fields.forEach(f => delete f.isDirty);
             if (onCancel) {
                 onCancel();
             }
+            setResult({
+                key: uniqueID(),
+                severity: 'success',
+                message: validationMessage
+            })
         }).catch((error) => {
             setResult({
                 key: uniqueID(),
-                status: 'error',
-                message: 'Une erreur est survenue lors de la sauvegarde des données...'
+                severity: 'error',
+                message: error.message
             })
         }).finally(() => {
             setSending(false);
@@ -131,7 +157,16 @@ const Form = ({
     return (
         <Stack spacing={2} alignItems="center">
         {
-            fields.filter(field => !field.hidden).map(field => <FormField key={field.id} field={field} value={values[field.id]} values={values} handleChange={handleChange} sending={sending} />)
+            fields.filter(field => !field.hidden).map(field => 
+                <FormField
+                    key={field.id}
+                    field={field}
+                    value={values[field.id]}
+                    values={values}
+                    handleChange={handleChange}
+                    sending={sending}
+                    readOnly={readOnly} />
+            )
         }
         {
             useCaptcha &&
@@ -140,11 +175,13 @@ const Form = ({
                 onChange={onCaptchaChange}
             />
         }
+        {   
+            readOnly === false &&
             <Stack spacing={2} direction="row" sx={{mt: 2}}>
                 <LoadingButton
                     onClick={onSubmit}
                     variant="contained"
-                    disabled={!isValid}
+                    disabled={!isValid || !isDirty}
                     startIcon={<SendIcon />}
                     loadingPosition="start"
                     loading={sending}
@@ -158,6 +195,7 @@ const Form = ({
                     </Button>
                 }
             </Stack>
+        }
 
             <FeedbackMessage key={result.key} severity={result.severity} message={result.message} />
 

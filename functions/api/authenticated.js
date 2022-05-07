@@ -24,7 +24,7 @@ async function isAuthenticated(request, response, next) {
         return next();
     } catch (err) {
         console.error(`${err.code} -  ${err.message}`);
-        return response.status(401).send({message: "Unauthorized"});
+        return response.status(500).send({error: err});
     }
 }
 

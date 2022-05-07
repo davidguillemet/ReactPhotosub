@@ -232,4 +232,8 @@ DataProvider.prototype.getImageFolders = function() {
     })
 }
 
+DataProvider.prototype.updateUser = function(user) {
+    return this.axios.put('/user', user);
+}
+
 export default DataProvider;

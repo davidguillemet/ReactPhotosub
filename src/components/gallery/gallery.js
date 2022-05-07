@@ -6,7 +6,7 @@ import Dialog from '@mui/material/Dialog';
 import Stack from '@mui/material/Stack';
 import LazyImage from '../lazyImage';
 import ExpandedView from './expandedView';
-import { withLoading, buildLoadingState } from '../../components/loading';
+import { withLoading, buildLoadingState } from '../../components/hoc';
 import MasonryGallery from '../masonryGallery';
 import { BlockQuote } from '../../template/pageTypography';
 

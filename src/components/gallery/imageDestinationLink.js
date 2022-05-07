@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 import DestinationLink from '../destinationLink';
 import { useGlobalContext } from '../globalContext';
 import { formatDateShort } from '../../utils';
-import { withLoading, buildLoadingState } from '../loading';
+import { withLoading, buildLoadingState } from '../hoc';
 
 
 const DestinationLinkContent = withLoading(({destination}) => {

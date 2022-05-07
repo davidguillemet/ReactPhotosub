@@ -4,7 +4,7 @@ import {isMobile} from 'react-device-detect';
 import Box from "@mui/material/Box";
 import Alert from '@mui/material/Alert';
 import { useResizeObserver } from '../../components/hooks';
-import { withLoading, buildLoadingState } from '../../components/loading';
+import { withLoading, buildLoadingState } from '../../components/hoc';
 import MasonryLayout from './masonryLayout';
 
 const _margin = isMobile ? 2 : 5;

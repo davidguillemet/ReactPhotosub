@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { Switch, Route, useHistory } from "react-router-dom";
 import { routes } from '../../navigation/routes';
-import { Loading } from '../../components/loading';
+import { Loading } from '../../components/hoc';
 import NotFound from '../../pages/notFound';
 
 const RouteComponent = ({route, subscribeDrawer}) => {

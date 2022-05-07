@@ -9,7 +9,8 @@ const AuthProvider = ({ children }) => {
     const context = useGlobalContext();
     const addFavorite = context.useAddFavorite();
     const removeFavorite = context.useRemoveFavorite();
-    const observers = useRef([]);
+    const favoritesObservers = useRef([]);
+    const userObservers = useRef([]);
 
     const addUserFavorite = useCallback(favoriteImgArray => {
 
@@ -32,7 +33,7 @@ const AuthProvider = ({ children }) => {
                     }
                 };
             });
-            observers.current.forEach(observer => observer(favoriteImgArray, 'add'));
+            favoritesObservers.current.forEach(observer => observer(favoriteImgArray, 'add'));
         });
 
     }, [addFavorite, context])
@@ -58,35 +59,55 @@ const AuthProvider = ({ children }) => {
                     }
                 };
             });
-            observers.current.forEach(observer => observer([favoriteImg], 'remove'));
+            favoritesObservers.current.forEach(observer => observer([favoriteImg], 'remove'));
         })
 
     }, [removeFavorite, context])
 
     const subscribeFavorites = useCallback((fn) => {
-        observers.current.push(fn);
+        favoritesObservers.current.push(fn);
     }, []);
 
     const unsubscribeFavorites = useCallback((fn) => {
-        observers.current = observers.current.filter(observer => observer !== fn);
+        favoritesObservers.current = favoritesObservers.current.filter(observer => observer !== fn);
     }, []);
 
+    const registerUserObserver = useCallback((userObserver) => {
+        userObservers.current.push(userObserver);
+        return () => userObservers.current = userObservers.current.filter(obs => obs !== userObserver)
+    }, []);
+
+    const reloadUser = useCallback(() => {
+        return context.firebaseAuth.currentUser.reload()
+        .then(() => {
+            userObservers.current.forEach(observer => observer())
+        })
+    }, [context.firebaseAuth])
+
+    const reauthenticateWithCredential = useCallback((email, password) => {
+        const credential = context.firebase.auth.EmailAuthProvider.credential(email, password);
+        return context.firebaseAuth.currentUser.reauthenticateWithCredential(credential);
+    }, [context.firebase, context.firebaseAuth.currentUser]);
+
     const [userContext, setUserContext] = useState({
-        user: context.firebase.auth().currentUser,
+        user: undefined,
         data: null,
         admin: false,
         addUserFavorite: addUserFavorite,
         removeUserFavorite: removeUserFavorite,
         subscribeFavorites: subscribeFavorites,
-        unsubscribeFavorites: unsubscribeFavorites
+        unsubscribeFavorites: unsubscribeFavorites,
+        reloadUser: reloadUser,
+        registerUserObserver: registerUserObserver,
+        reauthenticateWithCredential: reauthenticateWithCredential
     });
 
     useEffect(() => {
-        const unregisterAuthObserver = context.firebase.auth().onAuthStateChanged(async (user) => {
+        const unregisterAuthObserver = context.firebaseAuth.onAuthStateChanged(async (user) => {
 
             if (user) { // user is signed in
 
-                const idTokenResult = await context.firebase.auth().currentUser.getIdTokenResult();
+                const idTokenResult = await context.firebaseAuth.currentUser.getIdTokenResult(true);
                 context.dataProvider.getUserData()
                 .then((userData) => {
 
@@ -103,6 +124,15 @@ const AuthProvider = ({ children }) => {
                             admin: idTokenResult.claims.roles && idTokenResult.claims.roles.includes("admin")
                         };
                     });
+                }).catch(error => {
+                    if (error.cause?.code === "auth/id-token-revoked")
+                    {
+                        // https://firebase.google.com/docs/auth/admin/manage-sessions#detect_id_token_revocation_in_the_sdk
+                        // Token has been revoked. Inform the user to reauthenticate or signOut() the user
+                        context.firebaseAuth.signOut();
+                        return;
+                    }
+                    console.error("error while getting user data", error);
                 });
             } else { // user is signed out
                 setUserContext(prevUserContext => {

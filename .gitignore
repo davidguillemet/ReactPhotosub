@@ -9,6 +9,9 @@ coverage/
 # production
 build/
 
+# Firebase simulators export
+firebase-snapshot
+
 # misc
 .DS_Store
 .firebase/

@@ -5,7 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
-import { withLoading, buildLoadingState } from '../loading';
+import { withLoading, buildLoadingState } from '../hoc';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 

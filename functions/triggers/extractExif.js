@@ -68,12 +68,14 @@ module.exports = async function extractExif(file, fileContent) {
     };
 
     // Send post request api-photosub/image to insert a new image item
-    try {
-        await axios.post(apiBaseUrl + "/api/image", newImageItem);
-        logger.info(`${file.name} has been inserted.`);
-    } catch (error) {
-        logger.error(`Failed to insert new image ${file.name}.`, error);
-    }
+    // Axios post request is blocked when return axios.post(...) !!??
+    axios.post(apiBaseUrl + "/api/image", newImageItem)
+        .then(() => {
+            logger.info(`${file.name} has been inserted.`);
+        })
+        .catch((error) => {
+            logger.error(`Failed to insert new image ${file.name}.`, error);
+        });
 };
 
 function getObjectProperty(object, propertyName, defaultValue) {

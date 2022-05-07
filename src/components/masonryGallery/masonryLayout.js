@@ -1,5 +1,5 @@
 import React from 'react';
-import { withLoading, buildLoadingState } from '../../components/loading';
+import { withLoading, buildLoadingState } from '../../components/hoc';
 import ItemContainer from './itemContainer';
 
 function getTargetColumnIndex(columnHeight) {

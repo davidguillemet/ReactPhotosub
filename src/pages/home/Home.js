@@ -40,7 +40,7 @@ const MainImage = ({images, currentImageIndex, handleImageLoaded}) => {
 
 const Home = ({images, currentIndex, subscribeDrawer}) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
-    const [initialTimeoutCommpleted, setinitialTimeoutCommpleted] = useState(false);
+    const [initialTimeoutCompleted, setInitialTimeoutCompleted] = useState(false);
     const [blockScroll, allowScroll] = useScrollBlock();
     const diaporamaTimeoutRef = useRef(null);
     const initialTimeout = useRef(null);
@@ -56,7 +56,7 @@ const Home = ({images, currentIndex, subscribeDrawer}) => {
     useEffect(() => {
         // Just create a first timeout to display the first image a few seconds...
         initialTimeout.current = setTimeout(() => {
-            setinitialTimeoutCommpleted(true);
+            setInitialTimeoutCompleted(true);
         }, 3000);
     }, []);
 
@@ -69,10 +69,10 @@ const Home = ({images, currentIndex, subscribeDrawer}) => {
     useEffect(() => {
         // Just display the next image when all images are loaded and the first one
         // has been displayed a few seconds
-        if (images !== null && initialTimeoutCommpleted === true) {
+        if (images !== null && initialTimeoutCompleted === true) {
             setCurrentImageIndex(prevIndex => prevIndex + 1);
         }
-    }, [images, initialTimeoutCommpleted]);
+    }, [images, initialTimeoutCompleted]);
 
     const handleNextImage = useCallback(() => {
         if (images === null) {

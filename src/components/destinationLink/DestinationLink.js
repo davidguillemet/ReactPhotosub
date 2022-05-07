@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { withLoading, buildLoadingState } from '../loading';
+import { withLoading, buildLoadingState } from '../hoc';
 
 const DestinationLink = withLoading(({destination, children}) => {
     return (

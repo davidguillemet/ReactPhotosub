@@ -9,6 +9,11 @@
 # start functions emulator
 # export GOOGLE_APPLICATION_CREDENTIALS=../../gcp/photosub-5c66182af76f.json && firebase emulators:start
 firebase emulators:start --only hosting,functions
+export GOOGLE_APPLICATION_CREDENTIALS=../../gcp/photosub-5c66182af76f.json && firebase emulators:start --import ./firebase-snapshot --inspect-functions
+
+clear && firebase emulators:start --import ./firebase-snapshot --inspect-functions
+
+firebase emulators:export ./firebase-snapshot
 -> npm run-script firebase
 
 # Build React app for Firebase simulators

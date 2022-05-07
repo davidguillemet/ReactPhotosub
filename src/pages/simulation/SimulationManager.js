@@ -27,6 +27,7 @@ import {
 } from './actions/SimulationActions';
 
 import 'fontsource-roboto/100.css';
+import { withLoading, buildLoadingState } from '../../components/hoc';
 
 const sameUsers = (user1, user2) => {
     if (user1 === null && user2 === null) {
@@ -47,11 +48,10 @@ const initialState = {
     currentIndex: -1
 };
 
-const SimulationManager = () => {
+const SimulationManager = withLoading(({user}) => {
 
     const context = useGlobalContext();
-    const authContext = useAuthContext();
-    const { data: fetchedSimulations } = context.useFetchSimulations(authContext.user && authContext.user.uid);
+    const { data: fetchedSimulations } = context.useFetchSimulations(user && user.uid);
     const addMutation = context.useAddSimulation();
     const updateSimulation = context.useUpdateSimulation();
     const removeSimulation = context.useRemoveSimulation();
@@ -80,18 +80,18 @@ const SimulationManager = () => {
     }, []);
 
     useEffect(() => {
-        // No need to reinit simulations state it the user is the same
+        // No need to reinit simulations state if the user is the same
         // -> initialize only once on component mount
-        if (fetchedSimulations !== undefined && sameUsers(simulationInitUser.current, authContext.user) === false) {
-            simulationInitUser.current = authContext.user;
+        if (fetchedSimulations !== undefined && sameUsers(simulationInitUser.current, user) === false) {
+            simulationInitUser.current = user;
             dispatch(initSimulations(fetchedSimulations));
         }
-    }, [fetchedSimulations, authContext.user]);
+    }, [fetchedSimulations, user]);
 
-    const onSave = useCallback((simulationname) => {
+    const onSave = useCallback((simulationName) => {
         const simulationData = state.simulations[state.currentIndex];
-        if (simulationname) {
-            simulationData.name = simulationname;
+        if (simulationName) {
+            simulationData.name = simulationName;
         }
         
         if (isFromDb(simulationData)) {
@@ -162,11 +162,11 @@ const SimulationManager = () => {
         let message = "Des modifications sont en cours.\n"
                     + "Cliquez sur OK pour confirmer la navigation et perdre vos modifications.\n"
                     + "Cliquez sur Annuler pour rester sur la page et sauvagarder vos modifications";
-        if (authContext.user === null) {
+        if (user === null) {
             message += " (connexion requise)";
         }
         return message;
-    }, [authContext.user]);
+    }, [user]);
 
     const toggleHelpOpen = useCallback(() => {
         setHelpOpen(open => !open);
@@ -176,7 +176,7 @@ const SimulationManager = () => {
 
     // Add a simulation property to the simulation to recreate the component from scratch when the user changes
     // -> avoid an issue when refreshing the page
-    const simulationKey = authContext.user !== null ? authContext.user.uid : "anonymous";
+    const simulationKey = user !== null ? user.uid : "anonymous";
 
     return (
         <React.Fragment>
@@ -187,24 +187,21 @@ const SimulationManager = () => {
 
             <VerticalSpacing factor={2} />
 
-            {
-                authContext.user &&
-                <SimulationToolBar
-                    simulations={state.simulations}
-                    currentIndex={state.currentIndex}
-                    onSave={onSave}
-                    onAdd={onAdd}
-                    onDelete={onDelete}
-                    dispatch={dispatch}
-                />
-            }
+            <SimulationToolBar
+                simulations={state.simulations}
+                currentIndex={state.currentIndex}
+                onSave={onSave}
+                onAdd={onAdd}
+                onDelete={onDelete}
+                dispatch={dispatch}
+            />
 
             <VerticalSpacing factor={3} />
 
             <Simulation
                 simulations={state.simulations}
                 simulationIndex={state.currentIndex}
-                user={authContext.user}
+                user={user}
                 dispatch={dispatch}
                 key={simulationKey}
             />
@@ -217,6 +214,14 @@ const SimulationManager = () => {
 
         </React.Fragment>
     );
-};
+}, [buildLoadingState('user', undefined)]);
 
-export default SimulationManager;
+const SimulationManagerController = () => {
+     const authContext = useAuthContext();
+
+     return (
+        <SimulationManager user={authContext.user} />
+     )
+}
+
+export default SimulationManagerController;

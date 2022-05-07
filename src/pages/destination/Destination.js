@@ -13,7 +13,7 @@ import { formatDate, formatDateShort } from '../../utils';
 import Gallery from '../../components/gallery';
 import { PageSubTitle, PageHeader, Paragraph } from '../../template/pageTypography';
 import LazyDialog from '../../dialogs/LazyDialog';
-import { withLoading, buildLoadingState } from '../../components/loading';
+import { withLoading, buildLoadingState } from '../../components/hoc';
 import { useGlobalContext } from '../../components/globalContext';
 import DestinationLink from '../../components/destinationLink';
 import { VerticalSpacing } from '../../template/spacing';
