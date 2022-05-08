@@ -1,5 +1,5 @@
+const functions = require("firebase-functions");
 const axios = require("axios");
-const {logger} = require("../utils/logger");
 const {apiBaseUrl, verifyCustomTokenApiUrl} = require("./config");
 
 const admin = require("firebase-admin");
@@ -25,9 +25,9 @@ exports.deleteUser = async function(user) {
             });
         })
         .then(() => {
-            logger.info(`The data for user ${user.displayName} has been removed.`);
+            functions.logger.info(`The data for user ${user.displayName} has been removed.`);
         })
         .catch((error) => {
-            logger.error(`Failed to delete data for user ${user.displayName}.`, error);
+            functions.logger.error(`Failed to delete data for user ${user.displayName}.`, error);
         });
 };
