@@ -12,3 +12,9 @@ exports.verifyCustomTokenApiUrl =
     configFunctions.env === "local-dev" ?
         "http://localhost:9099/" + verifyCustomTokenApiBaseUrl : // Emulator
         "https://" + verifyCustomTokenApiBaseUrl;
+
+// https://firebase.google.com/docs/functions/writing-and-viewing-logs
+// --> the Cloud Functions logger SDK is recommended for most situations
+exports.logger = functions.logger;
+
+exports.config = configFunctions;

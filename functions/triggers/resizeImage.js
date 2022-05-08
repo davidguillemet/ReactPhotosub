@@ -4,7 +4,7 @@ const path = require("path");
 const {Storage} = require("@google-cloud/storage");
 const {unlink} = require("fs/promises");
 const os = require("os");
-const {logger} = require("../utils/logger");
+const {logger} = require("./config");
 
 const ACTION_CREATE = "create";
 const ACTION_DELETE = "delete";
@@ -40,7 +40,7 @@ function createThumbnail(fileContent, bucket, width, tempResizedFilePath, resize
 
         // Used to preserve aspect ratio and resize the image to be as large as possible
         // while ensuring its dimensions are less than or equal to both those specified
-        // -> With the same value for width and height, we ensire to resize the longest edge
+        // -> With the same value for width and height, we ensure to resize the longest edge
         //    from this specified value
         fit: "inside",
     };

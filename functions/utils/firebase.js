@@ -23,4 +23,7 @@ module.exports = {
     convertPathToUrl: convertPathToUrl,
     bucket: bucket,
     settings: configFunctions,
+    // https://firebase.google.com/docs/functions/writing-and-viewing-logs
+    // --> the Cloud Functions logger SDK is recommended for most situations
+    logger: functions.logger,
 };

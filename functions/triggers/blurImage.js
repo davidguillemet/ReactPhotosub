@@ -2,9 +2,7 @@ const sharp = require("sharp");
 const path = require("path");
 const {Storage} = require("@google-cloud/storage");
 const os = require("os");
-const {logger} = require("../utils/logger");
-const functions = require("firebase-functions");
-const configFunctions = functions.config();
+const {logger, config} = require("./config");
 
 function _getBlurryFilePath(filePathProps, blurryFolder) {
     const fileDir = filePathProps.dir;
@@ -21,7 +19,7 @@ exports.blurImage = function(file, fileContent, blurryFolder) {
     const tempBlurryFilePath = path.join(os.tmpdir(), tempBlurryFileName);
 
     return sharp(fileContent)
-        .blur(parseFloat(configFunctions.blur.sigma))
+        .blur(parseFloat(config.blur.sigma))
         .toFile(tempBlurryFilePath)
         .then(() => {
             const blurryFilePathInBucket = _getBlurryFilePath(filePathProps, blurryFolder);

@@ -26,11 +26,10 @@ const {Storage} = require("@google-cloud/storage");
 const {parse} = require("path");
 const axios = require("axios");
 
-const {logger} = require("../utils/logger");
 const extractExif = require("./extractExif");
 const {blurImage, deleteBlurryImage} = require("./blurImage");
 const {createThumbnails, deleteThumbnails, addSizeRatio} = require("./resizeImage");
-const {apiBaseUrl} = require("./config");
+const {apiBaseUrl, logger} = require("./config");
 
 const _blurryFolder = "blurry";
 const _thumbsFolder = "thumbs";

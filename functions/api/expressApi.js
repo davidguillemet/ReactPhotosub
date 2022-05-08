@@ -5,19 +5,12 @@ require("dotenv").config();
 
 const express = require("express");
 const compression = require("compression");
-const {logger/* , makeExpressLoggerMiddleware */} = require("../utils/logger");
-const {convertPathToUrl, bucket, settings} = require("../utils/firebase");
+const {convertPathToUrl, bucket, settings, logger} = require("../utils/firebase");
 const {isAuthenticated, isAuthorized} = require("./authenticated");
 const cors = require("cors");
 
 // Get a connection pool for postgreSql
 const {pool} = require("../utils/pool-postgresql");
-
-// DOC at https://googleapis.dev/nodejs/logging-winston/latest/
-// Create a middleware that will use the provided logger.
-// A Stackdriver Logging transport will be created automatically
-// and added onto the provided logger.
-// const mw = await makeExpressLoggerMiddleware();
 
 // Build express app
 const app = express();

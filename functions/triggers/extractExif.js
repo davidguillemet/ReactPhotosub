@@ -2,8 +2,7 @@ const exifr = require("exifr");
 const imageSize = require("buffer-image-size");
 const axios = require("axios");
 const {parse} = require("path");
-const {logger} = require("../utils/logger");
-const {apiBaseUrl} = require("./config");
+const {apiBaseUrl, logger} = require("./config");
 
 module.exports = async function extractExif(file, fileContent) {
     let xmp = null;
