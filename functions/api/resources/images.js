@@ -50,13 +50,18 @@ module.exports = function(config) {
             // };
             const newImage = req.body;
             const fileFullPath = `${newImage.path}/${newImage.name}`;
-            try {
-                await config.pool("images").insert(newImage);
-                res.status(200).send(`Successfully inserting image ${fileFullPath}.`).end();
-            } catch (err) {
-                config.logger.error(`Failed to insert image ${fileFullPath}.`, err);
-                res.status(500).send(`Error while inserting image ${fileFullPath}.`).end();
-            }
+            config
+                .pool("images")
+                .insert(newImage)
+                .onConflict(["name", "path"])
+                .merge()
+                .then(() => {
+                    res.status(200).send(`Successfully inserting image ${fileFullPath}.`).end();
+                })
+                .catch((err) => {
+                    config.logger.error(`Failed to insert image ${fileFullPath}.`, err);
+                    res.status(500).send(`Error while inserting image ${fileFullPath}.`).end();
+                });
         })
         // Delete an image
         .delete(async function(req, res, next) {
