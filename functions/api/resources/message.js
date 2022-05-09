@@ -58,11 +58,15 @@ module.exports = function(config) {
             // };
 
             // First try to validate the reCaptcha token:
+            const secret = config.settings.recaptcha.secretkey;
+            const response = req.body.token;
             try {
-                const verify = await axios.post("https://www.google.com/recaptcha/api/siteverify", {
-                    secret: config.settings.recaptcha.secretekey,
-                    response: req.body.token,
-                });
+                const verify = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${response}`,
+                    {
+                    },
+                    {
+                        headers: {"Content-Type": "application/x-www-form-urlencoded; charset=utf-8"},
+                    });
                 // verify =
                 // {
                 //     "success": true|false,
@@ -70,12 +74,14 @@ module.exports = function(config) {
                 //     "hostname": string,         // the hostname of the site where the reCAPTCHA was solved
                 //     "error-codes": [...]        // optional
                 // }
-                if (verify.sucess === false) {
+                if (verify.data.success === false) {
                     res.status(500).send("It seems you're a spammer...").end();
+                    return;
                 }
             } catch (error) {
                 config.logger.error("Failed to verify reCaptcha token", error);
                 res.status(500).send({error: "An error occurred while verifying the reCaptcha token"}).end();
+                return;
             }
 
             const transporter = nodemailer.createTransport({
