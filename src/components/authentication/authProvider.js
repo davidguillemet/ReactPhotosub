@@ -124,6 +124,10 @@ const AuthProvider = ({ children }) => {
                             admin: idTokenResult.claims.roles && idTokenResult.claims.roles.includes("admin")
                         };
                     });
+
+                    context.firebaseAnalytics.logEvent("login", {
+                        method: context.firebase.auth.EmailAuthProvider.PROVIDER_ID
+                    });
                 }).catch(error => {
                     if (error.cause?.code === "auth/id-token-revoked")
                     {

@@ -174,6 +174,10 @@ const Search = React.forwardRef(({
                 return;
             }
 
+            context.firebaseAnalytics.logEvent("search", {
+                search_term: searchConfig.query
+            });
+
             // response format:
             // {
             //     items: <image array>,

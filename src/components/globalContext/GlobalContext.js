@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useRef } from 'react';
 
 import firebase from 'firebase/app';
+import "firebase/analytics";
 import "firebase/auth";
 import "firebase/storage";
 
@@ -19,6 +20,7 @@ const GlobalContextProvider = ({children}) => {
 
     const globalContext = useRef(null);
     const queryClient = useQueryClient();
+    const analytics = useRef(null);
 
     const isDev = () => {
         return process.env.NODE_ENV === "development"
@@ -36,6 +38,7 @@ const GlobalContextProvider = ({children}) => {
             appId: "1:780806748384:web:c2976014be05cc21a13885",
             measurementId: "G-NNE3P3R7HH"
         });
+        analytics.current = firebase.analytics();
     }
 
     if (globalContext.current === null) {
@@ -82,6 +85,7 @@ const GlobalContextProvider = ({children}) => {
         globalContext.current = {
             firebase,
             firebaseAuth,
+            firebaseAnalytics: analytics.current,
             dataProvider,
             queryClient,
             useFetchHomeSlideshow: () => useQuery('homeslideshow', () => dataProvider.getImageDefaultSelection()),
