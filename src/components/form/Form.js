@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import Stack from '@mui/material/Stack';
-import ReCAPTCHA from 'react-google-recaptcha';
 import FormField from './FormField';
 import { LoadingButton } from '@mui/lab';
 import SendIcon from '@mui/icons-material/Send';
@@ -16,12 +15,13 @@ export const FIELD_TYPE_DATE = 'date';
 export const FIELD_TYPE_SELECT = 'select';
 export const FIELD_TYPE_CHECK_BOX = 'checkbox';
 export const FIELD_TYPE_PASSWORD = 'password';
+export const FIELD_TYPE_CAPTCHA = 'reCaptcha';
 
 const getValuesFromFields = (fields, initialValues) => {
     return fields.reduce((values, field) => {
         return {
             ...values,
-            [field.id]: initialValues ? initialValues[field.id] : field.default
+            [field.id]: initialValues && initialValues[field.id] ? initialValues[field.id] : field.default
         }
     }, {/* empty map */})
 }
@@ -30,10 +30,10 @@ const Form = ({
     fields,
     initialValues = null,
     submitAction,
-    useCaptcha = false,
     onCancel = null,
     submitCaption = "Envoyer",
     validationMessage = "Les modifications ont été enregistrées avec succès.",
+    onChange = null,
     readOnly = false}) => {
 
     const [values, setValues] = React.useState(() => getValuesFromFields(fields, initialValues));
@@ -111,6 +111,10 @@ const Form = ({
             field.dependencies.forEach(dep => dependencies[dep] = "");
         }
 
+        if (onChange) {
+            onChange();
+        }
+
         unstable_batchedUpdates(() => {
             setIsDirty(true);
             setValues(oldValues => {
@@ -163,17 +167,10 @@ const Form = ({
                     field={field}
                     value={values[field.id]}
                     values={values}
-                    handleChange={handleChange}
+                    handleChange={field.type === FIELD_TYPE_CAPTCHA ? onCaptchaChange : handleChange}
                     sending={sending}
                     readOnly={readOnly} />
             )
-        }
-        {
-            useCaptcha &&
-            <ReCAPTCHA
-                sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-                onChange={onCaptchaChange}
-            />
         }
         {   
             readOnly === false &&

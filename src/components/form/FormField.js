@@ -8,6 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import LazyImage from "../lazyImage";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import {
     FIELD_TYPE_TEXT,
@@ -16,7 +17,8 @@ import {
     FIELD_TYPE_SELECT,
     FIELD_TYPE_SWITCH,
     FIELD_TYPE_DATE,
-    FIELD_TYPE_PASSWORD
+    FIELD_TYPE_PASSWORD,
+    FIELD_TYPE_CAPTCHA
 } from './Form';
 
 const SelectControl = ({field, value, values, handleChange, sending, readOnly}) => {
@@ -126,6 +128,15 @@ const GenericTextField = ({ field, value, values, handleChange, sending, readOnl
     )
 }
 
+const CaptchaField = ({ field, value, values, handleChange, sending }) => {
+    return (
+        <ReCAPTCHA
+            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+            onChange={handleChange}
+        />
+    )
+}
+
 const FormField = (props) => {
     
     const FormFields = useRef({
@@ -135,12 +146,13 @@ const FormField = (props) => {
         [FIELD_TYPE_TEXT]: GenericTextField,
         [FIELD_TYPE_EMAIL]: GenericTextField,
         [FIELD_TYPE_DATE]: GenericTextField,
-        [FIELD_TYPE_PASSWORD]: GenericTextField
+        [FIELD_TYPE_PASSWORD]: GenericTextField,
+        [FIELD_TYPE_CAPTCHA]: CaptchaField
     });
 
     const { field } = props;
-    const FieldComoponent = FormFields.current[field.type];
-    return <FieldComoponent {...props} />
+    const FieldComponent = FormFields.current[field.type];
+    return <FieldComponent {...props} />
 };
 
 export default FormField;
