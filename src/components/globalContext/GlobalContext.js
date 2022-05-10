@@ -38,10 +38,16 @@ const GlobalContextProvider = ({children}) => {
             appId: "1:780806748384:web:c2976014be05cc21a13885",
             measurementId: "G-NNE3P3R7HH"
         });
-        analytics.current = firebase.analytics();
     }
 
     if (globalContext.current === null) {
+
+        analytics.current = 
+            isDev() ?
+            {
+                logEvent: () => { /* Empty */ }
+            } :
+            firebase.analytics();
 
         const firebaseAuth = firebase.auth();
         if (isDev()) {
