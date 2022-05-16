@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { withRouter } from "react-router-dom";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import Gallery from '../../components/gallery';
@@ -23,7 +24,31 @@ const NextPageButton = ({
     );
 };
 
-const SearchPage = () => {
+function getQuerySearch(querySearch) {
+    const queryParameters = new URLSearchParams(querySearch)
+    return queryParameters.get("query");
+}
+
+const SearchPage = ({location, history}) => {
+
+    const [query, setQuery] = React.useState(() => getQuerySearch(location.search));
+
+    const onNewQueryString = useCallback((query) => {
+        if (history.action !== 'PUSH')
+            return;
+        history.push({
+            pathname: '/search',
+            search: '?' + new URLSearchParams({query: query}).toString()
+        })
+    }, [history]);
+
+    useEffect(() => {
+        if (history.action === 'POP') {
+            // Forward, Backward or Refresh
+            // -> inject the query parameter from location.search 
+            setQuery(getQuerySearch(location.search))
+        }
+    }, [location, history]);
 
     return (
         <React.Fragment>
@@ -32,9 +57,11 @@ const SearchPage = () => {
                 showExactSwitch={true}
                 galleryComponent={Gallery}
                 nextPageComponent={NextPageButton}
+                onNewQueryString={onNewQueryString}
+                query={query}
             />
         </React.Fragment>
     );
 };
 
-export default SearchPage;
+export default withRouter(SearchPage);

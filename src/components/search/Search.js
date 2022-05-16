@@ -19,23 +19,25 @@ import { uniqueID } from '../../utils';
 import LazyDialog from '../../dialogs/LazyDialog';
 import { useGlobalContext } from '../globalContext';
 import { Paragraph } from '../../template/pageTypography';
+import { useStateWithDep } from '../hooks';
 
 const _pageSize = 10;
-
 
 export function getInitialSearchResult() {
     return {
         images: [],
         hasNext: false,
         hasError: false,
+        query: "",
         page: 0,
         totalCount: -1
     }
 }
 
-function getEmptySearchResult() {
+function getEmptySearchResult(query) {
     return {
         ...getInitialSearchResult(),
+        query: query,
         totalCount: 0
     }
 }
@@ -74,7 +76,14 @@ const ResultStatus= ({searchResult}) => {
     return null;
 }
 
-const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp, showResultCount}) => {
+const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp, showResultCount, initialValue}) => {
+
+    const [value, setValue] = useStateWithDep(initialValue);
+
+    const onValueChange = useCallback((event) => {
+        setValue(event.target.value);
+        onChange(event)
+    }, [onChange, setValue])
 
     return (
         <Paper sx={{
@@ -101,7 +110,8 @@ const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp, s
                 inputProps={{ 'aria-label': 'search google maps' }}
                 fullWidth
                 type="search"
-                onChange={onChange}
+                onChange={onValueChange}
+                value={value}
             />
             <Divider
                 sx={{
@@ -126,6 +136,8 @@ const Search = React.forwardRef(({
     onResult = null,
     galleryComponent = null,
     nextPageComponent = null,
+    onNewQueryString = null,
+    query = null,
     pageIndex = 0}, ref) => {
 
     const context = useGlobalContext();
@@ -135,12 +147,22 @@ const Search = React.forwardRef(({
     const [ searchConfig, setSearchConfig ] = useState({
         exact: false,
         page: 0,
-        query: ""
+        query: query || ""
     });
     const { data: imageCount } = context.useFetchImageCount();
     const searchTimer = useRef(null);
 
     const lastSearchProcessId = useRef(null);
+
+    useEffect(() => {
+        setSearchConfig(prevConfig => {
+            return {
+                exact: prevConfig.exact,
+                page: 0,
+                query: query || ""
+            }
+        })
+    }, [query]);
 
     useEffect(() => {
         setSearchConfig(oldConfig => {
@@ -156,6 +178,15 @@ const Search = React.forwardRef(({
             onResult(searchResult);
         }
     }, [onResult, searchResult])
+
+    useEffect(() => {
+        if (searchResult.totalCount === -1) {
+            return;
+        }
+        if (onNewQueryString && searchResult.page === 0) {
+            onNewQueryString(searchResult.query)
+        }
+    }, [onNewQueryString, searchResult]);
 
     useEffect(() => {
         if (searchConfig.query.length <= 2)
@@ -190,28 +221,29 @@ const Search = React.forwardRef(({
                 const results = response.items;
                 if (results.length === 0 && searchConfig.page === 0)
                 {
-                    return getEmptySearchResult();
+                    return getEmptySearchResult(searchConfig.query);
                 }
-                const aggegatedResults = searchConfig.page === 0 ? results : oldResult.images.concat(results);
+                const aggregatedResults = searchConfig.page === 0 ? results : oldResult.images.concat(results);
                 const newResult = {
-                    images: aggegatedResults,
-                    hasNext: aggegatedResults.length < response.totalCount,
+                    images: aggregatedResults,
+                    hasNext: aggregatedResults.length < response.totalCount,
                     hasError: false,
                     page: searchConfig.page,
+                    query: searchConfig.query,
                     totalCount: response.totalCount
                 }
                 return newResult;
             });
         }).catch(err => {
             setSearchResult({
-                ...getEmptySearchResult(),
+                ...getEmptySearchResult(searchConfig.query),
                 hasError: true
             });
         }).finally(() => {
             setSearchIsRunning(false);
         })
 
-    }, [searchConfig, context.dataProvider]);
+    }, [searchConfig, context.dataProvider, context.firebaseAnalytics]);
 
     const toggleSearchHelpOpen = useCallback(() => {
         setHelpOpen(open => !open);
@@ -281,6 +313,7 @@ const Search = React.forwardRef(({
                 onChange={onQueryChange}
                 onOpenHelp={toggleSearchHelpOpen}
                 showResultCount={GalleryComponent === null}
+                initialValue={searchConfig.query}
             />
             { 
                 showExactSwitch && 
