@@ -21,6 +21,7 @@ import DestinationsMap from '../../components/map';
 import lazyComponent from '../../components/lazyComponent';
 import RelatedDestinations from './relatedDestinations';
 import NotFound from '../notFound';
+import { HelmetDestination } from '../../template/seo';
 
 const RegionChip = ({region}) => {
 
@@ -52,6 +53,12 @@ const NavigationItem = ({destination, type, caption}) => {
         return null;
     }
 
+    const destinationDate = new Date(destination.date);
+    const formattedDate =
+        isMobile ?
+        formatDateShort(destinationDate) :
+        formatDate(destinationDate);
+
     const noWrapAndEllipsis = {
         whiteSpace: "nowrap",
         width: "100%",
@@ -61,6 +68,7 @@ const NavigationItem = ({destination, type, caption}) => {
 
     return (
         <DestinationLink destination={destination}>
+            <HelmetDestination destination={destination} />
             <Paper
                 elevation={2}
                 sx={{
@@ -98,11 +106,7 @@ const NavigationItem = ({destination, type, caption}) => {
                         {destination.title}
                     </PageHeader>
                     <Paragraph sx={{my: 0, fontWeight: "100", textAlign: type, ...noWrapAndEllipsis}}>
-                        {
-                            isMobile ?
-                            formatDateShort(new Date(destination.date)) :
-                            formatDate(new Date(destination.date))
-                        }
+                        { formattedDate }
                     </Paragraph>
                 </Stack>
                 {
@@ -194,7 +198,6 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
 
     return (
         <React.Fragment>
-
             <RegionPath regions={destination.regionpath}></RegionPath>
 
             <Box sx={{ width: "100%", height: isMobile ? "300px" : "400px", position: "relative" }}>

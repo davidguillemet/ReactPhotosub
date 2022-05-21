@@ -5,6 +5,7 @@ import { Switch, Route, useHistory } from "react-router-dom";
 import { routes } from '../../navigation/routes';
 import { Loading } from '../../components/hoc';
 import NotFound from '../../pages/notFound';
+import { HelmetFull } from '../seo';
 
 const RouteComponent = ({route, subscribeDrawer}) => {
     const Component = route.component;
@@ -58,6 +59,7 @@ const PageContent = ({onHistoryChanged, subscribeDrawer}) => {
                         routes.map((route, index) => {
                             return (
                             <Route key={index} exact strict path={route.path}>
+                                <HelmetFull route={route} />
                                 <RouteComponent route={route} subscribeDrawer={subscribeDrawer} />
                             </Route>
                             );
