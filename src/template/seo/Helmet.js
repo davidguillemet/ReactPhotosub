@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Helmet } from "react-helmet";
+import { useLocation } from "react-router-dom";
 import { getThumbnailSrc, formatDate } from '../../utils';
 
 const _titlePlaceHolder = '{title}';
@@ -29,28 +30,32 @@ export const HelmetFull = ({ route }) => {
     );
 };
 
-export const HelmetCommon = () => (
-    <Helmet>
-        <meta name="google-site-verification" content="MV0EsGEbTYaJwYgzMrID484Xbvp7Hk3An8RSGU-c6Us" />
-        <meta charset="utf-8" />
-        <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+export const HelmetCommon = () => {
+    const location = useLocation();
+    const pageUrl = useMemo(() => `https://www.davidphotosub.com${location.pathname}${location.search}`, [location]);
+    return (
+        <Helmet>
+            <meta name="google-site-verification" content="MV0EsGEbTYaJwYgzMrID484Xbvp7Hk3An8RSGU-c6Us" />
+            <meta charset="utf-8" />
+            <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
 
-        <meta name="apple-mobile-web-app-title" content="David Guillemet - Underwater Photography" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
+            <meta name="apple-mobile-web-app-title" content="David Guillemet - Underwater Photography" />
+            <meta name="apple-mobile-web-app-capable" content="yes" />
 
-        <meta name="msapplication-TileColor" content="#da532c" />
-        <meta name="theme-color" content="#ffffff" />
+            <meta name="msapplication-TileColor" content="#da532c" />
+            <meta name="theme-color" content="#ffffff" />
 
-        <meta property="og:url" content="https://www.davidphotosub.com" />
-        {/* Use article for articles and website for the rest of your pages */}
-        <meta property="og:type" content="website" />
-        <meta property="og:locale" content="fr_FR" />
+            <meta property="og:url" content={pageUrl} />
+            {/* Use article for articles and website for the rest of your pages */}
+            <meta property="og:type" content="website" />
+            <meta property="og:locale" content="fr_FR" />
 
-        <meta name="twitter:url" content="https://www.davidphotosub.com" />
-        {/* summary, photo, video, product, app, gallery */}
-        <meta name="twitter:card" content="summary" />
-    </Helmet>
-);
+            <meta name="twitter:url" content={pageUrl} />
+            {/* summary, photo, video, product, app, gallery */}
+            <meta name="twitter:card" content="summary" />
+        </Helmet>
+    )
+};
 
 export const HelmetImage = ({image}) => {
     const fullImage = useMemo(() => getThumbnailSrc(image, _imageWidth), [image]);
