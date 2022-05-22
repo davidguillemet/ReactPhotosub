@@ -1,16 +1,19 @@
 const functions = require("firebase-functions");
-const fs = require("fs");
 const express = require("express");
-const cors = require("cors");
+const preRender = require("prerender-node");
 
-const preRender = express();
+const configFunctions = functions.config();
+if (configFunctions.env === "local-dev") {
+    preRender.set("prerenderServiceUrl", "http://localhost:3000/");
+} else {
+    preRender.set("prerenderToken", configFunctions.prerender.token);
+}
 
-preRender.use(cors({origin: true}));
+const preRenderApp = express();
+preRenderApp.use(preRender);
 
-preRender.use(require("prerender-node").set("prerenderToken", functions.config().prerender.token));
-
-preRender.get("*", (req, res) => {
-    res.status(200).send(fs.readFileSync("./web/index.html").toString());
+preRenderApp.get("*", (req, res) => {
+    res.status(200).sendFile("index.html", {root: "./web"});
 });
 
-exports.preRender = functions.https.onRequest(preRender);
+exports.preRender = functions.https.onRequest(preRenderApp);
