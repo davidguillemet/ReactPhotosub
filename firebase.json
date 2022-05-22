@@ -31,7 +31,7 @@
       },
       {
         "source": "**",
-        "destination": "/index.html"
+        "function": "preRender"
       }
     ]
   },
