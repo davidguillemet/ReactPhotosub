@@ -68,7 +68,6 @@ const NavigationItem = ({destination, type, caption}) => {
 
     return (
         <DestinationLink destination={destination}>
-            <HelmetDestination destination={destination} />
             <Paper
                 elevation={2}
                 sx={{
@@ -165,6 +164,7 @@ const DestinationDetails = ({destination}) => {
                 flexDirection: 'column',
                 alignItems: 'flex-start'
             }}>
+            <HelmetDestination destination={destination} />
             <PageSubTitle sx={{m: 0, color: "white", whiteSpace: "nowrap", fontWeight: 300}}>{destination.title}</PageSubTitle>
             <PageHeader sx={{m: 0, color: "white"}}>{formatedDate}</PageHeader>
             {
