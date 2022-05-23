@@ -22,6 +22,21 @@
         "source": "**/phocagallery/:year*/:location*/:image*",
         "destination": "https://storage.googleapis.com/photosub.appspot.com/legacy/:year/:location/:image",
         "type": 301
+      },
+      {
+        "source": "**/simulation",
+        "destination": "/composition",
+        "type": 301
+      },
+      {
+        "regex": "\/galeries\/(?P<year>[0-9]{4})\/(?P<location>[a-z]+)",
+        "destination": "/destinations/:year/:location",
+        "type": 301
+      },
+      {
+        "regex": "\/destinations\/(?P<location>[a-z]+)-(?P<year>[0-9]{4})",
+        "destination": "/destinations/:year/:location",
+        "type": 301
       }
     ],
     "rewrites": [

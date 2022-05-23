@@ -106,3 +106,11 @@ export const HelmetDestination = ({destination}) => {
         </React.Fragment>
     )
 }
+
+export const Helmet404 = () => {
+    return (
+        <Helmet>
+            <meta name="prerender-status-code" content="404"></meta>
+        </Helmet>
+    )
+}
