@@ -21,7 +21,7 @@ import DestinationsMap from '../../components/map';
 import lazyComponent from '../../components/lazyComponent';
 import RelatedDestinations from './relatedDestinations';
 import NotFound from '../notFound';
-import { HelmetDestination } from '../../template/seo';
+import { HelmetDestination, buildFullTitle } from '../../template/seo';
 import { useReactQuery } from '../../components/reactQuery';
 
 const RegionChip = ({region}) => {
@@ -139,7 +139,7 @@ const DestinationDetails = ({destination}) => {
 
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [hasSummary, setHasSummary] = useState(false);
-    const formatedDate = useMemo(() => formatDate(new Date(destination.date)), [destination]);
+    const formattedDate = useMemo(() => formatDate(new Date(destination.date)), [destination]);
 
     const toggleOpenSummary = useCallback(() => {
         setSummaryOpen(open => !open);
@@ -166,8 +166,10 @@ const DestinationDetails = ({destination}) => {
                 alignItems: 'flex-start'
             }}>
             <HelmetDestination destination={destination} />
+            {/* Hidden H1 for SEO only */}
+            <PageSubTitle component="h1" sx={{display: "none"}}>{buildFullTitle(`${destination.title} - ${formattedDate}`)}</PageSubTitle>
             <PageSubTitle sx={{m: 0, color: "white", whiteSpace: "nowrap", fontWeight: 300}}>{destination.title}</PageSubTitle>
-            <PageHeader sx={{m: 0, color: "white"}}>{formatedDate}</PageHeader>
+            <PageHeader sx={{m: 0, color: "white"}}>{formattedDate}</PageHeader>
             {
                 destination.link &&
                 <Chip color="primary" size="small" label={destination.location} component="a" href={destination.link} clickable target="_blank" />
@@ -179,7 +181,7 @@ const DestinationDetails = ({destination}) => {
             <LazyDialog
                 open={summaryOpen}
                 handleClose={toggleOpenSummary}
-                title={`${destination.title} - ${formatedDate}`}
+                title={`${destination.title} - ${formattedDate}`}
                 path={`summaries/${destination.path}`}
             />
         </Paper>

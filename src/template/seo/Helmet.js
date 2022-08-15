@@ -9,7 +9,7 @@ const _defaultImage = "https://storage.googleapis.com/photosub.appspot.com/2017/
 const _imageWidth = 1200;
 const _imageHeight = 800;
 
-const buildFullTitle = (title) => {
+export const buildFullTitle = (title) => {
     return title ? _titleTemplate.replace(_titlePlaceHolder, title) : null;
 }
 

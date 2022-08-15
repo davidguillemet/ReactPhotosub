@@ -4,5 +4,6 @@ export {
     HelmetDescription,
     HelmetImage,
     HelmetDestination,
-    Helmet404
+    Helmet404,
+    buildFullTitle
 } from './Helmet';
