@@ -2,6 +2,7 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { useGlobalContext } from '../globalContext';
 import './firebaseui.css';
 import React, { useCallback, useEffect, useState } from 'react';
+import { Box } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
@@ -47,6 +48,21 @@ const NotSignedInButton = ({handleSignIn}) => {
         <ConnexionButtonBase onClick={handleSignIn} />
     );
 };
+
+const LoadingUserState = () => {
+    return (
+        <Box
+            sx={{
+                position: 'absolute',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                right: 20
+            }}
+        >
+            <Loading size={20} marginTop={0} />
+        </Box>
+    )
+}
 
 const SignedInButton = ({handleLogout}) => {
 
@@ -195,7 +211,7 @@ const FirebaseAuth = (props) => {
         <React.Fragment>
             {
                 authContext.user === undefined ?
-                <Loading size={20}/> :
+                <LoadingUserState /> :
                 authContext.user === null ?
                 <NotSignedInButton handleSignIn={handleSignIn} /> :
                 <SignedInButton  handleLogout={logout}/>
