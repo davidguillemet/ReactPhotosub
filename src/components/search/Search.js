@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
-import { green, orange } from '@mui/material/colors';
+import { green, orange, red } from '@mui/material/colors';
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Box from "@mui/material/Box";
@@ -14,12 +14,14 @@ import InputBase from '@mui/material/InputBase';
 import Divider from '@mui/material/Divider';
 import HelpIcon from '@mui/icons-material/Help';
 import WarningIcon from '@mui/icons-material/Warning';
+import ErrorIcon from '@mui/icons-material/Error';
 
 import { uniqueID } from '../../utils';
 import LazyDialog from '../../dialogs/LazyDialog';
 import { useGlobalContext } from '../globalContext';
 import { Paragraph } from '../../template/pageTypography';
 import { useStateWithDep } from '../hooks';
+import ErrorAlert from '../error';
 
 const _pageSize = 10;
 
@@ -42,7 +44,7 @@ function getEmptySearchResult(query) {
     }
 }
 
-const SearcIconButton = styled(IconButton)(({theme}) => ({
+const SearchIconButton = styled(IconButton)(({theme}) => ({
     padding: 10
 }));
 
@@ -65,11 +67,13 @@ const StatusIcon = ({searchIsRunning}) => {
     );
 }
 
-const ResultStatus= ({searchResult}) => {
+const ResultStatus = ({searchResult}) => {
     const totalCount = searchResult.totalCount;
     if (searchResult.hasError === true) {
+        return <ErrorIcon sx={{ml: 1, color: red[400]}} />
+    } else if (totalCount === 0) {
         return <WarningIcon sx={{ml: 1, color: orange[400]}} />
-    } else if (totalCount >= 0) {
+    } else if (totalCount > 0) {
         return <Chip color="success" sx={{ml: 1, bgcolor: totalCount > 0 ? green[600] : orange[700]}} label={totalCount}></Chip>
     }
 
@@ -97,9 +101,9 @@ const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp, s
             px: '4px',
             m: 0
         }}>
-            <SearcIconButton disabled={true}>
+            <SearchIconButton disabled={true}>
                 <StatusIcon searchIsRunning={running}/>
-            </SearcIconButton>
+            </SearchIconButton>
             <InputBase
                 sx={{
                     flex: 1,
@@ -124,9 +128,9 @@ const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp, s
                 showResultCount &&
                 <ResultStatus searchResult={searchResult} />
             }
-            <SearcIconButton onClick={onOpenHelp}>
+            <SearchIconButton onClick={onOpenHelp}>
                 <HelpIcon />
-            </SearcIconButton>
+            </SearchIconButton>
         </Paper>
     );
 }
@@ -333,8 +337,8 @@ const Search = React.forwardRef(({
             GalleryComponent &&
             <React.Fragment>
                 {
-                    searchResult.totalCount >= 0 &&
-                    <Paragraph>{`${searchResult.totalCount} Résultat(s)`}</Paragraph>
+                    searchResult.hasError ? <ErrorAlert /> :
+                    searchResult.totalCount >= 0 && <Paragraph>{`${searchResult.totalCount} Résultat(s)`}</Paragraph>
                 }
                 <GalleryComponent
                     images={searchResult.images}

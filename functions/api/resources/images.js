@@ -4,32 +4,24 @@ module.exports = function(config) {
             // select distinct path
             // from images
             // where path not in (select distinct path from destinations)
-            config.pool("images")
+            res.locals.errorMessage = "Failed to get image folders.";
+            return config.pool("images")
                 .distinct("path")
                 .orderBy("path", "asc")
                 .then((result) => {
                     res.json(result);
-                }).catch((err) => {
-                    config.logger.error("Failed to get image folders.", err);
-                    res.status(500)
-                        .send("Unable to get image folders.")
-                        .end();
-                });
+                }).catch(next);
         });
 
     // Get number of images
     config.app.route("/images")
         .get(function(req, res, next) {
-            config.pool("images").count("id as CNT").then((total) => {
+            res.locals.errorMessage = "Failed to get number of images.";
+            return config.pool("images").count("id as CNT").then((total) => {
                 res.json({
                     count: total[0].CNT,
                 });
-            }).catch((err) => {
-                config.logger.error("Failed to get count of images.", err);
-                res.status(500)
-                    .send("Unable to get image count.")
-                    .end();
-            });
+            }).catch(next);
         });
 
     config.app.route("/image")
@@ -50,18 +42,15 @@ module.exports = function(config) {
             // };
             const newImage = req.body;
             const fileFullPath = `${newImage.path}/${newImage.name}`;
-            config
-                .pool("images")
+            res.locals.errorMessage = `Failed to insert image ${fileFullPath}.`;
+            return config.pool("images")
                 .insert(newImage)
                 .onConflict(["name", "path"])
                 .merge()
                 .then(() => {
                     res.status(200).send(`Successfully inserting image ${fileFullPath}.`).end();
                 })
-                .catch((err) => {
-                    config.logger.error(`Failed to insert image ${fileFullPath}.`, err);
-                    res.status(500).send(`Error while inserting image ${fileFullPath}.`).end();
-                });
+                .catch(next);
         })
         // Delete an image
         .delete(async function(req, res, next) {
@@ -69,17 +58,16 @@ module.exports = function(config) {
             //     name: "DSC_6578.jpg",
             //     path: "/folder/folder/",
             // }
-            const imgeToDelete = req.body;
-            const fileFullPath = `${imgeToDelete.path}/${imgeToDelete.name}`;
-            try {
-                await config.pool("images").where({
-                    path: imgeToDelete.path,
-                    name: imgeToDelete.name,
-                }).delete();
-                res.status(200).send(`Successfully deleting image ${fileFullPath}.`).end();
-            } catch (err) {
-                config.logger.error(`Failed to remove image ${fileFullPath}.`, err);
-                res.status(500).send(`Error while deleting image ${fileFullPath}.`).end();
-            }
+            const imageToDelete = req.body;
+            const fileFullPath = `${imageToDelete.path}/${imageToDelete.name}`;
+            res.locals.errorMessage = `Failed to remove image ${fileFullPath}.`;
+            return config.pool("images").where(
+                {
+                    path: imageToDelete.path,
+                    name: imageToDelete.name,
+                }).delete()
+                .then(() => {
+                    res.status(200).send(`Successfully deleting image ${fileFullPath}.`).end();
+                }).catch(next);
         });
 };

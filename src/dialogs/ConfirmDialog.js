@@ -23,6 +23,8 @@ export default function ConfirmDialog({
         if (onValidate) {
             onValidate().then(() => {
                 handleClose();
+            }).catch(() =>{
+                handleClose();
             })
         }
     };

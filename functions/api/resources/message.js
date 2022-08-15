@@ -122,12 +122,10 @@ module.exports = function(config) {
                 promises.push(transporter.sendMail(mailCopyData));
             }
 
-            Promise.all(promises)
+            res.locals.errorMessage = "L'envoi du message a échoué.";
+            return Promise.all(promises)
                 .then((_) => {
                     res.status(200).end();
-                }).catch((err) => {
-                    config.logger.error(`Failed to send message from ${req.body.email}.`, err);
-                    res.status(500).json(err);
-                });
+                }).catch(next);
         });
 };

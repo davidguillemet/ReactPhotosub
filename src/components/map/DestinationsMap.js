@@ -15,6 +15,8 @@ import Fab from '@mui/material/Fab';
 
 import LocationDialog from './LocationDialog';
 import LocationInfoWindow from './LocationInfoWindow';
+import { withLoading, buildLoadingState } from '../hoc';
+import { useReactQuery } from '../reactQuery';
 
 const _infoCoverWidth = 150;
 // Center in the middle of the atlantic ocean
@@ -60,34 +62,20 @@ const CustomFullScreen = ({destinations, fullScreen, onClose}) => {
     );
 }
 
-const DestinationsMap = ({destinations, isFullScreen = false, onClose}) => {
-
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        // The google maps API keys are restricted (IP and HTTP referrer)
-        googleMapsApiKey: process.env.REACT_APP_GMAP_API_KEY
-    })
-
-    const isDestinationPage = useRouteMatch(DestinationPath);
-
-    const context = useGlobalContext();
+const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = false, onClose, isDestinationPage}) => {
 
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [destinationsPerLocation, setDestinationsPerLocation] = useState([]);
+    const [openInfoWindow, setOpenInfoWindow] = useState(true);
+
     // eslint-disable-next-line no-unused-vars
     const [map, setMap] = React.useState(null)
     const [clusterer, setClusterer] = React.useState(null)
-    const [openInfoWindow, setOpenInfoWindow] = useState(true);
-
-    const { data: locations} = context.useFetchLocations(
-        // Fetch locations only for the Destinations page
-        destinations !== null && isDestinationPage === null
-    );
 
     // Set destinations per location for the single destination page
     useEffect(() => {
 
-        if (destinations !== null && isDestinationPage !== null) {
+        if (destinations !== null && isDestinationPage === true) {
             const destination = destinations[0];
             const location = {
                 title: destination.location,
@@ -109,10 +97,8 @@ const DestinationsMap = ({destinations, isFullScreen = false, onClose}) => {
     // Set destinations per location for the destinations page
     useEffect(() => {
 
-        if (locations === undefined || isDestinationPage !== null) {
-            // don't update destinationsPerLocation if
-            // - locations are not loaded
-            // - OR we are on a single destination page
+        if (isDestinationPage === true) {
+            // don't update destinationsPerLocation if we are on a single destination page
             return;
         }
 
@@ -181,11 +167,11 @@ const DestinationsMap = ({destinations, isFullScreen = false, onClose}) => {
             clusterer.fitMapToMarkers();
         }
     }, [clusterer, destinationsPerLocation, handleMarkerClick])
-    
+
     const handleMapLoaded = React.useCallback((map) => {
         setMap(map)
     }, [])
-    
+
     const handleMapUnmount = React.useCallback((map) => {
         setMap(null)
     }, [])
@@ -197,10 +183,6 @@ const DestinationsMap = ({destinations, isFullScreen = false, onClose}) => {
     const handleClustererUnmount = React.useCallback(clusterer => {
         setClusterer(null);
     }, []);
-
-    if (isLoaded === false) {
-        return <></>;
-    }
 
     return (
         <Box sx={{
@@ -258,6 +240,55 @@ const DestinationsMap = ({destinations, isFullScreen = false, onClose}) => {
         }       
         </Box>
     );
+}, [
+    buildLoadingState("locations", [undefined])
+]);
+
+const DestinationsMapWithLocationLoader = ({destinations, isFullScreen = false, onClose}) => {
+
+    const context = useGlobalContext();
+    const { data: locations } = useReactQuery(context.useFetchLocations);
+
+    return <DestinationsMapUi
+                destinations={destinations}
+                locations={locations}
+                isFullScreen={isFullScreen}
+                isDestinationPage={false}
+                onClose={onClose}
+            />
+}
+
+const DestinationsMap = ({destinations, isFullScreen = false, onClose}) => {
+
+    const { isLoaded } = useJsApiLoader({
+        id: 'google-map-script',
+        // The google maps API keys are restricted (IP and HTTP referrer)
+        googleMapsApiKey: process.env.REACT_APP_GMAP_API_KEY
+    })
+
+    const destinationPageMatch = useRouteMatch(DestinationPath);
+
+    if (isLoaded === false) {
+        return <></>;
+    }
+
+    if (destinationPageMatch === null) {
+        // Destinations page = need to load locations
+        return <DestinationsMapWithLocationLoader
+                    destinations={destinations}
+                    isFullScreen={isFullScreen}
+                    onClose={onClose}
+                />
+    } else {
+        // Destination page = no need to load locations
+        return <DestinationsMapUi
+                    destinations={destinations}
+                    locations={null}
+                    isFullScreen={isFullScreen}
+                    isDestinationPage={true}
+                    onClose={onClose}
+                />
+    }
 }
 
 export default DestinationsMap;

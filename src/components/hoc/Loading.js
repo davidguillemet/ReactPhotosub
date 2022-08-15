@@ -1,5 +1,7 @@
 import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
+import ErrorAlert from '../error';
+import { QUERY_ERROR } from '../reactQuery';
 
 export const Loading = ({size, marginTop = 3}) => {
     return (
@@ -24,6 +26,10 @@ const isReady = (conditions, props) => {
     return conditions.every(condition => conditionIsReached(condition, props))
 }
 
+const isError = (conditions, props) => {
+    return conditions.find(condition => props[condition.property] === QUERY_ERROR)
+}
+
 /**
  * 
  * @param {any} Component The Component to enhance with loading behavior
@@ -32,7 +38,13 @@ const isReady = (conditions, props) => {
  */
 export const withLoading = (Component, conditions, loadingProps) => (props) => {
 
-    // Don't keep a ref since teh state might change when props change
+    if (isError(conditions, props)) {
+        return (
+            <ErrorAlert />
+        )
+    }
+
+    // Don't keep a ref since the state might change when props change
     // -> the image slider for images in simulation when switching source
     const ready = isReady(conditions, props);
 

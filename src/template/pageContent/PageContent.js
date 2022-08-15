@@ -6,6 +6,7 @@ import { routes } from '../../navigation/routes';
 import { Loading } from '../../components/hoc';
 import NotFound from '../../pages/notFound';
 import { HelmetFull } from '../seo';
+import { ToastNotifications } from '../../components/notifications';
 
 const RouteComponent = ({route, subscribeDrawer}) => {
     const Component = route.component;
@@ -68,6 +69,7 @@ const PageContent = ({onHistoryChanged, subscribeDrawer}) => {
                     <Route path="*" component={NotFound} />
                 </Switch>
             </Suspense>
+            <ToastNotifications />
         </Container>
     );
 };

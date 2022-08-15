@@ -49,9 +49,12 @@ const GlobalContextProvider = ({children}) => {
             } :
             firebase.analytics();
 
+        const storageHost = isDev() ? "http://localhost:9199" : "https://storage.googleapis.com";
         const firebaseAuth = firebase.auth();
+        const firebaseStorage = firebase.storage();
         if (isDev()) {
             firebaseAuth.useEmulator("http://localhost:9099");
+            firebaseStorage.useEmulator("localhost", 9199);
         }
 
         const apiBaseUrl =
@@ -91,11 +94,13 @@ const GlobalContextProvider = ({children}) => {
         globalContext.current = {
             firebase,
             firebaseAuth,
+            firebaseStorage,
+            storageHost,
             firebaseAnalytics: analytics.current,
             dataProvider,
             queryClient,
             useFetchHomeSlideshow: () => useQuery('homeslideshow', () => dataProvider.getImageDefaultSelection()),
-            useFetchLocations: (enabled) => useQuery('locations', () => dataProvider.getLocations(), { enabled: enabled }), 
+            useFetchLocations: () => useQuery('locations', () => dataProvider.getLocations()), 
             useFetchRegions: () => useQuery('regions', () => dataProvider.getRegions()),
             useFetchDestinations: () => useQuery('destinations', () => dataProvider.getDestinations()),
             useAddDestination: () => useMutation((destination) => dataProvider.createDestination(destination), {

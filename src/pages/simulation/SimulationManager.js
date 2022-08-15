@@ -3,8 +3,6 @@ import Button from '@mui/material/Button';
 import InfoIcon from '@mui/icons-material/Info';
 import { Prompt } from "react-router-dom";
 
-import {unstable_batchedUpdates} from 'react-dom';
-
 import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import { isFromDb, isDirty, getDbIndex } from '../../dataProvider';
@@ -12,10 +10,9 @@ import SimulationToolBar from './SimulationToolBar';
 import Simulation from './Simulation';
 import LazyDialog from '../../dialogs/LazyDialog';
 
-import FeedbackMessage from '../../components/feedback';
 import { useAuthContext } from '../../components/authentication';
-import { uniqueID } from '../../utils';
 import { useGlobalContext } from '../../components/globalContext';
+import { useReactQuery } from '../../components/reactQuery';
 
 import simulationsReducer from './actions/SimulationReducer';
 import {
@@ -28,6 +25,7 @@ import {
 
 import 'fontsource-roboto/100.css';
 import { withLoading, buildLoadingState } from '../../components/hoc';
+import { useToast } from '../../components/notifications';
 
 const sameUsers = (user1, user2) => {
     if (user1 === null && user2 === null) {
@@ -48,15 +46,15 @@ const initialState = {
     currentIndex: -1
 };
 
-const SimulationManager = withLoading(({user}) => {
+const SimulationManager = withLoading(({user, fetchedSimulations}) => {
 
     const context = useGlobalContext();
-    const { data: fetchedSimulations } = context.useFetchSimulations(user && user.uid);
+
     const addMutation = context.useAddSimulation();
     const updateSimulation = context.useUpdateSimulation();
     const removeSimulation = context.useRemoveSimulation();
     const simulationInitUser = useRef(undefined);
-    const [helpOpen, setHelpOpen] = useState(false);
+    const { toast } = useToast();
 
     /**
      * state = {
@@ -65,24 +63,11 @@ const SimulationManager = withLoading(({user}) => {
      * }
      */
     const [state, dispatch] = useReducer(simulationsReducer, initialState);
-    const [feedback, setFeedback] = useState({
-        severity: "success",
-        message: null,
-        key: uniqueID()
-    })
-
-    const displayFeedback = useCallback((severity, message) => {
-        setFeedback({
-            severity: severity,
-            message: message,
-            key: uniqueID()
-        });
-    }, []);
 
     useEffect(() => {
         // No need to reinit simulations state if the user is the same
         // -> initialize only once on component mount
-        if (fetchedSimulations !== undefined && sameUsers(simulationInitUser.current, user) === false) {
+        if (fetchedSimulations !== null && sameUsers(simulationInitUser.current, user) === false) {
             simulationInitUser.current = user;
             dispatch(initSimulations(fetchedSimulations));
         }
@@ -96,15 +81,11 @@ const SimulationManager = withLoading(({user}) => {
         
         if (isFromDb(simulationData)) {
             updateSimulation.mutateAsync(simulationData).then(res => {
-                unstable_batchedUpdates(() => {
-                    dispatch(setSimulationDirty(false, state.currentIndex));
-                    displayFeedback("success", `la composition '${simulationData.name}' a été sauvegardée.`);
-                });
+                dispatch(setSimulationDirty(false, state.currentIndex));
+                toast.success(`la composition '${simulationData.name}' a été sauvegardée.`)
             }).catch (err => {
-                console.error(`error while saving the composition '${simulationData.name}':`);
-                console.error(err);
-                displayFeedback("error", `Une erreur est survenue lors de la sauvegarde de la composition '${simulationData.name}'`);
-            })
+                // Empty
+            });
         } else {
             addMutation.mutateAsync(simulationData).then(res => {
                 // res contains all the simulations
@@ -113,27 +94,21 @@ const SimulationManager = withLoading(({user}) => {
                 const dbIndex = getDbIndex(newSimulationFromDb);
                 if (dbIndex !== res.length - 1) {
                     const message = `The dbindex of the new composition should be ${res.length - 1}`;
-                    console.error(message);
+                    //console.error(message); // TRY TO REMOVE
                     throw new Error(message);
                 }
-                unstable_batchedUpdates(() => {
-                    dispatch(setSimulationDbIndex(dbIndex, state.currentIndex));
-                    displayFeedback("success", `La composition '${simulationData.name}' a été sauvegardée.`);
-                });
+                dispatch(setSimulationDbIndex(dbIndex, state.currentIndex));
+                toast.success(`La composition '${simulationData.name}' a été sauvegardée.`);
             }).catch (err => {
-                console.error(`error while saving the coposition '${simulationData.name}':`);
-                console.error(err);
-                displayFeedback("error", `Une erreur est survenue lors de la sauvegarde de la composition '${simulationData.name}'`);
+                // Empty
             });
         } 
-    }, [displayFeedback, state, addMutation, updateSimulation]);
+    }, [toast, state, addMutation, updateSimulation]);
 
     const onAdd = useCallback((name) => {
-        unstable_batchedUpdates(() => {
-            dispatch(addSimulation(name));
-            displayFeedback("success", `La composition '${name}' a été ajoutée.`);
-        });
-    }, [dispatch, displayFeedback]);
+        dispatch(addSimulation(name));
+        toast.success(`La composition '${name}' a été ajoutée.`);
+    }, [dispatch, toast]);
 
     const onDelete = useCallback(() => {
 
@@ -146,31 +121,23 @@ const SimulationManager = withLoading(({user}) => {
             Promise.resolve(null); // just remove from the store
 
         removePromise.then((res) => {
-            unstable_batchedUpdates(() => {
-                dispatch(deleteSimulation(state.currentIndex, res));
-                displayFeedback("success", `La composition '${simulationToRemove.name}' a été supprimée.`);
-            });
+            dispatch(deleteSimulation(state.currentIndex, res));
+            toast.success(`La composition '${simulationToRemove.name}' a été supprimée.`);
         }).catch (err => {
-            console.error(`Error while deleting the composition '${simulationName}'`);
-            console.error(err);
-            displayFeedback("error", `Une erreur est survenue lors de la suppression de la composition '${simulationName}'`);
+            // Empty
         });
 
-    }, [state, dispatch, displayFeedback, removeSimulation]);
+    }, [state, dispatch, toast, removeSimulation]);
 
     const promptMessage = useMemo(() => {
         let message = "Des modifications sont en cours.\n"
                     + "Cliquez sur OK pour confirmer la navigation et perdre vos modifications.\n"
-                    + "Cliquez sur Annuler pour rester sur la page et sauvagarder vos modifications";
+                    + "Cliquez sur Annuler pour rester sur la page et sauvegarder vos modifications";
         if (user === null) {
             message += " (connexion requise)";
         }
         return message;
     }, [user]);
-
-    const toggleHelpOpen = useCallback(() => {
-        setHelpOpen(open => !open);
-    }, []);
 
     const hasDirty = state !== null && state.simulations.find(simulation => isDirty(simulation)) !== undefined;
 
@@ -180,10 +147,6 @@ const SimulationManager = withLoading(({user}) => {
 
     return (
         <React.Fragment>
-
-            <PageTitle>Composition</PageTitle>
-
-            <Button variant="contained" startIcon={<InfoIcon />} onClick={toggleHelpOpen}>Qu'est-ce que c'est?</Button>
 
             <VerticalSpacing factor={2} />
 
@@ -208,20 +171,47 @@ const SimulationManager = withLoading(({user}) => {
 
             <Prompt when={hasDirty} message={promptMessage} />
 
-            <FeedbackMessage severity={feedback.severity} message={feedback.message} key={feedback.key}/>
+        </React.Fragment>
+    );
+}, [buildLoadingState('fetchedSimulations', undefined)]);
+
+const SimulationManagerConnected = ({user}) => {
+
+    const context = useGlobalContext();
+    const { data: fetchedSimulations } = useReactQuery(context.useFetchSimulations, [user.uid]);
+    return <SimulationManager user={user} fetchedSimulations={fetchedSimulations} />
+}
+
+const SimulationManagerDispatcher = withLoading(({user}) => {
+
+    if (user === null) {
+        return <SimulationManager user={null} fetchedSimulations={[]} />    
+    } else {
+        return <SimulationManagerConnected user={user} />
+    }
+}, [buildLoadingState('user', undefined)]);
+
+const SimulationManagerController = () => {
+    const authContext = useAuthContext();
+    const [helpOpen, setHelpOpen] = useState(false);
+
+    const toggleHelpOpen = useCallback(() => {
+        setHelpOpen(open => !open);
+    }, []);
+
+     return (
+        <React.Fragment>
+
+            <PageTitle>Composition</PageTitle>
+
+            <Button variant="contained" startIcon={<InfoIcon />} onClick={toggleHelpOpen}>De quoi s'agit-il?</Button>
+
+            <SimulationManagerDispatcher user={authContext.user} />
 
             <LazyDialog title={"Composition Murale"} path="simulation/help" open={helpOpen} handleClose={toggleHelpOpen} />
 
         </React.Fragment>
-    );
-}, [buildLoadingState('user', undefined)]);
-
-const SimulationManagerController = () => {
-     const authContext = useAuthContext();
-
-     return (
-        <SimulationManager user={authContext.user} />
-     )
+    )
 }
 
 export default SimulationManagerController;

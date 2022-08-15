@@ -48,7 +48,6 @@ require("./resources/userdata")(resourceConfiguration);
 require("./resources/favorites")(resourceConfiguration);
 require("./resources/simulations")(resourceConfiguration);
 require("./resources/bucket")(resourceConfiguration);
-require("./resources/uploadedInteriors")(resourceConfiguration);
 require("./resources/search")(resourceConfiguration);
 require("./resources/message")(resourceConfiguration);
 require("./resources/user")(resourceConfiguration);
@@ -62,7 +61,12 @@ app.get("/status", (req, res) => res.send("Working!"));
 // be catch here and we will send an internal server error http 500
 // response with the error message as the response body
 app.use((error, req, res, next) => {
-    return res.status(500).json({error: error.toString()});
+    logger.error(res.locals.errorMessage, error);
+    return res.status(500).json({
+        error: {
+            message: res.locals.errorMessage,
+        },
+    });
 });
 
 const mainapi = express();

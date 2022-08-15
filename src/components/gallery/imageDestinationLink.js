@@ -2,20 +2,19 @@ import { Typography } from '@mui/material';
 import DestinationLink from '../destinationLink';
 import { useGlobalContext } from '../globalContext';
 import { formatDateShort } from '../../utils';
-import { withLoading, buildLoadingState } from '../hoc';
+import { useReactQuery } from '../reactQuery';
 
-
-const DestinationLinkContent = withLoading(({destination}) => {
+const DestinationLinkContent = ({destination}) => {
     return (
-        <Typography variant="body2" sx={{ mb: 0.5}}>{destination.title} - {formatDateShort(new Date(destination.date))}</Typography>
+        <Typography variant="body2" sx={{ mt: 0.5, mb: 0}}>{destination.title} - {formatDateShort(new Date(destination.date))}</Typography>
     );
-}, [buildLoadingState("destination", [null, undefined])], { size: 16, marginTop: 0 });
+};
 
 const ImageDestinationLink = ({image}) => {
 
     const context = useGlobalContext();
     const [year, title] = image.path.split('/');
-    const { data: destination } = context.useFetchDestinationDesc(year, title);
+    const { data: destination } = useReactQuery(context.useFetchDestinationDesc, [year, title]);
 
     return (
         <DestinationLink destination={destination} >

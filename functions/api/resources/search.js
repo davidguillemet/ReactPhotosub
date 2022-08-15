@@ -182,7 +182,8 @@ module.exports = function(config) {
                 buildSearchQueryExact(config, criteriaList, page, pageSize) :
                 buildSearchQueryNotExact(config, criteriaList, page, pageSize);
 
-            fullSqlQuery
+            res.locals.errorMessage = `la recherche "${searchData.query}" a échoué.`;
+            return fullSqlQuery
                 .orderBy("create", "desc") // recent images first
                 .limit(pageSize)
                 .offset(page * pageSize)
@@ -198,10 +199,6 @@ module.exports = function(config) {
                         processId: processId,
                         totalCount: results.length > 0 ? results[0].total_count : 0,
                     });
-                }).catch((err) => {
-                    config.logger.error(`Failed to search images from query "${searchData.query}"`);
-                    config.logger.error(err.toString());
-                    res.status(500).end();
-                });
+                }).catch(next);
         });
 };

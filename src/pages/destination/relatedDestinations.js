@@ -10,6 +10,8 @@ import {isMobile} from 'react-device-detect';
 import { formatDate, formatDateShort } from '../../utils';
 import ImageDescription from '../../components/imageDescription/imageDescription';
 import Alert from '@mui/material/Alert';
+import { withLoading, buildLoadingState } from '../../components/hoc';
+import { useReactQuery } from '../../components/reactQuery';
 
 function imageFromCover(destination) {
     const dateFormater = isMobile ? formatDateShort : formatDate;
@@ -37,12 +39,9 @@ const EmptyRelatedDestinations = () => {
     );
 }
 
-const RelatedDestinations = lazyComponent(({destination}) => {
-
+const RelatedDestinationsUI = withLoading(({destination, related}) => {
     const history = useHistory();
-    const context = useGlobalContext();
-    const { data: related } = context.useFetchRelatedDestinations(destination.regionpath, destination.macro, destination.wide);
-    const images = useMemo(() => related !== undefined ? related.filter(dest => dest.id !== destination.id).map(dest => imageFromCover(dest)) : null, [related, destination]);
+    const images = useMemo(() => related.filter(dest => dest.id !== destination.id).map(dest => imageFromCover(dest)), [related, destination]);
 
     const onSelectDestination = (index) => {
         history.push(`/destinations/${images[index].path}`);
@@ -91,6 +90,12 @@ const RelatedDestinations = lazyComponent(({destination}) => {
             />
         </Box>
     );
+}, [buildLoadingState("related", [undefined])]);
+
+const RelatedDestinations = lazyComponent(({destination}) => {
+    const context = useGlobalContext();
+    const { data } = useReactQuery(context.useFetchRelatedDestinations, [destination.regionpath, destination.macro, destination.wide]);
+    return <RelatedDestinationsUI destination={destination} related={data} />
 });
 
 export default RelatedDestinations;

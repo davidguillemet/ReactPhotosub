@@ -10,9 +10,11 @@ const ImageInfo = ({image, displayDestination, style}) => {
             sx={{
                 ...style,
                 position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
                 mx: 1,
                 mt: 1,
-                pl: 0.5,
+                py: 0.5,
                 textAlign: 'center',
                 borderWidth: "1px",
                 borderStyle: "solid",

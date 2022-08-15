@@ -37,12 +37,12 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
         if (name === null ) {
             return false;
         }
-        const trimedName = name.trim();
-        if (trimedName.length === 0) {
+        const trimmedName = name.trim();
+        if (trimmedName.length === 0) {
             return false;
         }
         const sameNameIndex = simulations.findIndex((simulation, index) => {
-            return (action === NAME_DIALOG_ACTION_NEW || index !== currentIndex) && (simulation.name.toLowerCase() === trimedName.toLowerCase())
+            return (action === NAME_DIALOG_ACTION_NEW || index !== currentIndex) && (simulation.name.toLowerCase() === trimmedName.toLowerCase())
         });
         return (sameNameIndex < 0)
     }, [simulations, currentIndex]);

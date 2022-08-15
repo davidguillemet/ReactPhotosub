@@ -206,7 +206,7 @@ const DestinationGallery = ({destinations}) => {
                 onValidate={onDeleteDestination}
                 title="Supprimer la destination"
                 dialogContent={[
-                    `Confirmez-vous la supression de la destination '${destinationToEdit?.title}'?`,
+                    `Confirmez-vous la suppression de la destination '${destinationToEdit?.title}'?`,
                     'Attention, cette action est irreversible.'
                 ]}
             />

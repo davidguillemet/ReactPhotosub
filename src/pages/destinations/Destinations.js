@@ -17,6 +17,8 @@ import DestinationGallery from './DestinationGallery';
 import { buildLoadingState, withLoading } from '../../components/hoc';
 import { isMobile } from 'react-device-detect';
 
+import { useReactQuery } from '../../components/reactQuery';
+
 const useStyles = makeStyles(() => ({
     regionContainer: {
         display: 'flex',
@@ -176,7 +178,7 @@ const DestinationsController = () => {
     const context = useGlobalContext();
 
     // Fetch Destinations & Regions
-    const { data: destinations } = context.useFetchDestinations();
+    const { data: destinations } = useReactQuery(context.useFetchDestinations);
 
     return (
         <React.Fragment>

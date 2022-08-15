@@ -17,29 +17,26 @@ function getDestinationPath(req) {
 }
 
 module.exports = function(config) {
-    // Get minimal destinatination info to get the desc (title, date, cover, location)
+    // Get minimal destination info to get the desc (title, date, cover, location)
     config.app.route("/destination/:year/:title/desc")
         .get(function(req, res, next) {
-            config.pool()
+            res.locals.errorMessage = `Failed to load description for destination '${getDestinationPath(req)}'`;
+            return config.pool()
                 .select("*")
-                .from("destinations")
+                .from("destinationszzzz")
                 .where("path", getDestinationPath(req))
                 .then((destinations) => {
                     const destination = destinations[0];
                     convertPath(destination, config);
                     res.json(destination);
-                }).catch((err) => {
-                    config.logger.error(`Failed to load destination from path = '${getDestinationPath(req)}':`, err);
-                    res.status(500)
-                        .send(`Failed to load destination from path = ${getDestinationPath(req)}`)
-                        .end();
-                });
+                }).catch(next);
         });
 
     // Get a specific destination head from identifier, including region path
     config.app.route("/destination/:year/:title/head")
         .get(function(req, res, next) {
-            config.pool().raw(
+            res.locals.errorMessage = `Failed to load information for destination '${getDestinationPath(req)}'`;
+            return config.pool().raw(
                 `WITH destination AS (
                     SELECT
                     d.title, d.date, d.cover, d.path, d.id, d.macro, d.wide, d.regionpath,
@@ -58,21 +55,22 @@ module.exports = function(config) {
                        (select row_to_json(nextDest.*) from nextDest) as next
                 from destination d`, getDestinationPath(req))
                 .then((destinations) => {
-                    const destination = destinations.rows[0];
-                    convertPath(destination, config);
-                    res.json(destination);
-                }).catch((err) => {
-                    config.logger.error(`Failed to load destination path = '${getDestinationPath(req)}':`, err);
-                    res.status(500)
-                        .send("Failed to load destination.")
-                        .end();
-                });
+                    if (destinations.rowCount === 0) {
+                        // HTTP 404 : bad destination
+                        res.sendStatus(404);
+                    } else {
+                        const destination = destinations.rows[0];
+                        convertPath(destination, config);
+                        res.json(destination);
+                    }
+                }).catch(next);
         });
 
     // Get images for a specific destination from identifier
     config.app.route("/destination/:year/:title/images")
         .get(function(req, res, next) {
-            config.pool({i: "images"})
+            res.locals.errorMessage = `Failed to load images for destination '${getDestinationPath(req)}'`;
+            return config.pool({i: "images"})
                 .select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio", "i.create")
                 .where("i.path", getDestinationPath(req))
                 .orderBy("i.create", "asc")
@@ -82,11 +80,6 @@ module.exports = function(config) {
                         image.src = config.convertPathToUrl(image.path + "/" + image.name);
                     });
                     res.json(images);
-                }).catch((err) => {
-                    config.logger.error(`Failed to load destination with id = ${req.params.id}`, err);
-                    res.status(500)
-                        .send("Failed to load destination.")
-                        .end();
-                });
+                }).catch(next);
         });
 };

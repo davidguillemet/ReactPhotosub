@@ -11,11 +11,13 @@ import { Typography } from '@mui/material';
 import { useGlobalContext } from '../../components/globalContext';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import ErrorIcon from '@mui/icons-material/Error';
+import { useToast } from '../../components/notifications';
+
 import './fileUploadStyles.css';
 
-const STEP_UPLOAD = "upload";
-const STEP_THUMBAILS = "thumbnail";
-const STEP_ERROR = "error";
+const STEP_UPLOAD = "step::upload";
+const STEP_THUMBNAILS = "step::thumbnail";
+const STEP_ERROR = "step::error";
 
 const UploadProgress = ({progress}) => {
     return (
@@ -63,7 +65,7 @@ const ThumbnailGeneration = () => {
     );
 }
 
-const ThumbnailError = () => {
+const ThumbnailError = ({error}) => {
     return (
         <Box style={{
             display: 'flex',
@@ -80,7 +82,7 @@ const ThumbnailError = () => {
                     textOverflow: 'ellipsis',
                     maxWidth: 200
                 }}>
-                Une erreur est survenue...
+                {error.message}
             </Typography>
         </Box>
     );
@@ -89,9 +91,10 @@ const ThumbnailError = () => {
 const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
 
     const context = useGlobalContext();
-    const [step, setStep] = useState(STEP_UPLOAD);
+    const [step, setStep] = useState({ name: STEP_UPLOAD, error: null });
     const [progress, setProgress] = useState(0);
     const uploadTaskRef = useRef(null);
+    const { toast } = useToast();
 
     const handleCancel = useCallback(() => {
         // Task is stopped by the cleanup function above
@@ -99,9 +102,11 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
     }, [file, onCancel]);
 
     useEffect(() => {
-        if (step === STEP_ERROR) {
+        if (step.name === STEP_ERROR) {
             setTimeout(() => handleCancel(), 5000);
+            toast.error(step.error.message);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [step, handleCancel]);
 
     useEffect(() => {
@@ -119,18 +124,18 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
             (error) => {
                 // Handle unsuccessful uploads
                 console.error(error);
+                setStep({ name: STEP_ERROR, error: error });
             }, 
             () => {
                 // Handle successful uploads on complete
                 // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-                setStep(STEP_THUMBAILS);
+                setStep({ name: STEP_THUMBNAILS, error: null });
                 context.dataProvider.waitForThumbnails(file.name).then((fileProps) => {
                     const { sizeRatio } = fileProps;
                     onFileUploaded(file.name, sizeRatio);
                     onCancel(file);
                 }).catch(error => {
-                    console.error(error);
-                    setStep(STEP_ERROR);
+                    setStep({ name: STEP_ERROR, error: error });
                 });
             }
         );
@@ -159,11 +164,11 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
                 <HorizontalSpacing factor={2} />
                 <div style={{ flex: 1}} />
                 {
-                    step === STEP_UPLOAD ?
+                    step.name === STEP_UPLOAD ?
                     <UploadProgress progress={progress} /> :
-                    step === STEP_THUMBAILS ?
+                    step.name === STEP_THUMBNAILS ?
                     <ThumbnailGeneration /> :
-                    <ThumbnailError />
+                    <ThumbnailError error={step.error}/>
                 }
                 <HorizontalSpacing factor={2} />
             </Paper>
@@ -179,10 +184,10 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
 
     useEffect(() => {
         if (userUploadRef.current === null) {
-            const storageRef = context.firebase.storage().ref();
+            const storageRef = context.firebaseStorage.ref();
             userUploadRef.current = storageRef.child(`userUpload/${user.uid}/interiors`);
         }
-    }, [user, context.firebase]);
+    }, [user, context.firebaseStorage]);
 
     const handleFileSelection = (event) => {
         const { target: { files } } = event;
@@ -190,7 +195,7 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
         for (let i = 0; i < files.length; i++) {
             _files.push(files[i]);
         }
-        // Reset the iput value to be able to upload the same file again
+        // Reset the input value to be able to upload the same file again
         // For example after having removed it
         event.target.value = "";
         setUploadFiles(_files);

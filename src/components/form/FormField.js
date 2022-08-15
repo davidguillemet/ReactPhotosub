@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from '@mui/material/FormHelperText';
 import Checkbox from '@mui/material/Checkbox';
 import Switch from "@mui/material/Switch";
 import TextField from '@mui/material/TextField';
@@ -9,6 +10,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import LazyImage from "../lazyImage";
 import ReCAPTCHA from "react-google-recaptcha";
+import { Alert } from '@mui/material';
 
 import {
     FIELD_TYPE_TEXT,
@@ -24,14 +26,19 @@ import {
 const SelectControl = ({field, value, values, handleChange, sending, readOnly}) => {
 
     // TODO : don't call field.options on each render...
-    const options = field.options(field.dependsOn ? field.dependsOn.map(dependency => values[dependency] ) : null);
-
+    let options = null;
+    let hasError = false;
+    try {
+        options = field.options(field.dependsOn ? field.dependsOn.map(dependency => values[dependency] ) : null);
+    } catch (err) {
+        hasError = true;
+    }
     const valueProperty = field.mapping ? field.mapping["value"] : "id";
     const captionProperty = field.mapping ? field.mapping["caption"] : "title";
     const keyProperty = field.mapping ? field.mapping["key"] : "id";
 
     return (
-        <FormControl fullWidth>
+        <FormControl fullWidth error={hasError}>
             <InputLabel id="select-label">{field.Label}</InputLabel>
             <Select
                 labelId="select-label"
@@ -61,6 +68,7 @@ const SelectControl = ({field, value, values, handleChange, sending, readOnly}) 
                 null
             }
             </Select>
+            { hasError && <FormHelperText>Oups...Une erreur s'est produite</FormHelperText> }
         </FormControl>
     )
 }

@@ -18,9 +18,11 @@ module.exports = function(config) {
                     await admin.auth().setCustomUserClaims(uid, {roles: ["admin"]});
                 }
             }
+
+            res.locals.errorMessage = "Le chargement des données utilisateur a échoué.";
             // get only admin property and favorites for the current user
             // -> we will fetch simulations on demand
-            config.pool().raw(
+            return config.pool().raw(
                 `WITH favorites_array as (
                     select ARRAY(
                         select row_to_json(favorite_rows) as favorites
@@ -50,10 +52,7 @@ module.exports = function(config) {
                         });
                     }
                     res.json(data);
-                }).catch((err) => {
-                    config.logger.error(`Failed to load user data for uid ${uid}.`, err);
-                    res.status(500).send({error: err}).end();
-                });
+                }).catch(next);
         });
 
     config.app.route("/userdata")
@@ -64,7 +63,8 @@ module.exports = function(config) {
             // }
             // 1. Delete uploaded interiors
             const userInfo = req.body;
-            config.bucket.deleteFiles({
+            res.locals.errorMessage = `Failed to remove data for user ${userInfo.displayName}.`;
+            return config.bucket.deleteFiles({
                 prefix: `userUpload/${userInfo.uid}`,
                 delimiter: "/",
             }).then((filesResponse) => {
@@ -73,9 +73,6 @@ module.exports = function(config) {
                 }).delete();
             }).then(() => {
                 res.status(200).send(`Successfully deleting data for user ${userInfo.displayName}.`).end();
-            }).catch((err) => {
-                config.logger.error(`Failed to remove data for user ${userInfo.displayName}.`, err);
-                res.status(500).send(`Error while deleting data for user ${userInfo.displayName}.`).end();
-            });
+            }).catch(next);
         });
 };

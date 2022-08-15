@@ -26,7 +26,7 @@ const ImageCaption = ({image}) => {
                     display: "flex",
                     flexDirection: "column",
                     flex: 1,
-                    my: 1,
+                    my: 0,
                     mx: 0
                 }}>
                     <ImageDescription image={image} language={language} />

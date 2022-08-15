@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import AuthContext from './authContext';
 import { useGlobalContext } from '../globalContext/GlobalContext';
+import { useToast } from '../notifications';
 
 const imagePath = (image) => `${image.path}/${image.name}`
 
 const AuthProvider = ({ children }) => {
 
     const context = useGlobalContext();
+    const { toast } = useToast();
     const addFavorite = context.useAddFavorite();
     const removeFavorite = context.useRemoveFavorite();
     const favoritesObservers = useRef([]);
@@ -135,8 +137,19 @@ const AuthProvider = ({ children }) => {
                         // Token has been revoked. Inform the user to reauthenticate or signOut() the user
                         context.firebaseAuth.signOut();
                         return;
+                    } else {
+                        toast.error(error.message);
+                        setUserContext(prevUserContext => {
+                            return {
+                                ...prevUserContext,
+                                user: user,
+                                data: {
+                                    favorites: null
+                                },
+                                admin: false
+                            };
+                        });
                     }
-                    console.error("error while getting user data", error);
                 });
             } else { // user is signed out
                 setUserContext(prevUserContext => {

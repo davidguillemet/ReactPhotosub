@@ -22,6 +22,7 @@ import lazyComponent from '../../components/lazyComponent';
 import RelatedDestinations from './relatedDestinations';
 import NotFound from '../notFound';
 import { HelmetDestination } from '../../template/seo';
+import { useReactQuery } from '../../components/reactQuery';
 
 const RegionChip = ({region}) => {
 
@@ -188,7 +189,7 @@ const DestinationDetails = ({destination}) => {
 const DestinationDisplay = withLoading(({destination, year, title}) => {
 
     const context = useGlobalContext();
-    const { data: images } = context.useFetchDestinationImages(year, title);
+    const { data: images } = useReactQuery(context.useFetchDestinationImages, [year, title]);
     const [ galleryIsReady, setGalleryIsReady ] = useState(false);
     const destinations = useMemo(() => [destination], [destination]);
 
@@ -234,8 +235,8 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
 const Destination = () => {
     const context = useGlobalContext();
     const { year, title } = useParams();
-    const { data, isError} = context.useFetchDestinationHeader(year, title);
-    if (isError === true) {
+    const { data, isError, error} = useReactQuery(context.useFetchDestinationHeader, [year, title]);
+    if (isError === true && error.response && error.response.status === 404) {
         return <NotFound />
     } else {
         return <DestinationDisplay destination={data} year={year} title={title} />

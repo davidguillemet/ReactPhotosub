@@ -10,8 +10,7 @@ import { VerticalSpacing } from '../../template/spacing';
 import { withUser } from '../../components/hoc';
 import { ConfirmDialog } from '../../dialogs';
 import EnterPasswordDlg from './EnterPasswordDlg';
-import FeedbackMessage from '../../components/feedback';
-import { uniqueID } from '../../utils';
+import { useToast } from '../../components/notifications';
 
 import Form, {
     FIELD_TYPE_TEXT,
@@ -34,6 +33,7 @@ const UserProfile = (props) => {
 
     const authContext = useAuthContext();
     const context = useGlobalContext();
+    const { toast } = useToast();
 
     const [readOnly, setReadOnly] = useState(true);
 
@@ -43,11 +43,6 @@ const UserProfile = (props) => {
         open: false,
         action: null
     });
-
-    const [result, setResult] = React.useState({
-        status: 'success',
-        message: null
-    })
 
     const fields = useRef([
         {
@@ -194,21 +189,13 @@ const UserProfile = (props) => {
             } else if (action === "delete") {
                 return onDeleteAccount();
             } else {
-                setResult({
-                    severity: 'error',
-                    message: `Unknown action '${action}'`,
-                    key: uniqueID()
-                })
+                toast.error(`Unknown action '${action}'`);
             }
         })
         .catch(err => {
-            setResult({
-                severity: 'error',
-                message: err.message,
-                key: uniqueID()
-            })
+            toast.error(err.message);
         });
-    }, [authContext.user.email, onIdTokenRevocation, onDeleteAccount]);
+    }, [toast, authContext.user.email, onIdTokenRevocation, onDeleteAccount]);
 
     return (
         <React.Fragment>
@@ -237,7 +224,9 @@ const UserProfile = (props) => {
                 color="error"
                 onClick={onClickDeleteAccount}
                 variant="contained"
-                startIcon={<DeleteIcon/>}>
+                startIcon={<DeleteIcon/>}
+                disabled={authContext.admin === true}
+            >
                 Supprimer le compte
             </Button>
             <EnterPasswordDlg
@@ -250,15 +239,14 @@ const UserProfile = (props) => {
                 open={openDeleteConfirmation}
                 onOpenChanged={setOpenDeleteConfirmation}
                 onValidate={onConfirmDeleteAccount}
-                title="Suppresion du compte"
+                title="Suppression du compte"
                 dialogContent={[
-                    'Confirmez-vous la supression de votre compte ?',
+                    'Confirmez-vous la suppression de votre compte ?',
                     'Attention, cette action est irreversible.',
                     'Vos éventuels favoris et compositions seront effacés.',
                     'Vous pourrez à tout moment créer un nouveau compte avec la même adresse mail.'
                 ]}
             />
-            <FeedbackMessage key={result.key} severity={result.severity} message={result.message} />
         </React.Fragment>
     )
 }

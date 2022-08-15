@@ -26,20 +26,29 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
     const getImagesFromPath = useCallback(([path]) => {
         if (path) {
             const [ year, title ] = path.split('/');
-            const { data } = context.useFetchDestinationImages(year, title);
+            const { data, isError, error } = context.useFetchDestinationImages(year, title);
+            if (isError === true) {
+                throw error;
+            }
             return data;
         } else {
             return null;
         }
     }, [context]);
 
-    const getLoacations = useCallback(() => {
-        const { data } = context.useFetchLocations(true);
+    const getLocations = useCallback(() => {
+        const { data, isError, error } = context.useFetchLocations();
+        if (isError === true) {
+            throw error;
+        }
         return data;
     }, [context]);
 
     const getImageFolders = useCallback(() => {
-        const { data } = context.useFetchImageFolders();
+        const { data, isError, error } = context.useFetchImageFolders();
+        if (isError === true) {
+            throw error;
+        }
         return data;
     }, [context])
 
@@ -68,7 +77,7 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
                 required: true,
                 errorText: "Merci d'indiquer le lieu de la destination.",
                 type: FIELD_TYPE_SELECT,
-                options: getLoacations,
+                options: getLocations,
                 default: ""
             },
             {
@@ -118,7 +127,7 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
                 default: false
             }
         ]);
-    }, [getImagesFromPath, getImageFolders, getLoacations]);
+    }, [getImagesFromPath, getImageFolders, getLocations]);
 
     const [isOpen, setIsOpen] = useState(open);
     const [values, setValues] = useState(null);

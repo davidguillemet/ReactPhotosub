@@ -27,7 +27,7 @@ const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
             authContext.addUserFavorite([image]);
 
         favoriteActionPromise.catch(err => {
-            console.error(err);
+            // Empty... mutationCache is adding an error toast
         }).finally(() => {
             setUpdating(false);
         })

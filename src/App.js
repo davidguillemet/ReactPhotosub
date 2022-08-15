@@ -26,12 +26,14 @@ import { routes, NavigationLink } from './navigation/routes';
 import { FirebaseSignin } from './components/firebase';
 import { AuthProvider } from './components/authentication';
 import GlobalContextProvider from './components/globalContext';
-import ReactQueryClientProvider from './components/reactQuery';
+import { ReactQueryClientProvider } from './components/reactQuery';
 import Footer from './template/footer';
 import ScrollTop from './template/scrollTop';
 import PageContent from './template/pageContent';
 import ResponsiveTheme from './template/theme';
 import SocialIcons from './components/socialIcons';
+
+import { ToastContextProvider } from './components/notifications';
 
 import './App.css';
 import { VerticalSpacing } from './template/spacing';
@@ -363,21 +365,23 @@ const App = (props) => {
         <div style={{ display: 'flex' }}>
             <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={ResponsiveTheme}>
-                    <ReactQueryClientProvider>
-                        <GlobalContextProvider>
-                            <AuthProvider>
+                    <ToastContextProvider>
+                        <ReactQueryClientProvider>
+                            <GlobalContextProvider>
+                                <AuthProvider>
 
-                                <CssBaseline />
+                                    <CssBaseline />
 
-                                <Router>
-                                    <AppContent {...props} />
-                                </Router>
+                                    <Router>
+                                        <AppContent {...props} />
+                                    </Router>
 
-                                <ScrollTop {...props} anchorSelector={`#${scrollTopAnchor}`}></ScrollTop>
+                                    <ScrollTop {...props} anchorSelector={`#${scrollTopAnchor}`}></ScrollTop>
 
-                            </AuthProvider>
-                        </GlobalContextProvider>
-                    </ReactQueryClientProvider>
+                                </AuthProvider>
+                            </GlobalContextProvider>
+                        </ReactQueryClientProvider>
+                    </ToastContextProvider>
                 </ThemeProvider>
             </StyledEngineProvider>
         </div>

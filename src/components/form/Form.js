@@ -5,8 +5,7 @@ import FormField from './FormField';
 import { LoadingButton } from '@mui/lab';
 import SendIcon from '@mui/icons-material/Send';
 import { Button } from '@mui/material';
-import FeedbackMessage from '../feedback/Feedback';
-import { uniqueID } from '../../utils';
+import { useToast } from '../notifications';
 
 export const FIELD_TYPE_TEXT = 'text';
 export const FIELD_TYPE_EMAIL = 'email';
@@ -37,6 +36,7 @@ const Form = ({
     readOnly = false}) => {
 
     const [values, setValues] = React.useState(() => getValuesFromFields(fields, initialValues));
+    const { toast } = useToast();
 
     useEffect(() => {
         setValues(getValuesFromFields(fields, initialValues));
@@ -45,12 +45,6 @@ const Form = ({
     const [sending, setSending] = React.useState(false);
     const [isValid, setIsValid] = React.useState(false);
     const [isDirty, setIsDirty] = React.useState(false);
-
-    const [result, setResult] = React.useState({
-        status: 'success',
-        message: null,
-        key: null // uniqueID()
-    })
 
     const onCaptchaChange = React.useCallback((value) => {
         setValues(oldValues => {
@@ -142,17 +136,9 @@ const Form = ({
             if (onCancel) {
                 onCancel();
             }
-            setResult({
-                key: uniqueID(),
-                severity: 'success',
-                message: validationMessage
-            })
+            toast.success(validationMessage);
         }).catch((error) => {
-            setResult({
-                key: uniqueID(),
-                severity: 'error',
-                message: error.message
-            })
+            toast.error(error.message);
         }).finally(() => {
             setSending(false);
         })
@@ -193,8 +179,6 @@ const Form = ({
                 }
             </Stack>
         }
-
-            <FeedbackMessage key={result.key} severity={result.severity} message={result.message} />
 
         </Stack>
     )

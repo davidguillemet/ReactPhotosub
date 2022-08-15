@@ -8,11 +8,23 @@ export const TransientProperties = [
 
 // Delete transient properties we don't want to save in database
 export function deleteTransientProperties(simulation, keepProperties) {
+    const propsToRollback = [];
     TransientProperties.forEach(propName => {
         if (keepProperties === undefined || keepProperties.includes(propName) === false) {
-            delete simulation[propName];
+            if (simulation[propName]) {
+                propsToRollback.push({
+                    name: propName,
+                    value: simulation[propName]
+                })
+                delete simulation[propName];
+            }
         }
     });
+    return () => {
+        propsToRollback.forEach(prop => {
+            simulation[prop.name] = prop.value;
+        })
+    }
 }
 
 export function getDbIndex(simulation) {

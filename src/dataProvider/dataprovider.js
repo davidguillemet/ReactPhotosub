@@ -113,8 +113,8 @@ DataProvider.prototype.removeFavorite = function(path) {
 };
 
 DataProvider.prototype.getFavorites = function(uid) {
-    // NOTE: this request shoudl not be triggered...
-    // the query data is initialized when getting user data at login time
+    // NOTE: this request should not be triggered...
+    // the query data cache is hydrated from userdata response when getting user data at login time
     if (uid === null) {
         return Promise.resolve([]);
     }
@@ -137,20 +137,26 @@ DataProvider.prototype.getSimulations = function(uid) {
 }
 
 DataProvider.prototype.addSimulation = function(newSimulation) {
-    deleteTransientProperties(newSimulation);
+    const rollbackFunc = deleteTransientProperties(newSimulation);
     return this.axios.post('/simulations', newSimulation)
     .then(response => {
         return _addSimulationDbIndex(response.data);
+    }).catch((error) => {
+        rollbackFunc();
+        throw error;
     });
 }
 
 DataProvider.prototype.updateSimulation = function(simulation) {
     // Delete transient properties but keep dbindex
-    deleteTransientProperties(simulation, [TRANSIENT_PROPERTY_DB_INDEX]);
+    const rollbackFunc = deleteTransientProperties(simulation, [TRANSIENT_PROPERTY_DB_INDEX]);
     // Here, simulation should contain an index property
     return this.axios.post('/simulations', simulation)
     .then(response => {
         return _addSimulationDbIndex(response.data);
+    }).catch((error) => {
+        rollbackFunc();
+        throw error;
     });
 }
 

@@ -29,8 +29,11 @@ import {setBackground, resize, borderWidth, borderColor, shadow, addImage, setIm
 
 import { useResizeObserver } from '../../components/hooks';
 import Search, { getInitialSearchResult } from '../../components/search';
-import useImageLoader, {LIST_HOME_SLIDESHOW, LIST_FAVORITES, LIST_SEARCH} from './hooks/imageLoaderHook';
+import useImageLoader, {LIST_HOME_SLIDESHOW, LIST_FAVORITES, LIST_SEARCH, LIST_INTERIORS} from './hooks/imageLoaderHook';
 import { withLoading, buildLoadingState } from '../../components/hoc';
+import { useGlobalContext } from '../../components/globalContext';
+import ErrorAlert from '../../components/error/error';
+import { QUERY_ERROR } from '../../components/reactQuery';
 
 const borderColors = [
     "#FFFFFF",
@@ -41,8 +44,26 @@ const borderColors = [
 
 const EmptySimulationImages = ({type, images, searchResult}) => {
     if (images === null) {
-        // to avoid blinking component display when transitionning
+        // to avoid blinking component display when transitioning
         return null;
+    }
+
+    if (images === QUERY_ERROR ||
+        (images.length === 0 && type === LIST_INTERIORS) ||
+        (type === LIST_SEARCH && searchResult.hasError === true)) {
+        return (
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                width: '100%',
+                height: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                px: 1
+            }}>
+                <ErrorAlert />
+            </Box>
+        );
     }
 
     if (type === LIST_FAVORITES || type === LIST_SEARCH) {
@@ -77,6 +98,7 @@ const EmptySimulationImages = ({type, images, searchResult}) => {
 
 const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
+    const context = useGlobalContext();
     const [listType, setListType] = useState(LIST_HOME_SLIDESHOW);
     const [interiors, images, setSearchImages, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
@@ -102,7 +124,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         let initBackground = true;
         if (simulation.background !== null) {
             interiorIndex = interiors.findIndex(interior => interior.src === simulation.background);
-            if (interiorIndex === -1) {
+            if (interiorIndex === -1 && interiors.length > 0) {
                 // Background not found
                 interiorIndex = 0;
             } else {
@@ -163,10 +185,10 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         // https://firebasestorage.googleapis.com/v0/b/photosub.appspot.com/o/userUpload%2FO30yfAqRCnS99zc1VoKMjIt9IEg1%2Finteriors%2FDSC_1388-Modifier.jpg?alt=media&token=796f88e2-d1b2-4827-b0f5-da9008e778bb
         // While we just need the following:
         // https://storage.googleapis.com/photosub.appspot.com/userUpload%2FO30yfAqRCnS99zc1VoKMjIt9IEg1%2Finteriors%2FDSC_1388-Modifier.jpg
-        const fileSrc = `https://storage.googleapis.com/photosub.appspot.com/userUpload/${user.uid}/interiors/${fileName}`;
+        const fileSrc = `${context.storageHost}/${context.firebaseStorage.app.options.storageBucket}/userUpload/${user.uid}/interiors/${fileName}`;
         // Add the new uploaded image to the interiors' array
         addUploadedInterior(fileSrc, sizeRatio);
-    }, [user, addUploadedInterior]);
+    }, [context, user, addUploadedInterior]);
 
     const handleListType = (event, newListType) => {
         if (newListType === null) {
@@ -223,6 +245,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 imageHeight={isMobile ? 100 : 120}
                 disabled={simulation.isLocked}
                 onDeleteUploaded={deleteUploadedInterior}
+                emptyComponent={<EmptySimulationImages type={LIST_INTERIORS} images={interiors} />}
             />
 
             <VerticalSpacing factor={3} />

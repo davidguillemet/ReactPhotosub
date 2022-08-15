@@ -4,6 +4,7 @@ module.exports = function(config) {
 
     const fetchAllDestinations = (req, res, next) => {
         // See https://firebase.google.com/docs/storage/web/download-files
+        res.locals.errorMessage = "Failed to load destinations.";
         return config.pool().select("d.*")
             .from({d: "destinations_with_regionpath"})
             .orderBy("d.date", "desc")
@@ -13,65 +14,50 @@ module.exports = function(config) {
                     destination.cover = config.convertPathToUrl(destination.path + "/" + destination.cover);
                 });
                 res.json(destinations);
-            }).catch((err) => {
-                config.logger.error("Failed to load destinations.", err);
-                res.status(500)
-                    .send("Failed to load destinations.")
-                    .end();
-            });
+            }).catch(next);
     };
 
     config.app.route("/admin/destinations")
         // Create a new destination (admin task)
         .post(async function(req, res, next) {
             const newDestination = req.body;
-
-            try {
-                await config.pool("destinations").returning("id").insert(newDestination);
-            } catch (err) {
-                config.logger.error(`Failed to insert destination ${newDestination.title} / ${newDestination.path}.`, err);
-                res.status(500).send(`Error while inserting destination ${newDestination.title} / ${newDestination.path}.`).end();
-                return;
-            }
-
-            return fetchAllDestinations(req, res, next);
+            res.locals.errorMessage = `Failed to insert destination ${newDestination.title}/${newDestination.path}.`;
+            return config.pool("destinations")
+                .returning("id")
+                .insert(newDestination)
+                .then(() => {
+                    return fetchAllDestinations(req, res, next);
+                })
+                .catch(next);
         })
         // Update the specified destination
         .put(async function(req, res, next) {
             const destination = req.body;
-
-            try {
-                await config.pool("destinations")
-                    .where("id", destination.id)
-                    .update({
-                        "title": destination.title,
-                        "date": destination.date,
-                        "location": destination.location,
-                        "path": destination.path,
-                        "cover": destination.cover,
-                        "macro": destination.macro,
-                        "wide": destination.wide,
-                    });
-            } catch (err) {
-                config.logger.error(`Failed to update destination ${destination.title} / ${destination.path}.`, err);
-                res.status(500).send(`Error while updating destination ${destination.title} / ${destination.path}.`).end();
-                return;
-            }
-
-            return fetchAllDestinations(req, res, next);
+            res.locals.errorMessage = `Failed to update destination ${destination.title}/${destination.path}.`;
+            return config.pool("destinations")
+                .where("id", destination.id)
+                .update({
+                    "title": destination.title,
+                    "date": destination.date,
+                    "location": destination.location,
+                    "path": destination.path,
+                    "cover": destination.cover,
+                    "macro": destination.macro,
+                    "wide": destination.wide,
+                }).then(() => {
+                    return fetchAllDestinations(req, res, next);
+                }).catch(next);
         })
         // Delete a destination (admin task)
         .delete(function(req, res, next) {
             const removedDestination = req.body;
-            config.pool("destinations")
+            res.locals.errorMessage = `Failed to delete destination ${removedDestination.id}.`;
+            return config.pool("destinations")
                 .where("id", removedDestination.id)
                 .del()
                 .then(() => {
                     res.status(200).send({id: removedDestination.id}).end();
-                }).catch((err) => {
-                    config.logger.error(`Failed to delete destination ${removedDestination.id}.`, err);
-                    res.status(500).send(`Failed to delete destination ${removedDestination.id}.`).end();
-                });
+                }).catch(next);
         });
 
     // Get all Destinations
@@ -93,7 +79,9 @@ module.exports = function(config) {
             // Only compare the root region (South-east asia, sousth-africa, ...)
             const rootRegion = regions[regions.length - 1];
 
-            config.pool().select("destinations_with_regionpath.*")
+            res.locals.errorMessage = "Le chargement des destinations similaires a échoué.";
+
+            return config.pool().select("destinations_with_regionpath.*")
                 .from("destinations_with_regionpath")
                 // destinations_with_regionpath.regionpath is the region array from lowest to highest level [raja, indo, asie]
                 // To get related regions we test if the last element of regionpath (e.g. asie) is the same as the last element of the specified region path (req.query.region)
@@ -108,11 +96,6 @@ module.exports = function(config) {
                         destination.cover = config.convertPathToUrl(destination.path + "/" + destination.cover);
                     });
                     res.json(destinations);
-                }).catch((err) => {
-                    config.logger.error("Failed to load related destinations", err);
-                    res.status(500)
-                        .send("Failed to load related destinations.")
-                        .end();
-                });
+                }).catch(next);
         });
 };
