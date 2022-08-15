@@ -23,7 +23,7 @@ module.exports = function(config) {
             res.locals.errorMessage = `Failed to load description for destination '${getDestinationPath(req)}'`;
             return config.pool()
                 .select("*")
-                .from("destinationszzzz")
+                .from("destinations")
                 .where("path", getDestinationPath(req))
                 .then((destinations) => {
                     const destination = destinations[0];
