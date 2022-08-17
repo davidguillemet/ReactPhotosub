@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useHistory } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import { green, orange, red } from '@mui/material/colors';
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -140,10 +141,11 @@ const Search = React.forwardRef(({
     onResult = null,
     galleryComponent = null,
     nextPageComponent = null,
-    onNewQueryString = null,
     query = null,
+    pushHistory = false,
     pageIndex = 0}, ref) => {
 
+    const history = useHistory();
     const context = useGlobalContext();
     const [ helpOpen, setHelpOpen ] = useState(false);
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
@@ -187,10 +189,7 @@ const Search = React.forwardRef(({
         if (searchResult.totalCount === -1) {
             return;
         }
-        if (onNewQueryString && searchResult.page === 0) {
-            onNewQueryString(searchResult.query)
-        }
-    }, [onNewQueryString, searchResult]);
+    }, [searchResult]);
 
     useEffect(() => {
         if (searchConfig.query.length <= 2)
@@ -263,14 +262,21 @@ const Search = React.forwardRef(({
         });
     }
 
-    function setSearchQuery(query) {
-        setSearchConfig(oldConfig => {
-            return {
-                ...oldConfig,
-                query: query,
-                page: 0
-            }
-        })
+    function setSearchQuery(newQuery) {
+        if (pushHistory ===  true) {
+            history.push({
+                pathname: '/search',
+                search: '?' + new URLSearchParams({query: newQuery}).toString()
+            })
+        } else {
+            setSearchConfig(oldConfig => {
+                return {
+                    ...oldConfig,
+                    query: newQuery,
+                    page: 0
+                }
+            })
+        }
     }
 
     const handleNextPage = useCallback(() => {
