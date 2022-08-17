@@ -182,6 +182,11 @@ const ExpandedView = React.forwardRef(({
         }
     }, [images])
 
+    // Required to update image for backward/forward
+    useEffect(() => {
+        setCurrentIndex(index);
+    }, [index]);
+
     const handleThumbnailClick = useCallback((index) => {
         setCurrentIndex(index);
         if (onChangeIndex) {

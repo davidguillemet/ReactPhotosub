@@ -214,7 +214,13 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
 
             <VerticalSpacing factor={2} />
 
-            <Gallery images={images} onReady={onGalleryIsReady} displayDestination={false} sort="asc" />
+            <Gallery
+                images={images}
+                onReady={onGalleryIsReady}
+                displayDestination={false}
+                sort="asc"
+                pushHistory={true}
+            />
 
             <VerticalSpacing factor={4} />
 

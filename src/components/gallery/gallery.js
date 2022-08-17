@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {isMobile} from 'react-device-detect';
 import { grey } from '@mui/material/colors';
 import Alert from '@mui/material/Alert';
@@ -9,6 +9,7 @@ import ExpandedView from './expandedView';
 import { withLoading, buildLoadingState } from '../../components/hoc';
 import MasonryGallery from '../masonryGallery';
 import { BlockQuote } from '../../template/pageTypography';
+import { useHistory, useLocation } from 'react-router-dom';
 
 const GROUP_BY_YEAR = "year";
 
@@ -97,6 +98,11 @@ const GroupGallery = ({images, onReady, renderItem}) => (
     />
 )
 
+function getViewImage(querySearch) {
+    const queryParameters = new URLSearchParams(querySearch)
+    return queryParameters.get("image");
+}
+
 const Gallery = ({
     images,
     count = null,
@@ -107,11 +113,47 @@ const Gallery = ({
     onNextPage = null,
     groupBy = null,
     // By default sort images by date, descending, i.e. from the most recent to the oldest
-    sort = "desc"}) => {
+    sort = "desc",
+    pushHistory = false}) => {
+
+    const history = useHistory();
+    const location = useLocation();
 
     const [expandedImageIndex, setExpandedImageIndex] = useState(null);
 
     const [ groups, allImages] = useMemo(() => groupFavorites(images, groupBy, sort), [images, groupBy, sort]);
+
+    // location.search has been modified after history.push
+    useEffect(() => {
+        if (images === undefined || pushHistory === false) {
+            return;
+        }
+        const imageFullPath = getViewImage(location.search);
+        const imageIndex =
+            imageFullPath !== null ?
+            images.findIndex(image => imageFullPath.endsWith(image.name)) :
+            null;
+        setExpandedImageIndex(imageIndex);
+    }, [location.search, images, pushHistory]);
+
+    const handleOnImageClick = useCallback((index) => {
+        if (pushHistory === true) {
+            let search = null;
+            if (index !== null) {
+                const image = images[index];
+                search = '?' + new URLSearchParams({image: `${image.path}/${image.name}`}).toString();
+            }
+            if (location.search === search) {
+                return;
+            }
+            history.push({
+                pathname: location.pathname,
+                search: search
+            });
+        } else {
+            setExpandedImageIndex(index)
+        }
+    }, [pushHistory, images, history, location.search, location.pathname]);
 
     const renderItem = (item, index, width, groupIndex) => {
         const offset = groups[groupIndex].offset;
@@ -126,11 +168,11 @@ const Gallery = ({
     };
 
     function onImageClick(imageIndex) {
-        setExpandedImageIndex(imageIndex);
+        handleOnImageClick(imageIndex);
     }
 
     function onCloseModal() {
-        setExpandedImageIndex(null);
+        handleOnImageClick(null);
     }
 
     if (images.length === 0 && emptyMessage !== null) {
@@ -178,7 +220,7 @@ const Gallery = ({
                         images={allImages}
                         count={count || allImages.length}
                         index={expandedImageIndex}
-                        onChangeIndex={setExpandedImageIndex}
+                        onChangeIndex={handleOnImageClick}
                         onClose={onCloseModal}
                         displayDestination={displayDestination}
                         hasNext={hasNext}
