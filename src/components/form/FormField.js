@@ -10,7 +10,6 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import LazyImage from "../lazyImage";
 import ReCAPTCHA from "react-google-recaptcha";
-import { Alert } from '@mui/material';
 
 import {
     FIELD_TYPE_TEXT,

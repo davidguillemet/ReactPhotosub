@@ -21,7 +21,7 @@ import DestinationsMap from '../../components/map';
 import lazyComponent from '../../components/lazyComponent';
 import RelatedDestinations from './relatedDestinations';
 import NotFound from '../notFound';
-import { HelmetDestination, buildFullTitle } from '../../template/seo';
+import { HelmetDestination } from '../../template/seo';
 import { useReactQuery } from '../../components/reactQuery';
 
 const RegionChip = ({region}) => {
@@ -166,9 +166,7 @@ const DestinationDetails = ({destination}) => {
                 alignItems: 'flex-start'
             }}>
             <HelmetDestination destination={destination} />
-            {/* Hidden H1 for SEO only */}
-            <PageSubTitle component="h1" sx={{display: "none"}}>{buildFullTitle(`${destination.title} - ${formattedDate}`)}</PageSubTitle>
-            <PageSubTitle sx={{m: 0, color: "white", whiteSpace: "nowrap", fontWeight: 300}}>{destination.title}</PageSubTitle>
+            <PageSubTitle component="h1" sx={{m: 0, color: "white", whiteSpace: "nowrap", fontWeight: 300}}>{destination.title}</PageSubTitle>
             <PageHeader sx={{m: 0, color: "white"}}>{formattedDate}</PageHeader>
             {
                 destination.link &&

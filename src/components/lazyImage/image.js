@@ -122,7 +122,7 @@ const LazyImage = ({
                 }}
                 ref={imageRef}
                 src={imageSrc}
-                alt=""
+                alt={image.description || image.title}
                 onLoad={onLoad}
                 onError={onError}
             />

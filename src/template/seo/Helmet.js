@@ -3,18 +3,23 @@ import { Helmet } from "react-helmet";
 import { useLocation } from "react-router-dom";
 import { getThumbnailSrc, formatDate } from '../../utils';
 
-const _titlePlaceHolder = '{title}';
-const _titleTemplate = `${_titlePlaceHolder} | David Guillemet - Underwater Photography`;
+const _pageNamePlaceHolder = '{title}';
+const _descriptionTemplate = `${_pageNamePlaceHolder} | David Guillemet - Underwater Photography`;
+const _shortTitleTemplate = `${_pageNamePlaceHolder} | David Guillemet`;
 const _defaultImage = "https://storage.googleapis.com/photosub.appspot.com/2017/rajaampat/DSC_5683.jpg";
 const _imageWidth = 1200;
 const _imageHeight = 800;
 
-export const buildFullTitle = (title) => {
-    return title ? _titleTemplate.replace(_titlePlaceHolder, title) : null;
+const buildFullDescription = (title) => {
+    return title ? _descriptionTemplate.replace(_pageNamePlaceHolder, title) : null;
+}
+
+const buildShortTitle = (title) => {
+    return title ? _shortTitleTemplate.replace(_pageNamePlaceHolder, title) : null;
 }
 
 const buildDescription = (description, title) => {
-    return description || buildFullTitle(title);
+    return description || buildFullDescription(title);
 }
 
 export const HelmetFull = ({ route }) => {
@@ -72,10 +77,11 @@ export const HelmetImage = ({image}) => {
 }
 
 export const HelmetTitle = ({title}) => {
-    const fullTitle = useMemo(() => buildFullTitle(title), [title]);
+    const fullTitle = useMemo(() => buildFullDescription(title), [title]);
+    const shortTitle = useMemo(() => buildShortTitle(title), [title]);
     return fullTitle ?
         <Helmet>
-            <title>{fullTitle}</title>
+            <title>{shortTitle}</title>
             <meta property="og:title" content={fullTitle} />
             <meta name="twitter:title" content={fullTitle} />
         </Helmet> :
