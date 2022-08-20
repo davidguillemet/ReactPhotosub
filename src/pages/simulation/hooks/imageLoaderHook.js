@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { uniqueID } from '../../../utils';
 import { useGlobalContext } from '../../../components/globalContext';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useReactQuery } from '../../../components/reactQuery';
 
 export const LIST_HOME_SLIDESHOW = "list::slideshow";
@@ -116,7 +116,7 @@ const useImageLoader = (user, simulations, listType) => {
     }, [allInteriors, queryClient, removeUserInterior, user]);
 
     const setSearchImages = useCallback((results) => {
-        queryClient.setQueryData('searchResults', results);
+        queryClient.setQueryData(['searchResults'], results);
     }, [queryClient])
 
     return [

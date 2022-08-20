@@ -8,7 +8,7 @@ import "firebase/storage";
 import axios from 'axios';
 import DataProvider from '../../dataProvider/dataprovider';
 
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const GlobalContext = createContext(null);
 
@@ -99,10 +99,10 @@ const GlobalContextProvider = ({children}) => {
             firebaseAnalytics: analytics.current,
             dataProvider,
             queryClient,
-            useFetchHomeSlideshow: () => useQuery('homeslideshow', () => dataProvider.getImageDefaultSelection()),
-            useFetchLocations: () => useQuery('locations', () => dataProvider.getLocations()), 
-            useFetchRegions: () => useQuery('regions', () => dataProvider.getRegions()),
-            useFetchDestinations: () => useQuery('destinations', () => dataProvider.getDestinations()),
+            useFetchHomeSlideshow: () => useQuery(['homeslideshow'], () => dataProvider.getImageDefaultSelection()),
+            useFetchLocations: () => useQuery(['locations'], () => dataProvider.getLocations()), 
+            useFetchRegions: () => useQuery(['regions'], () => dataProvider.getRegions()),
+            useFetchDestinations: () => useQuery(['destinations'], () => dataProvider.getDestinations()),
             useAddDestination: () => useMutation((destination) => dataProvider.createDestination(destination), {
                 onSuccess: (data) => {
                     queryClient.setQueryData(['destinations'], data)
@@ -124,11 +124,15 @@ const GlobalContextProvider = ({children}) => {
             useFetchDestinationDesc: (year, title) => useQuery(['destinationdesc', year, title], () => dataProvider.getDestinationDescFromPath(year, title)),
             useFetchDestinationHeader: (year, title) => useQuery(['destinationheader', year, title], () => dataProvider.getDestinationDetailsFromPath(year, title)),
             useFetchDestinationImages: (year, title) => useQuery(['destinationimages', year, title], () => dataProvider.getDestinationImagesFromPath(year, title)),
-            useFetchInteriors: (thenFunc) => useQuery('interiors', () => dataProvider.getInteriors().then(thenFunc)),
+            useFetchInteriors: (thenFunc) => useQuery(['interiors'], () => dataProvider.getInteriors().then(thenFunc)),
             useFetchUserInteriors: (uid, thenFunc) => useQuery(['userInteriors', uid], () => dataProvider.getUploadedInteriors(uid).then(thenFunc)),
             useRemoveUserInterior: () => useMutation((fileName) => dataProvider.removeUploadedInterior(fileName)),
-            useFetchDefaultSelection: (enabled, thenFunc) => useQuery('defaultSelection', () => dataProvider.getImageDefaultSelection().then(thenFunc), { enabled: enabled }),
-            useFetchSearchResults: (enabled, thenFunc) => useQuery('searchResults', () => Promise.resolve([]), { enabled: enabled }),
+            useFetchDefaultSelection: (enabled, thenFunc) => useQuery(
+                ['defaultSelection'],
+                () => dataProvider.getImageDefaultSelection().then(thenFunc),
+                { enabled: enabled }
+            ),
+            useFetchSearchResults: (enabled, thenFunc) => useQuery(['searchResults'], () => Promise.resolve([]), { enabled: enabled }),
 
             useFetchSimulations: (uid) => useQuery(['simulations', uid], () => dataProvider.getSimulations(uid), {
                 notifyOnChangePropsExclusions: ['data'] // Prevent re-render when data property changes (does ot work!)
@@ -148,7 +152,7 @@ const GlobalContextProvider = ({children}) => {
                     queryClient.setQueryData(['simulations', userId()], data)
                 }
             }),
-            useFetchImageCount: () => useQuery('imageCount', () => dataProvider.getImageCount()),
+            useFetchImageCount: () => useQuery(['imageCount'], () => dataProvider.getImageCount()),
 
             useFetchFavorites: (uid, enabled, thenFunc) => useQuery(['favorites', uid], () => dataProvider.getFavorites(uid).then(thenFunc), { enabled: enabled }),
             useAddFavorite: () => useMutation((pathArray) => dataProvider.addFavorite(pathArray)),

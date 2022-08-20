@@ -4,7 +4,7 @@ import {
     QueryClientProvider,
     QueryCache,
     MutationCache
-} from 'react-query';
+} from '@tanstack/react-query';
 
 import { useToast } from '../notifications';
 
