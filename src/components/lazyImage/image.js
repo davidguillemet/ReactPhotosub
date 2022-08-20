@@ -66,7 +66,7 @@ const LazyImage = ({
 
     const onLoad = event => {
         if (event.target.src !== placeHolder) {
-            // add class loaded and modify ref valeu to prevent one additional render
+            // add class loaded and modify ref value to prevent one additional render
             event.target.classList.add('loaded');
             loaded.current = true;
         }

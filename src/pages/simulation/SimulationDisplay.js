@@ -6,8 +6,8 @@ import LockIcon from '@mui/icons-material/Lock';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { deleteImage} from './actions/SimulationActions';
 
-
 import SimulationImage from './SimulationImage';
+import { getThumbnailSrc } from '../../utils';
 
 const ImageTools = ({onDelete}) => {
 
@@ -25,7 +25,7 @@ const ImageTools = ({onDelete}) => {
     );
 }
 
-const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispatch, selectedImage, onToggleCurrentImageId}, ref) => {
+const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispatch, selectedImage, onToggleCurrentImageId, width}, ref) => {
 
     const simulation = useMemo(() => simulations[simulationIndex], [simulations, simulationIndex]);
 
@@ -50,7 +50,7 @@ const SimulationDisplay = React.forwardRef(({simulations, simulationIndex, dispa
             <img
                 alt=""
                 border="0"
-                src={simulation.background}
+                src={getThumbnailSrc(simulation.background, width)}
                 style={{
                     width: '100%',
                     display: 'block'

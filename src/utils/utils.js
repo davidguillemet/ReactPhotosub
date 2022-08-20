@@ -200,6 +200,9 @@ function getThumbnailFromSpec(image, sizeSpec) {
 
 export function getThumbnailSrc(image, containerWidth, containerHeight) {
 
+    if (!image) {
+        return null;
+    }
     let actualWidth = containerWidth;
     let longestEdge = actualWidth;
     if (image.sizeRatio !== undefined) {

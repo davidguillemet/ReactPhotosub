@@ -430,6 +430,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 dispatch={dispatch}
                 onToggleCurrentImageId={handleToggleCurrentImageId}
                 selectedImage={currentImageId}
+                width={resizeObserver.width}
             />
 
         </Box>
