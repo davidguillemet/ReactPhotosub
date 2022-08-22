@@ -9,7 +9,7 @@ module.exports = function(config) {
         .get(async function(req, res, next) {
             const uid = res.locals.uid;
             const user = await admin.auth().getUser(uid);
-            if (user.email === config.settings.admin.email) {
+            if (user.email === process.env.ADMIN_EMAIL) {
                 // Check claims and set admin role if needed
                 const user = await admin.auth().getUser(uid);
                 const customClaims = user.customClaims;

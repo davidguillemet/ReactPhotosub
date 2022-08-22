@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const express = require("express");
 const compression = require("compression");
-const {convertPathToUrl, bucket, settings, logger} = require("../utils/firebase");
+const {convertPathToUrl, bucket, logger} = require("../utils/firebase");
 const {isAuthenticated, isAuthorized} = require("./authenticated");
 const cors = require("cors");
 
@@ -33,7 +33,6 @@ const resourceConfiguration = {
     pool,
     convertPathToUrl,
     bucket,
-    settings,
     logger,
     isAuthenticated,
     isAuthorized,

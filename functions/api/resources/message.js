@@ -58,7 +58,7 @@ module.exports = function(config) {
             // };
 
             // First try to validate the reCaptcha token:
-            const secret = config.settings.recaptcha.secretkey;
+            const secret = process.env.RECAPTCHA_SECRETKEY;
             const response = req.body.token;
             try {
                 const verify = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${response}`,
@@ -85,11 +85,11 @@ module.exports = function(config) {
             }
 
             const transporter = nodemailer.createTransport({
-                port: parseInt(config.settings.mail.smtp.port), // 465,
-                host: config.settings.mail.smtp.host, // "smtp.gmail.com",
+                port: parseInt(process.env.MAIL_SMTP_PORT), // 465,
+                host: process.env.MAIL_SMTP_HOST, // "smtp.gmail.com",
                 auth: {
-                    user: config.settings.mail.auth.user, // "david.photosub",
-                    pass: config.settings.mail.auth.pass,
+                    user: process.env.MAIL_AUTH_USER, // "david.photosub",
+                    pass: process.env.MAIL_AUTH_PASS,
                 },
                 secure: true,
             });
@@ -100,8 +100,8 @@ module.exports = function(config) {
             const messageHtml = htmlContentForMainMessage(req.body);
             const messageText = fromHtmlToText(messageHtml);
             const mailData = {
-                from: config.settings.mail.from, // "david.photosub@gmail.com",
-                to: config.settings.mail.to, // "david.guillemet@hotmail.com",
+                from: process.env.MAIL_FROM, // "david.photosub@gmail.com",
+                to: process.env.MAIL_TO, // "david.guillemet@hotmail.com",
                 subject: `[davidphotosub.com] ${req.body.subject}`,
                 text: messageText,
                 html: messageHtml,
@@ -113,7 +113,7 @@ module.exports = function(config) {
                 const messageCopyHtml = htmlContentForCopyMessage(req.body);
                 const messageCopyText = fromHtmlToText(messageCopyHtml);
                 const mailCopyData = {
-                    from: config.settings.mail.from, // "david.photosub@gmail.com",
+                    from: process.env.MAIL_FROM, // "david.photosub@gmail.com",
                     to: req.body.email,
                     subject: `[davidphotosub.com] ${req.body.subject}`,
                     text: messageCopyText,

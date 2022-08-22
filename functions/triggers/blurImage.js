@@ -2,7 +2,7 @@ const sharp = require("sharp");
 const path = require("path");
 const {Storage} = require("@google-cloud/storage");
 const os = require("os");
-const {logger, config} = require("./config");
+const {logger} = require("./config");
 
 function _getBlurryFilePath(filePathProps, blurryFolder) {
     const fileDir = filePathProps.dir;
@@ -19,7 +19,7 @@ exports.blurImage = function(file, fileContent, blurryFolder) {
     const tempBlurryFilePath = path.join(os.tmpdir(), tempBlurryFileName);
 
     return sharp(fileContent)
-        .blur(parseFloat(config.blur.sigma))
+        .blur(parseFloat(process.env.BLUR_SIGMA))
         .toFile(tempBlurryFilePath)
         .then(() => {
             const blurryFilePathInBucket = _getBlurryFilePath(filePathProps, blurryFolder);

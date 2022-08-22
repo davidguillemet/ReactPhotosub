@@ -12,10 +12,21 @@ exports.deleteImage = functions.storage.object().onDelete(async (file) => {
     return deleteFile(file);
 });
 
-exports.deleteUser = functions.auth.user().onDelete(async (user) => {
-    return deleteUser(user);
-});
+exports.deleteUser = functions
+    .runWith({secrets: ["CONFIG_APIKEY"]})
+    .auth
+    .user()
+    .onDelete(async (user) => {
+        return deleteUser(user);
+    });
 
-exports.mainapi = functions.https.onRequest(mainapi);
+exports.mainapi = functions
+    .runWith({secrets: [
+        "MAIL_AUTH_PASS",
+        "POSTGRESQL_PASSWORD",
+        "RECAPTCHA_SECRETKEY",
+    ]})
+    .https
+    .onRequest(mainapi);
 
 exports.preRender = functions.https.onRequest(preRender);

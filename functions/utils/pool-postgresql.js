@@ -1,21 +1,18 @@
 const knex = require("knex");
-const functions = require("firebase-functions");
-
-const configFunctions = functions.config();
 
 // [START cloud_sql_postgres_knex_create_socket]
 const createUnixSocketPool = (config) => {
     const connection = {
-        user: configFunctions.postgresql.user,
-        password: configFunctions.postgresql.password,
-        database: configFunctions.postgresql.database,
+        user: process.env.POSTGRESQL_USER,
+        password: process.env.POSTGRESQL_PASSWORD,
+        database: process.env.POSTGRESQL_DATABASE,
     };
 
-    if (configFunctions.env === "remote-dev" || configFunctions.env === "local-dev") {
-        connection.host = configFunctions.postgresql.host;
-        connection.port = configFunctions.postgresql.port;
+    if (process.env.FUNCTIONS_EMULATOR === "true") {
+        connection.host = process.env.POSTGRESQL_HOST;
+        connection.port = process.env.POSTGRESQL_PORT;
 
-        /* if (configFunctions.env === "remote-dev") {
+        /* if (process.env.NODE_ENV === "remote") {
             // Connect to Google Cloud instance from local env
             const fs = require("fs");
             const pathToCertificates = __dirname + "/../../../gcp/postgresql/";
@@ -27,7 +24,7 @@ const createUnixSocketPool = (config) => {
             };
         } */
     } else {
-        connection.host = `/cloudsql/photosub:${configFunctions.postgresql.region}:${configFunctions.postgresql.instance}`;
+        connection.host = `/cloudsql/photosub:${process.env.POSTGRESQL_REGION}:${process.env.POSTGRESQL_INSTANCE}`;
     }
 
     // Establish a connection to the database
