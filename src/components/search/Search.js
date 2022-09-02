@@ -23,6 +23,7 @@ import { useGlobalContext } from '../globalContext';
 import { Paragraph } from '../../template/pageTypography';
 import { useStateWithDep } from '../hooks';
 import ErrorAlert from '../error';
+import { useFirebaseContext } from '../firebase';
 
 const _pageSize = 10;
 
@@ -147,6 +148,7 @@ const Search = React.forwardRef(({
 
     const history = useHistory();
     const context = useGlobalContext();
+    const firebaseContext = useFirebaseContext();
     const [ helpOpen, setHelpOpen ] = useState(false);
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
     const [ searchResult, setSearchResult] = useState(getInitialSearchResult())
@@ -208,7 +210,7 @@ const Search = React.forwardRef(({
                 return;
             }
 
-            context.firebaseAnalytics.logEvent("search", {
+            firebaseContext.logEvent("search", {
                 search_term: searchConfig.query
             });
 
@@ -246,7 +248,7 @@ const Search = React.forwardRef(({
             setSearchIsRunning(false);
         })
 
-    }, [searchConfig, context.dataProvider, context.firebaseAnalytics]);
+    }, [searchConfig, context, firebaseContext]);
 
     const toggleSearchHelpOpen = useCallback(() => {
         setHelpOpen(open => !open);

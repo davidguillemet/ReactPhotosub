@@ -14,6 +14,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { useToast } from '../../components/notifications';
 
 import './fileUploadStyles.css';
+import { useFirebaseContext } from '../../components/firebase';
 
 const STEP_UPLOAD = "step::upload";
 const STEP_THUMBNAILS = "step::thumbnail";
@@ -90,6 +91,7 @@ const ThumbnailError = ({error}) => {
 
 const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
 
+    const firebaseContext = useFirebaseContext();
     const context = useGlobalContext();
     const [step, setStep] = useState({ name: STEP_UPLOAD, error: null });
     const [progress, setProgress] = useState(0);
@@ -112,7 +114,9 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
     useEffect(() => {
         // launch firebase upload
         // see documentation at https://firebase.google.com/docs/storage/web/upload-files
-        uploadTaskRef.current = storageRef.child(file.name).put(file);
+        const parentPath = storageRef.fullPath;
+        const fileStorageRef = firebaseContext.storageRef(parentPath + "/" + file.name);
+        uploadTaskRef.current = firebaseContext.upload(fileStorageRef, file, { contentType: file.type });
 
         uploadTaskRef.current.on('state_changed', 
             (snapshot) => {
@@ -145,7 +149,7 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
                 uploadTaskRef.current.cancel();
             }
         }
-    }, [file, storageRef, onCancel, onFileUploaded, context.dataProvider]);
+    }, [file, storageRef, onCancel, onFileUploaded, context.dataProvider, firebaseContext]);
 
     return (
         <Box>
@@ -178,16 +182,15 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
 
 const FileUpload = ({caption, user, onFileUploaded}) => {
 
-    const context = useGlobalContext();
+    const firebaseContext = useFirebaseContext();
     const [uploadFiles, setUploadFiles] = useState([]);
     const userUploadRef = useRef(null);
 
     useEffect(() => {
         if (userUploadRef.current === null) {
-            const storageRef = context.firebaseStorage.ref();
-            userUploadRef.current = storageRef.child(`userUpload/${user.uid}/interiors`);
+            userUploadRef.current = firebaseContext.storageRef(`userUpload/${user.uid}/interiors`);
         }
-    }, [user, context.firebaseStorage]);
+    }, [user, firebaseContext]);
 
     const handleFileSelection = (event) => {
         const { target: { files } } = event;

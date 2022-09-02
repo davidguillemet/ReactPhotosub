@@ -1,61 +1,27 @@
 import React, { createContext, useContext, useRef } from 'react';
 
-import firebase from 'firebase/app';
-import "firebase/analytics";
-import "firebase/auth";
-import "firebase/storage";
-
 import axios from 'axios';
 import DataProvider from '../../dataProvider/dataprovider';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useFirebaseContext } from '../firebase';
 
 const GlobalContext = createContext(null);
 
-function userId() {
-    return firebase.auth().currentUser.uid;
+const isDev = () => {
+    return process.env.NODE_ENV === "development"
 }
 
 const GlobalContextProvider = ({children}) => {
 
+    const firebaseContext = useFirebaseContext();
     const globalContext = useRef(null);
     const queryClient = useQueryClient();
-    const analytics = useRef(null);
 
-    const isDev = () => {
-        return process.env.NODE_ENV === "development"
-    }
-
-    // With React.StrictMode - to detet issues - it seems the App is rendered twice
-    // but the globalContent ref is lost since it is not the same App instn-ance
-    if (!firebase.apps.length) {
-        firebase.initializeApp({
-            apiKey: "AIzaSyALeWHQ-CKzvcG-sb7466UNzFDn_w5HQOc",
-            authDomain: "photosub.firebaseapp.com",
-            projectId: "photosub",
-            storageBucket: "photosub.appspot.com",
-            messagingSenderId: "780806748384",
-            appId: "1:780806748384:web:c2976014be05cc21a13885",
-            measurementId: "G-NNE3P3R7HH"
-        });
-    }
+    const getUser = () => firebaseContext.auth.currentUser;
+    const userId = () => getUser().uid
 
     if (globalContext.current === null) {
-
-        analytics.current = 
-            isDev() ?
-            {
-                logEvent: () => { /* Empty */ }
-            } :
-            firebase.analytics();
-
-        const storageHost = isDev() ? "http://localhost:9199" : "https://storage.googleapis.com";
-        const firebaseAuth = firebase.auth();
-        const firebaseStorage = firebase.storage();
-        if (isDev()) {
-            firebaseAuth.useEmulator("http://localhost:9099");
-            firebaseStorage.useEmulator("localhost", 9199);
-        }
 
         const apiBaseUrl =
             process.env.REACT_APP_USE_FUNCTIONS_EMULATOR === 'true' ?
@@ -69,7 +35,7 @@ const GlobalContextProvider = ({children}) => {
 
         // configure axios to send an authentication token as soon as a user is connected
         axiosInstance.interceptors.request.use(async function (config) {
-            const currentUSer = firebaseAuth.currentUser;
+            const currentUSer = getUser();
             if (currentUSer) {
                 const token = await currentUSer.getIdToken(true);
                 config.headers.Authorization = `Bearer ${token}`;
@@ -92,11 +58,6 @@ const GlobalContextProvider = ({children}) => {
         const dataProvider = new DataProvider(axiosInstance);
 
         globalContext.current = {
-            firebase,
-            firebaseAuth,
-            firebaseStorage,
-            storageHost,
-            firebaseAnalytics: analytics.current,
             dataProvider,
             queryClient,
             useFetchHomeSlideshow: () => useQuery(['homeslideshow'], () => dataProvider.getImageDefaultSelection()),

@@ -9,6 +9,12 @@
             "request": "attach",
             "name": "Debug",
             "port": 9229
+        },
+        {
+        "type": "chrome",
+        "request": "launch",
+        "name": "Debug React Photosub",
+        "url": "http://localhost:3000"
         }
     ]
 }

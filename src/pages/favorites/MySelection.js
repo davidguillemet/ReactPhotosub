@@ -9,6 +9,7 @@ import Gallery from '../../components/gallery';
 import { PageTitle, PageSubTitle } from '../../template/pageTypography';
 import { useGlobalContext } from '../../components/globalContext';
 import { withLoading, buildLoadingState, withUser } from '../../components/hoc';
+import { useFavorites } from '../../components/favorites';
 
 const MySelectionContent = withLoading(({images}) => {
     return (
@@ -26,6 +27,7 @@ const MySelection = withUser(() => {
 
     const context = useGlobalContext();
     const authContext = useAuthContext();
+    const favoritesContext = useFavorites();
     const { data: images } = context.useFetchFavorites(authContext.user && authContext.user.uid, true)
     const [ removedFavorites, setRemovedFavorites ] = useState([]);
     const [ undoRunning, setUndoRunning ] = useState(false);
@@ -58,9 +60,9 @@ const MySelection = withUser(() => {
     }, [removedFavorites])
 
     useEffect(() => {
-        authContext.subscribeFavorites(favoriteAction);
-        return () => authContext.unsubscribeFavorites(favoriteAction);
-    }, [favoriteAction, authContext])
+        favoritesContext.subscribeFavorites(favoriteAction);
+        return () => favoritesContext.unsubscribeFavorites(favoriteAction);
+    }, [favoriteAction, favoritesContext])
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -71,7 +73,7 @@ const MySelection = withUser(() => {
 
     const handleUndo = () => {
         setUndoRunning(true);
-        authContext.addUserFavorite(removedFavorites).then(() => {
+        favoritesContext.addUserFavorite(removedFavorites).then(() => {
             setRemovedFavorites([]);
         }).finally(() => {
             setUndoRunning(false);

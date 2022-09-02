@@ -25,7 +25,7 @@ const ToastNotifications = (props) => {
                     toasts.map((toast, index) => {
                         return (
                             <CSSTransition
-                                key={toast._id}
+                                key={toast.__id}
                                 timeout={200}
                                 classNames="notification"
                             >                

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import FavoriteIconOutlined from '@mui/icons-material/FavoriteBorderOutlined';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
@@ -9,22 +9,22 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import TooltipIconButton from '../tooltipIconButton';
 import { useAuthContext } from '../authentication';
 import './styles.css';
+import { useFavorites } from '../favorites';
 
 const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
 
-    const path = `${image.path}/${image.name}`;
     const authContext = useAuthContext();
+    const favoritesContext = useFavorites();
     const [ updating, setUpdating ] = useState(false);
 
-    // TODO: create isInfavorites() method in authContext
-    const isInFavorites = useMemo(() => authContext.data?.favorites && authContext.data.favorites.has(path), [authContext.data, path]);
+    const isInFavorites = favoritesContext.isIn(image);
 
     function handleFavoriteClick() {
         setUpdating(true);
         const favoriteActionPromise =
             isInFavorites ?
-            authContext.removeUserFavorite(image) :
-            authContext.addUserFavorite([image]);
+            favoritesContext.removeUserFavorite(image) :
+            favoritesContext.addUserFavorite([image]);
 
         favoriteActionPromise.catch(err => {
             // Empty... mutationCache is adding an error toast

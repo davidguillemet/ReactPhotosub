@@ -1,5 +1,6 @@
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import { useGlobalContext } from '../globalContext';
+import useFirebaseContext from './firebaseContextHook';
+import { EmailAuthProvider } from "firebase/auth";
 import './firebaseui.css';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box } from '@mui/material';
@@ -167,7 +168,7 @@ const SignedInButton = ({handleLogout}) => {
 
 const FirebaseAuth = (props) => {
 
-    const context = useGlobalContext();
+    const firebaseContext = useFirebaseContext();
     const authContext = useAuthContext();
 
     const [isLogin, setIsLogin] = useState(false);
@@ -184,7 +185,7 @@ const FirebaseAuth = (props) => {
     }
 
     function logout() {
-        context.firebaseAuth.signOut();
+        firebaseContext.signOut();
     }
 
     function onCloseModal() {
@@ -197,7 +198,7 @@ const FirebaseAuth = (props) => {
         signInFlow: 'popup',
         // We will display Google and Facebook as auth providers.
         signInOptions: [
-            context.firebase.auth.EmailAuthProvider.PROVIDER_ID
+            EmailAuthProvider.PROVIDER_ID
         ],
         callbacks: {
             signInSuccessWithAuthResult: function (authResult, redirectUrl) {
@@ -230,7 +231,7 @@ const FirebaseAuth = (props) => {
             >
                 <Fade in={isLogin}>
                     <div style={{display: 'flex', flex: 1}}>
-                        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={context.firebaseAuth} />
+                        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseContext.auth} />
                     </div>
                 </Fade>
             </Modal>

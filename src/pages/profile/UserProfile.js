@@ -135,7 +135,7 @@ const UserProfile = (props) => {
         })
         .catch(err => {
             if (err.code === "auth/user-token-expired") {
-                // A major user account chnage (password, email) requires re-authentication
+                // A major user account change (password, email) requires re-authentication
                 // https://firebase.google.com/docs/auth/admin/manage-sessions
                 // -> reauthenticate with new email and password
                 return onIdTokenRevocation(values.email, values.password);

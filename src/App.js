@@ -23,8 +23,9 @@ import Tooltip from '@mui/material/Tooltip';
 
 import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import { routes, NavigationLink } from './navigation/routes';
-import { FirebaseSignin } from './components/firebase';
+import { FirebaseSignin, FirebaseProvider } from './components/firebase';
 import { AuthProvider } from './components/authentication';
+import { FavoritesProvider } from './components/favorites';
 import GlobalContextProvider from './components/globalContext';
 import { ReactQueryClientProvider } from './components/reactQuery';
 import Footer from './template/footer';
@@ -151,64 +152,41 @@ const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
     );
 };
 
-const AppContent = (props) => {
-
-    const drawerSubscriptions = useRef([]);
-    const subscribeDrawer = useCallback((func) => {
-        drawerSubscriptions.current.push(func);
-    }, []);
-    const location = useLocation();
-    const isHomePage = location.pathname === '/';
-
-    const [open, setOpen] = React.useState(false);
-
-    const handleDrawerOpen = () => {
-        setOpen(true);
-        drawerSubscriptions.current.forEach(func => func(true));
-    };
-
-    const handleDrawerClose = () => {
-        setOpen(false);
-        drawerSubscriptions.current.forEach(func => func(false));
-    };
-
-    const handleHistoryChanged = () => {
-        handleDrawerClose();
+const MenuItemIcon = ({route, variant, children}) => {
+    if (variant === "permanent") {
+        return (
+            <Tooltip
+                title={route.label}
+                arrow
+                placement="right"
+            >
+                {children}
+            </Tooltip>
+        )
+    } else {
+        return children;
     }
+}
 
-    function isLinkActive(match, location) {
-        if (match === null) {
-            return false;
-        }
-
-        if (match.url === "/" || match.url === "") {
-            return location.pathname === "/";
-        }
-
-        if (location.pathname.indexOf(match.url) === 0) {
-            return true;
-        }
-
+function isLinkActive(match, location) {
+    if (match === null) {
         return false;
     }
 
-    const MenuItemIcon = ({route, variant, children}) => {
-        if (variant === "permanent") {
-            return (
-                <Tooltip
-                    title={route.label}
-                    arrow
-                    placement="right"
-                >
-                    {children}
-                </Tooltip>
-            )
-        } else {
-            return children;
-        }
+    if (match.url === "/" || match.url === "") {
+        return location.pathname === "/";
     }
 
-    const DrawerContent = ({open, handleClose, variant = "temporary"}) => (
+    if (location.pathname.indexOf(match.url) === 0) {
+        return true;
+    }
+
+    return false;
+}
+
+const DrawerContent = ({open, handleClose, handleDrawerOpen, variant = "temporary"}) => {
+
+    return (
         <div>
             <DrawerHeader>
                 {
@@ -285,7 +263,33 @@ const AppContent = (props) => {
                 </React.Fragment>
             }
         </div>
-    );
+    )
+};
+
+const AppContent = (props) => {
+
+    const drawerSubscriptions = useRef([]);
+    const subscribeDrawer = useCallback((func) => {
+        drawerSubscriptions.current.push(func);
+    }, []);
+    const location = useLocation();
+    const isHomePage = location.pathname === '/';
+
+    const [open, setOpen] = React.useState(false);
+
+    const handleDrawerOpen = () => {
+        setOpen(true);
+        drawerSubscriptions.current.forEach(func => func(true));
+    };
+
+    const handleDrawerClose = () => {
+        setOpen(false);
+        drawerSubscriptions.current.forEach(func => func(false));
+    };
+
+    const handleHistoryChanged = () => {
+        handleDrawerClose();
+    }
 
     const container = window !== undefined ? () => window.document.body : undefined;
 
@@ -323,7 +327,7 @@ const AppContent = (props) => {
                         keepMounted: true, // Better open performance on mobile.
                     }}
                 >
-                    <DrawerContent handleClose={handleDrawerClose} open={open} variant="temporary" />
+                    <DrawerContent handleClose={handleDrawerClose} handleDrawerOpen={handleDrawerOpen} open={open} variant="temporary" />
                 </SwipeableDrawer>
 
                 <Drawer
@@ -367,8 +371,10 @@ const App = (props) => {
                 <ThemeProvider theme={ResponsiveTheme}>
                     <ToastContextProvider>
                         <ReactQueryClientProvider>
+                            <FirebaseProvider>
                             <GlobalContextProvider>
-                                <AuthProvider>
+                            <AuthProvider>
+                            <FavoritesProvider>
 
                                     <CssBaseline />
 
@@ -378,8 +384,10 @@ const App = (props) => {
 
                                     <ScrollTop {...props} anchorSelector={`#${scrollTopAnchor}`}></ScrollTop>
 
-                                </AuthProvider>
+                            </FavoritesProvider>
+                            </AuthProvider>
                             </GlobalContextProvider>
+                            </FirebaseProvider>
                         </ReactQueryClientProvider>
                     </ToastContextProvider>
                 </ThemeProvider>
