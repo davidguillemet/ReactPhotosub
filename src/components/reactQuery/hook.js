@@ -19,7 +19,12 @@ export function useReactQuery(fetchFunction, argsOrOptions1 = null, argsOrOption
         const errorPlaceholder =
             queryOptions !== null && queryOptions.errorPlaceholder ? queryOptions.errorPlaceholder :
             QUERY_ERROR;
-        queryResult.data = errorPlaceholder;
+        // With statement queryResult.data = errorPlaceholder
+        // We get the error "Cannot set property data of #<Object> which has only a getter"
+        return {
+            ...queryResult,
+            data: errorPlaceholder
+        };
     }
     return queryResult;
 }
