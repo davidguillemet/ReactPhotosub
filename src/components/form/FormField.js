@@ -110,7 +110,7 @@ const SwitchField = ({ field, value, handleChange, sending, readOnly }) => {
     );
 }
 
-const GenericTextField = ({ field, value, values, handleChange, sending, readOnly }) => {
+const GenericTextField = ({ field, value, error, values, handleChange, sending, readOnly }) => {
     return (
         <TextField
             key={field.id}
@@ -125,8 +125,8 @@ const GenericTextField = ({ field, value, values, handleChange, sending, readOnl
             multiline={field.multiline}
             minRows="10"
             onChange={handleChange}
-            error={field.error}
-            helperText={field.error ? field.errorText : ''}
+            error={error}
+            helperText={error ? field.errorText : ''}
             disabled={sending || readOnly || field.readOnly}
             InputLabelProps={{
                 shrink: true

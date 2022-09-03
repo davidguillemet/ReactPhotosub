@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import Stack from '@mui/material/Stack';
 import FormField from './FormField';
@@ -36,11 +36,13 @@ const Form = ({
     readOnly = false}) => {
 
     const [values, setValues] = React.useState(() => getValuesFromFields(fields, initialValues));
+    const [errors, setErrors] = React.useState({});
     const { toast } = useToast();
 
-    useEffect(() => {
-        setValues(getValuesFromFields(fields, initialValues));
-    }, [fields, initialValues]);
+    // Used to check if we must validate a field or not
+    // -> not modified = don't check (or all fields will be invalid at the beginning)
+    // -> modified = check field validity
+    const modifiedFields = useRef(new Set());
 
     const [sending, setSending] = React.useState(false);
     const [isValid, setIsValid] = React.useState(false);
@@ -56,21 +58,43 @@ const Form = ({
     }, []);
 
     useEffect(() => {
-        let isValid = true;
+        setValues(getValuesFromFields(fields, initialValues));
+    }, [fields, initialValues]);
 
+    useEffect(() => {
+        const newErrors = {};
         fields.forEach(field => {
-            const fieldValue = values[field.id];
-            if (fieldValue === null ||
-                (field.type === FIELD_TYPE_TEXT && field.required === true && fieldValue.length === 0) ||
-                (field.type === FIELD_TYPE_EMAIL && !validateEmail(fieldValue)) ||
-                (field.type === FIELD_TYPE_SELECT && field.required === true && fieldValue.length === 0) ||
-                (field.type === FIELD_TYPE_DATE && field.required === true && fieldValue.length === 0)) {
+            if (modifiedFields.current.has(field.id)) {
+                // UPdate error only for modified fields
+                // Otherwise, all fields are on error at the beginning...
+                const fieldValue = values[field.id];
+                let isError = false;
+                if (typeof fieldValue === "string") {
+                    const isEmpty = fieldValue.trim().length === 0;
+                    if (field.type === FIELD_TYPE_EMAIL) {
+                        isError = field.required && (isEmpty === true || !validateEmail(fieldValue));
+                    } else {
+                        isError = field.required && isEmpty === true;
+                    }
+                } else if (fieldValue === undefined || fieldValue === null) {
+                    isError = field.required;
+                }
+                newErrors[field.id] = isError;
+            }
+        })
+        setErrors(newErrors);
+    }, [values, fields]);
+
+    useEffect(() => {
+        let isValid = true;
+        fields.forEach(field => {
+            if (errors[field.id]) {
                 isValid = false;
                 // No break with forEach...
             }
         })
         setIsValid(isValid);
-    }, [values, fields])
+    }, [errors, fields])
 
     function validateEmail(email) {
         const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -80,23 +104,13 @@ const Form = ({
     const handleChange = (event) => {
         const fieldId = event.target.id || event.target.name;
         const field = fields.find(f => f.id === fieldId);
-        field.isDirty = true;
+        modifiedFields.current.add(fieldId);
 
         let fieldValue = null;
         if (field.type === FIELD_TYPE_SWITCH || field.type === FIELD_TYPE_CHECK_BOX) {
             fieldValue = event.target.checked;
         } else {
             fieldValue = event.target.value;
-            if (typeof fieldValue === "string") {
-                fieldValue = fieldValue.trim();
-                if (field.type === FIELD_TYPE_EMAIL) {
-                    field.error = (field.required || fieldValue.length === 0) && !validateEmail(fieldValue);
-                } else {
-                    field.error = field.required && fieldValue.length === 0;
-                }
-            } else if (event.target.value === undefined || event.target.value === null) {
-                field.error = field.required;
-            }
         }
 
         // reset dependencies
@@ -124,15 +138,22 @@ const Form = ({
     const onSubmit = (e) => {
         e.preventDefault();
         setSending(true);
-        const formValues = {
-            ...values
-        };
+        const formValues = {};
+
         // Remove readonly field values
-        fields.forEach(f => { if (f.readOnly) delete formValues[f.id]; });
+        // And remove leading/trailing spaces for string values
+        fields.forEach(f => {
+            if (!f.readOnly) {
+                let fieldValue = values[f.id];
+                if (typeof fieldValue === "string") {
+                    fieldValue = fieldValue.trim();
+                }
+                formValues[f.id] = fieldValue;
+            }
+        });
 
         submitAction(formValues)
         .then(() => {
-            fields.forEach(f => delete f.isDirty);
             if (onCancel) {
                 onCancel();
             }
@@ -152,6 +173,7 @@ const Form = ({
                     key={field.id}
                     field={field}
                     value={values[field.id]}
+                    error={errors[field.id]}
                     values={values}
                     handleChange={field.type === FIELD_TYPE_CAPTCHA ? onCaptchaChange : handleChange}
                     sending={sending}

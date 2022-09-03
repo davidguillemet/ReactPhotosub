@@ -82,6 +82,7 @@ const Contact = () => {
     const [isDirty, setIsDirty] = React.useState(false);
 
     const onSubmitMessageForm = useCallback((values) => {
+        setIsDirty(false);
         return context.dataProvider.sendMessage(values);
     }, [context]);
 
