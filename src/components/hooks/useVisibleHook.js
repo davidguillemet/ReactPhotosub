@@ -1,8 +1,11 @@
 import { useState, useCallback } from 'react';
+import { useGlobalContext } from '../globalContext';
 import useIntersectionObserver from './intersectionObserverHook';
 
 export default function useVisibleHook() {
-    const [isVisible, setIsVisible] = useState(false);
+    const context = useGlobalContext();
+    // Always visible on prerender
+    const [isVisible, setIsVisible] = useState(context.isPrerender);
 
     const onVisible = useCallback(() => {
         setIsVisible(true);

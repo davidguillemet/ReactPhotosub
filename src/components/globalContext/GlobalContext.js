@@ -5,6 +5,14 @@ import DataProvider from '../../dataProvider/dataprovider';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFirebaseContext } from '../firebase';
+import {getUA} from 'react-device-detect';
+
+const isPrerenderUserAgent = () => {
+    if (getUA.toLowerCase().indexOf('prerender') !== -1) {
+        return true;
+    }
+    return false;
+}
 
 const GlobalContext = createContext(null);
 
@@ -60,6 +68,7 @@ const GlobalContextProvider = ({children}) => {
         globalContext.current = {
             dataProvider,
             queryClient,
+            isPrerender: isPrerenderUserAgent(),
             useFetchHomeSlideshow: () => useQuery(['homeslideshow'], () => dataProvider.getImageDefaultSelection()),
             useFetchLocations: () => useQuery(['locations'], () => dataProvider.getLocations()), 
             useFetchRegions: () => useQuery(['regions'], () => dataProvider.getRegions()),
