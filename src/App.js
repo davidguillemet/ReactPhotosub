@@ -10,7 +10,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Slide from '@mui/material/Slide';
 //ximport logo from './assets/images/logo.jpg';
-import { styled, ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
+import { styled, StyledEngineProvider } from '@mui/material/styles';
 
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import MuiDrawer from '@mui/material/Drawer';
@@ -27,11 +27,11 @@ import { FirebaseSignin, FirebaseProvider } from './components/firebase';
 import { AuthProvider } from './components/authentication';
 import { FavoritesProvider } from './components/favorites';
 import GlobalContextProvider from './components/globalContext';
+import CustomThemeProvider from './template/theme';
 import { ReactQueryClientProvider } from './components/reactQuery';
 import Footer from './template/footer';
 import ScrollTop from './template/scrollTop';
 import PageContent from './template/pageContent';
-import ResponsiveTheme from './template/theme';
 import SocialIcons from './components/socialIcons';
 
 import { ToastContextProvider } from './components/notifications';
@@ -394,7 +394,7 @@ const App = (props) => {
     return (
         <Box sx={{ display: 'flex', height: '100vh', overflow: 'auto' }} >
             <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={ResponsiveTheme}>
+                <CustomThemeProvider>
                     <ToastContextProvider>
                         <ReactQueryClientProvider>
                             <FirebaseProvider>
@@ -414,7 +414,7 @@ const App = (props) => {
                             </FirebaseProvider>
                         </ReactQueryClientProvider>
                     </ToastContextProvider>
-                </ThemeProvider>
+                </CustomThemeProvider>
             </StyledEngineProvider>
         </Box>
     )
