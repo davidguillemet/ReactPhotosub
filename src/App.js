@@ -24,11 +24,6 @@ import Tooltip from '@mui/material/Tooltip';
 import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import { routes, NavigationLink } from './navigation/routes';
 import { FirebaseSignin, FirebaseProvider } from './components/firebase';
-import { AuthProvider } from './components/authentication';
-import { FavoritesProvider } from './components/favorites';
-import GlobalContextProvider from './components/globalContext';
-import CustomThemeProvider from './template/theme';
-import { ReactQueryClientProvider } from './components/reactQuery';
 import Footer from './template/footer';
 import ScrollTop from './template/scrollTop';
 import PageContent from './template/pageContent';
@@ -39,6 +34,13 @@ import { useResizeObserver } from './components/hooks';
 
 import './App.css';
 import { VerticalSpacing } from './template/spacing';
+
+import ChainedProviders from './components/chainedProviders';
+import CustomThemeProvider from './template/theme';
+import GlobalContextProvider from './components/globalContext';
+import { AuthProvider } from './components/authentication';
+import { FavoritesProvider } from './components/favorites';
+import { ReactQueryClientProvider } from './components/reactQuery';
 
 const drawerWidth = 240;
 const miniDrawerWidth = 56;
@@ -394,27 +396,22 @@ const App = (props) => {
     return (
         <Box sx={{ display: 'flex', height: '100vh', overflow: 'auto' }} >
             <StyledEngineProvider injectFirst>
-                <CustomThemeProvider>
-                    <ToastContextProvider>
-                        <ReactQueryClientProvider>
-                            <FirebaseProvider>
-                            <GlobalContextProvider>
-                            <AuthProvider>
-                            <FavoritesProvider>
-
-                                    <CssBaseline />
-
-                                    <Router>
-                                        <AppContent {...props} />
-                                    </Router>
-
-                            </FavoritesProvider>
-                            </AuthProvider>
-                            </GlobalContextProvider>
-                            </FirebaseProvider>
-                        </ReactQueryClientProvider>
-                    </ToastContextProvider>
-                </CustomThemeProvider>
+                <ChainedProviders
+                    providers={[
+                        CustomThemeProvider,
+                        ToastContextProvider,
+                        ReactQueryClientProvider,
+                        FirebaseProvider,
+                        GlobalContextProvider,
+                        AuthProvider,
+                        FavoritesProvider
+                    ]}
+                >
+                    <CssBaseline />
+                    <Router>
+                        <AppContent {...props} />
+                    </Router>
+                </ChainedProviders>
             </StyledEngineProvider>
         </Box>
     )
