@@ -53,10 +53,17 @@ const useStyles = makeStyles({
 
 const StyleImage = styled('img')(({ theme }) => ({ }));
 
-function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
+function StopButtonWithCircularProgress({ onClick, onCompletedRef, duration }) {
     const [progress, setProgress] = useState(0);
 
     const timerRef = useRef(null);
+
+    useEffect(() => {
+        if (progress === 100) {
+            clearInterval(timerRef.current);
+            onCompletedRef.current();
+        }
+    }, [progress, onCompletedRef])
 
     React.useEffect(() => {
         const progressStep = 2; // step is 2%
@@ -65,7 +72,6 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
         timerRef.current = setInterval(() => {
             setProgress((prevProgress) => {
                 if (prevProgress === 100) {
-                    onCompleted();
                     return 100;
                 }
                 const newProgress = prevProgress >= 100 ? 100 : prevProgress + progressStep;
@@ -75,7 +81,7 @@ function StopButtonWithCircularProgress({ onClick, onCompleted, duration }) {
         return () => {
             clearInterval(timerRef.current);
         };
-    }, [duration, onCompleted]);
+    }, [duration]);
 
     const handleClick = () => {
         clearInterval(timerRef.current);
@@ -150,6 +156,7 @@ const ExpandedView = React.forwardRef(({
     const [fullScreen, setFullScreen] = useState(false);
     const headerBarRef = useRef(null);
     const hideHeaderTimeout = useRef(null);
+    const handleNextImageRef = useRef(null);
 
     const waitingForNextPage = useRef(false);
 
@@ -239,41 +246,41 @@ const ExpandedView = React.forwardRef(({
         }
     }
 
-    const cancelHideHeaderBar = () => {
+    const cancelHideHeaderBar = useCallback(() => {
         headerBarRef.current.classList.remove('hidden');
         clearTimeout(hideHeaderTimeout.current);
-    }
+    }, []);
 
-    const handleClickFullScreen = () => {
+    const handleClickFullScreen = useCallback(() => {
         handleMouseMove();
         setFullScreen(true);
-    }
+    }, [handleMouseMove]);
 
-    const handleClickExitFullScreen = () => {
+    const handleClickExitFullScreen = useCallback(() => {
         cancelHideHeaderBar();
         setFullScreen(false);
-    }
+    }, [cancelHideHeaderBar]);
 
-    const handlePlayClick = () => {
+    const handlePlayClick = useCallback(() => {
         handleMouseMove();
         unstable_batchedUpdates(() => {
             setInfoVisible(false);
             setIsPlaying(true);
         })
-    }
+    }, [handleMouseMove]);
 
-    const handleStopClick = () => {
+    const handleStopClick = useCallback(() => {
         cancelHideHeaderBar();
         setIsPlaying(false);
-    }
+    }, [cancelHideHeaderBar]);
 
-    const handleInfoClick = () => {
-        setInfoVisible(!infoVisible);
-    }
+    const handleInfoClick = useCallback(() => {
+        setInfoVisible(prevInfoVisible => !prevInfoVisible);
+    }, []);
 
-    const handleCloseClick = () => {
+    const handleCloseClick = useCallback(() => {
         onClose();
-    }
+    }, [onClose]);
 
     const handlePreviousImage = () => {
         if (currentIndex > 0) {
@@ -289,6 +296,9 @@ const ExpandedView = React.forwardRef(({
             onNextPage();
         }
     }
+
+    // To avoid useless StopButtonWithCircularProgress rerendering
+    handleNextImageRef.current = handleNextImage;
 
     const slideRenderer = (params) => {
         const {index} = params;
@@ -352,7 +362,12 @@ const ExpandedView = React.forwardRef(({
                 >
                     {
                         isPlaying ?
-                            <StopButtonWithCircularProgress onClick={handleStopClick} onCompleted={handleNextImage} duration={5000} key={currentImage.id}/> :
+                            <StopButtonWithCircularProgress
+                                onClick={handleStopClick}
+                                onCompletedRef={handleNextImageRef}
+                                duration={5000}
+                                key={currentImage.id}/
+                            > :
                             <TooltipIconButton
                                 tooltip="Lancer le diaporama"
                                 onClick={handlePlayClick}
