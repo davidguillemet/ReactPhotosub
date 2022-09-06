@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { Switch, Route, useHistory } from "react-router-dom";
@@ -24,7 +24,7 @@ const RouteComponent = ({route, subscribeDrawer}) => {
     }
 }
 
-const PageContent = ({onHistoryChanged, subscribeDrawer}) => {
+const PageContent = React.forwardRef(({onHistoryChanged, subscribeDrawer}, ref) => {
     const history = useHistory();
 
     useEffect(() => history.listen(() => {
@@ -34,6 +34,7 @@ const PageContent = ({onHistoryChanged, subscribeDrawer}) => {
 
     return (
         <Container
+            ref={ref}
             sx={{
                 width: 'unset',
                 display: 'flex',
@@ -72,6 +73,6 @@ const PageContent = ({onHistoryChanged, subscribeDrawer}) => {
             <ToastNotifications />
         </Container>
     );
-};
+});
 
 export default PageContent;

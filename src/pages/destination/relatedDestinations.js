@@ -39,7 +39,7 @@ const EmptyRelatedDestinations = () => {
     );
 }
 
-const RelatedDestinationsUI = withLoading(({destination, related}) => {
+const RelatedDestinationsSlider = withLoading(({destination, related, imageHeight}) => {
     const history = useHistory();
     const images = useMemo(() => related.filter(dest => dest.id !== destination.id).map(dest => imageFromCover(dest)), [related, destination]);
 
@@ -71,31 +71,39 @@ const RelatedDestinationsUI = withLoading(({destination, related}) => {
     }, []);
 
     return (
-        <Box sx={{ width: "100%"}} >
-            <LabeledDivider label="Destinations Similaires"></LabeledDivider>
-            <VerticalSpacing factor={2} />
-            <ImageSlider
-                images={images}
-                currentIndex={-1}
-                onThumbnailClick={onSelectDestination}
-                style={{
-                    mx: {
-                        "xs": -1,
-                        "sm": 0
-                    }
-                }}
-                imageHeight={isMobile ? 120 : 150}
-                emptyComponent={<EmptyRelatedDestinations/>}
-                renderOverlay={renderOverlay}
-            />
-        </Box>
+        <ImageSlider
+            images={images}
+            currentIndex={-1}
+            onThumbnailClick={onSelectDestination}
+            style={{
+                mx: {
+                    "xs": -1,
+                    "sm": 0
+                }
+            }}
+            imageHeight={imageHeight}
+            emptyComponent={<EmptyRelatedDestinations/>}
+            renderOverlay={renderOverlay}
+        />
     );
 }, [buildLoadingState("related", [undefined])]);
 
-const RelatedDestinations = lazyComponent(({destination}) => {
+const imageHeight = isMobile ? 120 : 150;
+
+const RelatedDestinationsSliderController = lazyComponent(({destination}) => {
     const context = useGlobalContext();
     const { data } = useReactQuery(context.useFetchRelatedDestinations, [destination.regionpath, destination.macro, destination.wide]);
-    return <RelatedDestinationsUI destination={destination} related={data} />
-});
+    return <RelatedDestinationsSlider destination={destination} related={data} imageHeight={imageHeight}/>
+}, { height: imageHeight });
+
+const RelatedDestinations = ({destination}) => {
+    return (
+        <Box sx={{ width: "100%"}} >
+            <LabeledDivider label="Destinations Similaires"></LabeledDivider>
+            <VerticalSpacing factor={2} />
+            <RelatedDestinationsSliderController destination={destination} />
+        </Box>
+    );
+};
 
 export default RelatedDestinations;

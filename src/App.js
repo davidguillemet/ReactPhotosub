@@ -35,6 +35,7 @@ import ResponsiveTheme from './template/theme';
 import SocialIcons from './components/socialIcons';
 
 import { ToastContextProvider } from './components/notifications';
+import { useResizeObserver } from './components/hooks';
 
 import './App.css';
 import { VerticalSpacing } from './template/spacing';
@@ -266,7 +267,10 @@ const DrawerContent = ({open, handleClose, handleDrawerOpen, variant = "temporar
     )
 };
 
-const AppContent = (props) => {
+const AppContent = React.forwardRef((props, ref) => {
+
+    const containerResizeObserver = useResizeObserver(true);
+    const contentResizeObserver = useResizeObserver(false);
 
     const drawerSubscriptions = useRef([]);
     const subscribeDrawer = useCallback((func) => {
@@ -342,31 +346,53 @@ const AppContent = (props) => {
             </Box>
 
             <Box
+                ref={containerResizeObserver.ref}
+                id="scrollContainer"
                 component="main"
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    overflow: "hidden",
-                    minHeight: '100vh',
                     flexGrow: 1,
+                    overflowY: 'scroll',
+                    maxHeight: '100vh',
                     paddingBottom: 0,
                     p: 0,
                 }}
             >
                 <div id={scrollTopAnchor} />
-                <DrawerHeader />
-                <PageContent onHistoryChanged={handleHistoryChanged} subscribeDrawer={subscribeDrawer} />
-                <Footer />
+                <Box
+                    ref={contentResizeObserver.ref}
+                    id="fullPageContent"
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flexGrow: 1,
+                        p: 0,
+                    }}
+                >
+                    <DrawerHeader />
+                    <PageContent onHistoryChanged={handleHistoryChanged} subscribeDrawer={subscribeDrawer} />
+                    <Footer />
+                </Box>
             </Box>
+
+            <ScrollTop
+                {...props}
+                window={containerResizeObserver.element}
+                anchorSelector={`#${scrollTopAnchor}`}
+                scrollTop={containerResizeObserver.scrollTop}
+                fullHeight={contentResizeObserver.height}
+                containerHeight={containerResizeObserver.height}
+            />
 
         </React.Fragment>
     );
-}
+});
 
 const App = (props) => {
 
     return (
-        <div style={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex', height: '100vh', overflow: 'auto' }} >
             <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={ResponsiveTheme}>
                     <ToastContextProvider>
@@ -382,8 +408,6 @@ const App = (props) => {
                                         <AppContent {...props} />
                                     </Router>
 
-                                    <ScrollTop {...props} anchorSelector={`#${scrollTopAnchor}`}></ScrollTop>
-
                             </FavoritesProvider>
                             </AuthProvider>
                             </GlobalContextProvider>
@@ -392,7 +416,7 @@ const App = (props) => {
                     </ToastContextProvider>
                 </ThemeProvider>
             </StyledEngineProvider>
-        </div>
+        </Box>
     )
 }
 

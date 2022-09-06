@@ -84,7 +84,7 @@ function throttle(func, wait, leading, trailing, context) {
 
 export default function useResizeObserver(watchScroll) {
   const [size, setSize] = useState({ width: 0, height: 0 });
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const [scroll, setScroll] = useState({top: 0, left: 0});
   const resizeObserver = useRef(null);
   const element = useRef(null);
 
@@ -94,7 +94,7 @@ export default function useResizeObserver(watchScroll) {
   }, []);
 
   const onScroll = useCallback(() => {
-    setScrollLeft(element.current.scrollLeft);
+    setScroll({ top: element.current.scrollTop, left: element.current.scrollLeft});
   }, []);
 
   const ref = useCallback(
@@ -110,7 +110,7 @@ export default function useResizeObserver(watchScroll) {
           node.removeEventListener('scroll', onScroll);
           node.addEventListener('scroll', onScroll);
           // Don't remove scroll handler for element.current
-          // otherwse it won't be added again when switching simulation image source
+          // otherwise it won't be added again when switching simulation image source
           // It should just be removed in the cleaning hook below
         }
         element.current = node;
@@ -133,6 +133,7 @@ export default function useResizeObserver(watchScroll) {
     element: element.current,
     width: size.width,
     height: size.height,
-    scrollLeft
+    scrollLeft: scroll.left,
+    scrollTop: scroll.top
   };
 }

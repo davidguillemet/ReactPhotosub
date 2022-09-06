@@ -133,7 +133,7 @@ const Navigation = lazyComponent(({destination}) => {
             </Grid>
         </Grid>
     )
-});
+}, { height: 90 });
 
 const DestinationDetails = ({destination}) => {
 
