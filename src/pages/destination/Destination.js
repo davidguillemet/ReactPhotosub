@@ -166,8 +166,8 @@ const DestinationDetails = ({destination}) => {
                 alignItems: 'flex-start'
             }}>
             <HelmetDestination destination={destination} />
-            <PageSubTitle component="h1" sx={{m: 0, color: "white", whiteSpace: "nowrap", fontWeight: 300}}>{destination.title}</PageSubTitle>
-            <PageHeader sx={{m: 0, color: "white"}}>{formattedDate}</PageHeader>
+            <PageSubTitle component="h1" sx={{m: 0, color: theme => theme.palette.primary.contrastText, whiteSpace: "nowrap", fontWeight: 300}}>{destination.title}</PageSubTitle>
+            <PageHeader sx={{m: 0, color: theme => theme.palette.primary.contrastText}}>{formattedDate}</PageHeader>
             {
                 destination.link &&
                 <Chip color="primary" size="small" label={destination.location} component="a" href={destination.link} clickable target="_blank" />
