@@ -17,6 +17,7 @@ import LocationDialog from './LocationDialog';
 import LocationInfoWindow from './LocationInfoWindow';
 import { withLoading, buildLoadingState } from '../hoc';
 import { useReactQuery } from '../reactQuery';
+import { useDarkMode } from '../../template/theme';
 
 const _infoCoverWidth = 150;
 // Center in the middle of the atlantic ocean
@@ -24,6 +25,89 @@ const _defaultCenter = {
     lat: 34,
     lng: -40
 }
+
+const lightModeStyles = [];
+const darkModeStyles = 
+[
+    { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+    {
+        featureType: "administrative.locality",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#d59563" }],
+    },
+    {
+        featureType: "poi",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#d59563" }],
+    },
+    {
+        featureType: "poi.park",
+        elementType: "geometry",
+        stylers: [{ color: "#263c3f" }],
+    },
+    {
+        featureType: "poi.park",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#6b9a76" }],
+    },
+    {
+        featureType: "road",
+        elementType: "geometry",
+        stylers: [{ color: "#38414e" }],
+    },
+    {
+        featureType: "road",
+        elementType: "geometry.stroke",
+        stylers: [{ color: "#212a37" }],
+    },
+    {
+        featureType: "road",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#9ca5b3" }],
+    },
+    {
+        featureType: "road.highway",
+        elementType: "geometry",
+        stylers: [{ color: "#746855" }],
+    },
+    {
+        featureType: "road.highway",
+        elementType: "geometry.stroke",
+        stylers: [{ color: "#1f2835" }],
+    },
+    {
+        featureType: "road.highway",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#f3d19c" }],
+    },
+    {
+        featureType: "transit",
+        elementType: "geometry",
+        stylers: [{ color: "#2f3948" }],
+    },
+    {
+        featureType: "transit.station",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#d59563" }],
+    },
+    {
+        featureType: "water",
+        elementType: "geometry",
+        stylers: [{ color: "#17263c" }],
+    },
+    {
+        featureType: "water",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#515c6d" }],
+    },
+    {
+        featureType: "water",
+        elementType: "labels.text.stroke",
+        stylers: [{ color: "#17263c" }],
+    },
+];
 
 const CustomFullScreen = ({destinations, fullScreen, onClose}) => {
     const [locationOpen, setLocationOpen] = useState(false);
@@ -64,6 +148,7 @@ const CustomFullScreen = ({destinations, fullScreen, onClose}) => {
 
 const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = false, onClose, isDestinationPage}) => {
 
+    const { darkMode } = useDarkMode();
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [destinationsPerLocation, setDestinationsPerLocation] = useState([]);
     const [openInfoWindow, setOpenInfoWindow] = useState(true);
@@ -201,7 +286,8 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
             onLoad={handleMapLoaded}
             onUnmount={handleMapUnmount}
             options={{
-                gestureHandling: "cooperative" // For mobile device,
+                gestureHandling: "cooperative", // For mobile device,
+                styles: darkMode ? darkModeStyles : lightModeStyles
             }}
         >
             <MarkerClusterer

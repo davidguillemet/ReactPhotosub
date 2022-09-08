@@ -70,7 +70,7 @@ const NavigationItem = ({destination, type, caption}) => {
     return (
         <DestinationLink destination={destination}>
             <Paper
-                elevation={2}
+                elevation={3}
                 sx={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -78,10 +78,7 @@ const NavigationItem = ({destination, type, caption}) => {
                     alignItems: 'center',
                     width: "100%",
                     py: 1,
-                    px: 1,
-                    borderStyle: "solid",
-                    borderWidth: "1px",
-                    borderColor: (theme) => theme.palette.grey[200]
+                    px: 1
                 }}
             >
                 {
