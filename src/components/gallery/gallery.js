@@ -189,7 +189,17 @@ const Gallery = ({
                     return (
                         group.key !== null ?
                         <Stack sx={{width: '100%'}} key={group.key}>
-                            <BlockQuote sx={{mb: 1, mt: 3, ml: 0, pl: 1, bgcolor: grey[200]}}>{group.key}</BlockQuote>
+                            <BlockQuote sx={{
+                                mb: 1,
+                                mt: 3,
+                                ml: 0,
+                                pl: 1,
+                                fontWeight: "bold",
+                                color: theme => theme.palette.primary.contrastText,
+                                bgcolor: theme => theme.palette.primary.light}}
+                            >
+                                {group.key}
+                            </BlockQuote>
                             <GroupGallery
                                 images={group.images}
                                 key={group.key}

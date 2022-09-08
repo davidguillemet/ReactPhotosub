@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo, useReducer, useRef } from 'react';
 import Button from '@mui/material/Button';
-import InfoIcon from '@mui/icons-material/Info';
+import HelpIcon from '@mui/icons-material/Help';
 import { Prompt } from "react-router-dom";
 
 import { PageTitle } from '../../template/pageTypography';
@@ -204,7 +204,7 @@ const SimulationManagerController = () => {
 
             <PageTitle>Composition</PageTitle>
 
-            <Button variant="contained" startIcon={<InfoIcon />} onClick={toggleHelpOpen}>De quoi s'agit-il?</Button>
+            <Button variant="contained" startIcon={<HelpIcon />} onClick={toggleHelpOpen}>De quoi s'agit-il?</Button>
 
             <SimulationManagerDispatcher user={authContext.user} />
 

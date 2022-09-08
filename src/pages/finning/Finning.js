@@ -29,7 +29,7 @@ const Anchor = ({index}) => (
 const CustomDivider = () => <Divider variant="middle" sx={{ my: 3, mx: '20%', borderBottomWidth: 3, borderBottomColor: (theme) => theme.palette.primary.light}}/>
 
 const ListItemLink = (props) => {
-    return <ListItem component="a" {...props} sx ={{ py: 0}}/>;
+    return <ListItem component="a" {...props} sx ={{ py: 0, color: theme => theme.palette.link.main}}/>;
 }
 
 const FinningListItem = ({caption, index}) => {
@@ -38,7 +38,8 @@ const FinningListItem = ({caption, index}) => {
             <ListItemIcon sx={{ minWidth: 'unset'}}>
                 <NavigateNextIcon />
             </ListItemIcon>
-            <ListItemLink href={`#anchor${index}`}>{caption}
+            <ListItemLink href={`#anchor${index}`}>
+                {caption}
             </ListItemLink>
         </ListItemButton>
     );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Button from '@mui/material/Button';
-import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -225,9 +225,9 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
             />
             <label htmlFor="contained-button-file">
                 <Button
-                    variant="outlined"
+                    variant="contained"
                     component="span"
-                    startIcon={<CloudUploadOutlinedIcon />}
+                    startIcon={<CloudUploadIcon />}
                     disabled={uploadFiles.length > 0}
                 >
                     {caption}

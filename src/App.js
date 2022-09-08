@@ -36,11 +36,12 @@ import './App.css';
 import { VerticalSpacing } from './template/spacing';
 
 import ChainedProviders from './components/chainedProviders';
-import CustomThemeProvider from './template/theme';
+import { CustomThemeProvider, DarkModeProvider, DarkModeSelector } from './template/theme';
 import GlobalContextProvider from './components/globalContext';
 import { AuthProvider } from './components/authentication';
 import { FavoritesProvider } from './components/favorites';
 import { ReactQueryClientProvider } from './components/reactQuery';
+import { useDarkMode } from './template/theme';
 
 const drawerWidth = 240;
 const miniDrawerWidth = 56;
@@ -118,6 +119,7 @@ function HideOnScroll(props) {
 
 const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
 
+    const { darkMode } = useDarkMode();
     const scrollTrigger = useScrollTrigger({
         disableHysteresis: true,
         threshold: 0
@@ -132,7 +134,12 @@ const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
             position="fixed"
             open={open}
             sx={{
-                ...(transparent && { backgroundColor: 'rgba(0,0,0,0.2)' })
+                ...(
+                    transparent ? 
+                    { backgroundColor: 'rgba(0,0,0,0.2)' } :
+                    darkMode === true ? { backgroundColor: 'rgba(0,0,0,0.9)'} :
+                    { }
+                )
             }}
         >
             <Toolbar>
@@ -260,6 +267,8 @@ const DrawerContent = ({open, handleClose, handleDrawerOpen, variant = "temporar
             {
                 variant === "temporary" &&
                 <React.Fragment>
+                    <VerticalSpacing factor={2}/>
+                    <DarkModeSelector />
                     <VerticalSpacing factor={2}/>
                     <SocialIcons />
                     <VerticalSpacing factor={2}/>
@@ -398,6 +407,7 @@ const App = (props) => {
             <StyledEngineProvider injectFirst>
                 <ChainedProviders
                     providers={[
+                        DarkModeProvider,
                         CustomThemeProvider,
                         ToastContextProvider,
                         ReactQueryClientProvider,

@@ -132,7 +132,7 @@ export const NavigationLink = styled(NavLink)(
         color: theme.palette.text.primary,
         "&.active span": {
             fontWeight: "bold",
-            color: "#28a745"  
+            color: theme.palette.link.main
         },
         "&.active > div, &.active > li": {
             backgroundColor: "rgba(0,0,0,0.06)"
