@@ -308,11 +308,12 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
                         setSelectedLocation(null);
                     }}
                     position={{
-                        lat: selectedLocation.latitude + 0.2,
+                        lat: selectedLocation.latitude,
                         lng: selectedLocation.longitude
                     }}
                     options={{
-                        disableAutoPan: false
+                        disableAutoPan: false,
+                        pixelOffset: { height: -35 }
                     }}
                 >
                     <LocationInfoWindow location={selectedLocation} coverWidth={_infoCoverWidth} />
