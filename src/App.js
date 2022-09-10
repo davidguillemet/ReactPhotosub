@@ -7,7 +7,6 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
-import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Slide from '@mui/material/Slide';
 //ximport logo from './assets/images/logo.jpg';
 import { styled, StyledEngineProvider } from '@mui/material/styles';
@@ -107,30 +106,35 @@ const AppBar = styled(MuiAppBar, {
 //const Image = styled('img')(({ theme }) => ({ }));
 
 function HideOnScroll(props) {
-    const { children } = props;
-    const trigger = useScrollTrigger();
+    const { scrollTop, children } = props;
+    const prevScrollTop = useRef(0);
+    const showSlide = useRef(true);
+
+    if (prevScrollTop.current !== scrollTop) {
+        // AppContent is rendered twice with the same value of scrollTop..I don't know why
+        // As a workaround, showSlide is maintained as a reference and is computed
+        // only in case the previous scroll value is different than the new one.
+        showSlide.current = scrollTop < 100 || prevScrollTop.current > scrollTop;
+        prevScrollTop.current = scrollTop;
+    }
 
     return (
-        <Slide appear={false} direction="down" in={!trigger}>
+        <Slide appear={false} direction="down" in={showSlide.current}>
             {children}
         </Slide>
     );
 }
 
-const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
+const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose, scrollTop }) => {
 
     const { darkMode } = useDarkMode();
-    const scrollTrigger = useScrollTrigger({
-        disableHysteresis: true,
-        threshold: 0
-    });
     const location = useLocation();
     const transparent = location.pathname === '/';
 
     return (
-        <HideOnScroll>
+        <HideOnScroll scrollTop={scrollTop}>
         <AppBar
-            elevation={scrollTrigger ? 4 : 0}
+            elevation={scrollTop > 0 ? 4 : 0}
             position="fixed"
             open={open}
             sx={{
@@ -292,19 +296,19 @@ const AppContent = React.forwardRef((props, ref) => {
 
     const [open, setOpen] = React.useState(false);
 
-    const handleDrawerOpen = () => {
+    const handleDrawerOpen = useCallback(() => {
         setOpen(true);
         drawerSubscriptions.current.forEach(func => func(true));
-    };
+    }, []);
 
-    const handleDrawerClose = () => {
+    const handleDrawerClose = useCallback(() => {
         setOpen(false);
         drawerSubscriptions.current.forEach(func => func(false));
-    };
+    }, []);
 
-    const handleHistoryChanged = () => {
+    const handleHistoryChanged = useCallback(() => {
         handleDrawerClose();
-    }
+    }, [handleDrawerClose]);
 
     const container = window !== undefined ? () => window.document.body : undefined;
 
@@ -315,6 +319,7 @@ const AppContent = React.forwardRef((props, ref) => {
                 open={open}
                 handleDrawerOpen={handleDrawerOpen}
                 handleDrawerClose={handleDrawerClose}
+                scrollTop={containerResizeObserver.scrollTop}
             />
 
             <Box

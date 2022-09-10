@@ -26,10 +26,11 @@ import {
 // Action for the main simulations' array
 //////////////////////////////////////////
 
-export function initSimulations(simulations) {
+export function initSimulations(simulations, merge = false) {
     return {
         type: ACTION_LOAD_SIMULATIONS,
-        simulations: simulations
+        simulations: simulations,
+        merge: merge
     };
 }
 

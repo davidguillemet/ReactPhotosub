@@ -27,6 +27,8 @@ import 'fontsource-roboto/100.css';
 import { withLoading, buildLoadingState } from '../../components/hoc';
 import { useToast } from '../../components/notifications';
 
+const SimulationContext = React.createContext();
+
 const sameUsers = (user1, user2) => {
     if (user1 === null && user2 === null) {
         return true;
@@ -50,28 +52,23 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
 
     const context = useGlobalContext();
 
+    const { state, dispatch } = React.useContext(SimulationContext);
+
     const addMutation = context.useAddSimulation();
     const updateSimulation = context.useUpdateSimulation();
     const removeSimulation = context.useRemoveSimulation();
     const simulationInitUser = useRef(undefined);
     const { toast } = useToast();
 
-    /**
-     * state = {
-     *  simulations: <array>,
-     *  currentIndex: <integer>
-     * }
-     */
-    const [state, dispatch] = useReducer(simulationsReducer, initialState);
-
     useEffect(() => {
         // No need to reinit simulations state if the user is the same
         // -> initialize only once on component mount
         if (fetchedSimulations !== null && sameUsers(simulationInitUser.current, user) === false) {
+            const merge = (simulationInitUser.current === null || simulationInitUser.current === undefined) && user !== null && user !== undefined;
             simulationInitUser.current = user;
-            dispatch(initSimulations(fetchedSimulations));
+            dispatch(initSimulations(fetchedSimulations, merge));
         }
-    }, [fetchedSimulations, user]);
+    }, [fetchedSimulations, user, dispatch]);
 
     const onSave = useCallback((simulationName) => {
         const simulationData = state.simulations[state.currentIndex];
@@ -103,7 +100,7 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
                 // Empty
             });
         } 
-    }, [toast, state, addMutation, updateSimulation]);
+    }, [toast, state, addMutation, updateSimulation, dispatch]);
 
     const onAdd = useCallback((name) => {
         dispatch(addSimulation(name));
@@ -113,7 +110,6 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
     const onDelete = useCallback(() => {
 
         const simulationToRemove = state.simulations[state.currentIndex];
-        const simulationName = simulationToRemove.name;
 
         const removePromise =
             isFromDb(simulationToRemove) ?
@@ -193,6 +189,15 @@ const SimulationManagerDispatcher = withLoading(({user}) => {
 
 const SimulationManagerController = () => {
     const authContext = useAuthContext();
+
+    /**
+     * state = {
+     *  simulations: <array>,
+     *  currentIndex: <integer>
+     * }
+     */
+    const [state, dispatch] = useReducer(simulationsReducer, initialState);
+
     const [helpOpen, setHelpOpen] = useState(false);
 
     const toggleHelpOpen = useCallback(() => {
@@ -206,7 +211,9 @@ const SimulationManagerController = () => {
 
             <Button variant="contained" startIcon={<HelpIcon />} onClick={toggleHelpOpen}>De quoi s'agit-il?</Button>
 
-            <SimulationManagerDispatcher user={authContext.user} />
+            <SimulationContext.Provider value={{ state, dispatch }}>
+                <SimulationManagerDispatcher user={authContext.user} />
+            </SimulationContext.Provider>
 
             <LazyDialog title={"Composition Murale"} path="simulation/help" open={helpOpen} handleClose={toggleHelpOpen} />
 

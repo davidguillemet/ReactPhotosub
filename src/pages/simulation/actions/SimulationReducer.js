@@ -1,5 +1,5 @@
 import { uniqueID } from '../../../utils';
-import { TRANSIENT_PROPERTY_IS_DIRTY, TRANSIENT_PROPERTY_DB_INDEX, getDbIndex, isFromDb } from '../../../dataProvider';
+import { TRANSIENT_PROPERTY_IS_DIRTY, TRANSIENT_PROPERTY_DB_INDEX, getDbIndex, isFromDb, isDirty } from '../../../dataProvider';
 
 import { clearThumbnailSrc } from '../../../utils';
 
@@ -228,7 +228,11 @@ export default function simulationsReducer(state, action) {
                 [_initSimulation(null, null)];
 
             return {
-                simulations: simulations,
+                simulations:
+                    action.merge ?
+                    // consider merging only dirty simulations from the current state
+                    [ ...state.simulations.filter(sim => isDirty(sim)), ...simulations ] :
+                    simulations,
                 currentIndex: 0
             }
         case ACTION_SET_CURRENT_SIMULATION_INDEX:
