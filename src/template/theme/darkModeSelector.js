@@ -1,12 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Box from '@mui/material/Box';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import LightModeIcon from '@mui/icons-material/LightMode';
 import Tooltip from '@mui/material/Tooltip';
 import { useDarkMode } from './darkModeProvider';
 
@@ -69,22 +63,13 @@ const DarkModeSelector = () => {
     const currentMode = `${darkMode ? "Sombre" : "Clair"}${systemDarkMode === darkMode ? " (Système)" : ""}`;
 
     return (
-        <Box
-            sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                flex: 1
-            }}
-        >
-            <Tooltip title={currentMode}>
-                <MaterialUISwitch
-                    sx={{ m: 1 }}
-                    onChange={handleChangeMode}
-                    checked={darkMode}
-                />
-            </Tooltip>
-        </Box>
+        <Tooltip title={currentMode}>
+            <MaterialUISwitch
+                sx={{ m: 1 }}
+                onChange={handleChangeMode}
+                checked={darkMode}
+            />
+        </Tooltip>
     );
 }
 

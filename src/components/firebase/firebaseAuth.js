@@ -23,8 +23,9 @@ import MenuList from '@mui/material/MenuList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import { useAuthContext } from '../authentication';
-import { routes, NavigationLink } from '../../navigation/routes';
+import { routes, NavigationLink, ROUTES_NAMESPACE } from '../../navigation/routes';
 import { Loading } from '../hoc';
+import { useTranslation } from '../../utils';
 
 const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => (
     <IconButton
@@ -67,6 +68,7 @@ const LoadingUserState = () => {
 
 const SignedInButton = ({handleLogout}) => {
 
+    const t = useTranslation(ROUTES_NAMESPACE);
     const authContext = useAuthContext();
     const [userDisplayName, setUserDisplayName] = React.useState(authContext.user.displayName);
     const [menuOpen, setMenuOpen] = React.useState(false);
@@ -143,7 +145,7 @@ const SignedInButton = ({handleLogout}) => {
                                                     <ListItemIcon>
                                                         {route.icon}
                                                     </ListItemIcon>
-                                                    <Typography variant="inherit">{route.label}</Typography>
+                                                    <Typography variant="inherit">{t(route.label)}</Typography>
                                                 </MenuItem>
                                             </NavigationLink>
                                         );
@@ -154,7 +156,7 @@ const SignedInButton = ({handleLogout}) => {
                                     <ListItemIcon>
                                         <ExitToAppIcon fontSize="small" />
                                     </ListItemIcon>
-                                    <Typography variant="inherit">Déconnexion</Typography>
+                                    <Typography variant="inherit">{t("logout")}</Typography>
                                 </MenuItem>
                             </MenuList>
                         </ClickAwayListener>

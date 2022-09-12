@@ -5,13 +5,14 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import Gallery from '../../components/gallery';
 import Search from '../../components/search';
 import { PageTitle } from '../../template/pageTypography';
+import { useTranslation } from '../../utils';
 
 const NextPageButton = ({
     onClick,
     loading,
     count       // The number of images currently displayed
 }) => {
-
+    const t = useTranslation("pages.search");
     return (
         <LoadingButton
             loading={loading}
@@ -19,7 +20,7 @@ const NextPageButton = ({
             variant="contained"
             color="primary"
             onClick={onClick}>
-                Résultats suivants
+                {t("button::nextResults")}
         </LoadingButton>
     );
 };
@@ -31,6 +32,7 @@ function getQuerySearch(querySearch) {
 
 const SearchPage = () => {
 
+    const t = useTranslation("pages.search");
     const location = useLocation();
     const [query, setQuery] = React.useState(() => getQuerySearch(location.search));
 
@@ -43,7 +45,7 @@ const SearchPage = () => {
 
     return (
         <React.Fragment>
-            <PageTitle>Recherche</PageTitle>
+            <PageTitle>{t("title")}</PageTitle>
             <Search
                 showExactSwitch={true}
                 galleryComponent={Gallery}

@@ -1,0 +1,41 @@
+{
+    "menu": {
+        "home": "Accueil",
+        "destinations" : "Destinations",
+        "search": "Recherche",
+        "finning": "Le Finning",
+        "composition": "Composition",
+        "about": "A propos",
+        "contact": "Contact",
+        "favorites": "Ma Sélection",
+        "profile": "Mon Profil",
+        "logout": "Déconnexion"
+    },
+    "pages" : {
+        "home": {
+
+        },
+        "destinations": {
+            "title": "Toutes les destinations",
+            "count": "{0} Destination(s)",
+            "filterByRegions": "Filtrer par régions",
+            "noRegion": "Aucune région...",
+            "filterTip": "Sélectionnez une ou plusieurs régions pour filtrer les destinations",
+            "allDestinations": "Tout",
+            "macroDestinations": "Macro",
+            "wideAngleDestinations": "Ambiance"
+        },
+        "search": {
+            "title": "Recherche",
+            "button::nextResults": "Résultats suivants"
+        }
+    },
+    "components": {
+        "search": {
+            "inputPlaceHolder": "Rechercher parmi {0} images...",
+            "exactSwitch": "Rechercher les termes exacts",
+            "resultsCount": "{0} Résultat(s)",
+            "helpTitle": "Rechercher des images"
+        }
+    }
+}

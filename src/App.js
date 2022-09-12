@@ -21,7 +21,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 
 import { BrowserRouter as Router, useLocation } from "react-router-dom";
-import { routes, NavigationLink } from './navigation/routes';
+import { routes, NavigationLink, ROUTES_NAMESPACE } from './navigation/routes';
 import { FirebaseSignin, FirebaseProvider } from './components/firebase';
 import Footer from './template/footer';
 import ScrollTop from './template/scrollTop';
@@ -41,6 +41,9 @@ import { AuthProvider } from './components/authentication';
 import { FavoritesProvider } from './components/favorites';
 import { ReactQueryClientProvider } from './components/reactQuery';
 import { useDarkMode } from './template/theme';
+import { TranslationProvider, useTranslation } from './utils';
+
+import LanguageSelector from './components/language';
 
 const drawerWidth = 240;
 const miniDrawerWidth = 56;
@@ -167,10 +170,11 @@ const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose, scrollTop }) =>
 };
 
 const MenuItemIcon = ({route, variant, children}) => {
+    const t = useTranslation(ROUTES_NAMESPACE);
     if (variant === "permanent") {
         return (
             <Tooltip
-                title={route.label}
+                title={t(route.label)}
                 arrow
                 placement="right"
             >
@@ -199,6 +203,8 @@ function isLinkActive(match, location) {
 }
 
 const DrawerContent = ({open, handleClose, handleDrawerOpen, variant = "temporary"}) => {
+
+    const t = useTranslation(ROUTES_NAMESPACE);
 
     return (
         <div>
@@ -260,7 +266,7 @@ const DrawerContent = ({open, handleClose, handleDrawerOpen, variant = "temporar
                                             {route.icon}
                                         </ListItemIcon>
                                     </MenuItemIcon>
-                                    <ListItemText primary={route.label} />
+                                    <ListItemText primary={t(route.label)} />
                                 </ListItem>
                             </NavigationLink>
                         );
@@ -271,9 +277,20 @@ const DrawerContent = ({open, handleClose, handleDrawerOpen, variant = "temporar
             {
                 variant === "temporary" &&
                 <React.Fragment>
-                    <VerticalSpacing factor={2}/>
-                    <DarkModeSelector />
-                    <VerticalSpacing factor={2}/>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            flex: 1
+                        }}
+                    >
+                        <VerticalSpacing factor={2}/>
+                        <LanguageSelector />
+                        <VerticalSpacing factor={2}/>
+                        <DarkModeSelector />
+                        <VerticalSpacing factor={2}/>
+                    </Box>
                     <SocialIcons />
                     <VerticalSpacing factor={2}/>
                 </React.Fragment>
@@ -357,7 +374,7 @@ const AppContent = React.forwardRef((props, ref) => {
                         display: { xs: 'none', lg: (isHomePage ? 'none' : 'block') }
                     }}
                 >
-                    <DrawerContent handleClose={handleDrawerClose} open={open} variant="permanent" />
+                    <DrawerContent handleClose={handleDrawerClose} handleDrawerOpen={handleDrawerOpen} open={open} variant="permanent" />
                 </Drawer>
             </Box>
 
@@ -412,6 +429,7 @@ const App = (props) => {
             <StyledEngineProvider injectFirst>
                 <ChainedProviders
                     providers={[
+                        TranslationProvider,
                         DarkModeProvider,
                         CustomThemeProvider,
                         ToastContextProvider,

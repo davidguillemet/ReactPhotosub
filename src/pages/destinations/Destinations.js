@@ -18,6 +18,7 @@ import { buildLoadingState, withLoading } from '../../components/hoc';
 import { isMobile } from 'react-device-detect';
 
 import { useReactQuery } from '../../components/reactQuery';
+import { useTranslation } from '../../utils';
 
 const useStyles = makeStyles(() => ({
     regionContainer: {
@@ -64,6 +65,7 @@ const DisplayModeSelector = ({listType, onChange}) => {
 
 const PictureTypeSelector = ({destinationType, onChange}) => {
 
+    const t = useTranslation("pages.destinations");
     return (
         <ToggleButtonGroup
             size={isMobile ? "small" : "medium"}
@@ -72,15 +74,16 @@ const PictureTypeSelector = ({destinationType, onChange}) => {
             onChange={onChange}
             exclusive
         >
-            <ToggleButton value={TYPE_ALL}>Tout</ToggleButton>
-            <ToggleButton value={TYPE_MACRO}>Macro</ToggleButton>
-            <ToggleButton value={TYPE_WIDE_ANGLE}>Ambiance</ToggleButton>
+            <ToggleButton value={TYPE_ALL}>{t("allDestinations")}</ToggleButton>
+            <ToggleButton value={TYPE_MACRO}>{t("macroDestinations")}</ToggleButton>
+            <ToggleButton value={TYPE_WIDE_ANGLE}>{t("wideAngleDestinations")}</ToggleButton>
         </ToggleButtonGroup>
     );
 }
 
 const DestinationsComponent = withLoading(({destinations}) => {
 
+    const t = useTranslation("pages.destinations");
     const classes = useStyles();
 
     const [filteredDestinations, setFilteredDestinations] = useState(destinations);
@@ -140,7 +143,7 @@ const DestinationsComponent = withLoading(({destinations}) => {
             <RegionFilter destinations={destinations} onChange={handleRegionFilterChange} />
             {
                 filteredDestinations &&
-                <Paragraph>{`${filteredDestinations.length} Destination(s)`}</Paragraph>
+                <Paragraph>{t("count", filteredDestinations.length)}</Paragraph>
             }
             <VerticalSpacing factor={2} />
             <DisplayModeSelector listType={destinationsView} onChange={handleChangeDestinationView} />
@@ -175,6 +178,7 @@ const DestinationsComponent = withLoading(({destinations}) => {
 
 const DestinationsController = () => {
 
+    const t = useTranslation("pages.destinations");
     const context = useGlobalContext();
 
     // Fetch Destinations & Regions
@@ -182,7 +186,7 @@ const DestinationsController = () => {
 
     return (
         <React.Fragment>
-            <PageTitle>Toutes Les Destinations</PageTitle>
+            <PageTitle>{t("title")}</PageTitle>
             <VerticalSpacing factor={2} />
             <DestinationsComponent destinations={destinations} />
         </React.Fragment>

@@ -6,12 +6,14 @@ import {unstable_batchedUpdates} from 'react-dom';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { useTranslation } from '../../utils';
 
 const StyledListItem = styled('li')(({theme}) => ({
 }));
 
 const RegionFilterUI = ({hierarchy, onChange}) => {
 
+    const t = useTranslation("pages.destinations");
     const [filter, setFilter] = useState([]);
     const [options, setOptions] = useState([]);
     
@@ -70,13 +72,13 @@ const RegionFilterUI = ({hierarchy, onChange}) => {
             disableCloseOnSelect
             filterSelectedOptions={false}
             options={options}
-            noOptionsText='Aucune région...'
+            noOptionsText={t("noRegion")}
             getOptionLabel={(option) => option.title}
             defaultValue={[]}
             renderInput={(params) => (
                 <TextField
                     {...params}
-                    label="Filtre par régions"
+                    label={t("filterByRegions")}
                 />
             )}
             renderOption={(props, option, { selected }) => (
@@ -113,9 +115,7 @@ const RegionFilterUI = ({hierarchy, onChange}) => {
             onChange={handleChange}
             value={filter}
         />
-        <FormHelperText style={{ textAlign: "center" }}>
-            Sélectionnez une ou plusieurs régions pour filtrer les destinations
-        </FormHelperText>
+        <FormHelperText style={{ textAlign: "center" }}>{t("filterTip")}</FormHelperText>
         </React.Fragment>
     )
 }

@@ -17,7 +17,7 @@ import HelpIcon from '@mui/icons-material/Help';
 import WarningIcon from '@mui/icons-material/Warning';
 import ErrorIcon from '@mui/icons-material/Error';
 
-import { uniqueID } from '../../utils';
+import { uniqueID, useTranslation } from '../../utils';
 import LazyDialog from '../../dialogs/LazyDialog';
 import { useGlobalContext } from '../globalContext';
 import { Paragraph } from '../../template/pageTypography';
@@ -84,6 +84,7 @@ const ResultStatus = ({searchResult}) => {
 
 const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp, showResultCount, initialValue}) => {
 
+    const t = useTranslation("components.search");
     const [value, setValue] = useStateWithDep(initialValue);
 
     const onValueChange = useCallback((event) => {
@@ -111,9 +112,8 @@ const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp, s
                     flex: 1,
                     ml: 1
                 }}
-                placeholder={imageCount !== undefined  ? `Rechercher parmi ${imageCount} images...` : ""}
+                placeholder={imageCount !== undefined  ? t("inputPlaceHolder", imageCount) : ""}
                 autoFocus={true}
-                inputProps={{ 'aria-label': 'search google maps' }}
                 fullWidth
                 type="search"
                 onChange={onValueChange}
@@ -146,6 +146,7 @@ const Search = React.forwardRef(({
     pushHistory = false,
     pageIndex = 0}, ref) => {
 
+    const t = useTranslation("components.search");
     const history = useHistory();
     const context = useGlobalContext();
     const firebaseContext = useFirebaseContext();
@@ -337,7 +338,7 @@ const Search = React.forwardRef(({
                             name="checkedExact"
                             color="primary"
                     />}
-                    label="Rechercher les termes exacts"
+                    label={t("exactSwitch")}
                 />
             }
         </Box>
@@ -346,7 +347,7 @@ const Search = React.forwardRef(({
             <React.Fragment>
                 {
                     searchResult.hasError ? <ErrorAlert /> :
-                    searchResult.totalCount >= 0 && <Paragraph>{`${searchResult.totalCount} Résultat(s)`}</Paragraph>
+                    searchResult.totalCount >= 0 && <Paragraph>{t("resultsCount", searchResult.totalCount)}</Paragraph>
                 }
                 <GalleryComponent
                     images={searchResult.images}
@@ -364,7 +365,7 @@ const Search = React.forwardRef(({
             />
         }
 
-        <LazyDialog title={"Rechercher des images"} path="search/help" open={helpOpen} handleClose={toggleSearchHelpOpen} />
+        <LazyDialog title={t("helpTitle")} path="search/help" open={helpOpen} handleClose={toggleSearchHelpOpen} />
 
         </React.Fragment>
     );

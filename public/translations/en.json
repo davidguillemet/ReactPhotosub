@@ -1,0 +1,38 @@
+{
+    "menu": {
+        "home": "Home",
+        "destinations" : "Destinations",
+        "search": "Search",
+        "finning": "Finning",
+        "composition": "Composition",
+        "about": "About",
+        "contact": "Contact",
+        "favorites": "My favorites",
+        "profile": "My Profile",
+        "logout": "Logout"
+    },
+    "pages" : {
+        "home": {
+
+        },
+        "destinations": {
+            "title": "All destinations",
+            "count": "{0} Destination(s)",
+            "filterByRegions": "Filter by regions",
+            "noRegion": "No region...",
+            "filterTip": "Select a region to filter destinations"
+        },
+        "search": {
+            "title": "Search",
+            "button::nextResults": "Next Results"
+        }
+    },
+    "components": {
+        "search": {
+            "inputPlaceHolder": "Search within {0} images...",
+            "exactSwitch": "Search exact words",
+            "resultsCount": "{0} Result(s)",
+            "helpTitle": "Search for images"
+        }
+    }
+}
