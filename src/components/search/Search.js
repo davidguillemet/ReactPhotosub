@@ -17,7 +17,7 @@ import HelpIcon from '@mui/icons-material/Help';
 import WarningIcon from '@mui/icons-material/Warning';
 import ErrorIcon from '@mui/icons-material/Error';
 
-import { uniqueID, useTranslation } from '../../utils';
+import { uniqueID, useTranslation, useLanguage } from '../../utils';
 import LazyDialog from '../../dialogs/LazyDialog';
 import { useGlobalContext } from '../globalContext';
 import { Paragraph } from '../../template/pageTypography';
@@ -147,6 +147,7 @@ const Search = React.forwardRef(({
     pageIndex = 0}, ref) => {
 
     const t = useTranslation("components.search");
+    const { language } = useLanguage();
     const history = useHistory();
     const context = useGlobalContext();
     const firebaseContext = useFirebaseContext();
@@ -365,7 +366,7 @@ const Search = React.forwardRef(({
             />
         }
 
-        <LazyDialog title={t("helpTitle")} path="search/help" open={helpOpen} handleClose={toggleSearchHelpOpen} />
+        <LazyDialog title={t("helpTitle")} path={`search/help.${language}`} open={helpOpen} handleClose={toggleSearchHelpOpen} />
 
         </React.Fragment>
     );

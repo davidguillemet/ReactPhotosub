@@ -28,6 +28,9 @@
         "search": {
             "title": "Recherche",
             "button::nextResults": "Résultats suivants"
+        },
+        "composition": {
+            "button::help": "De quoi s'agit-il?"
         }
     },
     "components": {
@@ -37,5 +40,8 @@
             "resultsCount": "{0} Résultat(s)",
             "helpTitle": "Rechercher des images"
         }
+    },
+    "dialogs": {
+        "button::close": "Fermer"
     }
 }

@@ -25,6 +25,9 @@
         "search": {
             "title": "Search",
             "button::nextResults": "Next Results"
+        },
+        "composition": {
+            "button::help": "What is it about?"
         }
     },
     "components": {
@@ -34,5 +37,8 @@
             "resultsCount": "{0} Result(s)",
             "helpTitle": "Search for images"
         }
+    },
+    "dialogs": {
+        "button::close": "Close"
     }
 }

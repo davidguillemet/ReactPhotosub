@@ -26,6 +26,7 @@ import {
 import 'fontsource-roboto/100.css';
 import { withLoading, buildLoadingState } from '../../components/hoc';
 import { useToast } from '../../components/notifications';
+import { useLanguage, useTranslation } from '../../utils';
 
 const SimulationContext = React.createContext();
 
@@ -188,6 +189,9 @@ const SimulationManagerDispatcher = withLoading(({user}) => {
 }, [buildLoadingState('user', undefined)]);
 
 const SimulationManagerController = () => {
+
+    const { language } = useLanguage();
+    const t = useTranslation("pages.composition");
     const authContext = useAuthContext();
 
     /**
@@ -209,13 +213,13 @@ const SimulationManagerController = () => {
 
             <PageTitle>Composition</PageTitle>
 
-            <Button variant="contained" startIcon={<HelpIcon />} onClick={toggleHelpOpen}>De quoi s'agit-il?</Button>
+            <Button variant="contained" startIcon={<HelpIcon />} onClick={toggleHelpOpen}>{t("button::help")}</Button>
 
             <SimulationContext.Provider value={{ state, dispatch }}>
                 <SimulationManagerDispatcher user={authContext.user} />
             </SimulationContext.Provider>
 
-            <LazyDialog title={"Composition Murale"} path="simulation/help" open={helpOpen} handleClose={toggleHelpOpen} />
+            <LazyDialog title={"Composition Murale"} path={`simulation/help.${language}`} open={helpOpen} handleClose={toggleHelpOpen} />
 
         </React.Fragment>
     )
