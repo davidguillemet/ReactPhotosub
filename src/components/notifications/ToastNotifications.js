@@ -12,10 +12,11 @@ const ToastNotifications = (props) => {
             sx={{
                 position: 'fixed',
                 bottom: (theme) => theme.spacing(2),
-                zIndex: (theme) => theme.zIndex.tooltip,
+                zIndex: (theme) => theme.zIndex.snackbar,
                 width: '100%',
                 maxWidth: '600px',
-                p: (theme) => theme.spacing(1)
+                px: (theme) => theme.spacing(1),
+                my: (theme) => theme.spacing(1)
             }}
             spacing={2}
             id="DynamicNotifications"
