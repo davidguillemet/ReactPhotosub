@@ -7,6 +7,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Slide from '@mui/material/Slide';
 //ximport logo from './assets/images/logo.jpg';
 import { styled, StyledEngineProvider } from '@mui/material/styles';
@@ -29,7 +30,6 @@ import PageContent from './template/pageContent';
 import SocialIcons from './components/socialIcons';
 
 import { ToastContextProvider } from './components/notifications';
-import { useResizeObserver } from './components/hooks';
 
 import './App.css';
 import { VerticalSpacing } from './template/spacing';
@@ -109,35 +109,29 @@ const AppBar = styled(MuiAppBar, {
 //const Image = styled('img')(({ theme }) => ({ }));
 
 function HideOnScroll(props) {
-    const { scrollTop, children } = props;
-    const prevScrollTop = useRef(0);
-    const showSlide = useRef(true);
-
-    if (prevScrollTop.current !== scrollTop) {
-        // AppContent is rendered twice with the same value of scrollTop..I don't know why
-        // As a workaround, showSlide is maintained as a reference and is computed
-        // only in case the previous scroll value is different than the new one.
-        showSlide.current = scrollTop < 100 || prevScrollTop.current > scrollTop;
-        prevScrollTop.current = scrollTop;
-    }
-
+    const { children } = props;
+    const trigger = useScrollTrigger();
     return (
-        <Slide appear={false} direction="down" in={showSlide.current}>
+        <Slide appear={false} direction="down" in={!trigger}>
             {children}
         </Slide>
     );
 }
 
-const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose, scrollTop }) => {
+const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
 
+    const scrollTrigger = useScrollTrigger({
+        disableHysteresis: true,
+        threshold: 0
+    });
     const { darkMode } = useDarkMode();
     const location = useLocation();
     const transparent = location.pathname === '/';
 
     return (
-        <HideOnScroll scrollTop={scrollTop}>
+        <HideOnScroll>
         <AppBar
-            elevation={scrollTop > 0 ? 4 : 0}
+            elevation={scrollTrigger ? 4 : 0}
             position="fixed"
             open={open}
             sx={{
@@ -301,9 +295,6 @@ const DrawerContent = ({open, handleClose, handleDrawerOpen, variant = "temporar
 
 const AppContent = React.forwardRef((props, ref) => {
 
-    const containerResizeObserver = useResizeObserver(true);
-    const contentResizeObserver = useResizeObserver(false);
-
     const drawerSubscriptions = useRef([]);
     const subscribeDrawer = useCallback((func) => {
         drawerSubscriptions.current.push(func);
@@ -336,7 +327,6 @@ const AppContent = React.forwardRef((props, ref) => {
                 open={open}
                 handleDrawerOpen={handleDrawerOpen}
                 handleDrawerClose={handleDrawerClose}
-                scrollTop={containerResizeObserver.scrollTop}
             />
 
             <Box
@@ -379,44 +369,23 @@ const AppContent = React.forwardRef((props, ref) => {
             </Box>
 
             <Box
-                ref={containerResizeObserver.ref}
                 id="scrollContainer"
                 component="main"
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
+                    overflow: "hidden",
+                    minHeight: '100vh',
                     flexGrow: 1,
-                    overflowY: 'scroll',
-                    maxHeight: '100vh',
                     paddingBottom: 0,
                     p: 0,
                 }}
             >
                 <div id={scrollTopAnchor} />
-                <Box
-                    ref={contentResizeObserver.ref}
-                    id="fullPageContent"
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        flexGrow: 1,
-                        p: 0,
-                    }}
-                >
-                    <DrawerHeader />
-                    <PageContent onHistoryChanged={handleHistoryChanged} subscribeDrawer={subscribeDrawer} />
-                    <Footer />
-                </Box>
+                <DrawerHeader />
+                <PageContent onHistoryChanged={handleHistoryChanged} subscribeDrawer={subscribeDrawer} />
+                <Footer />
             </Box>
-
-            <ScrollTop
-                {...props}
-                window={containerResizeObserver.element}
-                anchorSelector={`#${scrollTopAnchor}`}
-                scrollTop={containerResizeObserver.scrollTop}
-                fullHeight={contentResizeObserver.height}
-                containerHeight={containerResizeObserver.height}
-            />
 
         </React.Fragment>
     );
@@ -425,7 +394,7 @@ const AppContent = React.forwardRef((props, ref) => {
 const App = (props) => {
 
     return (
-        <Box sx={{ display: 'flex', height: '100vh', overflow: 'auto' }} >
+        <Box sx={{ display: 'flex' }} >
             <StyledEngineProvider injectFirst>
                 <ChainedProviders
                     providers={[
@@ -444,6 +413,10 @@ const App = (props) => {
                     <Router>
                         <AppContent {...props} />
                     </Router>
+                    <ScrollTop
+                        {...props}
+                        anchorSelector={`#${scrollTopAnchor}`}
+                    />
                 </ChainedProviders>
             </StyledEngineProvider>
         </Box>
