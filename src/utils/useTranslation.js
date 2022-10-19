@@ -30,14 +30,16 @@ export const TranslationProvider = ({children}) => {
 
     const loadLanguage = useCallback((language) => {
         setBackDropOpen(true);
-        const resourceFileName = `translations/${language}.json`;
+        const resourceFileName = `/translations/${language}.json`;
         fetch(resourceFileName, {
-            headers : { 
+            headers : {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            return response.json()
+        })
         .then(data => {
             resources.current = data;
             setLanguage(language);
