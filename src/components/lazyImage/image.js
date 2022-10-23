@@ -101,7 +101,7 @@ const LazyImage = ({
                 maxWidth: width,
                 width: width,
                 height: "100%",
-                bgcolor: grey[100],
+                backgroundColor: theme => theme.palette.mode === "light" ? "rgba(255, 255, 255, 0.13)" : "rgba(0, 0, 0, 0.11)",
                 transition: 'top 0.8s, left 0.8s',
                 overflow: "hidden",
             }}
