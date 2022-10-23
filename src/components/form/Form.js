@@ -6,6 +6,7 @@ import { LoadingButton } from '@mui/lab';
 import SendIcon from '@mui/icons-material/Send';
 import { Button } from '@mui/material';
 import { useToast } from '../notifications';
+import LoadingOverlay from '../loading/loadingOverlay';
 
 export const FIELD_TYPE_TEXT = 'text';
 export const FIELD_TYPE_EMAIL = 'email';
@@ -166,43 +167,48 @@ const Form = ({
     }
 
     return (
-        <Stack spacing={2} alignItems="center">
-        {
-            fields.filter(field => !field.hidden).map(field => 
-                <FormField
-                    key={field.id}
-                    field={field}
-                    value={values[field.id]}
-                    error={errors[field.id]}
-                    values={values}
-                    handleChange={field.type === FIELD_TYPE_CAPTCHA ? onCaptchaChange : handleChange}
-                    sending={sending}
-                    readOnly={readOnly} />
-            )
-        }
-        {   
-            readOnly === false &&
-            <Stack spacing={2} direction="row" sx={{mt: 2}}>
-                <LoadingButton
-                    onClick={onSubmit}
-                    variant="contained"
-                    disabled={!isValid || !isDirty}
-                    startIcon={<SendIcon />}
-                    loadingPosition="start"
-                    loading={sending}
-                    >
-                    {submitCaption}
-                </LoadingButton>
-                {
-                    onCancel !== null &&
-                    <Button variant="contained" onClick={onCancel}>
-                        Annuler
-                    </Button>
-                }
-            </Stack>
-        }
+        <React.Fragment>
+            <Stack spacing={2} alignItems="center">
+            {
+                fields.filter(field => !field.hidden).map(field => 
+                    <FormField
+                        key={field.id}
+                        field={field}
+                        value={values[field.id]}
+                        error={errors[field.id]}
+                        values={values}
+                        handleChange={field.type === FIELD_TYPE_CAPTCHA ? onCaptchaChange : handleChange}
+                        sending={sending}
+                        readOnly={readOnly} />
+                )
+            }
+            {   
+                readOnly === false &&
+                <Stack spacing={2} direction="row" sx={{mt: 2}}>
+                    <LoadingButton
+                        onClick={onSubmit}
+                        variant="contained"
+                        disabled={!isValid || !isDirty}
+                        startIcon={<SendIcon />}
+                        loadingPosition="start"
+                        loading={sending}
+                        >
+                        {submitCaption}
+                    </LoadingButton>
+                    {
+                        onCancel !== null &&
+                        <Button variant="contained" onClick={onCancel}>
+                            Annuler
+                        </Button>
+                    }
+                </Stack>
+            }
 
-        </Stack>
+            </Stack>
+
+            <LoadingOverlay open={sending} />
+
+        </React.Fragment>
     )
 }
 

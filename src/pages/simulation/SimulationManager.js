@@ -27,6 +27,7 @@ import 'fontsource-roboto/100.css';
 import { withLoading, buildLoadingState } from '../../components/hoc';
 import { useToast } from '../../components/notifications';
 import { useLanguage, useTranslation } from '../../utils';
+import LoadingOverlay from '../../components/loading';
 
 const SimulationContext = React.createContext();
 
@@ -54,6 +55,7 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
     const context = useGlobalContext();
 
     const { state, dispatch } = React.useContext(SimulationContext);
+    const [actionIsRunning, setActionIsRunning] = useState(false);
 
     const addMutation = context.useAddSimulation();
     const updateSimulation = context.useUpdateSimulation();
@@ -72,18 +74,22 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
     }, [fetchedSimulations, user, dispatch]);
 
     const onSave = useCallback((simulationName) => {
+        setActionIsRunning(true)
+
         const simulationData = state.simulations[state.currentIndex];
         if (simulationName) {
             simulationData.name = simulationName;
         }
-        
+
         if (isFromDb(simulationData)) {
             updateSimulation.mutateAsync(simulationData).then(res => {
                 dispatch(setSimulationDirty(false, state.currentIndex));
                 toast.success(`la composition '${simulationData.name}' a été sauvegardée.`)
             }).catch (err => {
                 // Empty
-            });
+            }).finally(() => {
+                setActionIsRunning(false);
+            })
         } else {
             addMutation.mutateAsync(simulationData).then(res => {
                 // res contains all the simulations
@@ -99,7 +105,9 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
                 toast.success(`La composition '${simulationData.name}' a été sauvegardée.`);
             }).catch (err => {
                 // Empty
-            });
+            }).finally(() => {
+                setActionIsRunning(false);
+            })
         } 
     }, [toast, state, addMutation, updateSimulation, dispatch]);
 
@@ -110,6 +118,7 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
 
     const onDelete = useCallback(() => {
 
+        setActionIsRunning(true);
         const simulationToRemove = state.simulations[state.currentIndex];
 
         const removePromise =
@@ -122,7 +131,9 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
             toast.success(`La composition '${simulationToRemove.name}' a été supprimée.`);
         }).catch (err => {
             // Empty
-        });
+        }).finally(() => {
+            setActionIsRunning(false);
+        })
 
     }, [state, dispatch, toast, removeSimulation]);
 
@@ -167,6 +178,8 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
             />
 
             <Prompt when={hasDirty} message={promptMessage} />
+
+            <LoadingOverlay open={actionIsRunning} />
 
         </React.Fragment>
     );
