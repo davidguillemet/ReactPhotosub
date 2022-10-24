@@ -10,7 +10,7 @@ const LANGUAGE_EN = "en";
 const unknownKey = (key) => `[[${key}]]`;
 
 const getNavigatorLanguage = () => {
-    if (process.env.REACT_APP_HANDLE_LANGUAGES === false) {
+    if (process.env.REACT_APP_HANDLE_LANGUAGES === "false") {
         return "fr";
     }
     const language = (navigator.languages && navigator.languages[0]) ||
