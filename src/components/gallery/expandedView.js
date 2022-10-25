@@ -1,6 +1,5 @@
 import { makeStyles } from '@mui/styles';
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
-import {unstable_batchedUpdates} from 'react-dom';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -18,12 +17,13 @@ import StopIcon from '@mui/icons-material/Stop';
 import CloseIcon from '@mui/icons-material/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
+import AppsIcon from '@mui/icons-material/Apps';
 import { useEventListener, getThumbnailSrc } from '../../utils';
 import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
 import ImageInfo from './imageInfo';
 import { useResizeObserver } from '../../components/hooks';
-import { useScrollBlock } from '../../utils';
+import { useScrollBlock, openFullscreen, closeFullscreen } from '../../utils';
 
 import TooltipIconButton from '../../components/tooltipIconButton';
 import { HorizontalSpacing } from '../../template/spacing';
@@ -154,6 +154,7 @@ const ExpandedView = React.forwardRef(({
     const [infoVisible, setInfoVisible] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [fullScreen, setFullScreen] = useState(false);
+    const [showThumbnails, setShowThumbnails] = useState(true);
     const headerBarRef = useRef(null);
     const hideHeaderTimeout = useRef(null);
     const handleNextImageRef = useRef(null);
@@ -211,7 +212,7 @@ const ExpandedView = React.forwardRef(({
         hideHeaderTimeout.current = setTimeout(hideHeaderBar, 3000);
     }, [hideHeaderBar]);
 
-    const toolbarIconSize = isMobile ? 'medium' : 'large';
+    const toolbarIconSize = isMobile ? 'small' : 'medium';
     const playable = count > 1;
 
     function handleKeyDown(event) {
@@ -252,21 +253,23 @@ const ExpandedView = React.forwardRef(({
     }, []);
 
     const handleClickFullScreen = useCallback(() => {
-        handleMouseMove();
         setFullScreen(true);
-    }, [handleMouseMove]);
+        openFullscreen();
+    }, []);
 
     const handleClickExitFullScreen = useCallback(() => {
         cancelHideHeaderBar();
         setFullScreen(false);
+        closeFullscreen();
     }, [cancelHideHeaderBar]);
+
+    const handleClickToggleThumbnails = useCallback(() => {
+        setShowThumbnails(visible => !visible);
+    }, []);
 
     const handlePlayClick = useCallback(() => {
         handleMouseMove();
-        unstable_batchedUpdates(() => {
-            setInfoVisible(false);
-            setIsPlaying(true);
-        })
+        setIsPlaying(true);
     }, [handleMouseMove]);
 
     const handleStopClick = useCallback(() => {
@@ -279,6 +282,7 @@ const ExpandedView = React.forwardRef(({
     }, []);
 
     const handleCloseClick = useCallback(() => {
+        closeFullscreen();
         onClose();
     }, [onClose]);
 
@@ -319,14 +323,15 @@ const ExpandedView = React.forwardRef(({
     return (
         <Box
             onMouseMove={floatingHeader ? handleMouseMove : null}
-            style={{
+            sx={{
                 display: 'flex',
                 flex: 1,
                 flexDirection: 'column',
                 justifyContent: 'flex-start',
                 width: '100%',
                 height: '100%',
-                padding: 0
+                padding: 0,
+                backgroundColor: theme => theme.palette.grey['900']
             }}
         >
             { /* HEADER TOOLBAR */}
@@ -376,33 +381,37 @@ const ExpandedView = React.forwardRef(({
                                 <PlayArrowIcon fontSize={toolbarIconSize}></PlayArrowIcon>
                             </TooltipIconButton>
                     }
-                    {
-                        isPlaying ?
-                        null :
-                        <React.Fragment>
-                            <TooltipIconButton
-                                tooltip={infoVisible ? "Cacher les détails" : "Afficher les détails"}
-                                onClick={handleInfoClick}
-                            >
-                                {
-                                    infoVisible ?
-                                    <InfoIcon fontSize={toolbarIconSize}></InfoIcon> :
-                                    <InfoOutlined fontSize={toolbarIconSize}></InfoOutlined>
-                                }
-                            </TooltipIconButton>
-                            <FavoriteButton fontSize={toolbarIconSize} image={currentImage} />
-                            <TooltipIconButton
-                                tooltip={fullScreen ? "Réduire" : "Plein écran"}
-                                onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}
-                            >
-                            {   
-                                fullScreen ?
-                                <FullscreenExitIcon fontSize={toolbarIconSize} /> :
-                                <FullscreenIcon fontSize={toolbarIconSize} />
+
+                    <React.Fragment>
+                        <TooltipIconButton
+                            tooltip={infoVisible ? "Cacher les détails" : "Afficher les détails"}
+                            onClick={handleInfoClick}
+                        >
+                            {
+                                infoVisible ?
+                                <InfoIcon fontSize={toolbarIconSize}></InfoIcon> :
+                                <InfoOutlined fontSize={toolbarIconSize}></InfoOutlined>
                             }
-                            </TooltipIconButton>
-                        </React.Fragment>
-                    }
+                        </TooltipIconButton>
+                        <FavoriteButton fontSize={toolbarIconSize} image={currentImage} />
+                        <TooltipIconButton
+                            tooltip={fullScreen ? "Réduire" : "Plein écran"}
+                            onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}
+                        >
+                        {   
+                            fullScreen ?
+                            <FullscreenExitIcon fontSize={toolbarIconSize} /> :
+                            <FullscreenIcon fontSize={toolbarIconSize} />
+                        }
+                        </TooltipIconButton>
+                        <TooltipIconButton
+                            tooltip={showThumbnails ? "Masquer les vignettes" : "Afficher les vignettes"}
+                            onClick={handleClickToggleThumbnails}
+                        >
+                            <AppsIcon fontSize={toolbarIconSize} />
+                        </TooltipIconButton>
+                    </React.Fragment>
+
                 </Box>
                 <Box
                     style={{
@@ -533,17 +542,19 @@ const ExpandedView = React.forwardRef(({
                 />
             </Collapse>
 
-            <Collapse in={!isPlaying && !fullScreen}>
-                <ImageSlider
-                    style={{
-                        my: 1,
+            <Collapse in={showThumbnails}>
+                <Paper sx={{
+                        py: 1,
                     }}
+                >
+                <ImageSlider
                     images={images}
                     currentIndex={currentIndex}
                     onThumbnailClick={handleThumbnailClick}
                     hasNext={hasNext}
                     onNextPage={onNextPage}
                 />
+                </Paper>
             </Collapse>
         </Box>
     );

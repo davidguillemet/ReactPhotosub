@@ -1,4 +1,3 @@
-import { makeStyles } from '@mui/styles';
 import Tooltip from '@mui/material/Tooltip';
 import Zoom from '@mui/material/Zoom';
 import IconButton from '@mui/material/IconButton';
@@ -17,7 +16,7 @@ const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style,
                 sx={{
                     mr: {
                         xs: 0,
-                        sm: 1
+                        sm: 0
                     }
                 }}
                 color="inherit"

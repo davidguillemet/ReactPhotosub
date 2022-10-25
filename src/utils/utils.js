@@ -1,13 +1,13 @@
 export function formatDate(tripDate, locale) {
     const options = { year: 'numeric', month: 'long' };
-    const formatedDate = tripDate.toLocaleDateString(locale, options);
-    return formatedDate.charAt(0).toUpperCase() + formatedDate.slice(1);
+    const formattedDate = tripDate.toLocaleDateString(locale, options);
+    return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
 }
 
 export function formatDateShort(tripDate, locale) {
     const options = { year: 'numeric', month: 'short' };
-    const formatedDate = tripDate.toLocaleDateString(locale, options);
-    return formatedDate.charAt(0).toUpperCase() + formatedDate.slice(1);
+    const formattedDate = tripDate.toLocaleDateString(locale, options);
+    return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
 }
 
 function parseSingleDescription(desc) {
@@ -255,4 +255,32 @@ export function debounce(func, wait, immediate, context) {
         if (callNow) result = func.apply(ctx, args);
         return result;
     };
+}
+
+/* View in fullscreen */
+export function openFullscreen() {
+    /* Get the documentElement (<html>) to display the page in fullscreen */
+    var elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+        elem.msRequestFullscreen();
+    }
+}
+
+/* Close fullscreen */
+export function closeFullscreen() {
+    if (document.fullscreenElement === null) {
+        // To avoid "TypeError: Document not active"
+        return;
+    }
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { /* Safari */
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE11 */
+        document.msExitFullscreen();
+    }
 }
