@@ -127,7 +127,7 @@ function buildSearchQueryNotExact(config, criteriaList, page, pageSize) {
     const sqlQuery = config.pool()
         .with(
             _flatTagsRows,
-            config.pool().raw(`select id, name, path, title, description, "sizeRatio", "create", coalesce(caption, '') as caption, unnest(tags) as ${_unnestedTagColumn} from images`))
+            config.pool().raw(`select id, name, path, title, description, "sizeRatio", "create", coalesce(caption, '') as caption, unnest(coalesce(tags, '{X}')) as ${_unnestedTagColumn} from images`))
         .with(
             "results",
             (qb) => {
