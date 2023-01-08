@@ -37,10 +37,11 @@ const VirtualizeSwipeableViews = virtualize(SwipeableViews);
 
 const useStyles = makeStyles({
     navigationButton: {
-        backgroundColor: 'rgba(255,255,255,0.5)',
+        backgroundColor: 'rgba(255,255,255,0.1)',
         position: 'absolute',
         top: '50%',
-        transform: 'translateY(-50%)'
+        transform: 'translateY(-50%)',
+        color: "#FFFFFF"
     },
     expandedHeader: {
         opacity: 1,
