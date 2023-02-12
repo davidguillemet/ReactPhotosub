@@ -9,6 +9,7 @@
         "contact": "Contact",
         "favorites": "Ma Sélection",
         "profile": "Mon Profil",
+        "admin": "Administration",
         "logout": "Déconnexion"
     },
     "pages" : {
@@ -31,6 +32,16 @@
         },
         "composition": {
             "button::help": "De quoi s'agit-il?"
+        },
+        "admin": {
+            "title": "Administration",
+            "regions": "Regions",
+            "images": "Images",
+            "expandAll": "Tout Déplier",
+            "collapseAll": "Tout Replier",
+            "title:deleteLocation": "Supprimer le lieu",
+            "confirmDeleteLocation": "Confirmez-vous la suppression du lieu '{0}'?",
+            "warningDeleteLocation": "Attention, cette action est irreversible."
         }
     },
     "components": {

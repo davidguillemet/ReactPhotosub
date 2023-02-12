@@ -26,7 +26,7 @@ const {Storage} = require("@google-cloud/storage");
 const {parse} = require("path");
 const axios = require("axios");
 
-const extractExif = require("./extractExif");
+const {insertNewImage} = require("./exifProcessing");
 const {blurImage, deleteBlurryImage} = require("./blurImage");
 const {createThumbnails, deleteThumbnails, addSizeRatio} = require("./resizeImage");
 const {apiBaseUrl, logger} = require("./config");
@@ -49,16 +49,19 @@ exports.deleteFile = function(file) {
             name: filePathProps.base,
             path: filePathProps.dir,
         };
-        const promise = axios.delete(apiBaseUrl + "/api/image", {data: fileItemProps});
+        const promise = axios.delete(apiBaseUrl + "/api/images", {data: fileItemProps});
         promises.push(promise);
     }
 
+    const storage = new Storage();
+    const bucket = storage.bucket(file.bucket);
+
     if (mustBlurImage(file)) {
-        promises.push(deleteBlurryImage(file, _blurryFolder));
+        promises.push(deleteBlurryImage(bucket, file, _blurryFolder));
     }
 
     if (mustResizeImage(file)) {
-        promises.push(deleteThumbnails(file, _thumbsFolder));
+        promises.push(deleteThumbnails(bucket, file, _thumbsFolder));
     }
 
     if (promises.length > 0) {
@@ -93,19 +96,19 @@ exports.newFile = function(file) {
     }).then((fileContent) => {
         const promises = [];
         if (mustExtractExif(file)) {
-            // Extract exif info and create a new entry in the tabel "images"
-            promises.push(extractExif(file, fileContent));
+            // Extract exif info and create a new entry in the table "images"
+            promises.push(insertNewImage(file, fileContent));
         }
         if (mustBlurImage(file)) {
             // Create a blurry low res version of the new image
-            promises.push(blurImage(file, fileContent, _blurryFolder));
+            promises.push(blurImage(bucket, file, fileContent, _blurryFolder));
         }
         if (mustResizeImage(file)) {
             // Create thumbnails for the current image
-            promises.push(createThumbnails(file, fileContent, _thumbsFolder));
+            promises.push(createThumbnails(bucket, file, fileContent, _thumbsFolder));
             if (isInteriorImage(file) || isInHomeSlideshow(file)) {
                 // Add sizeRatio property in metadata
-                promises.push(addSizeRatio(file, fileContent));
+                promises.push(addSizeRatio(bucket, file, fileContent));
             }
         }
         return Promise.all(promises);

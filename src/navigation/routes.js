@@ -7,6 +7,7 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import SvgIcon from '@mui/material/SvgIcon';
 
 import { styled } from '@mui/material/styles';
@@ -22,6 +23,7 @@ const About = lazy(() => import("../pages/about"));
 const Contact = lazy(() => import("../pages/contact"));
 const MySelection = lazy(() => import("../pages/favorites"));
 const MyProfile = lazy(() => import("../pages/profile"));
+const Admin = lazy(() => import("../admin"));
 
 export const HomePath = "/";
 export const DestinationsPath = "/destinations";
@@ -33,6 +35,7 @@ export const ContactPath = "/contact";
 export const FavoritesPath = "/favorites";
 export const ProfilPath = "/profil";
 export const DestinationPath = "/destinations/:year/:title";
+export const AdminPath = "/admin";
 
 export const ROUTES_NAMESPACE = "menu";
 
@@ -116,6 +119,14 @@ export const routes = [
         path: ProfilPath,
         component: MyProfile,
         icon: <AccountBoxIcon fontSize="small" />,
+        private: true,
+        fullWidth: false
+    },
+    {
+        label: "admin",
+        path: AdminPath,
+        component: Admin,
+        icon: <AdminPanelSettingsIcon fontSize="small" />,
         private: true,
         fullWidth: false
     },

@@ -1,6 +1,5 @@
 const sharp = require("sharp");
 const path = require("path");
-const {Storage} = require("@google-cloud/storage");
 const os = require("os");
 const {logger} = require("./config");
 
@@ -11,7 +10,7 @@ function _getBlurryFilePath(filePathProps, blurryFolder) {
     return blurryFilePathInBucket;
 }
 
-exports.blurImage = function(file, fileContent, blurryFolder) {
+exports.blurImage = function(bucket, file, fileContent, blurryFolder) {
     const filePathProps = path.parse(file.name);
     const fileNameWithoutExtension = filePathProps.name;
     const fileExtension = filePathProps.ext;
@@ -24,8 +23,6 @@ exports.blurImage = function(file, fileContent, blurryFolder) {
         .then(() => {
             const blurryFilePathInBucket = _getBlurryFilePath(filePathProps, blurryFolder);
 
-            const storage = new Storage();
-            const bucket = storage.bucket(file.bucket);
             return bucket.upload(tempBlurryFilePath, {
                 destination: blurryFilePathInBucket,
             });
@@ -34,12 +31,9 @@ exports.blurImage = function(file, fileContent, blurryFolder) {
         });
 };
 
-exports.deleteBlurryImage = function(file, blurryFolder) {
+exports.deleteBlurryImage = function(bucket, file, blurryFolder) {
     const filePathProps = path.parse(file.name);
     const blurryFilePathInBucket = _getBlurryFilePath(filePathProps, blurryFolder);
-
-    const storage = new Storage();
-    const bucket = storage.bucket(file.bucket);
 
     const bucketFile = bucket.file(blurryFilePathInBucket);
     return bucketFile.exists().then((data) => {

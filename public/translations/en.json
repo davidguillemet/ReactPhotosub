@@ -9,6 +9,7 @@
         "contact": "Contact",
         "favorites": "My favorites",
         "profile": "My Profile",
+        "admin": "Administration",
         "logout": "Logout"
     },
     "pages" : {
@@ -28,6 +29,16 @@
         },
         "composition": {
             "button::help": "What is it about?"
+        },
+        "admin": {
+            "title": "Administration",
+            "regions": "Regions",
+            "images": "Images",
+            "expandAll": "Expand All",
+            "collapseAll": "Collapse All",
+            "title:deleteLocation": "Delete Location",
+            "confirmDeleteLocation": "Are your sure you want to delete the location '{0}'?",
+            "warningDeleteLocation": "Warning, this action is irreversible."
         }
     },
     "components": {

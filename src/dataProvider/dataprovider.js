@@ -20,7 +20,11 @@ function DataProvider(axiosInstance) {
 DataProvider.prototype.getDestinationProps = function(year, title, props) {
     return this.axios.get(`/destination/${year}/${title}/${props}`)
     .then(response => {
-        return response.data;
+        if (response.status === 204) {
+            return null;
+        } else {
+            return response.data;
+        }
     })
 };
 
@@ -80,16 +84,35 @@ DataProvider.prototype.updateDestination = function(destination) {
 DataProvider.prototype.createDestination = function(destination) {
     return this.axios.post('/admin/destinations', destination)
     .then(response => {
-        return response.data; // contains the new destination
+        return response.data; // contains the new destinations
     });
 }
 
 DataProvider.prototype.deleteDestination = function(destinationId) {
     return this.axios.delete('/admin/destinations', {data: { id: destinationId } })
     .then(response => {
-        return response.data; // contains the new destination
+        return response.data; // contains the deleted destination
     });
 }
+
+DataProvider.prototype.updateLocation = function(location) {
+    return this.axios.put('/admin/locations', location);
+}
+
+DataProvider.prototype.createLocation = function(location) {
+    return this.axios.post('/admin/locations', location)
+    .then(response => {
+        return response.data; // contains the new locations
+    });
+}
+
+DataProvider.prototype.deleteLocation = function(locationId) {
+    return this.axios.delete('/admin/locations', {data: { id: locationId } })
+    .then(response => {
+        return response.data; // contains the deleted location
+    });
+}
+
 
 DataProvider.prototype.getUserData = function() {
     return this.axios.get(`/userdata`)
@@ -203,6 +226,12 @@ DataProvider.prototype._getBucketContent = function(folder) {
     });
 }
 
+DataProvider.prototype.renameFolder = function(folder, newName) {
+    return this.axios.patch(`/bucket/${folder}`, {
+        name: newName
+    });
+}
+
 DataProvider.prototype.waitForThumbnails = function(fileName) {
     return this.axios.get(`/thumbstatus/${fileName}`, {
         timeout: 60000, // Specific timeout for this request
@@ -240,6 +269,18 @@ DataProvider.prototype.getImageFolders = function() {
 
 DataProvider.prototype.updateUser = function(user) {
     return this.axios.put('/user', user);
+}
+
+DataProvider.prototype.refreshThumbnails = function(fullPath) {
+    return this.axios.patch(`/images`, {
+        fullPath,
+    });
+}
+
+DataProvider.prototype.insertImageInDatabase = function(fullPath) {
+    return this.axios.put(`/images`, {
+        fullPath,
+    });
 }
 
 export default DataProvider;

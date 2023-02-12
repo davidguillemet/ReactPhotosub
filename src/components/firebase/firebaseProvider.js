@@ -1,7 +1,15 @@
 import React from 'react';
 import { initializeApp } from "firebase/app"
 import { getAuth, connectAuthEmulator, signOut } from "firebase/auth";
-import { getStorage, connectStorageEmulator, ref, uploadBytesResumable, getDownloadURL} from "firebase/storage";
+import {
+    getStorage,
+    connectStorageEmulator,
+    ref,
+    list,
+    uploadBytesResumable,
+    uploadString,
+    getDownloadURL
+} from "firebase/storage";
 import { getAnalytics, logEvent } from "firebase/analytics";
 
 import FirebaseContext from './firebaseContext';
@@ -28,6 +36,8 @@ if (isDev) {
     connectStorageEmulator(firebaseStorage, "localhost", 9199);
 }
 
+const _ghostFileName = ".ghost";
+
 const firebaseContext = {
     auth: firebaseAuth,
     signOut: () => {
@@ -39,9 +49,17 @@ const firebaseContext = {
     storageRef: (path) => {
         return ref(firebaseStorage, path);
     },
+    list: (ref, options) => {
+        return list(ref, options);
+    },
     upload: (ref, file, metadata) => {
         return uploadBytesResumable(ref, file, metadata)
     },
+    createFolder: (currentFolderRef, folder) => {
+        const ghostFileRef = ref(firebaseStorage, `${currentFolderRef.fullPath}/${folder}/${_ghostFileName}`);
+        return uploadString(ghostFileRef, "empty file", "raw", { contentType: "text/plain" })
+    },
+    isGhostFile: (item) => item.name === _ghostFileName,
     getDownloadURL: getDownloadURL,
     logEvent:
         isDev ?

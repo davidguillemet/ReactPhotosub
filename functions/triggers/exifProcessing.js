@@ -4,7 +4,7 @@ const axios = require("axios");
 const {parse} = require("path");
 const {apiBaseUrl, logger} = require("./config");
 
-module.exports = async function extractExif(file, fileContent) {
+exports.extractExif = async function(file, fileContent) {
     let xmp = null;
 
     try {
@@ -25,7 +25,7 @@ module.exports = async function extractExif(file, fileContent) {
         return;
     }
 
-    // Update the intial gallery image
+    // Update the initial gallery image
     const imageTitle = getObjectProperty(xmp.title, "value", "");
     const imageDescription = getObjectProperty(xmp.description, "value", "");
     const imageTags = getObjectProperty(xmp, "subject", null);
@@ -66,9 +66,15 @@ module.exports = async function extractExif(file, fileContent) {
         create: creationDate,
     };
 
+    return newImageItem;
+};
+
+exports.insertNewImage = async function(file, fileContent) {
+    const newImageItem = await module.exports.extractExif(file, fileContent);
+
     // Send post request api-photosub/image to insert a new image item
     // Axios post request is blocked when return axios.post(...) !!??
-    axios.post(apiBaseUrl + "/api/image", newImageItem)
+    axios.post(apiBaseUrl + "/api/images", newImageItem)
         .then(() => {
             logger.info(`${file.name} has been inserted.`);
         })

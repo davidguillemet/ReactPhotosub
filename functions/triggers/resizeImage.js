@@ -1,7 +1,6 @@
 const sharp = require("sharp");
 const imageSize = require("buffer-image-size");
 const path = require("path");
-const {Storage} = require("@google-cloud/storage");
 const {unlink} = require("fs/promises");
 const os = require("os");
 const {logger} = require("./config");
@@ -71,13 +70,10 @@ function deleteThumbnail(bucket, thumbnailPathInBucket) {
     });
 }
 
-function processThumbnails(action, file, thumbsFolder, actionParams) {
+function processThumbnails(action, bucket, file, thumbsFolder, actionParams) {
     const filePathProps = path.parse(file.name);
     const fileNameWithoutExtension = filePathProps.name;
     const fileExtension = filePathProps.ext;
-
-    const storage = new Storage();
-    const bucket = storage.bucket(file.bucket);
 
     const promises = _sizes.map((sizeSpec) => {
         const thumbnailFileName = `${fileNameWithoutExtension}_${sizeSpec.suffix}${fileExtension}`;
@@ -96,22 +92,20 @@ function processThumbnails(action, file, thumbsFolder, actionParams) {
     return Promise.all(promises);
 }
 
-exports.createThumbnails = function(file, fileContent, thumbsFolder) {
+exports.createThumbnails = function(bucket, file, fileContent, thumbsFolder) {
     const params = {
         fileContent: fileContent,
     };
-    return processThumbnails(ACTION_CREATE, file, thumbsFolder, params);
+    return processThumbnails(ACTION_CREATE, bucket, file, thumbsFolder, params);
 };
 
-exports.deleteThumbnails = function(file, thumbsFolder) {
-    return processThumbnails(ACTION_DELETE, file, thumbsFolder);
+exports.deleteThumbnails = function(bucket, file, thumbsFolder) {
+    return processThumbnails(ACTION_DELETE, bucket, file, thumbsFolder);
 };
 
-exports.addSizeRatio = function(file, filecontent) {
+exports.addSizeRatio = function(bucket, file, filecontent) {
     const dimensions = imageSize(filecontent);
 
-    const storage = new Storage();
-    const bucket = storage.bucket(file.bucket);
     const bucketFile = bucket.file(file.name);
     return bucketFile.setMetadata({
         metadata: {

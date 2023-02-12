@@ -6,6 +6,7 @@ import DataProvider from '../../dataProvider/dataprovider';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFirebaseContext } from '../firebase';
 import {getUA} from 'react-device-detect';
+import { throttle } from '../../utils';
 
 const isPrerenderUserAgent = () => {
     if (getUA.toLowerCase().indexOf('prerender') !== -1) {
@@ -41,6 +42,12 @@ const GlobalContextProvider = ({children}) => {
             timeout: isDev() ? 1200000 /* 20mn in case of debug */ : 10000 /* 10s */,
         });
 
+        axiosInstance.defaults.headers = {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        };
+
         // configure axios to send an authentication token as soon as a user is connected
         axiosInstance.interceptors.request.use(async function (config) {
             const currentUSer = getUser();
@@ -57,6 +64,10 @@ const GlobalContextProvider = ({children}) => {
             err => {
                 if (err.response && err.response.status === 500 && err.response.data?.error) {
                     // response content should look like { error: { code: "...", message: "..." } }
+                    if (err.response.data.error.code === "auth/id-token-revoked") {
+                        firebaseContext.signOut();
+                        return;
+                    }
                     throw new Error(err.response.data.error.message, { cause: err.response.data?.error });
                 }
                 throw err;
@@ -73,6 +84,8 @@ const GlobalContextProvider = ({children}) => {
             useFetchLocations: () => useQuery(['locations'], () => dataProvider.getLocations()), 
             useFetchRegions: () => useQuery(['regions'], () => dataProvider.getRegions()),
             useFetchDestinations: () => useQuery(['destinations'], () => dataProvider.getDestinations()),
+
+            // Destinations
             useAddDestination: () => useMutation((destination) => dataProvider.createDestination(destination), {
                 onSuccess: (data) => {
                     queryClient.setQueryData(['destinations'], data)
@@ -90,10 +103,45 @@ const GlobalContextProvider = ({children}) => {
                     queryClient.setQueryData(['destinations'], data)
                 }
             }),
+
+            // Locations
+            useAddLocation: () => useMutation((location) => dataProvider.createLocation(location), {
+                onSuccess: (data) => {
+                    queryClient.setQueryData(['locations'], data)
+                }
+            }),
+            useDeleteLocation: () => useMutation((location) => dataProvider.deleteLocation(location.id), {
+                onSuccess: ({id}) => {
+                    const prevLocations = queryClient.getQueryData(['locations']);
+                    const newLocations = prevLocations.filter(l => l.id !== id);
+                    queryClient.setQueryData(['locations'], newLocations);
+                }
+            }),
+            useUpdateLocation: () => useMutation((location) => dataProvider.updateLocation(location), {
+                onSuccess: ({data}) => {
+                    queryClient.setQueryData(['locations'], data)
+                }
+            }),
+
             useFetchRelatedDestinations: (regions, macro, wide) => useQuery(['related', ...regions, macro, wide], () => dataProvider.getRelatedDestinations(regions, macro, wide)),
             useFetchDestinationDesc: (year, title) => useQuery(['destinationdesc', year, title], () => dataProvider.getDestinationDescFromPath(year, title)),
             useFetchDestinationHeader: (year, title) => useQuery(['destinationheader', year, title], () => dataProvider.getDestinationDetailsFromPath(year, title)),
-            useFetchDestinationImages: (year, title) => useQuery(['destinationimages', year, title], () => dataProvider.getDestinationImagesFromPath(year, title)),
+
+            useFetchDestinationImages: (year, title) => useQuery({
+                queryKey: ['destinationimages', year, title],
+                queryFn: () => dataProvider.getDestinationImagesFromPath(year, title),
+                enabled: year !== null && year !== undefined && title !== null && title !== undefined,
+                structuralSharing: false // To force a refresh even if the data is the same after query invalidation (Image management in Admin)
+            }),
+            clearDestinationImages: throttle(
+                (year, title) => {
+                    queryClient.invalidateQueries({
+                        queryKey: ['destinationimages', year, title]
+                    })
+                },
+                1000, true /* leading */
+            ),
+
             useFetchInteriors: (thenFunc) => useQuery(['interiors'], () => dataProvider.getInteriors().then(thenFunc)),
             useFetchUserInteriors: (uid, thenFunc) => useQuery(['userInteriors', uid], () => dataProvider.getUploadedInteriors(uid).then(thenFunc)),
             useRemoveUserInterior: () => useMutation((fileName) => dataProvider.removeUploadedInterior(fileName)),

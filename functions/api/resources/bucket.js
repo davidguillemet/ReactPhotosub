@@ -42,9 +42,25 @@ module.exports = function(config) {
     };
 
     config.app.route("/bucket/:folder")
+        // Get bucket content
         .get(async function(req, res, next) {
             return getBucketContent(req.params.folder, req, res, next);
         });
+
+    config.app.route("/bucket/*")
+        .patch(
+            config.isAuthenticated, // Authentication required to rename a folder
+            config.isAuthorized(["admin"]), // ONly the admin is authorized to rename a folder
+            async function(req, res, next) {
+                const folder = req.params[0];
+                const file = config.bucket.file(folder);
+                const newProps = req.body;
+                res.locals.errorMessage = `Le renommage du répertoire '${folder}' a échoué.`;
+                return file.rename(newProps.name)
+                    .then((response) => {
+                        res.status(200).send(`Successfully rename '${folder}' as '${newProps.name}.`).end();
+                    }).catch(next);
+            });
 
     config.app.route("/uploadedInteriors")
         .get(async function(req, res, next) {

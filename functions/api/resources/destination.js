@@ -26,9 +26,16 @@ module.exports = function(config) {
                 .from("destinations")
                 .where("path", getDestinationPath(req))
                 .then((destinations) => {
-                    const destination = destinations[0];
-                    convertPath(destination, config);
-                    res.json(destination);
+                    if (destinations.length > 0) {
+                        const destination = destinations[0];
+                        convertPath(destination, config);
+                        res.json(destination);
+                    } else {
+                        // The destination does not exist,
+                        // It may happen if an image exists in database
+                        // while it has no associated destination yet
+                        res.status(204).json(null);
+                    }
                 }).catch(next);
         });
 
