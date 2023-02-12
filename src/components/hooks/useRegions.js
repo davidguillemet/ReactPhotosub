@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useGlobalContext } from '../../components/globalContext';
+import { useGlobalContext } from '../globalContext';
 
 const compareRegions = (a, b) => a.title === b.title ? 0 : a.title < b.title ? -1 : 1;
 
@@ -25,8 +25,8 @@ const useRegions = () => {
 
     const context = useGlobalContext();
     const [regions, setRegions] = useState({
-        hierarchy: [],
-        map: null
+        hierarchy: undefined,
+        map: undefined
     });
 
     // Executed only once to get regions

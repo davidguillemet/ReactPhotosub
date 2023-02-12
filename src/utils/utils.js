@@ -83,7 +83,7 @@ export const THUMB_ORIGINAL = THUMB_L + 1;
 
 const _thumbsSubFolder = 'thumbs';
 
-const _thumbnailSpecs = [
+export const _thumbnailSpecs = [
     {
         maxSize: THUMB_XS,
         propertyName: "extraSmallSrc",

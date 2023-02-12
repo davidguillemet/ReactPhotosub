@@ -58,7 +58,7 @@ const AuthProvider = ({ children }) => {
                     {
                         // https://firebase.google.com/docs/auth/admin/manage-sessions#detect_id_token_revocation_in_the_sdk
                         // Token has been revoked. Inform the user to reauthenticate or signOut() the user
-                        firebaseContext.auth.signOut();
+                        firebaseContext.signOut();
                         return;
                     } else {
                         toast.error(error.message);

@@ -2,11 +2,14 @@ import { Link } from 'react-router-dom';
 import { withLoading, buildLoadingState } from '../hoc';
 
 const DestinationLink = withLoading(({destination, children}) => {
+    if (destination === null) {
+        return null;
+    }
     return (
         <Link to={`/destinations/${destination.path}`} style={{textDecoration: 'none'}}>
             {children}
         </Link>
     );
-}, [buildLoadingState("destination", [null, undefined])]);
+}, [buildLoadingState("destination", [undefined])]);
 
 export default DestinationLink;

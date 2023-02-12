@@ -23,7 +23,7 @@ import BorderInput from './BorderInput';
 import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import ImageSlider from '../../components/imageSlider';
 import SimulationDisplay from './SimulationDisplay';
-import FileUpload from './FileUpload';
+import FileUpload from '../../components/fileUpload/FileUpload';
 
 import {setBackground, resize, borderWidth, borderColor, shadow, addImage, setImage} from './actions/SimulationActions';
 
@@ -103,12 +103,20 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     const [interiors, images, setSearchImages, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
     const [currentInteriorIndex, setCurrentInteriorIndex] = useState(-1);
     const [searchResult, setSearchResult] = useState(getInitialSearchResult());
+    const [userUploadRef, setUserUploadRef] = useState(null);
 
     const [currentImageId, setCurrentImageId] = useState(null);
 
     const simulation = useMemo(() => simulations[simulationIndex], [simulations, simulationIndex]);
 
     const resizeObserver = useResizeObserver();
+
+    useEffect(() => {
+        if (user !== null && user !== undefined) {
+            const userUploadRef = firebaseContext.storageRef(`userUpload/${user.uid}/interiors`);
+            setUserUploadRef(userUploadRef);
+        }
+    }, [user, firebaseContext])
 
     useEffect(() => {
         if (resizeObserver.width > 0) {
@@ -224,10 +232,10 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
             <Typography variant="h4" style={{fontWeight: "100"}}>1. Sélectionnez une ambiance</Typography>
             {
-                user &&
+                userUploadRef &&
                 <FileUpload
                     caption="Ajoutez des ambiances"
-                    user={user}
+                    uploadRef={userUploadRef}
                     onFileUploaded={onFileUploaded}
                 />
             }

@@ -8,13 +8,13 @@ import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import { Typography } from '@mui/material';
-import { useGlobalContext } from '../../components/globalContext';
+import { useGlobalContext } from '../globalContext';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import ErrorIcon from '@mui/icons-material/Error';
-import { useToast } from '../../components/notifications';
+import { useToast } from '../notifications';
 
 import './fileUploadStyles.css';
-import { useFirebaseContext } from '../../components/firebase';
+import { useFirebaseContext } from '../firebase';
 
 const STEP_UPLOAD = "step::upload";
 const STEP_THUMBNAILS = "step::thumbnail";
@@ -180,17 +180,9 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
     );
 }
 
-const FileUpload = ({caption, user, onFileUploaded}) => {
+const FileUpload = ({caption, uploadRef, onFileUploaded}) => {
 
-    const firebaseContext = useFirebaseContext();
     const [uploadFiles, setUploadFiles] = useState([]);
-    const userUploadRef = useRef(null);
-
-    useEffect(() => {
-        if (userUploadRef.current === null) {
-            userUploadRef.current = firebaseContext.storageRef(`userUpload/${user.uid}/interiors`);
-        }
-    }, [user, firebaseContext]);
 
     const handleFileSelection = (event) => {
         const { target: { files } } = event;
@@ -251,7 +243,7 @@ const FileUpload = ({caption, user, onFileUploaded}) => {
                                     file={file}
                                     onCancel={onCancel}
                                     onFileUploaded={onFileUploaded}
-                                    storageRef={userUploadRef.current}/>
+                                    storageRef={uploadRef}/>
                             </CSSTransition>
                         );
                     })

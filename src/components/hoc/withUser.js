@@ -4,27 +4,33 @@ import { VerticalSpacing } from "../../template/spacing";
 import React from "react";
 import { Loading } from "./Loading";
 
-const Unauthorized = () => {
+const Unauthorized = ({admin}) => {
     return (
         <React.Fragment>
             <VerticalSpacing factor={2} />
-            <Alert severity="warning" elevation={4} variant="filled">Cette page n'est accessible qu'aux utilisateurs connectés</Alert>
+            <Alert severity="warning" elevation={4} variant="filled">
+            { 
+                admin === true ?
+                "Cette page n'est accessible qu'à l'administrateur" :
+                "Cette page n'est accessible qu'aux utilisateurs connectés"
+            }
+            </Alert>
         </React.Fragment>
     );
 }
 
-const withUser = (Component, alert = true) => (props) => {
+const withUser = (Component, options = { alert: true, admin: false }) => (props) => {
 
     const authContext = useAuthContext();
 
     return (
         authContext.user === undefined ?
-            <Loading size={40} /> :
-            authContext.user !== null ?
+            <Loading size={40} /> : // User not yet loaded
+            authContext.user !== null && (options.admin === false || authContext.admin === true) ?
                 <Component {...props} /> :
-                alert === true ?
-                    <Unauthorized /> :
-                    null
+                options.alert === true ?
+                    <Unauthorized admin={options.admin}/> : // Connected user required (maybe admin)
+                    null               // the component is just not displayed
     )
 }
 

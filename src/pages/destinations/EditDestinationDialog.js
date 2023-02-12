@@ -24,16 +24,12 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
     const [fields, setFields] = useState(null);
 
     const getImagesFromPath = useCallback(([path]) => {
-        if (path) {
-            const [ year, title ] = path.split('/');
-            const { data, isError, error } = context.useFetchDestinationImages(year, title);
-            if (isError === true) {
-                throw error;
-            }
-            return data;
-        } else {
-            return null;
+        const [ year, title ] = (path !== null && path !== undefined) ? path.split('/') : [ null, null ];
+        const { data, isError, error } = context.useFetchDestinationImages(year, title);
+        if (isError === true) {
+            throw error;
         }
+        return data;
     }, [context]);
 
     const getLocations = useCallback(() => {

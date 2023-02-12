@@ -10,7 +10,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import { PageTitle, Paragraph } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
-import DestinationsMap from '../../components/map';
+import { DestinationsMap } from '../../components/map';
 import RegionFilter from './RegionFilter';
 import { useGlobalContext } from '../../components/globalContext';
 import DestinationGallery from './DestinationGallery';

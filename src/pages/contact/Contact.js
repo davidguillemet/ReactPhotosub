@@ -74,6 +74,7 @@ const Contact = () => {
         },
         {
             id: "token",
+            required: true,
             type: FIELD_TYPE_CAPTCHA,
             default: null
         }

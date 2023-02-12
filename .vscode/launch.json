@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "attach",
-            "name": "Debug",
+            "name": "Debug functions",
             "port": 9229
         },
         {

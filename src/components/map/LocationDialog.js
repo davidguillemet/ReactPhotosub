@@ -2,9 +2,9 @@ import React from 'react';
 import {isMobile} from 'react-device-detect';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DestinationsMap from '.';
+import { LocationsMap } from './DestinationsMap';
 
-const LocationDialog = ({destinations, open, handleClose}) => {
+const LocationDialog = ({locations, open, handleClose}) => {
 
     return (
         <Dialog
@@ -27,7 +27,7 @@ const LocationDialog = ({destinations, open, handleClose}) => {
                 }}
             >
             { open &&
-                <DestinationsMap destinations={destinations} isFullScreen={true} onClose={handleClose} />
+                <LocationsMap locations={locations} isFullScreen={true} onClose={handleClose} />
             }
             </DialogContent>
         </Dialog>

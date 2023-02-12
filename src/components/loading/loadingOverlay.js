@@ -12,6 +12,8 @@ const LoadingOverlay = ({ open }) => {
                 justifyContent: 'center',
                 alignItems: 'center'
             }}
+            // TODO
+            // https://stackoverflow.com/questions/69991556/mui-v5-disablebackdropclick-in-createtheme-equivalent
             disableBackdropClick
             open={open}
         >

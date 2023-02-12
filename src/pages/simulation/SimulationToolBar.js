@@ -197,5 +197,5 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
 )};
 
 export default withLoading(
-    withUser(SimulationToolBar, false /* No alert if not connected */),
+    withUser(SimulationToolBar, { alert: false /* No alert if not connected */ }),
     [buildLoadingState("currentIndex", -1)]);

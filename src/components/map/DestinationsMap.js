@@ -7,7 +7,7 @@ import {unstable_batchedUpdates} from 'react-dom';
 import { GoogleMap, InfoWindow, MarkerClusterer, useJsApiLoader } from '@react-google-maps/api';
 import { useGlobalContext } from '../globalContext';
 import { formatDate, getThumbnailSrc } from '../../utils';
-import { DestinationPath } from '../../navigation/routes';
+import { DestinationsPath } from '../../navigation/routes';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import Box from '@mui/material/Box';
@@ -146,91 +146,40 @@ const CustomFullScreen = ({destinations, fullScreen, onClose}) => {
     );
 }
 
-const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = false, onClose, isDestinationPage}) => {
+export const LocationsMap = ({locations, isFullScreen = false, onClose, resetOnChange = true}) => {
+
+    const { isLoaded } = useJsApiLoader({
+        id: 'google-map-script',
+        // The google maps API keys are restricted (IP and HTTP referrer)
+        googleMapsApiKey: process.env.REACT_APP_GMAP_API_KEY
+    })
 
     const { darkMode } = useDarkMode();
     const [selectedLocation, setSelectedLocation] = useState(null);
-    const [destinationsPerLocation, setDestinationsPerLocation] = useState([]);
-    const [openInfoWindow, setOpenInfoWindow] = useState(true);
 
     // eslint-disable-next-line no-unused-vars
     const [map, setMap] = React.useState(null)
-    const [clusterer, setClusterer] = React.useState(null)
-
-    // Set destinations per location for the single destination page
-    useEffect(() => {
-
-        if (destinations !== null && isDestinationPage === true) {
-            const destination = destinations[0];
-            const location = {
-                title: destination.location,
-                latitude: destination.latitude,
-                longitude: destination.longitude,
-                destinations: [ destination ]
-            }
-            unstable_batchedUpdates(() => {
-                setDestinationsPerLocation([ location ]);
-                setSelectedLocation(null);
-                setOpenInfoWindow(false);
-            })
-            return;
-        }
-    // Don't need dependency with isDestinationPage
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [destinations]);
-
-    // Set destinations per location for the destinations page
-    useEffect(() => {
-
-        if (isDestinationPage === true) {
-            // don't update destinationsPerLocation if we are on a single destination page
-            return;
-        }
-
-        const locationMap = new Map();
-        locations.forEach(location => {
-            locationMap.set(location.id, location);
-        })
-
-        const destinationsPerlocation = new Map();
-        destinations.forEach(destination => {
-
-            const modifiedDestination = {
-                ...destination,
-                date: formatDate(new Date(destination.date)),
-                cover: getThumbnailSrc(destination.cover, _infoCoverWidth)
-            };
-            let locationInstance;
-            if (destinationsPerlocation.has(destination.location)) {
-                locationInstance = destinationsPerlocation.get(destination.location);
-            } else {
-                locationInstance = { ...locationMap.get(destination.location) }
-                locationInstance.destinations = [];
-                destinationsPerlocation.set(destination.location, locationInstance);
-            }
-            locationInstance.destinations.push(modifiedDestination);    
-        });
-
-        unstable_batchedUpdates(() => {
-            setDestinationsPerLocation([ ...destinationsPerlocation.values() ]);
-            setSelectedLocation(null);
-        })
-    // Don't need dependency with isDestinationPage
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [destinations, locations]);
+    const [clusterer, setClusterer] = React.useState(null);
+    const mapInitialized = React.useRef(false);
 
     const handleMarkerClick = React.useCallback((location) => {
-        if (openInfoWindow === true) {
+        if (location.destinations !== undefined) {
             setSelectedLocation(location);
         }
-    }, [openInfoWindow]);
+    }, []);
 
     useEffect(() => {
         if (clusterer === null) {
             return;
         }
         clusterer.clearMarkers();
-        const markers = destinationsPerLocation.map(location => {
+        const locationArray = 
+            locations === null || locations === undefined ? [] :
+            Array.isArray(locations) ? locations :
+            isNaN(locations.latitude) || isNaN(locations.longitude) ? [] :
+            [locations];
+
+        const markers = locationArray.map(location => {
             const marker = new google.maps.Marker({
                 position: {
                     lat: location.latitude,
@@ -242,16 +191,20 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
             return marker;
         });
         clusterer.addMarkers(markers);
+        const setZoom = resetOnChange === true || mapInitialized.current === false
         if (markers.length === 0) {
-            clusterer.map.setZoom(2);
+            if (setZoom)
+                clusterer.map.setZoom(2);
             clusterer.map.panTo(_defaultCenter);
         } else if (markers.length === 1) {
-            clusterer.map.setZoom(8);
+            if (setZoom)
+                clusterer.map.setZoom(8);
             clusterer.map.panTo(markers[0].getPosition());
         } else {
             clusterer.fitMapToMarkers();
         }
-    }, [clusterer, destinationsPerLocation, handleMarkerClick])
+        mapInitialized.current = true;
+    }, [clusterer, locations, handleMarkerClick, resetOnChange])
 
     const handleMapLoaded = React.useCallback((map) => {
         setMap(map)
@@ -268,6 +221,10 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
     const handleClustererUnmount = React.useCallback(clusterer => {
         setClusterer(null);
     }, []);
+
+    if (isLoaded === false) {
+        return <></>;
+    }
 
     return (
         <Box sx={{
@@ -323,10 +280,77 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
         {
             /* GMAP Fullscreen tool is not supported on iOS */
             /* Then, in this case, we create a custom button that opens a fullscreen dialog */
-            isIOS && <CustomFullScreen fullScreen={isFullScreen} onClose={onClose} destinations={destinations} />
+            isIOS && <CustomFullScreen fullScreen={isFullScreen} onClose={onClose} locations={locations} />
         }       
         </Box>
     );
+}
+
+const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = false, onClose, isDestinationPage}) => {
+
+    const [destinationsPerLocation, setDestinationsPerLocation] = useState([]);
+
+    // Set destinations per location for the single destination page
+    useEffect(() => {
+
+        if (destinations !== null && isDestinationPage === true) {
+            const destination = destinations[0];
+            const location = {
+                title: destination.location,
+                latitude: destination.latitude,
+                longitude: destination.longitude,
+                destinations: [ destination ]
+            }
+            unstable_batchedUpdates(() => {
+                setDestinationsPerLocation([ location ]);
+            })
+            return;
+        }
+    // Don't need dependency with isDestinationPage
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [destinations]);
+
+    // Set destinations per location for the destinations page
+    useEffect(() => {
+
+        if (isDestinationPage === true) {
+            // don't update destinationsPerLocation if we are on a single destination page
+            return;
+        }
+
+        const locationMap = new Map();
+        locations.forEach(location => {
+            locationMap.set(location.id, location);
+        })
+
+        const destinationsPerlocation = new Map();
+        destinations.forEach(destination => {
+
+            const modifiedDestination = {
+                ...destination,
+                date: formatDate(new Date(destination.date)),
+                cover: getThumbnailSrc(destination.cover, _infoCoverWidth)
+            };
+            let locationInstance;
+            if (destinationsPerlocation.has(destination.location)) {
+                locationInstance = destinationsPerlocation.get(destination.location);
+            } else {
+                locationInstance = { ...locationMap.get(destination.location) }
+                locationInstance.destinations = [];
+                destinationsPerlocation.set(destination.location, locationInstance);
+            }
+            locationInstance.destinations.push(modifiedDestination);    
+        });
+
+        unstable_batchedUpdates(() => {
+            setDestinationsPerLocation([ ...destinationsPerlocation.values() ]);
+        })
+    // Don't need dependency with isDestinationPage
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [destinations, locations]);
+
+    return <LocationsMap locations={destinationsPerLocation} isFullScreen={isFullScreen} onClose={onClose} />
+
 }, [
     buildLoadingState("locations", [undefined])
 ]);
@@ -345,21 +369,15 @@ const DestinationsMapWithLocationLoader = ({destinations, isFullScreen = false, 
             />
 }
 
-const DestinationsMap = ({destinations, isFullScreen = false, onClose}) => {
+export const DestinationsMap = ({destinations, isFullScreen = false, onClose}) => {
 
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        // The google maps API keys are restricted (IP and HTTP referrer)
-        googleMapsApiKey: process.env.REACT_APP_GMAP_API_KEY
-    })
+    const destinationsPageMatch = useRouteMatch({
+        path: DestinationsPath,
+        strict: true,
+        exact: true
+    });
 
-    const destinationPageMatch = useRouteMatch(DestinationPath);
-
-    if (isLoaded === false) {
-        return <></>;
-    }
-
-    if (destinationPageMatch === null) {
+    if (destinationsPageMatch !== null) {
         // Destinations page = need to load locations
         return <DestinationsMapWithLocationLoader
                     destinations={destinations}
@@ -377,5 +395,3 @@ const DestinationsMap = ({destinations, isFullScreen = false, onClose}) => {
                 />
     }
 }
-
-export default DestinationsMap;

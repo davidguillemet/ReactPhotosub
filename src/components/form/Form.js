@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import Stack from '@mui/material/Stack';
-import FormField from './FormField';
+import { FormField }from './FormField';
 import { LoadingButton } from '@mui/lab';
 import SendIcon from '@mui/icons-material/Send';
 import { Button } from '@mui/material';
@@ -9,12 +9,15 @@ import { useToast } from '../notifications';
 import LoadingOverlay from '../loading/loadingOverlay';
 
 export const FIELD_TYPE_TEXT = 'text';
+export const FIELD_TYPE_NUMBER = 'number';
 export const FIELD_TYPE_EMAIL = 'email';
+export const FIELD_TYPE_URL = 'url';
 export const FIELD_TYPE_SWITCH = 'switch';
 export const FIELD_TYPE_DATE = 'date';
 export const FIELD_TYPE_SELECT = 'select';
 export const FIELD_TYPE_CHECK_BOX = 'checkbox';
 export const FIELD_TYPE_PASSWORD = 'password';
+export const FIELD_TYPE_LATLONG = "latlong";
 export const FIELD_TYPE_CAPTCHA = 'reCaptcha';
 
 const getValuesFromFields = (fields, initialValues) => {
@@ -36,92 +39,33 @@ const Form = ({
     onChange = null,
     readOnly = false}) => {
 
-    const [values, setValues] = React.useState(() => getValuesFromFields(fields, initialValues));
-    const [errors, setErrors] = React.useState({});
+    const [values, setValues] = React.useState({});
+    const validators = React.useRef({});
     const { toast } = useToast();
-
-    // Used to check if we must validate a field or not
-    // -> not modified = don't check (or all fields will be invalid at the beginning)
-    // -> modified = check field validity
-    const modifiedFields = useRef(new Set());
 
     const [sending, setSending] = React.useState(false);
     const [isValid, setIsValid] = React.useState(false);
     const [isDirty, setIsDirty] = React.useState(false);
-
-    const onCaptchaChange = React.useCallback((value) => {
-        setValues(oldValues => {
-            return {
-                ...oldValues,
-                "token": value
-            }
-        })
-    }, []);
 
     useEffect(() => {
         setValues(getValuesFromFields(fields, initialValues));
     }, [fields, initialValues]);
 
     useEffect(() => {
-        const newErrors = {};
-        fields.forEach(field => {
-            if (modifiedFields.current.has(field.id)) {
-                // UPdate error only for modified fields
-                // Otherwise, all fields are on error at the beginning...
-                const fieldValue = values[field.id];
-                let isError = false;
-                if (typeof fieldValue === "string") {
-                    const isEmpty = fieldValue.trim().length === 0;
-                    if (field.type === FIELD_TYPE_EMAIL) {
-                        isError = field.required && (isEmpty === true || !validateEmail(fieldValue));
-                    } else {
-                        isError = field.required && isEmpty === true;
-                    }
-                } else if (fieldValue === undefined || fieldValue === null) {
-                    isError = field.required;
-                }
-                newErrors[field.id] = isError;
-            }
-        })
-        setErrors(newErrors);
-    }, [values, fields]);
-
-    useEffect(() => {
         let isValid = true;
         fields.forEach(field => {
-            if (errors[field.id]) {
+            if (validators.current[field.id](values[field.id]) === false) {
                 isValid = false;
-                // No break with forEach...
             }
         })
         setIsValid(isValid);
-    }, [errors, fields])
+    }, [fields, values]);
 
-    function validateEmail(email) {
-        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(String(email).toLowerCase());
-    }
-
-    const handleChange = (event) => {
-        const fieldId = event.target.id || event.target.name;
-        const field = fields.find(f => f.id === fieldId);
-        modifiedFields.current.add(fieldId);
-
-        let fieldValue = null;
-        if (field.type === FIELD_TYPE_SWITCH || field.type === FIELD_TYPE_CHECK_BOX) {
-            fieldValue = event.target.checked;
-        } else {
-            fieldValue = event.target.value;
-        }
-
+    const handleChange = React.useCallback((field, fieldValue) => {
         // reset dependencies
         const dependencies = [];
         if (field.dependencies) {
             field.dependencies.forEach(dep => dependencies[dep] = "");
-        }
-
-        if (onChange) {
-            onChange();
         }
 
         unstable_batchedUpdates(() => {
@@ -129,12 +73,12 @@ const Form = ({
             setValues(oldValues => {
                 return {
                     ...oldValues,
-                    [fieldId]: fieldValue,
+                    [field.id]: fieldValue,
                     ...dependencies
                 }
             })
         });
-    }
+    }, []);
 
     const onSubmit = (e) => {
         e.preventDefault();
@@ -168,18 +112,19 @@ const Form = ({
 
     return (
         <React.Fragment>
-            <Stack spacing={2} alignItems="center">
+            <Stack spacing={2} alignItems="center" sx={{width: '100%'}}>
             {
                 fields.filter(field => !field.hidden).map(field => 
                     <FormField
                         key={field.id}
                         field={field}
                         value={values[field.id]}
-                        error={errors[field.id]}
                         values={values}
-                        handleChange={field.type === FIELD_TYPE_CAPTCHA ? onCaptchaChange : handleChange}
+                        handleChange={handleChange}
                         sending={sending}
-                        readOnly={readOnly} />
+                        readOnly={readOnly}
+                        validators={validators.current}
+                    />
                 )
             }
             {   

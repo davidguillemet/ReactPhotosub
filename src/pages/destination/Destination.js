@@ -17,7 +17,7 @@ import { withLoading, buildLoadingState } from '../../components/hoc';
 import { useGlobalContext } from '../../components/globalContext';
 import DestinationLink from '../../components/destinationLink';
 import { VerticalSpacing } from '../../template/spacing';
-import DestinationsMap from '../../components/map';
+import { DestinationsMap } from '../../components/map';
 import lazyComponent from '../../components/lazyComponent';
 import RelatedDestinations from './relatedDestinations';
 import NotFound from '../notFound';
