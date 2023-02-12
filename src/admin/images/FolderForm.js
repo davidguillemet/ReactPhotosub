@@ -29,6 +29,7 @@ const FolderForm = ({onChange, onCancel}) => {
             fields={formFields}
             submitAction={onSubmitFolderForm}
             submitCaption="Valider"
+            validationMessage="Le répertoire a été créé avec succès."
             onChange={onChange}
             onCancel={onCancel}
         />
