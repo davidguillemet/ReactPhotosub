@@ -24,17 +24,24 @@ import {
 const _retryBeforeMissing = 5;
 const _retryTimeout = 1500;
 
-const allThumbsCreated = (ref, thumbs) => {
+const allThumbsCreated = (ref, thumbs, statusInfo) => {
     const itemFullName = ref.name; // "filename.jpg"
     const dotPosition = itemFullName.lastIndexOf(".");
     const fileExtension = itemFullName.substring(dotPosition);
     const itemName = itemFullName.substring(0, dotPosition);
 
-    const result = _thumbnailSpecs.every(thumbSpec => {
+    _thumbnailSpecs.forEach(thumbSpec => {
         const thumbnailFileName = `${itemName}_${thumbSpec.fileSuffix}${fileExtension}`;
-        return thumbs.has(thumbnailFileName);
+        const thumbnailExists = thumbs.has(thumbnailFileName);
+        if (!thumbnailExists) {
+            if (statusInfo.missing === undefined) {
+                statusInfo.missing = [];
+            }
+            statusInfo.missing.push(thumbSpec.fileSuffix);
+        }
+        return thumbnailExists;
     })
-    return result;
+    return (statusInfo.missing === undefined);
 }
 
 const StorageItemRow = ({
@@ -62,6 +69,7 @@ const StorageItemRow = ({
     const getThumbStatus = React.useCallback(() => {
         let message = null;
         let status = null;
+        const statusInfo = {};
         if (type === ITEM_TYPE_FOLDER || !row.name.endsWith(".jpg")) {
             // Not an image from a destination
             status = STATUS_NOT_AVAILABLE;
@@ -69,7 +77,7 @@ const StorageItemRow = ({
             // The thumbs folder does not exist
             message = "Le répertoire des vignettes n'existe pas";
             status = STATUS_NO_THUMBS_FOLDER;
-        } else if (allThumbsCreated(row, thumbs)) {
+        } else if (allThumbsCreated(row, thumbs, statusInfo)) {
             // All thumbnails exist -> OK
             status = STATUS_SUCCESS;
         } else if (imageContext.isNewFile(row) === true) {
@@ -77,7 +85,16 @@ const StorageItemRow = ({
             status = STATUS_PENDING;
         } else {
             // Some thumbnails are missing
-            message = "Il manque des vignettes";
+            if (statusInfo.missing !== undefined) {
+                if (statusInfo.missing.length === _thumbnailSpecs.length) {
+                    message = "Il manque toutes les vignettes";
+                } else {
+                    message = "Il manque les vignettes " + statusInfo.missing.join(", ");
+                }
+            } else {
+                // Should not happen...
+                message = "Il manque des vignettes";
+            }
             status = STATUS_ERROR;
         }
         return {
@@ -170,7 +187,7 @@ const StorageItemRow = ({
     React.useEffect(() => {
         const thumbStatus = getThumbStatus();
         const retryThumbnails =
-            (thumbStatus.status === STATUS_PENDING || thumbStatus.status === STATUS_NO_THUMBS_FOLDER) &&
+            (thumbStatus.status === STATUS_PENDING /*|| thumbStatus.status === STATUS_NO_THUMBS_FOLDER*/) &&
             thumbnailsRetryCount.current < _retryBeforeMissing;
 
         if (retryThumbnails) {
