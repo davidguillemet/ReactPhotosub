@@ -1,18 +1,21 @@
 import React from 'react';
+import { useUploadContext } from './UploadContext';
 import UploadStorageItemRow from './UploadStorageItemRow';
 
 const maxParallelUpload = 5;
 
-const UploadTableRows = ({files}) => {
+const UploadTableRows = () => {
 
-    if (files === null || files.length === 0) {
+    const uploadContext = useUploadContext();
+
+    if (uploadContext.files === null || uploadContext.files.length === 0) {
         return null;
     }
 
     return (
         <React.Fragment>
         {
-            files.map((file, index) => {
+            uploadContext.files.map((file, index) => {
                 return <UploadStorageItemRow
                             key={file.name}
                             file={file}

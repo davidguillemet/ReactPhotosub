@@ -1,0 +1,94 @@
+import React from 'react';
+import { StorageItemStatus } from './StorageItemStatus';
+import {
+    STATUS_PENDING,
+    STATUS_NOT_AVAILABLE,
+    STATUS_SUCCESS,
+    STATUS_ERROR
+} from './StorageItemStatus';
+import { _thumbnailSpecs } from '../../../utils';
+import { useUploadContext } from '../UploadContext';
+
+const allThumbsCreated = (ref, thumbs, statusInfo) => {
+    const itemFullName = ref.name; // "filename.jpg"
+    const dotPosition = itemFullName.lastIndexOf(".");
+    const fileExtension = itemFullName.substring(dotPosition);
+    const itemName = itemFullName.substring(0, dotPosition);
+
+    _thumbnailSpecs.forEach(thumbSpec => {
+        const thumbnailFileName = `${itemName}_${thumbSpec.fileSuffix}${fileExtension}`;
+        const thumbnailExists = thumbs.has(thumbnailFileName);
+        if (!thumbnailExists) {
+            if (statusInfo.missing === undefined) {
+                statusInfo.missing = [];
+            }
+            statusInfo.missing.push(thumbSpec.fileSuffix);
+        }
+        return thumbnailExists;
+    })
+    return (statusInfo.missing === undefined);
+}
+
+const ThumbnailStatus = ({row, thumbs, onSetStatus}) => {
+    const uploadContext = useUploadContext();
+    const [ status, setStatus ] = React.useState({
+        status: STATUS_PENDING,
+        message: ""
+    })
+
+    const onFixThumbnails = React.useCallback(() => {
+        uploadContext.generateThumbnails(row.fullPath);
+        onSetStatus(STATUS_PENDING);
+        setStatus({
+            status: STATUS_PENDING,
+            message: ""
+        });
+    }, [uploadContext, row, onSetStatus]);
+
+    React.useEffect(() => {
+        let message = null;
+        let status = null;
+        const statusInfo = {};
+        
+        if (!row.name.endsWith(".jpg")) {
+            // Not an image from a destination
+            status = STATUS_NOT_AVAILABLE;
+        } else if (allThumbsCreated(row, thumbs, statusInfo)) {
+            // All thumbnails exist -> OK
+            status = STATUS_SUCCESS;
+        } else {
+            // Some thumbnails are missing
+            if (statusInfo.missing !== undefined) {
+                if (statusInfo.missing.length === _thumbnailSpecs.length) {
+                    message = "Il manque toutes les vignettes";
+                } else {
+                    message = "Il manque les vignettes " + statusInfo.missing.join(", ");
+                }
+            } else {
+                // Should not happen...
+                message = "Il manque des vignettes";
+            }
+            status = STATUS_ERROR;
+        }
+
+        if (uploadContext.isThumbProcessing(row.fullPath)) {
+            if (status !== STATUS_SUCCESS) {
+                status = STATUS_PENDING;
+            } else {
+                uploadContext.onThumbProcessingCompleted(row.fullPath);
+            }
+        }
+
+        onSetStatus(status);
+        setStatus({
+            status,
+            message
+        });
+    }, [uploadContext, row, thumbs, onSetStatus]);
+
+    return (
+        <StorageItemStatus {...status} onFix={onFixThumbnails} fixCaption="Recréer les vignettes"/>
+    );
+};
+
+export default ThumbnailStatus;

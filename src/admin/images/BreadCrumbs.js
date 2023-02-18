@@ -8,9 +8,11 @@ import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { TextField } from '@mui/material';
 import { useGlobalContext } from '../../components/globalContext';
 import { useToast } from '../../components/notifications';
+import { useImageContext } from './ImageContext';
 
-const StorageBreadcrumbs = ({storageRef, onSetBucketPath}) => {
+const StorageBreadcrumbs = () => {
     const context = useGlobalContext();
+    const imageContext = useImageContext();
     const { toast } = useToast();
     const [ refHierarchy, setRefHierarchy ] = React.useState([]);
     const [ editMode, setEditMode ] = React.useState(false);
@@ -18,39 +20,40 @@ const StorageBreadcrumbs = ({storageRef, onSetBucketPath}) => {
 
     React.useEffect(() => {
         const references = [];
-        let ref = storageRef;
+        let ref = imageContext.storageRef;
         do {
             references.push({
-                name: ref.parent === null ? storageRef.bucket : ref.name,
+                name: ref.parent === null ? imageContext.storageRef.bucket : ref.name,
                 fullPath: ref.fullPath
             })
             ref = ref.parent; 
         } while (ref !== null);
         setRefHierarchy(references.reverse());
-        setNewFolderName(storageRef.name);
-    }, [storageRef]);
+        setNewFolderName(imageContext.storageRef.name);
+    }, [imageContext.storageRef]);
 
     const handleClick = React.useCallback((event) => {
         event.preventDefault();
+        const onSetBucketPath = imageContext.onSetBucketPath;
         onSetBucketPath(event.target.id);
-    }, [onSetBucketPath])
+    }, [imageContext.onSetBucketPath])
 
     const handleOnClickEdit = React.useCallback(() => {
         setEditMode(true);
     }, [])
 
     const handleOnClickSaveName = React.useCallback(() => {
-        context.dataProvider.renameFolder(storageRef.fullPath, `${storageRef.parent.fullPath}/${newFolderName}`)
+        context.dataProvider.renameFolder(imageContext.storageRef.fullPath, `${imageContext.storageRef.parent.fullPath}/${newFolderName}`)
         .then(() => {
             toast.success("Le répertoire a été renommé.");
         })
         .catch(error => {
-            setNewFolderName(storageRef.name);
+            setNewFolderName(imageContext.storageRef.name);
             toast.error(error.message);
         }).finally(() => {
             setEditMode(editMode => !editMode);
         })
-    }, [context, storageRef, newFolderName, toast])
+    }, [context, imageContext.storageRef, newFolderName, toast])
 
     const onFolderNameChange = React.useCallback((event) => {
         setNewFolderName(event.target.value);
@@ -70,7 +73,7 @@ const StorageBreadcrumbs = ({storageRef, onSetBucketPath}) => {
             }
             </Breadcrumbs>
             {
-                storageRef.parent !== null && // Not possible to edit the bucket root name
+                imageContext.storageRef.parent !== null && // Not possible to edit the bucket root name
                 <IconButton onClick={editMode ? handleOnClickSaveName : handleOnClickEdit} sx={{ml: 1, mv: 0}}>
                 {
                     editMode === true ?

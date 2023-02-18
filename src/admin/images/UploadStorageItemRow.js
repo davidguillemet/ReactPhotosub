@@ -1,10 +1,8 @@
 import { TableRow, TableCell, Checkbox, Chip } from "@mui/material";
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import FileUploadProgress from './FileUploadProgress';
-import useImageContext from "./ImageContextHook";
 
-const UploadStorageItemRow = ({file, /*storageRef,*/ start}) => {
-    const imageContext = useImageContext();
+const UploadStorageItemRow = ({file, start}) => {
 
     return (
         <TableRow
@@ -28,12 +26,7 @@ const UploadStorageItemRow = ({file, /*storageRef,*/ start}) => {
             </TableCell>
             <TableCell align="left">{file.size}</TableCell>
             <TableCell colSpan={2} align="left" sx={{paddingTop: 0, paddingBottom: 0}} >
-                <FileUploadProgress
-                    file={file}
-                    //storageRef={storageRef}
-                    start={start}
-                    onFileUploaded={imageContext.onFileUploaded}
-                />
+                <FileUploadProgress file={file} start={start} />
             </TableCell>
         </TableRow>
     )

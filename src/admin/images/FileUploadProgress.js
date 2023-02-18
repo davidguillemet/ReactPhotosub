@@ -2,6 +2,7 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { useFirebaseContext } from '../../components/firebase';
+import { useUploadContext } from './UploadContext';
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 20,
@@ -15,14 +16,16 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
 }));
 
-const FileUploadProgress = ({file, start, onFileUploaded}) => {
+const FileUploadProgress = ({file, start}) => {
 
     const firebaseContext = useFirebaseContext();
+    const uploadContext = useUploadContext();
     const [progress, setProgress] = React.useState(0);
     const [error, setError] = React.useState(null);
     const uploadTaskRef = React.useRef(null);
 
     React.useEffect(() => {
+        let unsubscribe = null;
         if (start === true)
         {
             // launch firebase upload
@@ -30,7 +33,7 @@ const FileUploadProgress = ({file, start, onFileUploaded}) => {
             const fileStorageRef = firebaseContext.storageRef(file.fullPath);
             uploadTaskRef.current = firebaseContext.upload(fileStorageRef, file.nativeFile, { contentType: file.nativeFile.type });
 
-            uploadTaskRef.current.on('state_changed', 
+            unsubscribe = uploadTaskRef.current.on('state_changed', 
                 (snapshot) => {
                     // Observe state change events such as progress, pause, and resume
                     // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -44,17 +47,21 @@ const FileUploadProgress = ({file, start, onFileUploaded}) => {
                 () => {
                     // Handle successful uploads on complete
                     // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+                    const onFileUploaded = uploadContext.onFileUploaded;
                     onFileUploaded(file.fullPath);
                 }
             );
         }
 
         return () => {
+            if (unsubscribe !== null) {
+                unsubscribe();
+            }
             if (uploadTaskRef.current !== null && uploadTaskRef.current.snapshot.state === 'running') {
                 uploadTaskRef.current.cancel();
             }
         }
-    }, [file, start, onFileUploaded, firebaseContext]);
+    }, [file, start, firebaseContext, uploadContext.onFileUploaded]);
 
     if (error) {
         return error.message

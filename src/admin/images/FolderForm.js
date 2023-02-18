@@ -2,7 +2,7 @@ import React from 'react';
 import Form, {
     FIELD_TYPE_TEXT
 } from '../../components/form/Form';
-import useImageContext from './ImageContextHook';
+import { useImageContext } from './ImageContext';
 
 const formFields = [
     {
@@ -21,8 +21,9 @@ const FolderForm = ({onChange, onCancel}) => {
     const imageContext = useImageContext();
 
     const onSubmitFolderForm = React.useCallback((values) => {
-        return imageContext.createFolder(values.name);
-    }, [imageContext]);
+        const createFolder = imageContext.createFolder;
+        return createFolder(values.name);
+    }, [imageContext.createFolder]);
 
     return (
         <Form

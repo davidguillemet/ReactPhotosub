@@ -139,7 +139,7 @@ const GlobalContextProvider = ({children}) => {
                         queryKey: ['destinationimages', year, title]
                     })
                 },
-                1000, true /* leading */
+                1000, false /* leading */, true /* Trailing */
             ),
 
             useFetchInteriors: (thenFunc) => useQuery(['interiors'], () => dataProvider.getInteriors().then(thenFunc)),

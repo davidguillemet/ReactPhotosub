@@ -3,21 +3,26 @@ import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER } from "./common";
 import { TableRow, TableCell, Checkbox, Chip } from "@mui/material";
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { STATUS_ERROR, StorageItemStatus } from './StorageItemStatus';
-import useImageContext from './ImageContextHook';
+import { STATUS_ERROR, StorageItemStatus } from './itemStatus/StorageItemStatus';
+import { useImageContext } from './ImageContext';
+import { useUploadContext } from './UploadContext';
 
 const MissingStorageItemRow = ({item, type}) => {
 
     const imageContext = useImageContext();
+    const uploadContext = useUploadContext();
 
     const fixMissingFolder = React.useCallback(() => {
-        imageContext.createFolder(item.name);
-    }, [imageContext, item]);
+        const createFolder = imageContext.createFolder;
+        createFolder(item.name);
+    }, [imageContext.createFolder, item]);
 
     const fixMissingFile = React.useCallback(() => {
-        imageContext.uploadFile();
-    }, [imageContext]);
+        const onClickUpload = uploadContext.onClickUpload;
+        onClickUpload();
+    }, [uploadContext.onClickUpload]);
 
     const errorCaption =
         type === ITEM_TYPE_FILE ? "L'image existe en base mais pas dans storage" :
@@ -52,6 +57,7 @@ const MissingStorageItemRow = ({item, type}) => {
                     onFix={type === ITEM_TYPE_FOLDER ? fixMissingFolder : fixMissingFile}
                     fixCaption={type === ITEM_TYPE_FOLDER ? "Créer le répertoire dans storage" : "Rechercher et transférer le fichier manquant"}
                     fixIcon={type === ITEM_TYPE_FOLDER ? CreateNewFolderOutlinedIcon : SearchOutlinedIcon }
+                    errorIcon={FolderOpenIcon}
                 />
             </TableCell>
         </TableRow>
