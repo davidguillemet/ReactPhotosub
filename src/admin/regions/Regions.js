@@ -109,7 +109,7 @@ function buildTreeView(hierarchy, parentId, locations, onEdit, onDelete) {
 }
 
 const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
-    const t = useTranslation("pages.admin");
+    const t = useTranslation("pages.admin.regions");
     const context = useGlobalContext();
     const deleteLocationMutation = context.useDeleteLocation();
 

@@ -35,7 +35,7 @@ const StorageFolderRow = ({folder, selected}) => {
             >
                 <Box sx={{display: "flex", flexDirection: "row", alignItems: "center", paddingTop: 0, paddingBottom: 0}}>
                     <FolderOpenIcon sx={{mr: 1, ml: 2, opacity: 0.6}}></FolderOpenIcon>
-                    <Link component="button" onClick={handleOnRowClick}>{folder.name}</Link>
+                    <Link component="button" onClick={handleOnRowClick}>{`${folder.name}/`}</Link>
                 </Box>
             </TableCell>
             <TableCell align="left">{" - "}</TableCell>

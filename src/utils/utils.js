@@ -87,28 +87,48 @@ export const _thumbnailSpecs = [
     {
         maxSize: THUMB_XS,
         propertyName: "extraSmallSrc",
-        fileSuffix: "xs"
+        fileSuffix: "xs",
+        caption: "Extra small"
     },
     {
         maxSize: THUMB_S,
         propertyName: "smallSrc",
-        fileSuffix: "s"
+        fileSuffix: "s",
+        caption: "small"
     },
     {
         maxSize: THUMB_M,
         propertyName: "mediumSrc",
-        fileSuffix: "m"
+        fileSuffix: "m",
+        caption: "medium"
     },
     {
         maxSize: THUMB_L,
         propertyName: "largeSrc",
-        fileSuffix: "l"
+        fileSuffix: "l",
+        caption: "large"
     }
 ];
 
+const _suffixes = _thumbnailSpecs.map(spec => spec.fileSuffix).join('|');
+const _thumbNameRegexPattern = `^(?<imageName>.+)_(${_suffixes})\.(?<extension>.+)$`;
+const _thumbNameRegex = new RegExp(_thumbNameRegexPattern, "i");
+
+export function getImageNameFromThumbnail(thumbName) {
+    const match = thumbName.match(_thumbNameRegex);
+    if (match) {
+        return `${match.groups.imageName}.${match.groups.extension}`;
+    }
+    throw new Error(`Unexpected thumbnail name ${thumbName}`);
+}
+
+export function getThumbnailsFromImageName(itemFullName) {
+    return _thumbnailSpecs.map(thumbSpec => _getThumbSrc(itemFullName, thumbSpec.fileSuffix));
+}
+
 function _getThumbSrc(src, fileSuffix) {
     // src is like https://<host>/folder1/folder2/DSC_2264.jpg
-    // we want a new path to the blurry version as https://<host>/folder1/folder2/thumbs/DSC_2264_[s|m].jpg
+    // we want a new path to the thumbnail as https://<host>/folder1/folder2/thumbs/DSC_2264_[s|m|l|xs].jpg
     const dotPosition = src.lastIndexOf(".");
     const lastSlashPosition = src.lastIndexOf("/");
 

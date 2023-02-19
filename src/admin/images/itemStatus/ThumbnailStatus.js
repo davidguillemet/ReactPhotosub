@@ -22,7 +22,7 @@ const allThumbsCreated = (ref, thumbs, statusInfo) => {
             if (statusInfo.missing === undefined) {
                 statusInfo.missing = [];
             }
-            statusInfo.missing.push(thumbSpec.fileSuffix);
+            statusInfo.missing.push(thumbSpec.caption);
         }
         return thumbnailExists;
     })
@@ -62,7 +62,7 @@ const ThumbnailStatus = ({row, thumbs, onSetStatus}) => {
                 if (statusInfo.missing.length === _thumbnailSpecs.length) {
                     message = "Il manque toutes les vignettes";
                 } else {
-                    message = "Il manque les vignettes " + statusInfo.missing.join(", ");
+                    message = "Il manque des vignettes: " + statusInfo.missing.join(", ");
                 }
             } else {
                 // Should not happen...

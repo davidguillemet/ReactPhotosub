@@ -6,6 +6,7 @@ import {
     connectStorageEmulator,
     ref,
     list,
+    deleteObject,
     uploadBytesResumable,
     uploadString,
     getDownloadURL
@@ -48,6 +49,12 @@ const firebaseContext = {
     storageBucket: firebaseStorage.app.options.storageBucket,
     storageRef: (path) => {
         return ref(firebaseStorage, path);
+    },
+    deleteItems: (items) => {
+        const promises = items.map(itemFullPath => {
+            return deleteObject(ref(firebaseStorage, itemFullPath));
+        })
+        return Promise.all(promises);
     },
     list: (ref, options) => {
         return list(ref, options);

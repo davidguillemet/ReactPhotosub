@@ -68,7 +68,12 @@ const DatabaseStatus = ({row, imagesFromDb, onSetStatus}) => {
     }, [uploadContext, row, imagesFromDb, onSetStatus]);
 
     return (
-         <StorageItemStatus {...status} onFix={onInsertImageInDatabase} fixCaption="Insérer l'image en base" errorIcon={StorageOutlinedIcon} />
+         <StorageItemStatus
+            {...status}
+            onFix={onInsertImageInDatabase}
+            fixCaption="Insérer l'image en base"
+            errorIcon={StorageOutlinedIcon}
+        />
     )
 };
 

@@ -1,8 +1,4 @@
 import React from 'react';
-import { Box } from '@mui/system';
-import { Stack } from '@mui/material';
-import { IconButton } from '@mui/material';
-import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
@@ -12,15 +8,13 @@ import TableBody from '@mui/material/TableBody';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { useGlobalContext } from '../../components/globalContext';
-import FolderFormDialog from './FolderFormDialog';
-import FileUploadSelection from './FileUploadSelection';
-import StorageBreadcrumbs from './BreadCrumbs';
 import MissingStorageFolders from './MissingStorageFolders';
 import UploadTableRows from './UploadTableRows';
 import { ImageContextProvider, useImageContext } from './ImageContext';
-import { UploadContextProvider, useUploadContext } from './UploadContext';
+import { UploadContextProvider } from './UploadContext';
 import TableFolders from './TableFolders';
 import TableFiles from './TableFiles';
+import TableToolbar from './toolbar/TableToolbar';
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -31,44 +25,10 @@ const columns = [
 
 const Images = () => {
     const imageContext = useImageContext();
-    const uploadContext = useUploadContext();
-    const [ folderDialogOpen, setFolderDialogOpen ] = React.useState(false);
-    const uploadButtonRef = React.useRef(null);
-
-    const openUploadSelection = () => uploadButtonRef.current.click()
-    uploadContext.onClickUpload = openUploadSelection;
-
-    const handleOnClickCreateFolder = React.useCallback(() => {
-        setFolderDialogOpen(true);
-    }, []);
-
-    const onCloseFolderDialog = React.useCallback(() => {
-        setFolderDialogOpen(false);
-    }, []);
-
     return (
         <React.Fragment>
-        <TableContainer component={Paper}>
-            <Box
-                sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    bgcolor: theme => theme.palette.secondary.light,
-                    padding: 1
-                }}
-            >
-                <StorageBreadcrumbs />
-                <Stack direction="row" alignItems="center">
-                    <IconButton onClick={handleOnClickCreateFolder}>
-                        <CreateNewFolderOutlinedIcon sx={{color: theme => theme.palette.primary.contrastText}}></CreateNewFolderOutlinedIcon>
-                    </IconButton>
-                    <FileUploadSelection
-                        ref={uploadButtonRef}
-                        disabled={imageContext.destinationProps.year === null || imageContext.destinationProps.title === null}
-                    />
-                </Stack>
-            </Box>
+        <TableContainer component={Paper} sx={{display: 'flex', flexDirection: 'column'}}>
+            <TableToolbar />
             <Table sx={{ width: "100%" }} size="medium">
                 <TableHead>
                     <TableRow>
@@ -77,7 +37,7 @@ const Images = () => {
                                 color="primary"
                                 indeterminate={imageContext.manySelected}
                                 checked={imageContext.allSelected}
-                                onChange={imageContext.onSelectAllClick}
+                                onChange={imageContext.onSelectAll}
                                 inputProps={{
                                     'aria-label': 'select all items',
                                 }}
@@ -113,10 +73,6 @@ const Images = () => {
                 </TableBody>
             </Table>
         </TableContainer>
-        <FolderFormDialog
-            open={folderDialogOpen}
-            onClose={onCloseFolderDialog}
-        />
         </React.Fragment>
     )
 }

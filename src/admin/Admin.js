@@ -11,11 +11,11 @@ import Images from './images';
 
 const tabs = [
     {
-        label: "regions",
+        label: "lbl:regions",
         component: Regions
     },
     {
-        label: "images",
+        label: "lbl:images",
         component: Images
     },
 ];

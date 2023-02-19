@@ -128,6 +128,10 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         setSelectedItems(selection);
     }, [rows]);
 
+    const onUnselectAllClick = React.useCallback(() => {
+        setSelectedItems(new Set());
+    }, []);
+
     const handleOnRowClick = React.useCallback((row) => {
         const rowFullPath = row.fullPath;
         onSetBucketPath(rowFullPath);
@@ -157,7 +161,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     }, [storageRef, firebaseContext, fetchItems]);
 
     const totalRows = (rows.files ? rows.files.length : 0) + (rows.folders ? rows.folders.length : 0);
-    
+
     const imageContext = {
         rows,
         storageRef,
@@ -167,10 +171,13 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         fetchItems,
         onRowClick: handleOnRowClick,
         onSelectAll: onSelectAllClick,
+        onUnselectAll: onUnselectAllClick,
         onRowSelected: onRowSelected,
         isSelected: isSelected,
         allSelected: selectedItems.size > 0 && selectedItems.size === totalRows,
         manySelected: selectedItems.size > 0 && selectedItems.size < totalRows,
+        selectionCount: selectedItems.size,
+        selection: () => Array.from(selectedItems),
         refreshThumbnails: throttle(refreshThumbnails, 1000, false /* leading */, true /* trailing */),
         createFolder: createFolder
     };

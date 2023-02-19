@@ -24,21 +24,19 @@ const FolderFormDialog = ({open, onClose}) => {
     }, [onClose]);
 
     return (
-        <div>
-            <Dialog
-                fullScreen={isMobile}
-                fullWidth={true}
-                open={isOpen}
-                onClose={handleClose}
-            >
-                <DialogTitle id="form-dialog-title">Création d'un répertoire</DialogTitle>
+        <Dialog
+            fullScreen={isMobile}
+            fullWidth={true}
+            open={isOpen}
+            onClose={handleClose}
+        >
+            <DialogTitle id="form-dialog-title">Création d'un répertoire</DialogTitle>
 
-                <DialogContent>
-                    <FolderForm onCancel={handleClose} />
-                </DialogContent>
+            <DialogContent>
+                <FolderForm onCancel={handleClose} />
+            </DialogContent>
 
-            </Dialog>
-        </div>
+        </Dialog>
     )
 }
 
