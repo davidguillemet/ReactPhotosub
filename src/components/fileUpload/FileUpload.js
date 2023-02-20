@@ -108,8 +108,7 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
             setTimeout(() => handleCancel(), 5000);
             toast.error(step.error.message);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [step, handleCancel]);
+    }, [step, handleCancel, toast]);
 
     useEffect(() => {
         // launch firebase upload

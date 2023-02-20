@@ -81,6 +81,7 @@ const ActionToolbar = () => {
             });
     }, [
         context,
+        toast,
         imageContext.destinationProps,
         imageContext.selection,
         imageContext.fetchItems,

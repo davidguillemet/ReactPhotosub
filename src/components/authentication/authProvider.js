@@ -82,7 +82,7 @@ const AuthProvider = ({ children }) => {
             }
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-    }, [firebaseContext]);
+    }, [firebaseContext, toast]);
 
     return (
         <AuthContext.Provider value={userContext}>

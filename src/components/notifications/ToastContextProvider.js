@@ -30,15 +30,17 @@ const ToastContextProvider = ({children}) => {
         setToasts(toastList => toastList.filter(current => id(current) !== id(toast)));
     }, []);
 
+    const toast = React.useRef({
+        error: (msg) => addToast({message: msg, type: 'error'}),
+        success: (msg) => addToast({message: msg, type: 'success'}),
+        warning: (msg) => addToast({message: msg, type: 'warning'}),
+        info: (msg) => addToast({message: msg, type: 'info'})
+    });
+
     const contextValue = {
-        toasts: toasts,
-        removeToast: removeToast,
-        toast: {
-            error: (msg) => addToast({message: msg, type: 'error'}),
-            success: (msg) => addToast({message: msg, type: 'success'}),
-            warning: (msg) => addToast({message: msg, type: 'warning'}),
-            info: (msg) => addToast({message: msg, type: 'info'})
-        }
+        toasts,
+        removeToast,
+        toast: toast.current
     };
 
     return (

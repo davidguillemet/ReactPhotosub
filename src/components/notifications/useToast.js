@@ -1,3 +1,5 @@
+
+import React from 'react';
 import { useContext } from 'react';
 import { ToastContext } from './ToastContextProvider';
 
@@ -11,14 +13,17 @@ const withTimeout = (addToast, timeout, removeToast) => (toast) => {
 const useToast = (timeout = 10000) => {
     const {removeToast, toast: originalToast} = useContext(ToastContext);
 
-    const toast = {
+    const toast = React.useRef({
        error: withTimeout(originalToast.error, timeout, removeToast),
        success: withTimeout(originalToast.success, timeout, removeToast),
        info: withTimeout(originalToast.info, timeout, removeToast),
        warning: withTimeout(originalToast.warning, timeout, removeToast),
-    }
+    });
 
-    return {removeToast, toast};
+    return {
+        removeToast,
+        toast: toast.current
+    };
 }
 
 export const useToasts = () => {
