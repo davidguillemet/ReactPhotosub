@@ -22,8 +22,7 @@ export function getItemConsolidatedStatus() {
     }
 }
 
-const StorageItemStatusContent = ({status, message, onFix, fixCaption, fixIcon, errorIcon}) => {
-    const FixIcon = fixIcon ?? AutoFixHighOutlinedIcon;
+const StorageItemStatusContent = ({status, message, errorIcon, remediation}) => {
     const ErrorIcon = errorIcon ?? ErrorOutlineIcon;
 
     if (status === STATUS_UNKNOWN) {
@@ -45,12 +44,16 @@ const StorageItemStatusContent = ({status, message, onFix, fixCaption, fixIcon, 
                 <ErrorIcon fontSize='medium' color="error" />
             </Tooltip>
             {
-                onFix &&
-                <Tooltip title={fixCaption}>
-                    <IconButton onClick={onFix} sx={{m: 0}}>
-                        <FixIcon fontSize='medium' />
-                    </IconButton>
-                </Tooltip>
+                remediation.map(remediation => {
+                    const FixIcon = remediation.fixIcon ?? AutoFixHighOutlinedIcon;
+                    return (
+                        <Tooltip title={remediation.fixCaption}>
+                            <IconButton onClick={remediation.onFix} sx={{m: 0}}>
+                                <FixIcon fontSize='medium' />
+                            </IconButton>
+                        </Tooltip>
+                    )
+                })
             }
         </React.Fragment>
     )

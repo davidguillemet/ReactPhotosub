@@ -14,8 +14,9 @@ const MissingStorageFolders = ({dbFolders}) => {
             dbFolders.map((folder, index) => {
                 return <MissingStorageItemRow
                             key={folder.name}
-                            item={folder}
+                            itemName={folder.name}
                             type={ITEM_TYPE_FOLDER}
+                            dbIssue={true}
                         />
             })
         }

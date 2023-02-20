@@ -11,6 +11,7 @@ import { useImageContext } from './ImageContext';
 import { useUploadContext } from './UploadContext';
 import { getThumbnailsFromImageName } from '../../utils';
 import { useFirebaseContext } from '../../components/firebase';
+import { useGlobalContext } from '../../components/globalContext';
 
 const ThumbIssueStatus = ({itemName, error}) => {
 
@@ -28,27 +29,37 @@ const ThumbIssueStatus = ({itemName, error}) => {
         const thumbnails = getThumbnailsFromImageName(itemFullPath);
         const deleteItems = firebaseContext.deleteItems;
         setStatus(STATUS_PENDING);
-        deleteItems(thumbnails).finally(() => {
-            const refreshThumbnails = imageContext.refreshThumbnails;
-            refreshThumbnails();
-        })
+        deleteItems(thumbnails)
+            .finally(() => {
+                const refreshThumbnails = imageContext.refreshThumbnails;
+                refreshThumbnails();
+            })
     }, [imageContext.storageRef, imageContext.refreshThumbnails, firebaseContext.deleteItems, itemName]);
 
     return (
         <StorageItemStatus
             status={status}
             message={"Des vignettes existent pour cette image qui n'existe pas dans Storage."}
-            onFix={fixDeleteThumbnails}
-            fixCaption={"Supprimer les vignettes"}
-            fixIcon={DeleteOutlineIcon}
+            remediation={[{
+                onFix: fixDeleteThumbnails,
+                fixCaption: "Supprimer les vignettes",
+                fixIcon: DeleteOutlineIcon
+            }]}
         />
     )
 }
 
 const DatabaseIssueStatus = ({itemName, error, type}) => {
 
+    const context = useGlobalContext();
     const imageContext = useImageContext();
     const uploadContext = useUploadContext();
+
+    const [ status, setStatus ] = React.useState(error === true ? STATUS_ERROR : STATUS_NOT_AVAILABLE);
+
+    React.useEffect(() => {
+        setStatus(error === true ? STATUS_ERROR : STATUS_NOT_AVAILABLE);
+    }, [error])
 
     const fixMissingFolder = React.useCallback(() => {
         const createFolder = imageContext.createFolder;
@@ -60,19 +71,50 @@ const DatabaseIssueStatus = ({itemName, error, type}) => {
         onClickUpload();
     }, [uploadContext.onClickUpload]);
 
+    const removeImageFromDatabase = React.useCallback(() => {
+        setStatus(STATUS_PENDING);
+        const itemFullPath = `${imageContext.storageRef.fullPath}/${itemName}`;
+        context.dataProvider.removeImageFromDatabase(itemFullPath)
+            .finally(() => {
+                context.clearDestinationImages( // Throttling
+                    imageContext.destinationProps.year,
+                    imageContext.destinationProps.title);
+            })
+    }, [context, imageContext.destinationProps, imageContext.storageRef, itemName]);
+
     const errorCaption =
         type === ITEM_TYPE_FILE ?
         "L'image existe en base mais pas dans storage" :
         "Ce répertoire n'existe pas dans Storage alors qu'il contient des images en base";
 
+    const remediation =
+        type === ITEM_TYPE_FOLDER ?
+        [
+            {
+                onFix: fixMissingFolder,
+                fixCaption: "Créer le répertoire dans storage",
+                fixIcon: CreateNewFolderOutlinedIcon
+            }
+        ] :
+        [
+            {
+                onFix: fixMissingFile,
+                fixCaption: "Rechercher et transférer le fichier manquant",
+                fixIcon: SearchOutlinedIcon
+            },
+            {
+                onFix: removeImageFromDatabase,
+                fixCaption: "Supprimer l'image en base",
+                fixIcon: DeleteOutlineIcon
+            }
+        ];
+
     return (
         <StorageItemStatus
-            status={error === true ? STATUS_ERROR : STATUS_NOT_AVAILABLE}
+            status={status}
             message={errorCaption}
-            onFix={type === ITEM_TYPE_FOLDER ? fixMissingFolder : fixMissingFile}
-            fixCaption={type === ITEM_TYPE_FOLDER ? "Créer le répertoire dans storage" : "Rechercher et transférer le fichier manquant"}
-            fixIcon={type === ITEM_TYPE_FOLDER ? CreateNewFolderOutlinedIcon : SearchOutlinedIcon }
             errorIcon={FolderOpenIcon}
+            remediation={remediation}
         />
     )
 }

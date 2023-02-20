@@ -272,15 +272,23 @@ DataProvider.prototype.updateUser = function(user) {
 }
 
 DataProvider.prototype.refreshThumbnails = function(fullPath) {
-    return this.axios.patch(`/images`, {
+    return this.axios.patch('/images', {
         fullPath,
     });
 }
 
 DataProvider.prototype.insertImageInDatabase = function(fullPath) {
-    return this.axios.put(`/images`, {
-        fullPath,
+    return this.axios.put('/images', {
+        fullPath
     });
+}
+
+DataProvider.prototype.removeImageFromDatabase = function(fullPath) {
+    return this.axios.delete('/images', {data: {path: fullPath}});
+}
+
+DataProvider.prototype.removeStorageItem = function(folderFullPath) {
+    return this.axios.delete('/bucket', {data: { path: folderFullPath } })
 }
 
 export default DataProvider;

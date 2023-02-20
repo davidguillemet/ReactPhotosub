@@ -8,8 +8,17 @@ import { ConfirmDialog } from '../../../dialogs';
 import { useTranslation } from '../../../utils';
 import { useFirebaseContext } from '../../../components/firebase';
 import LoadingOverlay from '../../../components/loading';
+import { useToast } from '../../../components/notifications';
+import { useGlobalContext } from '../../../components/globalContext';
+import { getThumbnailsFromImageName } from '../../../utils';
+
+const isImageFile = (fullPath) => {
+    return fullPath.endsWith(".jpg");
+}
 
 const ActionToolbar = () => {
+    const context = useGlobalContext();
+    const { toast } = useToast();
     const imageContext = useImageContext();
     const firebaseContext = useFirebaseContext();
     const t = useTranslation("pages.admin.images");
@@ -31,16 +40,54 @@ const ActionToolbar = () => {
         }
     }, []);
 
+    const deleteItem = React.useCallback((itemFullPath) => {
+        const promises = [];
+        promises.push(context.dataProvider.removeStorageItem(itemFullPath));
+        if (isImageFile(itemFullPath)) {
+            const deleteItems = firebaseContext.deleteItems;
+            promises.push(deleteItems(getThumbnailsFromImageName(itemFullPath)));
+            promises.push(context.dataProvider.removeImageFromDatabase(itemFullPath));
+        }
+        return Promise.all(promises);
+
+    }, [context, firebaseContext.deleteItems]);
+
     const onDeleteItems = React.useCallback(() => {
         setProcessing(true);
         const getSelection = imageContext.selection;
-        const deleteItems = firebaseContext.deleteItems;
-        // TODO : for each file item, remove thumbnails and db entry
-        return deleteItems(getSelection())
-            .finally(() => {
-                setProcessing(false);
+        const selection = getSelection();
+        // Delete storage items
+        const hasImage = selection.some(itemFullPath => isImageFile(itemFullPath));
+        const promises = selection.map(itemFullPath => deleteItem(itemFullPath));
+        return Promise.all(promises)
+            .then(() => {
+                const fetchItems = imageContext.fetchItems
+                const refreshThumbnails = imageContext.refreshThumbnails;
+                fetchItems();
+                if (hasImage) {
+                    refreshThumbnails();
+                    context.clearDestinationImages( // Throttling
+                        imageContext.destinationProps.year,
+                        imageContext.destinationProps.title);
+                }
             })
-    }, [imageContext.selection, firebaseContext.deleteItems]);
+            .catch((e) => {
+                toast.error(e.message);
+            })
+            .finally(() => {
+                const unselectAll = imageContext.onUnselectAll;
+                unselectAll();
+                setProcessing(false);
+            });
+    }, [
+        context,
+        imageContext.destinationProps,
+        imageContext.selection,
+        imageContext.fetchItems,
+        imageContext.refreshThumbnails,
+        imageContext.onUnselectAll,
+        deleteItem
+    ]);
 
     return (
         <React.Fragment>

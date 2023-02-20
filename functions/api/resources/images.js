@@ -1,3 +1,4 @@
+const path = require("path");
 const {createThumbnails} = require("../../triggers/resizeImage");
 const {extractExif} = require("../../triggers/exifProcessing");
 
@@ -80,19 +81,19 @@ module.exports = function(config) {
         // Delete an image
         .delete(async function(req, res, next) {
             // {
-            //     name: "DSC_6578.jpg",
-            //     path: "/folder/folder/",
+            //     path: "/folder/folder/DSC_6578.jpg"
             // }
             const imageToDelete = req.body;
-            const fileFullPath = `${imageToDelete.path}/${imageToDelete.name}`;
-            res.locals.errorMessage = `Failed to remove image ${fileFullPath}.`;
+            const fileFullPath = imageToDelete.path;
+            const pathProperties = path.parse(fileFullPath);
+            res.locals.errorMessage = `Failed to delete image ${fileFullPath}.`;
             return config.pool("images").where(
                 {
-                    path: imageToDelete.path,
-                    name: imageToDelete.name,
+                    path: pathProperties.dir,
+                    name: pathProperties.base,
                 }).delete()
                 .then(() => {
-                    res.status(200).send(`Successfully deleting image ${fileFullPath}.`).end();
+                    res.status(200).send(`Successfully deleted image ${fileFullPath}.`).end();
                 }).catch(next);
         })
         // Patch an image = refresh thumbnails
@@ -104,7 +105,7 @@ module.exports = function(config) {
                 //     fullPath: "/folder/folder/DSC_6578.jpg",
                 // }
                 const props = req.body;
-                res.locals.errorMessage = `Failed to refresh thumbnails for image ${props.fullPath}.`;
+                res.locals.errorMessage = `Failed to generate thumbnails for image ${props.fullPath}.`;
 
                 const file = config.bucket.file(props.fullPath);
 
@@ -113,7 +114,7 @@ module.exports = function(config) {
                 }).then((fileContent) => {
                     return createThumbnails(config.bucket, file, fileContent, "thumbs");
                 }).then(() => {
-                    res.status(200).send(`Successfully refreshing thumbnails for image ${props.fullPath}.`).end();
+                    res.status(200).send(`Successfully generated thumbnails for image ${props.fullPath}.`).end();
                 }).catch(next);
             });
 };

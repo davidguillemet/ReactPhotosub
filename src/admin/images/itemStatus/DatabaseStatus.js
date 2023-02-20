@@ -70,9 +70,11 @@ const DatabaseStatus = ({row, imagesFromDb, onSetStatus}) => {
     return (
          <StorageItemStatus
             {...status}
-            onFix={onInsertImageInDatabase}
-            fixCaption="Insérer l'image en base"
-            errorIcon={StorageOutlinedIcon}
+            remediation={[{
+                    onFix: onInsertImageInDatabase,
+                    fixCaption: "Insérer l'image en base",
+                    errorIcon: StorageOutlinedIcon
+            }]}
         />
     )
 };

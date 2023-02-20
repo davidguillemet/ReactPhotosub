@@ -87,7 +87,13 @@ const ThumbnailStatus = ({row, thumbs, onSetStatus}) => {
     }, [uploadContext, row, thumbs, onSetStatus]);
 
     return (
-        <StorageItemStatus {...status} onFix={onFixThumbnails} fixCaption="Recréer les vignettes"/>
+        <StorageItemStatus
+            {...status}
+            remediation={[{
+                onFix: onFixThumbnails,
+                fixCaption: "Recréer les vignettes"
+            }]}
+        />
     );
 };
 

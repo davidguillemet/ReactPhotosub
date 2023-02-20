@@ -47,6 +47,19 @@ module.exports = function(config) {
             return getBucketContent(req.params.folder, req, res, next);
         });
 
+    config.app.route("/bucket")
+        // Delete a folder
+        .delete(async function(req, res, next) {
+            const deleteData = req.body;
+            const folderToDelete = deleteData.path;
+            res.locals.errorMessage = `La suppression du répertoire '${folderToDelete}' a échoué.`;
+            return config.bucket.deleteFiles({
+                prefix: folderToDelete,
+            }).then((filesResponse) => {
+                res.status(200).send(`Successfully deleted folder ${folderToDelete}.`).end();
+            }).catch(next);
+        });
+
     config.app.route("/bucket/*")
         .patch(
             config.isAuthenticated, // Authentication required to rename a folder
