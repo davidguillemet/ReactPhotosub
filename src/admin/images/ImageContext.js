@@ -163,6 +163,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const totalRows = (rows.files ? rows.files.length : 0) + (rows.folders ? rows.folders.length : 0);
 
     const imageContext = {
+        ready: rows.missingFolders !== undefined && rows.files !== undefined && rows.folders !== undefined,
         rows,
         storageRef,
         onSetBucketPath,

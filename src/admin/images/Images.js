@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box } from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
@@ -15,6 +16,7 @@ import { UploadContextProvider } from './UploadContext';
 import TableFolders from './TableFolders';
 import TableFiles from './TableFiles';
 import TableToolbar from './toolbar/TableToolbar';
+import { CircularProgress } from '@mui/material';
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -59,19 +61,23 @@ const Images = () => {
                 </TableHead>
                 <TableBody>
                     <UploadTableRows />
-                    <MissingStorageFolders dbFolders={imageContext.rows.missingFolders} />
                     {
                         // Don't use withLoading since a CircularProgress cannot be a child of TableBody
-                        imageContext.rows.folders !== undefined && 
-                        <TableFolders folders={imageContext.rows.folders} />
-                    }
-                    {
-                         // Don't use withLoading since a CircularProgress cannot be a child of TableBody
-                        imageContext.rows.files !== undefined &&
-                        <TableFiles files={imageContext.rows.files} />
+                        imageContext.ready === true && 
+                        <React.Fragment>
+                            <MissingStorageFolders dbFolders={imageContext.rows.missingFolders} />
+                            <TableFolders folders={imageContext.rows.folders} />
+                            <TableFiles files={imageContext.rows.files} />
+                        </React.Fragment>
                     }
                 </TableBody>
             </Table>
+            {
+                imageContext.ready === false &&
+                <Box sx={{padding: 1}} >
+                    <CircularProgress></CircularProgress>
+                </Box>
+            }
         </TableContainer>
         </React.Fragment>
     )
