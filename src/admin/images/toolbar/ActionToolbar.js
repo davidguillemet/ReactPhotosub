@@ -92,7 +92,20 @@ const ActionToolbar = () => {
 
     return (
         <Fade in={imageContext.selectionCount > 0}>
-            <Box>
+            <Box
+                sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "row",
+                    flexGrow: 1,
+                    justifyContent: "space-between",
+                    padding: 1
+                }}
+            >
                 <Stack direction="row" alignItems="center">
                     <IconButton>
                         <CloseIcon fontSize="small" onClick={handleOnClose} sx={{color: theme => theme.palette.secondary.contrastText}}/>

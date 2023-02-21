@@ -5,7 +5,6 @@ import ButtonBase from '@mui/material/ButtonBase';
 import FavoriteButton from '../gallery/favoriteButton';
 import { getThumbnailSrc } from '../../utils';
 import { useVisible } from '../hooks';
-import { grey } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
 import ImageDescription from '../imageDescription';
 import {isMobile} from 'react-device-detect';
