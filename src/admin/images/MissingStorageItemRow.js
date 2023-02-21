@@ -141,7 +141,6 @@ const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = fa
             >
                 <Chip color="error" icon={<InsertPhotoIcon />} label={itemName} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
             </TableCell>
-            <TableCell align="left"></TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
                 <ThumbIssueStatus itemName={itemName} error={thumbIssue} />
             </TableCell>

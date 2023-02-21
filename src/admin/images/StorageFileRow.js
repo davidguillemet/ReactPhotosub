@@ -42,7 +42,6 @@ const StorageFileRow = ({
             >
                 <Chip color={itemStatus} icon={<InsertPhotoIcon />} label={row.name} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
             </TableCell>
-            <TableCell align="left">{row.size}</TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
                 <ThumbnailStatus row={row} thumbs={thumbs} onSetStatus={setThumbStatus} />
             </TableCell>

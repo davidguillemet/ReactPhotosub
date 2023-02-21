@@ -24,7 +24,6 @@ const UploadStorageItemRow = ({file, start}) => {
             >
                 <Chip icon={<InsertPhotoIcon />} label={file.name} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
             </TableCell>
-            <TableCell align="left">{file.size}</TableCell>
             <TableCell colSpan={2} align="left" sx={{paddingTop: 0, paddingBottom: 0}} >
                 <FileUploadProgress file={file} start={start} />
             </TableCell>

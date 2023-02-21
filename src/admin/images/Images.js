@@ -20,7 +20,6 @@ import { CircularProgress } from '@mui/material';
 
 const columns = [
   { id: 'name', label: 'Name' },
-  { id: 'size', label: 'Size' },
   { id: 'thumbStatus', label: 'Thumbnail Status' }, // Ok if all thumbnails have been created
   { id: 'dbStatus', label: 'Database Status' },     // Ok if the image exists in database
 ];
