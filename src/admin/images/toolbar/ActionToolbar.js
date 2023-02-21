@@ -1,4 +1,6 @@
 import React from 'react';
+import Fade from '@mui/material/Fade';
+import Box from '@mui/material/Box'
 import {unstable_batchedUpdates} from 'react-dom';
 import { IconButton, Stack, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -89,31 +91,33 @@ const ActionToolbar = () => {
     ]);
 
     return (
-        <React.Fragment>
-            <Stack direction="row" alignItems="center">
-                <IconButton>
-                    <CloseIcon fontSize="small" onClick={handleOnClose} sx={{color: theme => theme.palette.secondary.contrastText}}/>
-                </IconButton>
-                <HorizontalSpacing />
-                <Paragraph sx={{color: theme => theme.palette.secondary.contrastText}}>{`${imageContext.selectionCount} item(s)`}</Paragraph>
-                <HorizontalSpacing factor={4} />
-                <Button variant="contained" onClick={handleOnClickDelete}>{"Supprimer"}</Button>
-            </Stack>
+        <Fade in={imageContext.selectionCount > 0}>
+            <Box>
+                <Stack direction="row" alignItems="center">
+                    <IconButton>
+                        <CloseIcon fontSize="small" onClick={handleOnClose} sx={{color: theme => theme.palette.secondary.contrastText}}/>
+                    </IconButton>
+                    <HorizontalSpacing />
+                    <Paragraph sx={{color: theme => theme.palette.secondary.contrastText}}>{`${imageContext.selectionCount} item(s)`}</Paragraph>
+                    <HorizontalSpacing factor={4} />
+                    <Button variant="contained" onClick={handleOnClickDelete}>{"Supprimer"}</Button>
+                </Stack>
 
-            <ConfirmDialog
-                open={confirmDeleteOen}
-                onOpenChanged={setConfirmDeleteOen}
-                onValidate={onDeleteItems}
-                title={t("title:deleteItems")}
-                dialogContent={[
-                    t("confirmDeleteItems"),
-                    t("warningDeleteItems")
-                ]}
-            />
+                <ConfirmDialog
+                    open={confirmDeleteOen}
+                    onOpenChanged={setConfirmDeleteOen}
+                    onValidate={onDeleteItems}
+                    title={t("title:deleteItems")}
+                    dialogContent={[
+                        t("confirmDeleteItems"),
+                        t("warningDeleteItems")
+                    ]}
+                />
 
-            <LoadingOverlay open={processing} />
+                <LoadingOverlay open={processing} />
 
-        </React.Fragment>
+            </Box>
+        </Fade>
     );
 }
 

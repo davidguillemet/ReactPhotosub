@@ -1,4 +1,6 @@
 import React from 'react';
+import Fade from '@mui/material/Fade';
+import Box from '@mui/material/Box'
 import { Stack } from '@mui/material';
 import { IconButton } from '@mui/material';
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
@@ -25,22 +27,24 @@ const DefaultToolbar = () => {
     }, []);
 
     return (
-         <React.Fragment>
-            <StorageBreadcrumbs />
-            <Stack direction="row" alignItems="center">
-                <IconButton onClick={handleOnClickCreateFolder}>
-                    <CreateNewFolderOutlinedIcon sx={{color: theme => theme.palette.primary.contrastText}}></CreateNewFolderOutlinedIcon>
-                </IconButton>
-                <FileUploadSelection
-                    ref={uploadButtonRef}
-                    disabled={imageContext.destinationProps.year === null || imageContext.destinationProps.title === null}
+        <Fade in={imageContext.selectionCount === 0}>
+            <Box sx={{display: "flex", flexDirection: "row", flexGrow: 1, justifyContent: "space-between"}}>
+                <StorageBreadcrumbs />
+                <Stack direction="row" alignItems="center">
+                    <IconButton onClick={handleOnClickCreateFolder}>
+                        <CreateNewFolderOutlinedIcon sx={{color: theme => theme.palette.primary.contrastText}}></CreateNewFolderOutlinedIcon>
+                    </IconButton>
+                    <FileUploadSelection
+                        ref={uploadButtonRef}
+                        disabled={imageContext.destinationProps.year === null || imageContext.destinationProps.title === null}
+                    />
+                </Stack>
+                <FolderFormDialog
+                    open={folderDialogOpen}
+                    onClose={onCloseFolderDialog}
                 />
-            </Stack>
-            <FolderFormDialog
-                open={folderDialogOpen}
-                onClose={onCloseFolderDialog}
-            />
-         </React.Fragment>
+            </Box>
+         </Fade>
     );
 }
 

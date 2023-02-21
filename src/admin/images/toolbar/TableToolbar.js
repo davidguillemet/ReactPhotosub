@@ -1,29 +1,47 @@
 import React from 'react';
-import { Box } from '@mui/system';
-import { useImageContext } from '../ImageContext';
+import Box from '@mui/material/Box'
 import DefaultToolbar from './DefaultToolbar';
 import ActionToolbar from './ActionToolbar';
 
+const ToolbarWrapper = ({children}) => {
+    return (
+        <Box
+            sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "row",
+                flexGrow: 1,
+                justifyContent: "space-between",
+                padding: 1
+            }}
+        >
+            {children}
+        </Box>
+    );
+};
+
 const TableToolbar = () => {
-    const imageContext = useImageContext();
     return (
         <React.Fragment>
             <Box
                 sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    flexGrow: 1,
-                    justifyContent: "space-between",
-                    bgcolor: theme => theme.palette.secondary.light,
-                    padding: 1,
+                    position: "relative",
                     height: "60px",
+                    width: "100%",
+                    bgcolor: theme => theme.palette.secondary.light,
                 }}
             >   
-            {
-                imageContext.selectionCount > 0 ?
-                <ActionToolbar /> :
-                <DefaultToolbar />
-            }
+                    <ToolbarWrapper>
+                        <ActionToolbar />
+                    </ToolbarWrapper>
+
+                    <ToolbarWrapper>
+                        <DefaultToolbar />
+                    </ToolbarWrapper>
             </Box>
         </React.Fragment>
     )
