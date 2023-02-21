@@ -21,7 +21,10 @@
             "count": "{0} Destination(s)",
             "filterByRegions": "Filter by regions",
             "noRegion": "No region...",
-            "filterTip": "Select a region to filter destinations"
+            "filterTip": "Select a region to filter destinations",
+            "allDestinations": "All",
+            "macroDestinations": "Macro",
+            "wideAngleDestinations": "Wide angle"
         },
         "search": {
             "title": "Search",
@@ -32,13 +35,20 @@
         },
         "admin": {
             "title": "Administration",
-            "regions": "Regions",
-            "images": "Images",
-            "expandAll": "Expand All",
-            "collapseAll": "Collapse All",
-            "title:deleteLocation": "Delete Location",
-            "confirmDeleteLocation": "Are your sure you want to delete the location '{0}'?",
-            "warningDeleteLocation": "Warning, this action is irreversible."
+            "lbl:regions": "Regions",
+            "lbl:images": "Images",
+            "regions": {
+                "expandAll": "Expand All",
+                "collapseAll": "Collapse All",
+                "title:deleteLocation": "Delete Location",
+                "confirmDeleteLocation": "Are your sure you want to delete the location '{0}'?",
+                "warningDeleteLocation": "This action is irreversible."
+            },
+            "images" : {
+                "title:deleteItems": "Delete pictures",
+                "confirmDeleteItems": "Are your sure you want to delete theses pictures?",
+                "warningDeleteItems": "This action is irreversible."
+            }
         }
     },
     "components": {

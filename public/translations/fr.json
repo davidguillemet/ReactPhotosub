@@ -42,12 +42,12 @@
                 "collapseAll": "Tout Replier",
                 "title:deleteLocation": "Supprimer le lieu",
                 "confirmDeleteLocation": "Confirmez-vous la suppression du lieu '{0}'?",
-                "warningDeleteLocation": "Attention, cette action est irreversible."
+                "warningDeleteLocation": "Cette action est irreversible!"
             },
             "images" : {
                 "title:deleteItems": "Supprimer des images",
                 "confirmDeleteItems": "Confirmez-vous la suppression de ces images?",
-                "warningDeleteItems":  "Attention, cette action est irreversible."
+                "warningDeleteItems":  "Cette action est irreversible!"
             }
         }
     },
