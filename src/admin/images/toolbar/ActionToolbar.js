@@ -1,4 +1,5 @@
 import React from 'react';
+import {unstable_batchedUpdates} from 'react-dom';
 import { IconButton, Stack, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useImageContext } from '../ImageContext';
@@ -18,11 +19,12 @@ const isImageFile = (fullPath) => {
 
 const ActionToolbar = () => {
     const context = useGlobalContext();
-    const { toast } = useToast();
     const imageContext = useImageContext();
     const firebaseContext = useFirebaseContext();
+    const { toast } = useToast();
     const t = useTranslation("pages.admin.images");
-    const [ confirmDelete, setConfirmDelete ] = React.useState(false);
+
+    const [ confirmDeleteOen, setConfirmDeleteOen ] = React.useState(false);
     const [ processing, setProcessing ] = React.useState(false);
 
     const handleOnClose = React.useCallback(() => {
@@ -31,13 +33,7 @@ const ActionToolbar = () => {
     }, [imageContext.onUnselectAll]);
 
     const handleOnClickDelete = React.useCallback(() => {
-        setConfirmDelete(true);
-    }, []);
-
-    const onConfirmDeleteOpenChanged = React.useCallback((open) => {
-        if (open === false) {
-            setConfirmDelete(false);
-        }
+        setConfirmDeleteOen(true);
     }, []);
 
     const deleteItem = React.useCallback((itemFullPath) => {
@@ -63,13 +59,15 @@ const ActionToolbar = () => {
             .then(() => {
                 const fetchItems = imageContext.fetchItems
                 const refreshThumbnails = imageContext.refreshThumbnails;
-                fetchItems();
-                if (hasImage) {
-                    refreshThumbnails();
-                    context.clearDestinationImages( // Throttling
-                        imageContext.destinationProps.year,
-                        imageContext.destinationProps.title);
-                }
+                unstable_batchedUpdates(() => {
+                    fetchItems();
+                    if (hasImage) {
+                        refreshThumbnails();
+                        context.clearDestinationImages( // Throttling
+                            imageContext.destinationProps.year,
+                            imageContext.destinationProps.title);
+                    }
+                })
             })
             .catch((e) => {
                 toast.error(e.message);
@@ -103,8 +101,8 @@ const ActionToolbar = () => {
             </Stack>
 
             <ConfirmDialog
-                open={confirmDelete}
-                onOpenChanged={onConfirmDeleteOpenChanged}
+                open={confirmDeleteOen}
+                onOpenChanged={setConfirmDeleteOen}
                 onValidate={onDeleteItems}
                 title={t("title:deleteItems")}
                 dialogContent={[

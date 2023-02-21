@@ -20,12 +20,9 @@ export default function ConfirmDialog({
     };
 
     const handleValidate = () => {
+        handleClose();
         if (onValidate) {
-            onValidate().then(() => {
-                handleClose();
-            }).catch(() =>{
-                handleClose();
-            })
+            onValidate();
         }
     };
 

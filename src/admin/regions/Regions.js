@@ -18,6 +18,7 @@ import { useTranslation } from '../../utils';
 import { HorizontalSpacing } from '../../template/spacing';
 import { EmptySquare, PlusSquare, MinusSquare } from './TreeViewIcons';
 import StyledTreeItem from './StyledTreeItem';
+import { useToast } from '../../components/notifications';
 
 const compareRegions = (a, b) => a.title === b.title ? 0 : a.title < b.title ? -1 : 1;
 
@@ -110,6 +111,7 @@ function buildTreeView(hierarchy, parentId, locations, onEdit, onDelete) {
 
 const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
     const t = useTranslation("pages.admin.regions");
+    const { toast } = useToast();
     const context = useGlobalContext();
     const deleteLocationMutation = context.useDeleteLocation();
 
@@ -119,8 +121,11 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
     const [expanded, setExpanded] = React.useState([]);
 
     const onDeleteLocation = React.useCallback(() => {
-        return deleteLocationMutation.mutateAsync(locationToDelete);
-    }, [deleteLocationMutation, locationToDelete]);
+        return deleteLocationMutation.mutateAsync(locationToDelete)
+            .then(() => {
+                toast.success("Le lieu a bien été supprimé.")
+            });
+    }, [deleteLocationMutation, locationToDelete, toast]);
 
     const onConfirmDeleteOpenChanged = React.useCallback((open) => {
         if (open === false) {
