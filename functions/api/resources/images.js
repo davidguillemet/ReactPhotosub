@@ -58,7 +58,7 @@ module.exports = function(config) {
             // };
             return insertImage(req.body, req, res, next).catch(next);
         })
-        // Process an image from Storage an insert it in database (called from Admin page)
+        // Process an image from Storage and insert it in database (called from Admin page)
         .put(
             config.isAuthenticated, // Authentication required to refresh thumbnails
             config.isAuthorized(["admin"]), // Only the admin is authorized to refresh thumbnails
@@ -79,23 +79,26 @@ module.exports = function(config) {
                 }).catch(next);
             })
         // Delete an image
-        .delete(async function(req, res, next) {
-            // {
-            //     path: "/folder/folder/DSC_6578.jpg"
-            // }
-            const imageToDelete = req.body;
-            const fileFullPath = imageToDelete.path;
-            const pathProperties = path.parse(fileFullPath);
-            res.locals.errorMessage = `Failed to delete image ${fileFullPath}.`;
-            return config.pool("images").where(
-                {
-                    path: pathProperties.dir,
-                    name: pathProperties.base,
-                }).delete()
-                .then(() => {
-                    res.status(200).send(`Successfully deleted image ${fileFullPath}.`).end();
-                }).catch(next);
-        })
+        .delete(
+            config.isAuthenticated, // Authentication required to refresh thumbnails
+            config.isAuthorized(["admin"]), // Only the admin is authorized to refresh thumbnails
+            async function(req, res, next) {
+                // {
+                //     path: "/folder/folder/DSC_6578.jpg"
+                // }
+                const imageToDelete = req.body;
+                const fileFullPath = imageToDelete.path;
+                const pathProperties = path.parse(fileFullPath);
+                res.locals.errorMessage = `Failed to delete image ${fileFullPath}.`;
+                return config.pool("images").where(
+                    {
+                        path: pathProperties.dir,
+                        name: pathProperties.base,
+                    }).delete()
+                    .then(() => {
+                        res.status(200).send(`Successfully deleted image ${fileFullPath}.`).end();
+                    }).catch(next);
+            })
         // Patch an image = refresh thumbnails
         .patch(
             config.isAuthenticated, // Authentication required to refresh thumbnails
