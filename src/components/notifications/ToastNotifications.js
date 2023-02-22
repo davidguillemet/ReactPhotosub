@@ -1,3 +1,4 @@
+import React from 'react';
 import { Stack } from "@mui/material";
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useToasts } from "./useToast";
@@ -24,13 +25,15 @@ const ToastNotifications = (props) => {
             <TransitionGroup component={null}>
                 {
                     toasts.map((toast, index) => {
+                        const toastRef = React.createRef(null);
                         return (
                             <CSSTransition
                                 key={toast.__id}
+                                nodeRef={toastRef}
                                 timeout={200}
                                 classNames="notification"
                             >                
-                                <Toast key={index} toast={toast} />
+                                <Toast ref={toastRef} key={index} toast={toast} />
                             </CSSTransition>
                         )
                     })

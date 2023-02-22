@@ -42,6 +42,7 @@ import { FavoritesProvider } from './components/favorites';
 import { ReactQueryClientProvider } from './components/reactQuery';
 import { useDarkMode } from './template/theme';
 import { TranslationProvider, useTranslation } from './utils';
+import { OverlayProvider } from './components/loading/loadingOverlay';
 
 import LanguageSelector from './components/language';
 
@@ -398,6 +399,7 @@ const App = (props) => {
             <StyledEngineProvider injectFirst>
                 <ChainedProviders
                     providers={[
+                        OverlayProvider,
                         TranslationProvider,
                         DarkModeProvider,
                         CustomThemeProvider,

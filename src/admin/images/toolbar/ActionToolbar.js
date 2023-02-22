@@ -10,10 +10,10 @@ import { HorizontalSpacing } from '../../../template/spacing';
 import { ConfirmDialog } from '../../../dialogs';
 import { useTranslation } from '../../../utils';
 import { useFirebaseContext } from '../../../components/firebase';
-import LoadingOverlay from '../../../components/loading';
 import { useToast } from '../../../components/notifications';
 import { useGlobalContext } from '../../../components/globalContext';
 import { getThumbnailsFromImageName } from '../../../utils';
+import { useOverlay } from '../../../components/loading';
 
 const isImageFile = (fullPath) => {
     return fullPath.endsWith(".jpg");
@@ -27,7 +27,7 @@ const ActionToolbar = () => {
     const t = useTranslation("pages.admin.images");
 
     const [ confirmDeleteOen, setConfirmDeleteOen ] = React.useState(false);
-    const [ processing, setProcessing ] = React.useState(false);
+    const { setOverlay: setProcessing } = useOverlay();
 
     const handleOnClose = React.useCallback(() => {
         const unselectAll = imageContext.onUnselectAll;
@@ -82,6 +82,7 @@ const ActionToolbar = () => {
     }, [
         context,
         toast,
+        setProcessing,
         imageContext.destinationProps,
         imageContext.selection,
         imageContext.fetchItems,
@@ -107,8 +108,8 @@ const ActionToolbar = () => {
                 }}
             >
                 <Stack direction="row" alignItems="center">
-                    <IconButton>
-                        <CloseIcon fontSize="small" onClick={handleOnClose} sx={{color: theme => theme.palette.secondary.contrastText}}/>
+                    <IconButton onClick={handleOnClose}>
+                        <CloseIcon fontSize="small" sx={{color: theme => theme.palette.secondary.contrastText}}/>
                     </IconButton>
                     <HorizontalSpacing />
                     <Paragraph sx={{color: theme => theme.palette.secondary.contrastText}}>{`${imageContext.selectionCount} item(s)`}</Paragraph>
@@ -126,8 +127,6 @@ const ActionToolbar = () => {
                         t("warningDeleteItems")
                     ]}
                 />
-
-                <LoadingOverlay open={processing} />
 
             </Box>
         </Fade>

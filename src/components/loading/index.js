@@ -1,1 +1,1 @@
-export {default} from './loadingOverlay';
+export * from './loadingOverlay';

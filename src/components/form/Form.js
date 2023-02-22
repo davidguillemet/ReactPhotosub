@@ -6,7 +6,7 @@ import { LoadingButton } from '@mui/lab';
 import SendIcon from '@mui/icons-material/Send';
 import { Button } from '@mui/material';
 import { useToast } from '../notifications';
-import LoadingOverlay from '../loading/loadingOverlay';
+import { useOverlay } from '../loading/loadingOverlay';
 
 export const FIELD_TYPE_TEXT = 'text';
 export const FIELD_TYPE_NUMBER = 'number';
@@ -43,7 +43,7 @@ const Form = ({
     const validators = React.useRef({});
     const { toast } = useToast();
 
-    const [sending, setSending] = React.useState(false);
+    const { overlay: sending, setOverlay: setSending } = useOverlay();
     const [isValid, setIsValid] = React.useState(false);
     const [isDirty, setIsDirty] = React.useState(false);
 
@@ -150,8 +150,6 @@ const Form = ({
             }
 
             </Stack>
-
-            <LoadingOverlay open={sending} />
 
         </React.Fragment>
     )

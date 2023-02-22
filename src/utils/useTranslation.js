@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Loading } from '../components/hoc';
-import LoadingOverlay from '../components/loading';
+import LoadingOverlay, { useOverlay } from '../components/loading';
 
 const TranslationContext = React.createContext(null);
 
@@ -26,10 +26,10 @@ export const TranslationProvider = ({children}) => {
     const resources = useRef(null);
     const translators = useRef(new Map());
 
-    const [backDropOpen, setBackDropOpen] = React.useState(false);
+    const { setOverlay } = useOverlay();
 
     const loadLanguage = useCallback((language) => {
-        setBackDropOpen(true);
+        setOverlay(true);
         const resourceFileName = `/translations/${language}.json`;
         fetch(resourceFileName, {
             headers : {
@@ -47,8 +47,8 @@ export const TranslationProvider = ({children}) => {
         .catch(err => {
             setLanguage(LANGUAGE_FR);
         })
-        .finally(() => setBackDropOpen(false));
-    }, []);
+        .finally(() => setOverlay(false));
+    }, [setOverlay]);
 
     useEffect(() => {
         loadLanguage(getNavigatorLanguage());
@@ -98,7 +98,6 @@ export const TranslationProvider = ({children}) => {
             }}
         >
             {children}
-            <LoadingOverlay open={backDropOpen} />
         </TranslationContext.Provider>
     );
 }

@@ -27,7 +27,7 @@ import 'fontsource-roboto/100.css';
 import { withLoading, buildLoadingState } from '../../components/hoc';
 import { useToast } from '../../components/notifications';
 import { useLanguage, useTranslation } from '../../utils';
-import LoadingOverlay from '../../components/loading';
+import { useOverlay } from '../../components/loading';
 
 const SimulationContext = React.createContext();
 
@@ -55,7 +55,7 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
     const context = useGlobalContext();
 
     const { state, dispatch } = React.useContext(SimulationContext);
-    const [actionIsRunning, setActionIsRunning] = useState(false);
+    const { setOverlay: setActionIsRunning } = useOverlay();
 
     const addMutation = context.useAddSimulation();
     const updateSimulation = context.useUpdateSimulation();
@@ -109,7 +109,7 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
                 setActionIsRunning(false);
             })
         } 
-    }, [toast, state, addMutation, updateSimulation, dispatch]);
+    }, [setActionIsRunning, toast, state, addMutation, updateSimulation, dispatch]);
 
     const onAdd = useCallback((name) => {
         dispatch(addSimulation(name));
@@ -135,7 +135,7 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
             setActionIsRunning(false);
         })
 
-    }, [state, dispatch, toast, removeSimulation]);
+    }, [setActionIsRunning, state, dispatch, toast, removeSimulation]);
 
     const promptMessage = useMemo(() => {
         let message = "Des modifications sont en cours.\n"
@@ -178,8 +178,6 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
             />
 
             <Prompt when={hasDirty} message={promptMessage} />
-
-            <LoadingOverlay open={actionIsRunning} />
 
         </React.Fragment>
     );
