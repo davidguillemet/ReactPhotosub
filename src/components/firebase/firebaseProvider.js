@@ -25,11 +25,11 @@ const firebaseApp = initializeApp({
     measurementId: "G-NNE3P3R7HH"
 });
 
+const isDev = process.env.NODE_ENV === "development";
+
 const firebaseAuth = getAuth(firebaseApp);
 const firebaseStorage = getStorage(firebaseApp);
-const firebaseAnalytics = getAnalytics(firebaseApp);
-
-const isDev = process.env.NODE_ENV === "development";
+const firebaseAnalytics = isDev ? null : getAnalytics(firebaseApp);
 
 const storageHost = isDev ? "http://localhost:9199" : "https://storage.googleapis.com";
 if (isDev) {

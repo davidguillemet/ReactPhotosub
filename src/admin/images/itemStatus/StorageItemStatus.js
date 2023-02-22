@@ -44,10 +44,10 @@ const StorageItemStatusContent = ({status, message, errorIcon, remediation}) => 
                 <ErrorIcon fontSize='medium' color="error" />
             </Tooltip>
             {
-                remediation.map(remediation => {
+                remediation.map((remediation, index) => {
                     const FixIcon = remediation.fixIcon ?? AutoFixHighOutlinedIcon;
                     return (
-                        <Tooltip title={remediation.fixCaption}>
+                        <Tooltip key={index} title={remediation.fixCaption}>
                             <IconButton onClick={remediation.onFix} sx={{m: 0}}>
                                 <FixIcon fontSize='medium' />
                             </IconButton>

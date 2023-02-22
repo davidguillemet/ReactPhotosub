@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Loading } from '../components/hoc';
-import LoadingOverlay, { useOverlay } from '../components/loading';
+import { useOverlay } from '../components/loading';
 
 const TranslationContext = React.createContext(null);
 
