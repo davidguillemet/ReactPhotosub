@@ -7,6 +7,7 @@ import RowSelector from './RowSelector';
 import DatabaseStatus from './itemStatus/DatabaseStatus';
 import ThumbnailStatus from './itemStatus/ThumbnailStatus';
 import { getItemConsolidatedStatus } from './itemStatus/StorageItemStatus';
+import TagStatus from './itemStatus/TagStatus';
 
 const StorageFileRow = ({
     row,
@@ -16,12 +17,13 @@ const StorageFileRow = ({
 
     const [ dbStatus, setDbStatus ] = React.useState("default");
     const [ thumbStatus, setThumbStatus ] = React.useState("default");
+    const [ tagStatus, setTagStatus ] = React.useState("default");
     const [ itemStatus, setItemStatus ] = React.useState("default")
 
     React.useEffect(() => {
         const consolidatedStatus = getItemConsolidatedStatus(dbStatus, thumbStatus);
         setItemStatus(consolidatedStatus);
-    }, [dbStatus, thumbStatus]);
+    }, [dbStatus, thumbStatus, tagStatus]);
 
     return (
         <TableRow
@@ -47,6 +49,9 @@ const StorageFileRow = ({
             </TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
                 <DatabaseStatus row={row} imagesFromDb={imagesFromDb} onSetStatus={setDbStatus} />
+            </TableCell>
+            <TableCell>
+                <TagStatus row={row} imagesFromDb={imagesFromDb} onSetStatus={setTagStatus} />
             </TableCell>
         </TableRow>
     )

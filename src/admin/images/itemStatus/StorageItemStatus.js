@@ -22,7 +22,7 @@ export function getItemConsolidatedStatus() {
     }
 }
 
-const StorageItemStatusContent = ({status, message, errorIcon, remediation}) => {
+const StorageItemStatusContent = ({status, message, errorIcon, remediation = null}) => {
     const ErrorIcon = errorIcon ?? ErrorOutlineIcon;
 
     if (status === STATUS_UNKNOWN) {
@@ -44,7 +44,7 @@ const StorageItemStatusContent = ({status, message, errorIcon, remediation}) => 
                 <ErrorIcon fontSize='medium' color="error" />
             </Tooltip>
             {
-                remediation.map((remediation, index) => {
+                remediation !== null && remediation.map((remediation, index) => {
                     const FixIcon = remediation.fixIcon ?? AutoFixHighOutlinedIcon;
                     return (
                         <Tooltip key={index} title={remediation.fixCaption}>

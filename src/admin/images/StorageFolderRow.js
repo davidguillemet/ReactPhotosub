@@ -40,6 +40,7 @@ const StorageFolderRow = ({folder, selected}) => {
             </TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>{" - "}</TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>{" - "}</TableCell>
+            <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>{" - "}</TableCell>
         </TableRow>
     )
 }

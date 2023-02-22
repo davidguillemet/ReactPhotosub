@@ -147,6 +147,7 @@ const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = fa
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
                 <DatabaseIssueStatus itemName={itemName} type={type} error={dbIssue} />
             </TableCell>
+            <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>{" - "}</TableCell>
         </TableRow>
     )
 }
