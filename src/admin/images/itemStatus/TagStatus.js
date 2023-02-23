@@ -21,6 +21,7 @@ const TagStatus = ({row, imagesFromDb, onSetStatus}) => {
 
         let newMessage = null;
         let newStatus = null;
+        let imageFromDb = null;
         
         if (!row.name.endsWith(".jpg")) {
             // Not an image from a destination
@@ -31,9 +32,9 @@ const TagStatus = ({row, imagesFromDb, onSetStatus}) => {
         } else if (imagesFromDb === undefined) {
             // Images are loading
             newStatus = STATUS_NOT_READY;
-        } else if (imagesFromDb.findIndex(image => image.name === row.name) >= 0) {
+        } else if ((imageFromDb = imagesFromDb.find(image => image.name === row.name)) !== undefined) {
             // The current image is in database, check tags
-            if (row.tags !== null) {
+            if (imageFromDb.tags === true) {
                 newStatus = STATUS_SUCCESS;
             } else {
                 newStatus = STATUS_ERROR;
