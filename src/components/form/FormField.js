@@ -335,6 +335,14 @@ const LatLongField = ({field, value, values, handleChange, sending, readOnly, va
         }
     }, [field, validators]);
 
+    const onMapClick = React.useCallback((position) => {
+        locationSource.current = "input";
+        setLocation({
+            latitude: position.lat,
+            longitude: position.lng
+        });
+    }, []);
+
     return (
         <React.Fragment>
             <GenericTextField
@@ -360,7 +368,7 @@ const LatLongField = ({field, value, values, handleChange, sending, readOnly, va
                 }}
             />
             <Box sx={{height: "200px", width: "100%"}}>
-                <LocationsMap locations={location} resetOnChange={false} />
+                <LocationsMap locations={location} resetOnChange={false} onMapClick={onMapClick} />
             </Box>
         </React.Fragment>
     )

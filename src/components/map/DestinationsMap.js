@@ -146,7 +146,7 @@ const CustomFullScreen = ({destinations, fullScreen, onClose}) => {
     );
 }
 
-export const LocationsMap = ({locations, isFullScreen = false, onClose, resetOnChange = true}) => {
+export const LocationsMap = ({locations, isFullScreen = false, onClose, resetOnChange = true, onMapClick}) => {
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
@@ -193,18 +193,28 @@ export const LocationsMap = ({locations, isFullScreen = false, onClose, resetOnC
         clusterer.addMarkers(markers);
         const setZoom = resetOnChange === true || mapInitialized.current === false
         if (markers.length === 0) {
-            if (setZoom)
+            if (setZoom) {
                 clusterer.map.setZoom(2);
+            }
             clusterer.map.panTo(_defaultCenter);
         } else if (markers.length === 1) {
-            if (setZoom)
+            if (setZoom) {
                 clusterer.map.setZoom(8);
+            }
             clusterer.map.panTo(markers[0].getPosition());
         } else {
             clusterer.fitMapToMarkers();
         }
+
+        if (mapInitialized.current ===  false && onMapClick) {
+            clusterer.map.addListener("click", (mapsMouseEvent) => {
+                const position = mapsMouseEvent.latLng;
+                    onMapClick(position.toJSON());
+            });
+        }
+
         mapInitialized.current = true;
-    }, [clusterer, locations, handleMarkerClick, resetOnChange])
+    }, [clusterer, locations, handleMarkerClick, onMapClick, resetOnChange])
 
     const handleMapLoaded = React.useCallback((map) => {
         setMap(map)
