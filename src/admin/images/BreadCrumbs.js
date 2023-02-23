@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@mui/system';
+import { Box, Chip } from '@mui/material';
 import { Breadcrumbs } from '@mui/material';
 import { IconButton, Link } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
@@ -9,6 +9,7 @@ import { TextField } from '@mui/material';
 import { useGlobalContext } from '../../components/globalContext';
 import { useToast } from '../../components/notifications';
 import { useImageContext } from './ImageContext';
+import GlobalStatus from './GlobalStatus';
 
 const StorageBreadcrumbs = () => {
     const context = useGlobalContext();
@@ -60,7 +61,8 @@ const StorageBreadcrumbs = () => {
     }, []);
 
     return (
-        <Box sx={{display: "flex", flexDirection: "row", alignItems: "center"}}>
+        <Box sx={{display: "flex", flexDirection: "row", alignItems: "center"}} component="span">
+            <GlobalStatus />
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{color: theme => theme.palette.primary.contrastText}}/>} sx={{ml: 2, pv: 1}} >
             {
                 refHierarchy.map((ref, index) => {

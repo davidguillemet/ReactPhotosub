@@ -35,13 +35,13 @@ const StorageItemStatusContent = ({status, message, errorIcon, remediation = nul
         return <CircularProgress size={20} />;
     }
     if (status === STATUS_SUCCESS) {
-        return <CheckCircleOutlineIcon fontSize='medium' color="success" />;
+        return <CheckCircleOutlineIcon fontSize='small' color="success" />;
     }
     // STATUS_ERROR
     return (
         <React.Fragment>
             <Tooltip title={message}>
-                <ErrorIcon fontSize='medium' color="error" />
+                <ErrorIcon fontSize='small' color="error" />
             </Tooltip>
             {
                 remediation !== null && remediation.map((remediation, index) => {
@@ -49,7 +49,7 @@ const StorageItemStatusContent = ({status, message, errorIcon, remediation = nul
                     return (
                         <Tooltip key={index} title={remediation.fixCaption}>
                             <IconButton onClick={remediation.onFix} sx={{m: 0}}>
-                                <FixIcon fontSize='medium' />
+                                <FixIcon fontSize='small' />
                             </IconButton>
                         </Tooltip>
                     )

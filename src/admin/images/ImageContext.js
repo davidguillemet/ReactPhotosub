@@ -54,6 +54,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const [ selectedItems, setSelectedItems ] = React.useState(new Set());
     const [ storageRef, setStorageRef ] = React.useState(firebaseContext.storageRef());
     const [ thumbs, setThumbs ] = React.useState(new Set());
+    const [ errors, setErrors ] = React.useState(new Set());
     const thumbsRef = React.useRef(null);
     const destinationProps = React.useRef({
         year: null,
@@ -105,15 +106,27 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         fetchItems();
     }, [fetchItems])
 
+    const setItemStatus = React.useCallback((fullPath, status) => {
+        setErrors(prevErrors => {
+            const newErrors = new Set(prevErrors);
+            if (status === "error") {
+                newErrors.add(fullPath);
+            } else {
+                newErrors.delete(fullPath);
+            }
+            return newErrors;
+        })
+    }, []);
+
     const onSetBucketPath = React.useCallback((bucketPath) => {
         unstable_batchedUpdates(() => {
             destinationProps.current = extractDestinationProps(bucketPath);
+            setErrors(new Set());
             setRows({});
             setStorageRef(firebaseContext.storageRef(bucketPath));
             setSelectedItems(new Set());
         });
     }, [firebaseContext]);
-
 
     const onSelectAllClick = React.useCallback((event) => {
         let selection;
@@ -170,6 +183,8 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         destinationProps: destinationProps.current,
         thumbs,
         fetchItems,
+        setItemStatus,
+        errors,
         onRowClick: handleOnRowClick,
         onSelectAll: onSelectAllClick,
         onUnselectAll: onUnselectAllClick,

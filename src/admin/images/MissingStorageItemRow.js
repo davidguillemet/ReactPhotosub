@@ -120,6 +120,12 @@ const DatabaseIssueStatus = ({itemName, error, type}) => {
 }
 
 const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = false}) => {
+    const imageContext = useImageContext();
+
+    React.useEffect(() => {
+        const setContextItemStatus = imageContext.setItemStatus;
+        setContextItemStatus(itemName, "error");
+    }, [itemName, imageContext.setItemStatus]);
 
     return (
         <TableRow

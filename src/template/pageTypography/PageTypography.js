@@ -8,6 +8,7 @@ const TitleTypography = ({children, ...other}) => (<Typography variant="h2" comp
 const SubTitleTypography = ({children, ...other}) => (<Typography variant="h3" component="h2" {...other}>{children}</Typography>);
 const HeaderTypography = ({children, ...other}) => (<Typography variant="h4" {...other}>{children}</Typography>);
 const ParagraphTypography = ({children, ...other}) => (<Typography variant="h6" {...other}>{children}</Typography>);
+const BodyTypography = ({children, ...other}) => (<Typography variant="body1" {...other}>{children}</Typography>);
 
 export const PageTitle = styled(TitleTypography)(({ theme }) => ({
     fontWeight: "300",
@@ -32,6 +33,13 @@ export const PageHeader = styled(HeaderTypography)(({ theme }) => ({
 
 export const Paragraph = styled(ParagraphTypography)(({ theme }) => ({
     fontWeight: "300",
+    textAlign: 'justify',
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1)
+}));
+
+export const Body = styled(BodyTypography)(({ theme }) => ({
+    fontWeight: "100",
     textAlign: 'justify',
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
