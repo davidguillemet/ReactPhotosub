@@ -89,7 +89,7 @@ const ThumbnailError = ({error}) => {
     );
 }
 
-const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
+const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUploaded}, ref) => {
 
     const firebaseContext = useFirebaseContext();
     const context = useGlobalContext();
@@ -151,7 +151,7 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
     }, [file, storageRef, onCancel, onFileUploaded, context.dataProvider, firebaseContext]);
 
     return (
-        <Box>
+        <Box ref={ref}>
             <VerticalSpacing factor={1} />
             <Paper
                 style={{
@@ -177,7 +177,7 @@ const FileProgress = ({file, storageRef, onCancel, onFileUploaded}) => {
             </Paper>
         </Box>
     );
-}
+});
 
 const FileUpload = ({caption, uploadRef, onFileUploaded}) => {
 
@@ -231,14 +231,17 @@ const FileUpload = ({caption, uploadRef, onFileUploaded}) => {
                 <TransitionGroup component={null}>
                 {
                     uploadFiles.map((file) => {
+                        const progressRef = React.createRef(null);
                         return (
                             <CSSTransition
                                 key={file.name}
+                                nodeRef={progressRef}
                                 timeout={200}
                                 classNames="fileProgress"
                             >                
                                 <FileProgress
                                     key={file.name}
+                                    ref={progressRef}
                                     file={file}
                                     onCancel={onCancel}
                                     onFileUploaded={onFileUploaded}

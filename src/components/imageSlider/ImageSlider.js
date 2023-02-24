@@ -183,14 +183,17 @@ const ImageSlider = ({
                     <TransitionGroup component={null}>
                     {
                         images.map((image, index) => { 
+                            const thumbnailRef = React.createRef(null);
                             return (
                                 <CSSTransition
                                     key={image.id}
+                                    nodeRef={thumbnailRef}
                                     timeout={500}
                                     classNames="thumbnail"
                                 >                
                                     <Thumbnail
                                         key={image.id}
+                                        ref={thumbnailRef}
                                         image={image}
                                         index={index}
                                         handleClick={handleThumbnailClick}

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useMemo } from 'react';
 import { Fab } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -5,7 +6,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import LazyImage from '../lazyImage';
 import SelectionMarker from '../selectionMarker';
 
-const Thumbnail = ({
+const Thumbnail = React.forwardRef(({
     image,
     index,
     handleClick,
@@ -14,7 +15,7 @@ const Thumbnail = ({
     spacing,
     disabled,
     onDelete,
-    renderOverlay = null}) => {
+    renderOverlay = null}, ref) => {
 
     const imageWidth = useMemo(() => Math.round(imageHeight * image.sizeRatio), [image, imageHeight])
 
@@ -23,14 +24,17 @@ const Thumbnail = ({
     }
 
     return (
-        <Box sx={{
-            position: 'relative',
-            p: 0,
-            mr: `${spacing}px`,
-            ml: index === 0 ? `${spacing}px` : 0,
-            height: `${imageHeight}px`,
-            width: `${imageWidth}px`,
-        }}>
+        <Box
+            ref={ref}
+            sx={{
+                position: 'relative',
+                p: 0,
+                mr: `${spacing}px`,
+                ml: index === 0 ? `${spacing}px` : 0,
+                height: `${imageHeight}px`,
+                width: `${imageWidth}px`,
+            }}
+        >
             <LazyImage
                 image={image} 
                 index={index}
@@ -63,6 +67,6 @@ const Thumbnail = ({
 
         </Box>
     );
-};
+});
 
 export default Thumbnail;

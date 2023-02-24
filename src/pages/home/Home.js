@@ -127,15 +127,18 @@ const Home = ({images, currentIndex, subscribeDrawer}) => {
         subscribeDrawer(onDrawerAction);
     }, [subscribeDrawer, onDrawerAction]);
 
+    const boxRef = React.createRef(null);
     return (
         <React.Fragment>
             <TransitionGroup component={null}>
                 <CSSTransition
                     key={currentImageIndex}
+                    nodeRef={boxRef}
                     timeout={_transitionDuration}
                     classNames="slide"
                 >
                     <Box
+                        ref={boxRef}
                         style={{
                             display: 'flex',
                             justifyContent: 'center',
