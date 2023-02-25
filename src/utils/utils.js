@@ -126,9 +126,10 @@ export function getThumbnailsFromImageName(itemFullName) {
     return _thumbnailSpecs.map(thumbSpec => _getThumbSrc(itemFullName, thumbSpec.fileSuffix));
 }
 
-function _getThumbSrc(src, fileSuffix) {
+function _getThumbSrc(encodedSrc, fileSuffix) {
     // src is like https://<host>/folder1/folder2/DSC_2264.jpg
     // we want a new path to the thumbnail as https://<host>/folder1/folder2/thumbs/DSC_2264_[s|m|l|xs].jpg
+    const src = decodeURIComponent(encodedSrc);
     const dotPosition = src.lastIndexOf(".");
     const lastSlashPosition = src.lastIndexOf("/");
 
