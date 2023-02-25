@@ -17,6 +17,7 @@ exports.mainapi = functions
         "MAIL_AUTH_PASS",
         "POSTGRESQL_PASSWORD",
         "RECAPTCHA_SECRETKEY",
+        "RECAPTCHAV3_SECRETKEY",
     ]})
     .https
     .onRequest(mainapi);

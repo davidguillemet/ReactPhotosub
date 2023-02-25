@@ -12,6 +12,11 @@ build/
 # Firebase simulators export
 firebase-snapshot
 
+# env files
+.env
+.env.production
+.env.production.local
+
 # misc
 .DS_Store
 .firebase/

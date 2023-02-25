@@ -6,6 +6,28 @@
 # get environment configuration
 # firebase functions:config:get
 
+
+##########################################
+# Secret Key management
+##########################################
+# Change the value of an existing secret
+firebase functions:secrets:set SECRET_NAME
+
+# View the value of a secret
+functions:secrets:access SECRET_NAME
+
+# Destroy a secret
+functions:secrets:destroy SECRET_NAME
+
+# View all secret versions and their state
+functions:secrets:get SECRET_NAME
+
+# Automatically clean up all secrets that aren't referenced by any of your functions
+functions:secrets:prune
+
+##########################################
+
+
 # start functions emulator
 # export GOOGLE_APPLICATION_CREDENTIALS=../../gcp/photosub-5c66182af76f.json && firebase emulators:start
 firebase emulators:start --only hosting,functions

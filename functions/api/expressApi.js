@@ -6,7 +6,8 @@ require("dotenv").config();
 const express = require("express");
 const compression = require("compression");
 const {convertPathToUrl, bucket, logger} = require("../utils/firebase");
-const {isAuthenticated, isAuthorized} = require("./authenticated");
+const {isAuthenticated, isAuthorized} = require("./middlewares/authenticated");
+const appCheckVerification = require("./middlewares/appCheckVerification");
 const cors = require("cors");
 
 // Get a connection pool for postgreSql
@@ -27,6 +28,9 @@ app.use(express.urlencoded({extended: true}));
 
 // Fix the CORS Error
 app.use(cors({origin: true}));
+
+// Firebase appCheck verification
+app.use(appCheckVerification);
 
 const resourceConfiguration = {
     app,

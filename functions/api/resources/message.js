@@ -1,4 +1,4 @@
-const reCaptcha = require("../reCaptcha");
+const reCaptcha = require("../middlewares/reCaptcha");
 const nodemailer = require("nodemailer");
 
 const headOpenRegexp = new RegExp("<h[0-9]>|<p>", "g");
