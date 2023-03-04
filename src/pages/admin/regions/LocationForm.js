@@ -1,13 +1,13 @@
 import React from 'react';
 import { Box } from '@mui/system';
 import { ListItemText } from '@mui/material';
-import { useQueryContext } from '../../components/queryContext';
+import { useQueryContext } from 'components/queryContext';
 import Form, {
     FIELD_TYPE_TEXT,
     FIELD_TYPE_URL,
     FIELD_TYPE_LATLONG,
     FIELD_TYPE_SELECT
-} from '../../components/form/Form';
+} from 'components/form/Form';
 import { alpha } from '@mui/material/styles';
 
 const RegionItem = ({option}) => {

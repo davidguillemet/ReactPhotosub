@@ -8,7 +8,7 @@ import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
-import { useQueryContext } from '../../components/queryContext';
+import { useQueryContext } from 'components/queryContext';
 import MissingStorageFolders from './MissingStorageFolders';
 import UploadTableRows from './UploadTableRows';
 import { ImageContextProvider, useImageContext } from './ImageContext';

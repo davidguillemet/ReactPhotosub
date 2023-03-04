@@ -1,7 +1,7 @@
 import React from 'react';
 import Form, {
     FIELD_TYPE_TEXT
-} from '../../components/form/Form';
+} from 'components/form';
 import { useImageContext } from './ImageContext';
 
 const formFields = [

@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { VerticalSpacing } from '../../template/spacing';
+import { VerticalSpacing } from 'template/spacing';
 import { useUploadContext } from './UploadContext';
 import { useImageContext } from './ImageContext';
 

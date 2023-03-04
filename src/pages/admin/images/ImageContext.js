@@ -1,8 +1,8 @@
 import React from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
-import { buildLoadingState, withLoading } from '../../components/hoc';
-import { throttle } from '../../utils';
-import { useFirebaseContext } from '../../components/firebase';
+import { buildLoadingState, withLoading } from 'components/hoc';
+import { throttle } from 'utils';
+import { useFirebaseContext } from 'components/firebase';
 
 const isNotThumbsFolder = (item) => item.name !== "thumbs";
 const isThumbsFolder = (item) => item.name === "thumbs";

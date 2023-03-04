@@ -6,7 +6,7 @@ import {
     STATUS_SUCCESS,
     STATUS_ERROR
 } from './StorageItemStatus';
-import { _thumbnailSpecs } from '../../../utils';
+import { _thumbnailSpecs } from 'utils';
 import { useUploadContext } from '../UploadContext';
 
 const allThumbsCreated = (ref, thumbs, statusInfo) => {

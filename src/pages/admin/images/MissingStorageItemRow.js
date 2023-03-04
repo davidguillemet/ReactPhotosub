@@ -9,10 +9,10 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { STATUS_ERROR, STATUS_NOT_AVAILABLE, STATUS_PENDING, StorageItemStatus } from './itemStatus/StorageItemStatus';
 import { useImageContext } from './ImageContext';
 import { useUploadContext } from './UploadContext';
-import { getThumbnailsFromImageName } from '../../utils';
-import { useFirebaseContext } from '../../components/firebase';
-import { useQueryContext } from '../../components/queryContext';
-import { useDataProvider } from '../../components/dataProvider';
+import { getThumbnailsFromImageName } from 'utils';
+import { useFirebaseContext } from 'components/firebase';
+import { useQueryContext } from 'components/queryContext';
+import { useDataProvider } from 'components/dataProvider';
 
 const ThumbIssueStatus = ({itemName, error}) => {
 

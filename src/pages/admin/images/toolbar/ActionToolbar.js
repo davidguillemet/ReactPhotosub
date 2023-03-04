@@ -5,16 +5,16 @@ import {unstable_batchedUpdates} from 'react-dom';
 import { IconButton, Stack, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useImageContext } from '../ImageContext';
-import { Paragraph } from '../../../template/pageTypography';
-import { HorizontalSpacing } from '../../../template/spacing';
-import { ConfirmDialog } from '../../../dialogs';
-import { useTranslation } from '../../../utils';
-import { useFirebaseContext } from '../../../components/firebase';
-import { useToast } from '../../../components/notifications';
-import { useQueryContext } from '../../../components/queryContext';
-import { getThumbnailsFromImageName } from '../../../utils';
-import { useOverlay } from '../../../components/loading';
-import { useDataProvider } from '../../../components/dataProvider';
+import { Paragraph } from 'template/pageTypography';
+import { HorizontalSpacing } from 'template/spacing';
+import { ConfirmDialog } from 'dialogs';
+import { useTranslation } from 'utils';
+import { useFirebaseContext } from 'components/firebase';
+import { useToast } from 'components/notifications';
+import { useQueryContext } from 'components/queryContext';
+import { getThumbnailsFromImageName } from 'utils';
+import { useOverlay } from 'components/loading';
+import { useDataProvider } from 'components/dataProvider';
 
 const isImageFile = (fullPath) => {
     return fullPath.endsWith(".jpg");

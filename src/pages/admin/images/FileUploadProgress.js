@@ -1,7 +1,7 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
-import { useFirebaseContext } from '../../components/firebase';
+import { useFirebaseContext } from 'components/firebase';
 import { useUploadContext } from './UploadContext';
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({

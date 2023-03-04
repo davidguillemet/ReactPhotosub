@@ -6,10 +6,10 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { TextField } from '@mui/material';
-import { useToast } from '../../../components/notifications';
+import { useToast } from 'components/notifications';
 import { useImageContext } from '../ImageContext';
 import GlobalStatus from './GlobalStatus';
-import { useDataProvider } from '../../../components/dataProvider';
+import { useDataProvider } from 'components/dataProvider';
 
 const StorageBreadcrumbs = () => {
     const dataProvider = useDataProvider();

@@ -1,11 +1,11 @@
 import React from 'react';
-import { useQueryContext } from '../../components/queryContext';
+import { useQueryContext } from 'components/queryContext';
 import { ITEM_TYPE_FILE } from './common';
 import StorageFileRow from './StorageFileRow';
 import MissingStorageItemRow from './MissingStorageItemRow';
 import { useImageContext } from './ImageContext';
 import { useUploadContext } from './UploadContext';
-import { getImageNameFromThumbnail } from '../../utils';
+import { getImageNameFromThumbnail } from 'utils';
 
 const useDestinationImages = ({year, title}) => {
     const queryContext = useQueryContext();

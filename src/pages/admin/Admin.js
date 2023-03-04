@@ -2,10 +2,10 @@ import React from 'react';
 import { Box } from '@mui/system';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab'; 
-import { useTranslation } from '../utils';
-import { PageTitle } from '../template/pageTypography';
-import { VerticalSpacing } from '../template/spacing';
-import { withUser } from '../components/hoc';
+import { useTranslation } from 'utils';
+import { PageTitle } from 'template/pageTypography';
+import { VerticalSpacing } from 'template/spacing';
+import { withUser } from 'components/hoc';
 import Regions from './regions/Regions';
 import Images from './images';
 

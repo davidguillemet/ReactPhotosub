@@ -23,7 +23,7 @@ const About = lazy(() => import("../pages/about"));
 const Contact = lazy(() => import("../pages/contact"));
 const MySelection = lazy(() => import("../pages/favorites"));
 const MyProfile = lazy(() => import("../pages/profile"));
-const Admin = lazy(() => import("../admin"));
+const Admin = lazy(() => import("../pages/admin"));
 
 export const HomePath = "/";
 export const DestinationsPath = "/destinations";

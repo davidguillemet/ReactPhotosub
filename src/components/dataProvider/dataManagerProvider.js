@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React from 'react';
-import { useFirebaseContext } from '../firebase';
-import DataProvider from '../../dataProvider/dataprovider';
+import { useFirebaseContext } from 'components/firebase';
+import DataProvider from 'dataProvider';
 
 const DataManagerContext = React.createContext(null);
 

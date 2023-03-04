@@ -1,6 +1,6 @@
 import React from 'react';
-import { useDataProvider } from '../../components/dataProvider';
-import { useQueryContext } from '../../components/queryContext';
+import { useDataProvider } from 'components/dataProvider';
+import { useQueryContext } from 'components/queryContext';
 import { useImageContext } from './ImageContext';
 
 const UploadContext = React.createContext(null);
