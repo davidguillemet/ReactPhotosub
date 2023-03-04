@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box } from '@mui/system';
 import { ListItemText } from '@mui/material';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 import Form, {
     FIELD_TYPE_TEXT,
     FIELD_TYPE_URL,
@@ -35,11 +35,11 @@ const RegionItem = ({option}) => {
 
 const LocationForm = ({location, locations, regions, onChange, onCancel, onNewLocation}) => {
 
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
     const [locationFields, setLocationFields] = React.useState([]);
 
-    const addLocationMutation = context.useAddLocation();
-    const updateLocationMutation = context.useUpdateLocation();
+    const addLocationMutation = queryContext.useAddLocation();
+    const updateLocationMutation = queryContext.useUpdateLocation();
 
     const onSubmitLocationForm = React.useCallback((values) => {
         const locationToSave = {

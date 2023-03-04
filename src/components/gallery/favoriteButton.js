@@ -17,9 +17,12 @@ const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
     const favoritesContext = useFavorites();
     const [ updating, setUpdating ] = useState(false);
 
-    const isInFavorites = favoritesContext.isIn(image);
+    const isInFavorites = React.useMemo(() => {
+        const isIn = favoritesContext.isIn;
+        return isIn(image);
+    }, [favoritesContext, image]);
 
-    function handleFavoriteClick() {
+    const handleFavoriteClick = React.useCallback(() => {
         setUpdating(true);
         const favoriteActionPromise =
             isInFavorites ?
@@ -31,7 +34,7 @@ const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
         }).finally(() => {
             setUpdating(false);
         })
-    }
+    }, [favoritesContext, isInFavorites, image]);
 
     const buttonStyle = {...style};
     let title = "Ajouter aux favoris";
@@ -66,7 +69,6 @@ const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
             }
             onClick={authContext.user && updating === false ? handleFavoriteClick : null}
             style={buttonStyle}
-            disabled={updating}
         >
             {
                 updating ?

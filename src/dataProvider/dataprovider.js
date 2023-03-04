@@ -77,43 +77,6 @@ DataProvider.prototype.getDestinationImagesFromPath = function(year, title) {
     return this.getDestinationProps(year, title, "images");
 };
 
-DataProvider.prototype.updateDestination = function(destination) {
-    return this.axios.put('/admin/destinations', destination);
-}
-
-DataProvider.prototype.createDestination = function(destination) {
-    return this.axios.post('/admin/destinations', destination)
-    .then(response => {
-        return response.data; // contains the new destinations
-    });
-}
-
-DataProvider.prototype.deleteDestination = function(destinationId) {
-    return this.axios.delete('/admin/destinations', {data: { id: destinationId } })
-    .then(response => {
-        return response.data; // contains the deleted destination
-    });
-}
-
-DataProvider.prototype.updateLocation = function(location) {
-    return this.axios.put('/admin/locations', location);
-}
-
-DataProvider.prototype.createLocation = function(location) {
-    return this.axios.post('/admin/locations', location)
-    .then(response => {
-        return response.data; // contains the new locations
-    });
-}
-
-DataProvider.prototype.deleteLocation = function(locationId) {
-    return this.axios.delete('/admin/locations', {data: { id: locationId } })
-    .then(response => {
-        return response.data; // contains the deleted location
-    });
-}
-
-
 DataProvider.prototype.getUserData = function() {
     return this.axios.get(`/userdata`)
     .then(response => {
@@ -226,20 +189,6 @@ DataProvider.prototype._getBucketContent = function(folder) {
     });
 }
 
-DataProvider.prototype.renameFolder = function(folder, newName) {
-    return this.axios.patch(`/bucket/${folder}`, {
-        name: newName
-    });
-}
-
-DataProvider.prototype.waitForThumbnails = function(fileName) {
-    return this.axios.get(`/thumbstatus/${fileName}`, {
-        timeout: 60000, // Specific timeout for this request
-    }).then(response => {
-        return response.data;
-    });
-}
-
 DataProvider.prototype.searchImages = function(pageIndex, query, pageSize, exact, processId) {
     return this.axios.post('/search', {
         query: query,
@@ -271,24 +220,75 @@ DataProvider.prototype.updateUser = function(user) {
     return this.axios.put('/user', user);
 }
 
-DataProvider.prototype.refreshThumbnails = function(fullPath) {
-    return this.axios.patch('/images', {
-        fullPath,
+
+//  ADMIN //
+
+// Destinations
+DataProvider.prototype.createDestination = function(destination) {
+    return this.axios.post('/admin/destinations', destination)
+    .then(response => {
+        return response.data; // contains the new destinations
+    });
+}
+DataProvider.prototype.updateDestination = function(destination) {
+    return this.axios.put('/admin/destinations', destination);
+}
+DataProvider.prototype.deleteDestination = function(destinationId) {
+    return this.axios.delete('/admin/destinations', {data: { id: destinationId } })
+    .then(response => {
+        return response.data; // contains the deleted destination
     });
 }
 
+// Locations
+DataProvider.prototype.createLocation = function(location) {
+    return this.axios.post('/admin/locations', location)
+    .then(response => {
+        return response.data; // contains the new locations
+    });
+}
+DataProvider.prototype.updateLocation = function(location) {
+    return this.axios.put('/admin/locations', location);
+}
+DataProvider.prototype.deleteLocation = function(locationId) {
+    return this.axios.delete('/admin/locations', {data: { id: locationId } })
+    .then(response => {
+        return response.data; // contains the deleted location
+    });
+}
+
+// Images / Thumbnails
 DataProvider.prototype.insertImageInDatabase = function(fullPath) {
-    return this.axios.put('/images', {
+    return this.axios.put('/admin/images', {
         fullPath
     });
 }
-
 DataProvider.prototype.removeImageFromDatabase = function(fullPath) {
-    return this.axios.delete('/images', {data: {path: fullPath}});
+    return this.axios.delete('/admin/images', {data: {path: fullPath}});
+}
+// Refresh thumbnails should not be an Admin API since it can be called in simulations,
+// to generate uploaded interior thumbnails
+DataProvider.prototype.refreshThumbnails = function(fullPath) {
+    return this.axios.patch('/admin/images', {
+        fullPath,
+    });
+}
+DataProvider.prototype.createInteriorThumbnails = function(fullPath) {
+    return this.axios.patch('/admin/interiors', {
+        fullPath,
+    }).then(response => {
+        return response.data; // Contains the size ratio of the original interior
+    });
 }
 
+// Storage
 DataProvider.prototype.removeStorageItem = function(folderFullPath) {
-    return this.axios.delete('/bucket', {data: { path: folderFullPath } })
+    return this.axios.delete('/admin/bucket', {data: { path: folderFullPath } })
+}
+DataProvider.prototype.renameFolder = function(folder, newName) {
+    return this.axios.patch(`/admin/bucket/${folder}`, {
+        name: newName
+    });
 }
 
 export default DataProvider;

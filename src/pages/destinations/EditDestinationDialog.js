@@ -12,41 +12,41 @@ import Form, {
     FIELD_TYPE_DATE,
     FIELD_TYPE_SWITCH
 } from '../../components/form';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 
 const EditDestinationDialog = ({open, destination, onClose}) => {
 
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
 
-    const addDestinationMutation = context.useAddDestination();
-    const updateDestinationMutation = context.useUpdateDestination();
+    const addDestinationMutation = queryContext.useAddDestination();
+    const updateDestinationMutation = queryContext.useUpdateDestination();
 
     const [fields, setFields] = useState(null);
 
     const getImagesFromPath = useCallback(([path]) => {
         const [ year, title ] = (path !== null && path !== undefined) ? path.split('/') : [ null, null ];
-        const { data, isError, error } = context.useFetchDestinationImages(year, title);
+        const { data, isError, error } = queryContext.useFetchDestinationImages(year, title);
         if (isError === true) {
             throw error;
         }
         return data;
-    }, [context]);
+    }, [queryContext]);
 
     const getLocations = useCallback(() => {
-        const { data, isError, error } = context.useFetchLocations();
+        const { data, isError, error } = queryContext.useFetchLocations();
         if (isError === true) {
             throw error;
         }
         return data;
-    }, [context]);
+    }, [queryContext]);
 
     const getImageFolders = useCallback(() => {
-        const { data, isError, error } = context.useFetchImageFolders();
+        const { data, isError, error } = queryContext.useFetchImageFolders();
         if (isError === true) {
             throw error;
         }
         return data;
-    }, [context])
+    }, [queryContext])
 
     useEffect(() => {
         setFields([

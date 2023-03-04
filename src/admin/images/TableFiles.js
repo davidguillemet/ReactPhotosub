@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 import { ITEM_TYPE_FILE } from './common';
 import StorageFileRow from './StorageFileRow';
 import MissingStorageItemRow from './MissingStorageItemRow';
@@ -8,8 +8,8 @@ import { useUploadContext } from './UploadContext';
 import { getImageNameFromThumbnail } from '../../utils';
 
 const useDestinationImages = ({year, title}) => {
-    const context = useGlobalContext();
-    const { data } = context.useFetchDestinationImages(year, title);
+    const queryContext = useQueryContext();
+    const { data } = queryContext.useFetchDestinationImages(year, title);
     if (year !== null && title !== null) {
         return data;
     } else {
@@ -62,19 +62,18 @@ const TableFiles = ({files}) => {
     }, [imageContext.thumbs, imageContext.storageRef, uploadContext.isUploading, files])
 
     React.useEffect(() => {
-        if (imageContext.thumbs !== null && dbImages !== null && dbImages !== undefined) {
-            missingImagesVsDatabase.current = new Set(getMissingImagesVersusDatabase());
-            missingImagesVsThumbs.current = new Set(getMissingImagesVersusThumbnails());
+        missingImagesVsThumbs.current = new Set(getMissingImagesVersusThumbnails());
+        missingImagesVsDatabase.current = new Set(getMissingImagesVersusDatabase());
 
-            const allMissingImagesSet = new Set(missingImagesVsDatabase.current);
+        const allMissingImagesSet = new Set(missingImagesVsDatabase.current);
+        if (missingImagesVsThumbs.current !== null) {
             for (const item of missingImagesVsThumbs.current) {
                 allMissingImagesSet.add(item);
             }
-
-            const allMissingImagesArray = Array.from(allMissingImagesSet).sort();
-            setMissingStorageImages(allMissingImagesArray);
         }
 
+        const allMissingImagesArray = Array.from(allMissingImagesSet).sort();
+        setMissingStorageImages(allMissingImagesArray);
     }, [imageContext.thumbs, dbImages, getMissingImagesVersusDatabase, getMissingImagesVersusThumbnails])
 
     if (dbImages === undefined || imageContext.thumbs === undefined) {

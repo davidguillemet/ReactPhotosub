@@ -1,3 +1,5 @@
+import {getUA} from 'react-device-detect';
+
 export function formatDate(tripDate, locale) {
     const options = { year: 'numeric', month: 'long' };
     const formattedDate = tripDate.toLocaleDateString(locale, options);
@@ -111,7 +113,7 @@ export const _thumbnailSpecs = [
 ];
 
 const _suffixes = _thumbnailSpecs.map(spec => spec.fileSuffix).join('|');
-const _thumbNameRegexPattern = `^(?<imageName>.+)_(${_suffixes})\.(?<extension>.+)$`;
+const _thumbNameRegexPattern = `^(?<imageName>.+)_(${_suffixes})\\.(?<extension>.+)$`;
 const _thumbNameRegex = new RegExp(_thumbNameRegexPattern, "i");
 
 export function getImageNameFromThumbnail(thumbName) {
@@ -304,4 +306,11 @@ export function closeFullscreen() {
     } else if (document.msExitFullscreen) { /* IE11 */
         document.msExitFullscreen();
     }
+}
+
+export const isPrerenderUserAgent = () => {
+    if (getUA.toLowerCase().indexOf('prerender') !== -1) {
+        return true;
+    }
+    return false;
 }

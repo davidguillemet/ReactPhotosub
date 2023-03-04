@@ -19,11 +19,12 @@ import ErrorIcon from '@mui/icons-material/Error';
 
 import { uniqueID, useTranslation, useLanguage } from '../../utils';
 import LazyDialog from '../../dialogs/LazyDialog';
-import { useGlobalContext } from '../globalContext';
+import { useQueryContext } from '../queryContext';
 import { Paragraph } from '../../template/pageTypography';
 import { useStateWithDep } from '../hooks';
 import ErrorAlert from '../error';
 import { useFirebaseContext } from '../firebase';
+import { useDataProvider } from '../dataProvider';
 
 const _pageSize = 10;
 
@@ -149,7 +150,8 @@ const Search = React.forwardRef(({
     const t = useTranslation("components.search");
     const { language } = useLanguage();
     const history = useHistory();
-    const context = useGlobalContext();
+    const dataProvider = useDataProvider();
+    const queryContext = useQueryContext();
     const firebaseContext = useFirebaseContext();
     const [ helpOpen, setHelpOpen ] = useState(false);
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
@@ -159,7 +161,7 @@ const Search = React.forwardRef(({
         page: 0,
         query: query || ""
     });
-    const { data: imageCount } = context.useFetchImageCount();
+    const { data: imageCount } = queryContext.useFetchImageCount();
     const searchTimer = useRef(null);
 
     const lastSearchProcessId = useRef(null);
@@ -205,7 +207,7 @@ const Search = React.forwardRef(({
 
         lastSearchProcessId.current = uniqueID();
 
-        context.dataProvider.searchImages(searchConfig.page, searchConfig.query, _pageSize, searchConfig.exact, lastSearchProcessId.current)
+        dataProvider.searchImages(searchConfig.page, searchConfig.query, _pageSize, searchConfig.exact, lastSearchProcessId.current)
         .then(response => {
             if (response.processId !== lastSearchProcessId.current) {
                 console.log(`skip obsolete search results ${response.processId}`);
@@ -250,7 +252,7 @@ const Search = React.forwardRef(({
             setSearchIsRunning(false);
         })
 
-    }, [searchConfig, context, firebaseContext]);
+    }, [searchConfig, dataProvider, firebaseContext]);
 
     const toggleSearchHelpOpen = useCallback(() => {
         setHelpOpen(open => !open);

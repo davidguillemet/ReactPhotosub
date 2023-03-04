@@ -15,7 +15,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useAuthContext } from '../../components/authentication';
 import EditDestinationDialog from './EditDestinationDialog';
 import {unstable_batchedUpdates} from 'react-dom';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 import ConfirmDialog from '../../dialogs/ConfirmDialog';
 
 const DestinationDetails = ({destination}) => {
@@ -136,9 +136,9 @@ const DestinationContent = ({item, index, width, params}) => {
 
 const DestinationGallery = ({destinations}) => {
 
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
     const authContext = useAuthContext();
-    const deleteDestinationMutation = context.useDeleteDestination();
+    const deleteDestinationMutation = queryContext.useDeleteDestination();
 
     const [editIsOpen, setEditIsOpen] = React.useState(false);
     const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);

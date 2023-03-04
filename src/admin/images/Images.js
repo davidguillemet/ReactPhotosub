@@ -8,7 +8,7 @@ import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 import MissingStorageFolders from './MissingStorageFolders';
 import UploadTableRows from './UploadTableRows';
 import { ImageContextProvider, useImageContext } from './ImageContext';
@@ -84,8 +84,8 @@ const Images = () => {
 }
 
 const ImagesController = () => {
-    const context = useGlobalContext();
-    const { data: folders } = context.useFetchImageFolders();
+    const queryContext = useQueryContext();
+    const { data: folders } = queryContext.useFetchImageFolders();
     return (
         <ImageContextProvider foldersFromDb={folders}>
             <UploadContextProvider>

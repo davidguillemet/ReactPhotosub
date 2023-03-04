@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useGlobalContext } from '../globalContext';
+import { useQueryContext } from '../queryContext';
 
 const compareRegions = (a, b) => a.title === b.title ? 0 : a.title < b.title ? -1 : 1;
 
@@ -23,14 +23,14 @@ function buildHierarchy(regionList) {
 
 const useRegions = () => {
 
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
     const [regions, setRegions] = useState({
         hierarchy: undefined,
         map: undefined
     });
 
     // Executed only once to get regions
-    const { isLoading, data } = context.useFetchRegions();
+    const { isLoading, data } = queryContext.useFetchRegions();
     
     useEffect(() => {
         if (isLoading === true) {

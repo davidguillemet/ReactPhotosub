@@ -11,16 +11,18 @@ import { ConfirmDialog } from '../../../dialogs';
 import { useTranslation } from '../../../utils';
 import { useFirebaseContext } from '../../../components/firebase';
 import { useToast } from '../../../components/notifications';
-import { useGlobalContext } from '../../../components/globalContext';
+import { useQueryContext } from '../../../components/queryContext';
 import { getThumbnailsFromImageName } from '../../../utils';
 import { useOverlay } from '../../../components/loading';
+import { useDataProvider } from '../../../components/dataProvider';
 
 const isImageFile = (fullPath) => {
     return fullPath.endsWith(".jpg");
 }
 
 const ActionToolbar = () => {
-    const context = useGlobalContext();
+    const dataProvider = useDataProvider();
+    const queryContext = useQueryContext();
     const imageContext = useImageContext();
     const firebaseContext = useFirebaseContext();
     const { toast } = useToast();
@@ -40,15 +42,15 @@ const ActionToolbar = () => {
 
     const deleteItem = React.useCallback((itemFullPath) => {
         const promises = [];
-        promises.push(context.dataProvider.removeStorageItem(itemFullPath));
+        promises.push(dataProvider.removeStorageItem(itemFullPath));
         if (isImageFile(itemFullPath)) {
             const deleteItems = firebaseContext.deleteItems;
             promises.push(deleteItems(getThumbnailsFromImageName(itemFullPath)));
-            promises.push(context.dataProvider.removeImageFromDatabase(itemFullPath));
+            promises.push(dataProvider.removeImageFromDatabase(itemFullPath));
         }
         return Promise.all(promises);
 
-    }, [context, firebaseContext.deleteItems]);
+    }, [dataProvider, firebaseContext.deleteItems]);
 
     const onDeleteItems = React.useCallback(() => {
         setProcessing(true);
@@ -65,7 +67,7 @@ const ActionToolbar = () => {
                     fetchItems();
                     if (hasImage) {
                         refreshThumbnails();
-                        context.clearDestinationImages( // Throttling
+                        queryContext.clearDestinationImages( // Throttling
                             imageContext.destinationProps.year,
                             imageContext.destinationProps.title);
                     }
@@ -80,7 +82,7 @@ const ActionToolbar = () => {
                 setProcessing(false);
             });
     }, [
-        context,
+        queryContext,
         toast,
         setProcessing,
         imageContext.destinationProps,

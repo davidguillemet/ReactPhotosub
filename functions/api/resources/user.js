@@ -1,9 +1,9 @@
 const admin = require("firebase-admin");
 
-module.exports = function(config) {
-    config.app.use("/user", config.isAuthenticated);
+module.exports = function(app, config) {
+    app.use("/user", config.isAuthenticated);
 
-    config.app.route("/user")
+    app.route("/user")
         // Update the specified user information
         .put(async function(req, res, next) {
             const newUserProperties = req.body;

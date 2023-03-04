@@ -156,9 +156,9 @@ function buildSearchQueryNotExact(config, criteriaList, page, pageSize) {
     return sqlQuery;
 }
 
-module.exports = function(config) {
+module.exports = function(app, config) {
     // Search for images
-    config.app.route("/search")
+    app.route("/search")
         .post(async function(req, res, next) {
             const searchData = req.body;
             const page = searchData.page;

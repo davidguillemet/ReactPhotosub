@@ -1,17 +1,19 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useAuthContext } from '../authentication';
-import { useGlobalContext } from '../globalContext';
+import { useDataProvider } from '../dataProvider';
+import { useQueryContext } from '../queryContext';
 import FavoritesContext from './favoritesContext';
 
 const imagePath = (image) => `${image.path}/${image.name}`
 
 const FavoritesProvider = ({ children }) => {
 
-    const context = useGlobalContext();
+    const dataProvider = useDataProvider();
+    const queryContext = useQueryContext();
     const authContext = useAuthContext();
 
-    const addFavorite = context.useAddFavorite();
-    const removeFavorite = context.useRemoveFavorite();
+    const addFavorite = queryContext.useAddFavorite();
+    const removeFavorite = queryContext.useRemoveFavorite();
     const favoritesObservers = useRef([]);
 
     const [favorites, setFavorites] = useState(null);
@@ -26,7 +28,7 @@ const FavoritesProvider = ({ children }) => {
                 favoriteImgArray.forEach((favoriteImg, index) => newMap.set(pathArray[index], favoriteImg));
 
                 // Set the new query data
-                context.queryClient.setQueryData(['favorites', authContext.user.uid], Array.from(newMap.values()))
+                queryContext.setFavoritesData(authContext.user.uid, Array.from(newMap.values()));
 
                 // Set the new state
                 return newMap;
@@ -34,7 +36,7 @@ const FavoritesProvider = ({ children }) => {
             favoritesObservers.current.forEach(observer => observer(favoriteImgArray, 'add'));
         });
 
-    }, [addFavorite, context, authContext.user])
+    }, [addFavorite, queryContext, authContext.user])
 
     const removeUserFavorite = useCallback(favoriteImg => {
 
@@ -46,7 +48,7 @@ const FavoritesProvider = ({ children }) => {
                 newMap.delete(path);
 
                 // Set the new query data
-                context.queryClient.setQueryData(['favorites', authContext.user.uid], Array.from(newMap.values()))
+                queryContext.setFavoritesData(authContext.user.uid, Array.from(newMap.values()));
 
                 // Set the new state
                 return newMap;
@@ -54,7 +56,7 @@ const FavoritesProvider = ({ children }) => {
             favoritesObservers.current.forEach(observer => observer([favoriteImg], 'remove'));
         })
 
-    }, [removeFavorite, context, authContext.user])
+    }, [removeFavorite, queryContext, authContext.user])
 
     const subscribeFavorites = useCallback((fn) => {
         favoritesObservers.current.push(fn);
@@ -70,16 +72,16 @@ const FavoritesProvider = ({ children }) => {
 
     useEffect(() => {
         if (authContext.user) {
-            context.dataProvider.getUserData().then((userData) => {
+            dataProvider.getUserData().then((userData) => {
                 const favMap = userData.favorites.reduce((acc, current) => { acc.set(imagePath(current), current); return acc; }, new Map());        
                 // Initialize query data for favorites
-                context.queryClient.setQueryData(['favorites', authContext.user.uid], Array.from(favMap.values()));
+                queryContext.setFavoritesData(authContext.user.uid, Array.from(favMap.values()));
                 setFavorites(favMap)
             });
         } else {
             setFavorites(null)
         }
-    }, [authContext.user, context]);
+    }, [authContext.user, queryContext, dataProvider]);
 
     return (
         <FavoritesContext.Provider value={{

@@ -1,10 +1,10 @@
 const admin = require("firebase-admin");
 
-module.exports = function(config) {
+module.exports = function(app, config) {
     // Authentication required for the following routes:
-    config.app.use("/userdata", config.isAuthenticated);
+    app.use("/userdata", config.isAuthenticated);
 
-    config.app.route("/userdata")
+    app.route("/userdata")
         // Get all data for a given user
         .get(async function(req, res, next) {
             const uid = res.locals.uid;
@@ -55,7 +55,7 @@ module.exports = function(config) {
                 }).catch(next);
         });
 
-    config.app.route("/userdata")
+    app.route("/userdata")
         .delete(async function(req, res, next) {
             // {
             //     uid: "xxxxxxxxxx",

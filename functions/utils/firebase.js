@@ -13,7 +13,8 @@ if (process.env.NODE_ENV === "remote") {
 const bucket = admin.storage().bucket(process.env.FIREBASE_CONFIG.storageBucket);
 
 function convertPathToUrl(imagePath) {
-    return bucket.file(imagePath).publicUrl();
+    // TODO : maybe remove decodeURI once the download Uri strategy has been refined...
+    return decodeURIComponent(bucket.file(imagePath).publicUrl());
 }
 
 module.exports = {

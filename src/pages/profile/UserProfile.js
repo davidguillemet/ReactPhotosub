@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { PageTitle } from '../../template/pageTypography';
-import { useGlobalContext } from '../../components/globalContext';
 import { useAuthContext } from '../../components/authentication';
 import { VerticalSpacing } from '../../template/spacing';
 import { withUser } from '../../components/hoc';
@@ -18,6 +17,7 @@ import Form, {
     FIELD_TYPE_CHECK_BOX,
     FIELD_TYPE_PASSWORD
 } from '../../components/form';
+import { useDataProvider } from '../../components/dataProvider';
 
 const getFormValues = (user) => {
     return {
@@ -32,7 +32,7 @@ const getFormValues = (user) => {
 const UserProfile = (props) => {
 
     const authContext = useAuthContext();
-    const context = useGlobalContext();
+    const dataProvider = useDataProvider();
     const { toast } = useToast();
 
     const [readOnly, setReadOnly] = useState(true);
@@ -112,7 +112,7 @@ const UserProfile = (props) => {
             delete values.password;
         }
         delete values.password_confirm;
-        return context.dataProvider.updateUser(values)
+        return dataProvider.updateUser(values)
         .then(() => {
             if (values.password) {
                 // Password has been changed, then reauthenticate
@@ -149,7 +149,7 @@ const UserProfile = (props) => {
             }
             throw err;
         });
-    }, [authContext, context, onIdTokenRevocation]);
+    }, [authContext, dataProvider, onIdTokenRevocation]);
 
     const onCancelChanges = useCallback(() => {
         fields.current.forEach(field => field.error = false);

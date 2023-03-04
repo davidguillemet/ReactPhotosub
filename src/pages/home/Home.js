@@ -5,7 +5,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 
 import { uniqueID, shuffleArray } from '../../utils';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 import { useScrollBlock } from '../../utils';
 
 const _diaporamaInterval = 6000;
@@ -165,9 +165,9 @@ const Home = ({images, currentIndex, subscribeDrawer}) => {
 };
 
 const HomeController = ({subscribeDrawer}) => {
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
     const [images, setImages] = useState(null);
-    const { data } = context.useFetchHomeSlideshow();
+    const { data } = queryContext.useFetchHomeSlideshow();
     useEffect(() => {
         if (data === undefined) {
             return;

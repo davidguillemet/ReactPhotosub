@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { uniqueID } from '../../../utils';
-import { useGlobalContext } from '../../../components/globalContext';
+import { useQueryContext } from '../../../components/queryContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useReactQuery } from '../../../components/reactQuery';
 
@@ -13,10 +13,10 @@ const emptyArray = [];
 
 const useFetchSource = (listType, user, thenFunc) => {
 
-    const context = useGlobalContext();
-    const { data: defaultSelection } = useReactQuery(context.useFetchDefaultSelection, [listType === LIST_HOME_SLIDESHOW, thenFunc]);
-    const { data: favorites } = useReactQuery(context.useFetchFavorites, [user && user.uid, listType === LIST_FAVORITES, thenFunc]);
-    const { data: searchResult } = useReactQuery(context.useFetchSearchResults, [listType === LIST_SEARCH, thenFunc]);
+    const queryContext = useQueryContext();
+    const { data: defaultSelection } = useReactQuery(queryContext.useFetchDefaultSelection, [listType === LIST_HOME_SLIDESHOW, thenFunc]);
+    const { data: favorites } = useReactQuery(queryContext.useFetchFavorites, [user && user.uid, listType === LIST_FAVORITES, thenFunc]);
+    const { data: searchResult } = useReactQuery(queryContext.useFetchSearchResults, [listType === LIST_SEARCH, thenFunc]);
 
     switch (listType) {
         case LIST_HOME_SLIDESHOW: return defaultSelection;
@@ -27,20 +27,20 @@ const useFetchSource = (listType, user, thenFunc) => {
 }
 
 const useImageLoader = (user, simulations, listType) => {
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
     const [allInteriors, setAllInteriors] = useState(null);
 
     const queryClient = useQueryClient();
-    const { data: interiors } = useReactQuery(context.useFetchInteriors, [(images) => buildImages(images, false)], {
+    const { data: interiors } = useReactQuery(queryContext.useFetchInteriors, [(images) => buildImages(images, false)], {
             errorPlaceholder: emptyArray // Empty array on error...not blocking
         });
-    const { data: userInteriors } = useReactQuery(context.useFetchUserInteriors, [
+    const { data: userInteriors } = useReactQuery(queryContext.useFetchUserInteriors, [
             user && user.uid,
             (images) => buildImages(images, true)
         ], {
             errorPlaceholder: emptyArray // Empty array on error...not blocking
         });
-    const removeUserInterior = context.useRemoveUserInterior();
+    const removeUserInterior = queryContext.useRemoveUserInterior();
     const images = useFetchSource(listType, user, (images) => images.map(image => {
         return {
             ...image,
@@ -105,7 +105,8 @@ const useImageLoader = (user, simulations, listType) => {
 
     const deleteUploadedInterior = useCallback((fileUrl) => {
         // Extract the file name from the src
-        const fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+        const decodedFileUrl = decodeURIComponent(fileUrl);
+        const fileName = decodedFileUrl.substring(decodedFileUrl.lastIndexOf('/') + 1);
         removeUserInterior.mutateAsync(fileName).then(() => {
             queryClient.setQueryData(['userInteriors', user.uid], [
                 ...allInteriors.filter(interior => interior.uploaded === true && interior.src !== fileUrl)

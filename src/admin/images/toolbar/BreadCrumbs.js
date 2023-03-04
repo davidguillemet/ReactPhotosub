@@ -1,18 +1,18 @@
 import React from 'react';
-import { Box, Chip } from '@mui/material';
+import { Box } from '@mui/material';
 import { Breadcrumbs } from '@mui/material';
 import { IconButton, Link } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { TextField } from '@mui/material';
-import { useGlobalContext } from '../../components/globalContext';
-import { useToast } from '../../components/notifications';
-import { useImageContext } from './ImageContext';
+import { useToast } from '../../../components/notifications';
+import { useImageContext } from '../ImageContext';
 import GlobalStatus from './GlobalStatus';
+import { useDataProvider } from '../../../components/dataProvider';
 
 const StorageBreadcrumbs = () => {
-    const context = useGlobalContext();
+    const dataProvider = useDataProvider();
     const imageContext = useImageContext();
     const { toast } = useToast();
     const [ refHierarchy, setRefHierarchy ] = React.useState([]);
@@ -44,7 +44,7 @@ const StorageBreadcrumbs = () => {
     }, [])
 
     const handleOnClickSaveName = React.useCallback(() => {
-        context.dataProvider.renameFolder(imageContext.storageRef.fullPath, `${imageContext.storageRef.parent.fullPath}/${newFolderName}`)
+        dataProvider.renameFolder(imageContext.storageRef.fullPath, `${imageContext.storageRef.parent.fullPath}/${newFolderName}`)
         .then(() => {
             toast.success("Le répertoire a été renommé.");
         })
@@ -54,7 +54,7 @@ const StorageBreadcrumbs = () => {
         }).finally(() => {
             setEditMode(editMode => !editMode);
         })
-    }, [context, imageContext.storageRef, newFolderName, toast])
+    }, [dataProvider, imageContext.storageRef, newFolderName, toast])
 
     const onFolderNameChange = React.useCallback((event) => {
         setNewFolderName(event.target.value);

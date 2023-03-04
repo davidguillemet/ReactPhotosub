@@ -1,71 +1,12 @@
-module.exports = function(config) {
-    // Authentication required for the following routes:
-    config.app.use("/admin/destinations", config.isAuthenticated, config.isAuthorized(["admin"]));
-
-    const fetchAllDestinations = (req, res, next) => {
-        // See https://firebase.google.com/docs/storage/web/download-files
-        res.locals.errorMessage = "Failed to load destinations.";
-        return config.pool().select("d.*")
-            .from({d: "destinations_with_regionpath"})
-            .orderBy("d.date", "desc")
-            .then((destinations) => {
-                destinations.forEach((destination) => {
-                    // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
-                    destination.cover = config.convertPathToUrl(destination.path + "/" + destination.cover);
-                });
-                res.json(destinations);
-            }).catch(next);
-    };
-
-    config.app.route("/admin/destinations")
-        // Create a new destination (admin task)
-        .post(async function(req, res, next) {
-            const newDestination = req.body;
-            res.locals.errorMessage = `Failed to insert destination ${newDestination.title}/${newDestination.path}.`;
-            return config.pool("destinations")
-                .returning("id")
-                .insert(newDestination)
-                .then(() => {
-                    return fetchAllDestinations(req, res, next);
-                })
-                .catch(next);
-        })
-        // Update the specified destination
-        .put(async function(req, res, next) {
-            const destination = req.body;
-            res.locals.errorMessage = `Failed to update destination ${destination.title}/${destination.path}.`;
-            return config.pool("destinations")
-                .where("id", destination.id)
-                .update({
-                    "title": destination.title,
-                    "date": destination.date,
-                    "location": destination.location,
-                    "path": destination.path,
-                    "cover": destination.cover,
-                    "macro": destination.macro,
-                    "wide": destination.wide,
-                }).then(() => {
-                    return fetchAllDestinations(req, res, next);
-                }).catch(next);
-        })
-        // Delete a destination (admin task)
-        .delete(function(req, res, next) {
-            const removedDestination = req.body;
-            res.locals.errorMessage = `Failed to delete destination ${removedDestination.id}.`;
-            return config.pool("destinations")
-                .where("id", removedDestination.id)
-                .del()
-                .then(() => {
-                    res.status(200).send({id: removedDestination.id}).end();
-                }).catch(next);
-        });
+module.exports = function(app, config) {
+    const fetchAllDestinations = require("../utils/fetchDestinations")(config);
 
     // Get all Destinations
     // including the region identifier through an inner join with the locations table
     // ==> select destinations.*, locations.region from destinations inner join locations on destinations.location = locations.id
-    config.app.route("/destinations").get(fetchAllDestinations);
+    app.route("/destinations").get(fetchAllDestinations);
 
-    config.app.route("/destinations/related")
+    app.route("/destinations/related")
         .get(function(req, res, next) {
             const region = req.query.region;
             // If only one region, region parameter is not an array...

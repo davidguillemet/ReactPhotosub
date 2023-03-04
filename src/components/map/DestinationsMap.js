@@ -5,7 +5,7 @@ import {isIOS} from 'react-device-detect';
 import { useRouteMatch } from "react-router-dom";
 import {unstable_batchedUpdates} from 'react-dom';
 import { GoogleMap, InfoWindow, MarkerClusterer, useJsApiLoader } from '@react-google-maps/api';
-import { useGlobalContext } from '../globalContext';
+import { useQueryContext } from '../queryContext';
 import { formatDate, getThumbnailSrc } from '../../utils';
 import { DestinationsPath } from '../../navigation/routes';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
@@ -367,8 +367,8 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
 
 const DestinationsMapWithLocationLoader = ({destinations, isFullScreen = false, onClose}) => {
 
-    const context = useGlobalContext();
-    const { data: locations } = useReactQuery(context.useFetchLocations);
+    const queryContext = useQueryContext();
+    const { data: locations } = useReactQuery(queryContext.useFetchLocations);
 
     return <DestinationsMapUi
                 destinations={destinations}

@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import DestinationLink from '../destinationLink';
-import { useGlobalContext } from '../globalContext';
+import { useQueryContext } from '../queryContext';
 import { formatDateShort } from '../../utils';
 import { useReactQuery } from '../reactQuery';
 
@@ -21,9 +21,9 @@ const DestinationLinkContent = ({destination}) => {
 
 const ImageDestinationLink = ({image}) => {
 
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
     const [year, title] = image.path.split('/');
-    const { data: destination } = useReactQuery(context.useFetchDestinationDesc, [year, title]);
+    const { data: destination } = useReactQuery(queryContext.useFetchDestinationDesc, [year, title]);
 
     return (
         <DestinationLink destination={destination} >

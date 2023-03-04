@@ -1,7 +1,7 @@
 import { Chip } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-const { useImageContext } = require("./ImageContext")
+const { useImageContext } = require("../ImageContext")
 
 const GlobalStatus = () => {
     const imageContext = useImageContext();

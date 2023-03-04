@@ -16,9 +16,9 @@ function getDestinationPath(req) {
     return `${req.params.year}/${req.params.title}`;
 }
 
-module.exports = function(config) {
+module.exports = function(app, config) {
     // Get minimal destination info to get the desc (title, date, cover, location)
-    config.app.route("/destination/:year/:title/desc")
+    app.route("/destination/:year/:title/desc")
         .get(function(req, res, next) {
             res.locals.errorMessage = `Failed to load description for destination '${getDestinationPath(req)}'`;
             return config.pool()
@@ -40,7 +40,7 @@ module.exports = function(config) {
         });
 
     // Get a specific destination head from identifier, including region path
-    config.app.route("/destination/:year/:title/head")
+    app.route("/destination/:year/:title/head")
         .get(function(req, res, next) {
             res.locals.errorMessage = `Failed to load information for destination '${getDestinationPath(req)}'`;
             return config.pool().raw(
@@ -74,7 +74,7 @@ module.exports = function(config) {
         });
 
     // Get images for a specific destination from identifier
-    config.app.route("/destination/:year/:title/images")
+    app.route("/destination/:year/:title/images")
         .get(function(req, res, next) {
             res.locals.errorMessage = `Failed to load images for destination '${getDestinationPath(req)}'`;
             return config.pool({i: "images"})

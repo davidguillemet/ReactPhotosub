@@ -8,13 +8,13 @@ import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import { Typography } from '@mui/material';
-import { useGlobalContext } from '../globalContext';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import ErrorIcon from '@mui/icons-material/Error';
 import { useToast } from '../notifications';
 
 import './fileUploadStyles.css';
 import { useFirebaseContext } from '../firebase';
+import { useDataProvider } from '../dataProvider';
 
 const STEP_UPLOAD = "step::upload";
 const STEP_THUMBNAILS = "step::thumbnail";
@@ -92,7 +92,7 @@ const ThumbnailError = ({error}) => {
 const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUploaded}, ref) => {
 
     const firebaseContext = useFirebaseContext();
-    const context = useGlobalContext();
+    const dataProvider = useDataProvider();
     const [step, setStep] = useState({ name: STEP_UPLOAD, error: null });
     const [progress, setProgress] = useState(0);
     const uploadTaskRef = useRef(null);
@@ -114,7 +114,8 @@ const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUpload
         // launch firebase upload
         // see documentation at https://firebase.google.com/docs/storage/web/upload-files
         const parentPath = storageRef.fullPath;
-        const fileStorageRef = firebaseContext.storageRef(parentPath + "/" + file.name);
+        const fileFullPath = `${parentPath}/${file.name}`;
+        const fileStorageRef = firebaseContext.storageRef(fileFullPath);
         uploadTaskRef.current = firebaseContext.upload(fileStorageRef, file, { contentType: file.type });
 
         uploadTaskRef.current.on('state_changed', 
@@ -133,7 +134,7 @@ const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUpload
                 // Handle successful uploads on complete
                 // For instance, get the download URL: https://firebasestorage.googleapis.com/...
                 setStep({ name: STEP_THUMBNAILS, error: null });
-                context.dataProvider.waitForThumbnails(file.name).then((fileProps) => {
+                dataProvider.createInteriorThumbnails(fileFullPath).then((fileProps) => {
                     const { sizeRatio } = fileProps;
                     onFileUploaded(file.name, sizeRatio);
                     onCancel(file);
@@ -148,7 +149,7 @@ const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUpload
                 uploadTaskRef.current.cancel();
             }
         }
-    }, [file, storageRef, onCancel, onFileUploaded, context.dataProvider, firebaseContext]);
+    }, [file, storageRef, onCancel, onFileUploaded, dataProvider, firebaseContext]);
 
     return (
         <Box ref={ref}>

@@ -14,7 +14,7 @@ import Gallery from '../../components/gallery';
 import { PageSubTitle, PageHeader, Paragraph } from '../../template/pageTypography';
 import LazyDialog from '../../dialogs/LazyDialog';
 import { withLoading, buildLoadingState } from '../../components/hoc';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 import DestinationLink from '../../components/destinationLink';
 import { VerticalSpacing } from '../../template/spacing';
 import { DestinationsMap } from '../../components/map';
@@ -185,8 +185,8 @@ const DestinationDetails = ({destination}) => {
 
 const DestinationDisplay = withLoading(({destination, year, title}) => {
 
-    const context = useGlobalContext();
-    const { data: images } = useReactQuery(context.useFetchDestinationImages, [year, title]);
+    const queryContext = useQueryContext();
+    const { data: images } = useReactQuery(queryContext.useFetchDestinationImages, [year, title]);
     const [ galleryIsReady, setGalleryIsReady ] = useState(false);
     const destinations = useMemo(() => [destination], [destination]);
 
@@ -236,9 +236,9 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
 }, [buildLoadingState("destination", [null, undefined])]);
 
 const Destination = () => {
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
     const { year, title } = useParams();
-    const { data, isError, error} = useReactQuery(context.useFetchDestinationHeader, [year, title]);
+    const { data, isError, error} = useReactQuery(queryContext.useFetchDestinationHeader, [year, title]);
     if (isError === true && error.response && error.response.status === 404) {
         return <NotFound />
     } else {

@@ -11,7 +11,8 @@ import { useImageContext } from './ImageContext';
 import { useUploadContext } from './UploadContext';
 import { getThumbnailsFromImageName } from '../../utils';
 import { useFirebaseContext } from '../../components/firebase';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
+import { useDataProvider } from '../../components/dataProvider';
 
 const ThumbIssueStatus = ({itemName, error}) => {
 
@@ -51,7 +52,8 @@ const ThumbIssueStatus = ({itemName, error}) => {
 
 const DatabaseIssueStatus = ({itemName, error, type}) => {
 
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
+    const dataProvider = useDataProvider();
     const imageContext = useImageContext();
     const uploadContext = useUploadContext();
 
@@ -74,13 +76,13 @@ const DatabaseIssueStatus = ({itemName, error, type}) => {
     const removeImageFromDatabase = React.useCallback(() => {
         setStatus(STATUS_PENDING);
         const itemFullPath = `${imageContext.storageRef.fullPath}/${itemName}`;
-        context.dataProvider.removeImageFromDatabase(itemFullPath)
+        dataProvider.removeImageFromDatabase(itemFullPath)
             .finally(() => {
-                context.clearDestinationImages( // Throttling
+                queryContext.clearDestinationImages( // Throttling
                     imageContext.destinationProps.year,
                     imageContext.destinationProps.title);
             })
-    }, [context, imageContext.destinationProps, imageContext.storageRef, itemName]);
+    }, [queryContext, dataProvider, imageContext.destinationProps, imageContext.storageRef, itemName]);
 
     const errorCaption =
         type === ITEM_TYPE_FILE ?

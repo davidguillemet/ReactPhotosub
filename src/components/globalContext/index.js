@@ -1,1 +1,0 @@
-export { default, GlobalContext, useGlobalContext } from './GlobalContext';

@@ -43,8 +43,8 @@ function fromHtmlToText(html) {
         .replace(headCloseRegexp, "\r\n"); // Replace </h3>, </p> and <br> by line breaks
 }
 
-module.exports = function(config) {
-    config.app.route("/message")
+module.exports = function(app, config) {
+    app.route("/message")
         // Get a new message
         .post(
             reCaptcha, // Validate reCaptcha token

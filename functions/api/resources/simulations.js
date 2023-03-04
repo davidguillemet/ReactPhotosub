@@ -1,8 +1,8 @@
-module.exports = function(config) {
+module.exports = function(app, config) {
     // Authentication required for the following routes:
-    config.app.use("/simulations", config.isAuthenticated);
+    app.use("/simulations", config.isAuthenticated);
 
-    config.app.route("/simulations")
+    app.route("/simulations")
         // get all simulations
         .get(async function(req, res, next) {
             res.locals.errorMessage = "Le chargement des compositions a échoué.";

@@ -2,7 +2,7 @@ import { useMemo, useCallback } from 'react';
 import { useHistory } from "react-router-dom";
 import Box from '@mui/material/Box';
 import lazyComponent from '../../components/lazyComponent';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 import LabeledDivider from '../../components/labeledDivider/labeledDivider';
 import ImageSlider from '../../components/imageSlider';
 import { VerticalSpacing } from '../../template/spacing';
@@ -91,8 +91,8 @@ const RelatedDestinationsSlider = withLoading(({destination, related, imageHeigh
 const imageHeight = isMobile ? 120 : 150;
 
 const RelatedDestinationsSliderController = lazyComponent(({destination}) => {
-    const context = useGlobalContext();
-    const { data } = useReactQuery(context.useFetchRelatedDestinations, [destination.regionpath, destination.macro, destination.wide]);
+    const queryContext = useQueryContext();
+    const { data } = useReactQuery(queryContext.useFetchRelatedDestinations, [destination.regionpath, destination.macro, destination.wide]);
     return <RelatedDestinationsSlider destination={destination} related={data} imageHeight={imageHeight}/>
 }, { height: imageHeight });
 

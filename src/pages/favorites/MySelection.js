@@ -7,7 +7,7 @@ import UndoIcon from '@mui/icons-material/Undo';
 import { useAuthContext } from '../../components/authentication';
 import Gallery from '../../components/gallery';
 import { PageTitle, PageSubTitle } from '../../template/pageTypography';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 import { withLoading, buildLoadingState, withUser } from '../../components/hoc';
 import { useFavorites } from '../../components/favorites';
 
@@ -25,10 +25,10 @@ const MySelectionContent = withLoading(({images}) => {
 
 const MySelection = withUser(() => {
 
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
     const authContext = useAuthContext();
     const favoritesContext = useFavorites();
-    const { data: images } = context.useFetchFavorites(authContext.user && authContext.user.uid, true)
+    const { data: images } = queryContext.useFetchFavorites(authContext.user && authContext.user.uid, true)
     const [ removedFavorites, setRemovedFavorites ] = useState([]);
     const [ undoRunning, setUndoRunning ] = useState(false);
     const undoTimerRef = useRef(null);

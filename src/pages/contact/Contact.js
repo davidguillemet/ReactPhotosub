@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Prompt } from "react-router-dom";
 import { PageTitle } from '../../template/pageTypography';
-import { useGlobalContext } from '../../components/globalContext';
 import { useAuthContext } from '../../components/authentication';
 
 import Form, {
@@ -10,10 +9,11 @@ import Form, {
     FIELD_TYPE_SWITCH,
     FIELD_TYPE_CAPTCHA
 } from '../../components/form';
+import { useDataProvider } from '../../components/dataProvider';
 
 const Contact = () => {
 
-    const context = useGlobalContext();
+    const dataProvider = useDataProvider();
     const authContext = useAuthContext();
     const [initialValues, setInitialValues] = useState(null);
 
@@ -84,8 +84,8 @@ const Contact = () => {
 
     const onSubmitMessageForm = useCallback((values) => {
         setIsDirty(false);
-        return context.dataProvider.sendMessage(values);
-    }, [context]);
+        return dataProvider.sendMessage(values);
+    }, [dataProvider]);
 
     const onChange = useCallback(() => {
         setIsDirty(true);

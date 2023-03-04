@@ -1,12 +1,14 @@
 import React from 'react';
-import { useGlobalContext } from '../../components/globalContext';
+import { useDataProvider } from '../../components/dataProvider';
+import { useQueryContext } from '../../components/queryContext';
 import { useImageContext } from './ImageContext';
 
 const UploadContext = React.createContext(null);
 
 export const UploadContextProvider = ({children}) => {
 
-    const context = useGlobalContext();
+    const dataProvider = useDataProvider();
+    const queryContext = useQueryContext();
     const imageContext = useImageContext();
     const [ filesToUpload, setFilesToUpload ] = React.useState([]);
     const dbProcessing = React.useRef(new Set());
@@ -28,26 +30,26 @@ export const UploadContextProvider = ({children}) => {
     // IF the user changed the current folder after having started an upload
     const _launchDbProcessing = React.useCallback((fileFullPath) => {
         dbProcessing.current.add(fileFullPath);
-        return context.dataProvider.insertImageInDatabase(fileFullPath)
+        return dataProvider.insertImageInDatabase(fileFullPath)
             .then(() => {
-                context.clearDestinationImages( // Throttling
+                queryContext.clearDestinationImages( // Throttling
                     imageContext.destinationProps.year,
                     imageContext.destinationProps.title);
             }).catch((e) => {
                 // TODO
             });
-    }, [context, imageContext.destinationProps]);
+    }, [dataProvider, queryContext, imageContext.destinationProps]);
 
     const _launchThumbProcessing = React.useCallback((fileFullPath) => {
         thumbProcessing.current.add(fileFullPath);
-        return context.dataProvider.refreshThumbnails(fileFullPath)
+        return dataProvider.refreshThumbnails(fileFullPath)
             .then(() => {
                 const refresh = imageContext.refreshThumbnails; // Throttling
                 refresh();
             }).catch((e) => {
                 // TODO
             });
-    }, [context, imageContext.refreshThumbnails]);
+    }, [dataProvider, imageContext.refreshThumbnails]);
 
     const onFileUploaded = React.useCallback((fileFullPath) => {
         const fetchItems = imageContext.fetchItems;

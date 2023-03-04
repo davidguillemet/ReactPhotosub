@@ -12,7 +12,7 @@ import { PageTitle, Paragraph } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import { DestinationsMap } from '../../components/map';
 import RegionFilter from './RegionFilter';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 import DestinationGallery from './DestinationGallery';
 import { buildLoadingState, withLoading } from '../../components/hoc';
 import { isMobile } from 'react-device-detect';
@@ -179,10 +179,10 @@ const DestinationsComponent = withLoading(({destinations}) => {
 const DestinationsController = () => {
 
     const t = useTranslation("pages.destinations");
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
 
     // Fetch Destinations & Regions
-    const { data: destinations } = useReactQuery(context.useFetchDestinations);
+    const { data: destinations } = useReactQuery(queryContext.useFetchDestinations);
 
     return (
         <React.Fragment>

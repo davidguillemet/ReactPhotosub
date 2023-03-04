@@ -1,9 +1,9 @@
-module.exports = function(config) {
+module.exports = function(app, config) {
     // Authentication required for the following routes:
-    config.app.use("/favorites", config.isAuthenticated);
+    app.use("/favorites", config.isAuthenticated);
 
     // Get, Add and Delete favorites
-    config.app.route("/favorites")
+    app.route("/favorites")
         // Get all favorites for the current user
         // Since the react query cache is hydrated from userdata response
         // It would be used only in case /userdata failed...

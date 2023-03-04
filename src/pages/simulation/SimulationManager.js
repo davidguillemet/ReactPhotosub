@@ -11,7 +11,7 @@ import Simulation from './Simulation';
 import LazyDialog from '../../dialogs/LazyDialog';
 
 import { useAuthContext } from '../../components/authentication';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 import { useReactQuery } from '../../components/reactQuery';
 
 import simulationsReducer from './actions/SimulationReducer';
@@ -52,14 +52,14 @@ const initialState = {
 
 const SimulationManager = withLoading(({user, fetchedSimulations}) => {
 
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
 
     const { state, dispatch } = React.useContext(SimulationContext);
     const { setOverlay: setActionIsRunning } = useOverlay();
 
-    const addMutation = context.useAddSimulation();
-    const updateSimulation = context.useUpdateSimulation();
-    const removeSimulation = context.useRemoveSimulation();
+    const addMutation = queryContext.useAddSimulation();
+    const updateSimulation = queryContext.useUpdateSimulation();
+    const removeSimulation = queryContext.useRemoveSimulation();
     const simulationInitUser = useRef(undefined);
     const { toast } = useToast();
 
@@ -185,8 +185,8 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
 
 const SimulationManagerConnected = ({user}) => {
 
-    const context = useGlobalContext();
-    const { data: fetchedSimulations } = useReactQuery(context.useFetchSimulations, [user.uid]);
+    const queryContext = useQueryContext();
+    const { data: fetchedSimulations } = useReactQuery(queryContext.useFetchSimulations, [user.uid]);
     return <SimulationManager user={user} fetchedSimulations={fetchedSimulations} />
 }
 

@@ -10,7 +10,7 @@ import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useReactQuery } from '../../components/reactQuery';
-import { useGlobalContext } from '../../components/globalContext';
+import { useQueryContext } from '../../components/queryContext';
 import { buildLoadingState, withLoading } from '../../components/hoc';
 import { ConfirmDialog } from '../../dialogs';
 import EditLocationDialog from './EditLocationDialog';
@@ -112,8 +112,8 @@ function buildTreeView(hierarchy, parentId, locations, onEdit, onDelete) {
 const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
     const t = useTranslation("pages.admin.regions");
     const { toast } = useToast();
-    const context = useGlobalContext();
-    const deleteLocationMutation = context.useDeleteLocation();
+    const queryContext = useQueryContext();
+    const deleteLocationMutation = queryContext.useDeleteLocation();
 
     const [locationToDelete, setLocationToDelete] = React.useState(null);
     const [locationToEdit, setLocationToEdit] = React.useState(null);
@@ -210,9 +210,9 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
 }, [buildLoadingState("regions", [undefined]), buildLoadingState("locations", [undefined])]);
 
 const Regions = () => {
-    const context = useGlobalContext();
+    const queryContext = useQueryContext();
     const [regionHierarchy, regionMap] = useRegions();
-    const { data: locations } = useReactQuery(context.useFetchLocations);
+    const { data: locations } = useReactQuery(queryContext.useFetchLocations);
     return <RegionsTreeView regions={regionHierarchy} regionMap={regionMap} locations={locations} />
 }
 
