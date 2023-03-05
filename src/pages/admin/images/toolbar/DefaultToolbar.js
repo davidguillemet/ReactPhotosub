@@ -4,11 +4,11 @@ import Box from '@mui/material/Box'
 import { Stack } from '@mui/material';
 import { IconButton } from '@mui/material';
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
-import FileUploadSelection from '../FileUploadSelection';
+import FileUploadSelection from '../upload/FileUploadSelection';
 import StorageBreadcrumbs from './BreadCrumbs';
 import FolderFormDialog from '../FolderFormDialog';
 import { useImageContext } from '../ImageContext';
-import { useUploadContext } from '../UploadContext';
+import { useUploadContext } from '../upload/UploadContext';
 
 const DefaultToolbar = () => {
     const uploadContext = useUploadContext();

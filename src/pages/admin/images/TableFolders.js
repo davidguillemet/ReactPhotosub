@@ -2,14 +2,18 @@ import React from 'react';
 import { useImageContext } from './ImageContext';
 import StorageFolderRow from './StorageFolderRow';
 
-const TableFolders = ({folders}) => {
+const TableFolders = () => {
 
     const imageContext = useImageContext();
+
+    if (imageContext.rows.folders === null) {
+        return null;
+    }
 
     return (
         <React.Fragment>
         {
-            folders.map((folder) => {
+            imageContext.rows.folders.map((folder) => {
                 const isItemSelected = imageContext.isSelected(folder);
                 return <StorageFolderRow
                             key={folder.name}

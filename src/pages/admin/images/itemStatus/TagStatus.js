@@ -4,14 +4,16 @@ import {
     STATUS_UNKNOWN,
     STATUS_PENDING,
     STATUS_NOT_AVAILABLE,
-    STATUS_NOT_READY,
     STATUS_SUCCESS,
     STATUS_ERROR
 } from './StorageItemStatus';
-import { useUploadContext } from '../UploadContext';
+import { useUploadContext } from '../upload/UploadContext';
+import { useImageContext } from '../ImageContext';
 
-const TagStatus = ({row, imagesFromDb, onSetStatus}) => {
+const TagStatus = ({row, onSetStatus}) => {
     const uploadContext = useUploadContext();
+    const imageContext = useImageContext();
+
     const [ status, setStatus ] = React.useState({
         status: STATUS_UNKNOWN,
         message: ""
@@ -21,29 +23,28 @@ const TagStatus = ({row, imagesFromDb, onSetStatus}) => {
 
         let newMessage = null;
         let newStatus = null;
-        let imageFromDb = null;
-        
+
         if (!row.name.endsWith(".jpg")) {
             // Not an image from a destination
             newStatus = STATUS_NOT_AVAILABLE;
-        } else if (imagesFromDb === null) {
-            // The parent folder is not a destination
-            newStatus = STATUS_NOT_AVAILABLE;
-        } else if (imagesFromDb === undefined) {
-            // Images are loading
-            newStatus = STATUS_NOT_READY;
-        } else if ((imageFromDb = imagesFromDb.find(image => image.name === row.name)) !== undefined) {
-            // The current image is in database, check tags
-            if (imageFromDb.tags === true) {
-                newStatus = STATUS_SUCCESS;
-            } else {
-                newStatus = STATUS_ERROR;
-                newMessage = "L'image n'a pas de tags...";
-            }
         } else {
-            // The current image is not in database
-            // DatabaseStatus will display the status message
-            newStatus = STATUS_NOT_AVAILABLE;
+            const imageFromDb = imageContext.getImageFromDatabase(row.name);
+            if (imageFromDb === null) {
+                // The parent folder is not a destination
+                newStatus = STATUS_NOT_AVAILABLE;
+            } else if (imageFromDb !== undefined) {
+                // The current image is in database, check tags
+                if (imageFromDb.tags === true) {
+                    newStatus = STATUS_SUCCESS;
+                } else {
+                    newStatus = STATUS_ERROR;
+                    newMessage = "L'image n'a pas de tags...";
+                }
+            } else {
+                // The current image is not in database
+                // DatabaseStatus will display the status message
+                newStatus = STATUS_NOT_AVAILABLE;
+            }
         }
 
         if (uploadContext.isDbProcessing(row.fullPath)) {
@@ -58,7 +59,7 @@ const TagStatus = ({row, imagesFromDb, onSetStatus}) => {
             message: newMessage
         });
 
-    }, [uploadContext, row, imagesFromDb, onSetStatus]);
+    }, [uploadContext, imageContext, row, onSetStatus]);
 
     return <StorageItemStatus {...status} />;
 }

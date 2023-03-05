@@ -7,7 +7,8 @@ import {
     STATUS_ERROR
 } from './StorageItemStatus';
 import { _thumbnailSpecs } from 'utils';
-import { useUploadContext } from '../UploadContext';
+import { useUploadContext } from '../upload/UploadContext';
+import { useImageContext } from '../ImageContext';
 
 const allThumbsCreated = (ref, thumbs, statusInfo) => {
     const itemFullName = ref.name; // "filename.jpg"
@@ -29,8 +30,10 @@ const allThumbsCreated = (ref, thumbs, statusInfo) => {
     return (statusInfo.missing === undefined);
 }
 
-const ThumbnailStatus = ({row, thumbs, onSetStatus}) => {
+const ThumbnailStatus = ({row, onSetStatus}) => {
     const uploadContext = useUploadContext();
+    const imageContext = useImageContext();
+
     const [ status, setStatus ] = React.useState({
         status: STATUS_PENDING,
         message: ""
@@ -53,7 +56,7 @@ const ThumbnailStatus = ({row, thumbs, onSetStatus}) => {
         if (!row.name.endsWith(".jpg")) {
             // Not an image from a destination
             status = STATUS_NOT_AVAILABLE;
-        } else if (allThumbsCreated(row, thumbs, statusInfo)) {
+        } else if (allThumbsCreated(row, imageContext.thumbs, statusInfo)) {
             // All thumbnails exist -> OK
             status = STATUS_SUCCESS;
         } else {
@@ -84,7 +87,7 @@ const ThumbnailStatus = ({row, thumbs, onSetStatus}) => {
             status,
             message
         });
-    }, [uploadContext, row, thumbs, onSetStatus]);
+    }, [uploadContext, imageContext.thumbs, row, onSetStatus]);
 
     return (
         <StorageItemStatus

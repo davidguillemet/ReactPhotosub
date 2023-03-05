@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDataProvider } from 'components/dataProvider';
 import { useQueryContext } from 'components/queryContext';
-import { useImageContext } from './ImageContext';
+import { useImageContext } from '../ImageContext';
 
 const UploadContext = React.createContext(null);
 
@@ -29,6 +29,9 @@ export const UploadContextProvider = ({children}) => {
     // TODO : Don't use destinationProps here since it might have changed since beginning of upload
     // IF the user changed the current folder after having started an upload
     const _launchDbProcessing = React.useCallback((fileFullPath) => {
+        if (imageContext.destinationProps.year === null || imageContext.destinationProps.title === null) {
+            return Promise.resolve();
+        }
         dbProcessing.current.add(fileFullPath);
         return dataProvider.insertImageInDatabase(fileFullPath)
             .then(() => {
@@ -42,14 +45,17 @@ export const UploadContextProvider = ({children}) => {
 
     const _launchThumbProcessing = React.useCallback((fileFullPath) => {
         thumbProcessing.current.add(fileFullPath);
-        return dataProvider.refreshThumbnails(fileFullPath)
-            .then(() => {
+        const thumbPromise =
+            imageContext.isDestinationFolder ?
+            dataProvider.refreshThumbnails(fileFullPath) :
+            dataProvider.createInteriorThumbnails(fileFullPath);
+        return thumbPromise.then(() => {
                 const refresh = imageContext.refreshThumbnails; // Throttling
                 refresh();
             }).catch((e) => {
                 // TODO
             });
-    }, [dataProvider, imageContext.refreshThumbnails]);
+    }, [dataProvider, imageContext.isDestinationFolder, imageContext.refreshThumbnails]);
 
     const onFileUploaded = React.useCallback((fileFullPath) => {
         const fetchItems = imageContext.fetchItems;

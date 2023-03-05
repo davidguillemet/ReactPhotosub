@@ -46,11 +46,13 @@ const ActionToolbar = () => {
         if (isImageFile(itemFullPath)) {
             const deleteItems = firebaseContext.deleteItems;
             promises.push(deleteItems(getThumbnailsFromImageName(itemFullPath)));
-            promises.push(dataProvider.removeImageFromDatabase(itemFullPath));
+            if (imageContext.isDestinationFolder) {
+                promises.push(dataProvider.removeImageFromDatabase(itemFullPath));
+            }
         }
         return Promise.all(promises);
 
-    }, [dataProvider, firebaseContext.deleteItems]);
+    }, [dataProvider, firebaseContext.deleteItems, imageContext.isDestinationFolder]);
 
     const onDeleteItems = React.useCallback(() => {
         setProcessing(true);
@@ -64,13 +66,13 @@ const ActionToolbar = () => {
                 const fetchItems = imageContext.fetchItems
                 const refreshThumbnails = imageContext.refreshThumbnails;
                 unstable_batchedUpdates(() => {
-                    fetchItems();
                     if (hasImage) {
                         refreshThumbnails();
                         queryContext.clearDestinationImages( // Throttling
                             imageContext.destinationProps.year,
                             imageContext.destinationProps.title);
                     }
+                    fetchItems();
                 })
             })
             .catch((e) => {

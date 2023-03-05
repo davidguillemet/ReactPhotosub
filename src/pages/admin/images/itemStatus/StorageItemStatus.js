@@ -13,7 +13,7 @@ export const STATUS_ERROR = "error";
 
 export function getItemConsolidatedStatus() {
     const statusArray = Array.from(arguments);
-    if (statusArray.every(status => status === STATUS_SUCCESS)) {
+    if (statusArray.every(status => status === STATUS_SUCCESS || status === STATUS_NOT_AVAILABLE)) {
         return "success";
     } else if (statusArray.some(status => status === STATUS_ERROR)) {
         return "error";

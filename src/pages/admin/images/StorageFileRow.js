@@ -10,11 +10,7 @@ import { getItemConsolidatedStatus } from './itemStatus/StorageItemStatus';
 import TagStatus from './itemStatus/TagStatus';
 import { useImageContext } from './ImageContext';
 
-const StorageFileRow = ({
-    row,
-    selected,
-    thumbs,
-    imagesFromDb}) => {
+const StorageFileRow = ({row, selected}) => {
 
     const imageContext = useImageContext();
 
@@ -50,13 +46,13 @@ const StorageFileRow = ({
                 <Chip color={itemStatus} icon={<InsertPhotoIcon />} label={row.name} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
             </TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
-                <ThumbnailStatus row={row} thumbs={thumbs} onSetStatus={setThumbStatus} />
+                <ThumbnailStatus row={row} onSetStatus={setThumbStatus} />
             </TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
-                <DatabaseStatus row={row} imagesFromDb={imagesFromDb} onSetStatus={setDbStatus} />
+                <DatabaseStatus row={row} onSetStatus={setDbStatus} />
             </TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
-                <TagStatus row={row} imagesFromDb={imagesFromDb} onSetStatus={setTagStatus} />
+                <TagStatus row={row} onSetStatus={setTagStatus} />
             </TableCell>
         </TableRow>
     )

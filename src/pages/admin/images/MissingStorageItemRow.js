@@ -8,7 +8,7 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { STATUS_ERROR, STATUS_NOT_AVAILABLE, STATUS_PENDING, StorageItemStatus } from './itemStatus/StorageItemStatus';
 import { useImageContext } from './ImageContext';
-import { useUploadContext } from './UploadContext';
+import { useUploadContext } from './upload/UploadContext';
 import { getThumbnailsFromImageName } from 'utils';
 import { useFirebaseContext } from 'components/firebase';
 import { useQueryContext } from 'components/queryContext';
@@ -17,6 +17,7 @@ import { useDataProvider } from 'components/dataProvider';
 const ThumbIssueStatus = ({itemName, error}) => {
 
     const imageContext = useImageContext();
+    const uploadContext = useUploadContext();
     const firebaseContext = useFirebaseContext();
 
     const [ status, setStatus ] = React.useState(error === true ? STATUS_ERROR : STATUS_NOT_AVAILABLE);
@@ -25,8 +26,13 @@ const ThumbIssueStatus = ({itemName, error}) => {
         setStatus(error === true ? STATUS_ERROR : STATUS_NOT_AVAILABLE);
     }, [error])
 
+    const fixMissingFile = React.useCallback(() => {
+        const onClickUpload = uploadContext.onClickUpload;
+        onClickUpload();
+    }, [uploadContext.onClickUpload]);
+
     const fixDeleteThumbnails = React.useCallback(() => {
-        const itemFullPath = `${imageContext.storageRef.fullPath}/${itemName}`;
+        const itemFullPath = `${imageContext.bucketPath}/${itemName}`;
         const thumbnails = getThumbnailsFromImageName(itemFullPath);
         const deleteItems = firebaseContext.deleteItems;
         setStatus(STATUS_PENDING);
@@ -35,17 +41,24 @@ const ThumbIssueStatus = ({itemName, error}) => {
                 const refreshThumbnails = imageContext.refreshThumbnails;
                 refreshThumbnails();
             })
-    }, [imageContext.storageRef, imageContext.refreshThumbnails, firebaseContext.deleteItems, itemName]);
+    }, [imageContext.bucketPath, imageContext.refreshThumbnails, firebaseContext.deleteItems, itemName]);
 
     return (
         <StorageItemStatus
             status={status}
             message={"Des vignettes existent pour cette image qui n'existe pas dans Storage."}
-            remediation={[{
-                onFix: fixDeleteThumbnails,
-                fixCaption: "Supprimer les vignettes",
-                fixIcon: DeleteOutlineIcon
-            }]}
+            remediation={[
+                {
+                    onFix: fixMissingFile,
+                    fixCaption: "Rechercher et transférer le fichier manquant",
+                    fixIcon: SearchOutlinedIcon
+                },
+                {
+                    onFix: fixDeleteThumbnails,
+                    fixCaption: "Supprimer les vignettes",
+                    fixIcon: DeleteOutlineIcon
+                }
+            ]}
         />
     )
 }
@@ -75,14 +88,14 @@ const DatabaseIssueStatus = ({itemName, error, type}) => {
 
     const removeImageFromDatabase = React.useCallback(() => {
         setStatus(STATUS_PENDING);
-        const itemFullPath = `${imageContext.storageRef.fullPath}/${itemName}`;
+        const itemFullPath = `${imageContext.bucketPath}/${itemName}`;
         dataProvider.removeImageFromDatabase(itemFullPath)
             .finally(() => {
                 queryContext.clearDestinationImages( // Throttling
                     imageContext.destinationProps.year,
                     imageContext.destinationProps.title);
             })
-    }, [queryContext, dataProvider, imageContext.destinationProps, imageContext.storageRef, itemName]);
+    }, [queryContext, dataProvider, imageContext.destinationProps, imageContext.bucketPath, itemName]);
 
     const errorCaption =
         type === ITEM_TYPE_FILE ?

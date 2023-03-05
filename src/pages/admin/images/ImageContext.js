@@ -3,6 +3,10 @@ import {unstable_batchedUpdates} from 'react-dom';
 import { buildLoadingState, withLoading } from 'components/hoc';
 import { throttle } from 'utils';
 import { useFirebaseContext } from 'components/firebase';
+import { useQueryContext } from 'components/queryContext';
+import { getImageNameFromThumbnail } from 'utils';
+
+const ImageContext = React.createContext(null);
 
 const isNotThumbsFolder = (item) => item.name !== "thumbs";
 const isThumbsFolder = (item) => item.name === "thumbs";
@@ -46,20 +50,55 @@ const getMissingStorageFolders = (currentPath, foldersFromStorage, foldersFromDb
     return Array.from(new Set(subFoldersFromDb)).map(f => { return { name: f}});
 }
 
-const ImageContext = React.createContext(null);
+const useDestinationImages = ({year, title}) => {
+    const queryContext = useQueryContext();
+    const { data } = queryContext.useFetchDestinationImages(year, title);
+    if (year !== null && title !== null) {
+        return data;
+    } else {
+        return null;
+    }
+}
+
+const getMissingImagesVersusDatabase = (files, imagesFromDatabase) => {
+    if (imagesFromDatabase !== null) {
+        // Check if all images in DB are in Storage
+        const missingStorageImages = imagesFromDatabase.filter(dbImage => {
+            return files.findIndex(storageImage => storageImage.name === dbImage.name) === -1;
+        });
+        return missingStorageImages.map(image => image.name);
+    } else {
+        return null;
+    }
+};
+
+const getMissingImagesVersusThumbnails = (files, thumbs) => {
+    const imagesFromThumbs = new Set();
+    // browse thumbs and check the original image exists
+    for (const thumbName of thumbs) {
+        // Thumb is like "DSC_4991_l.jpg", "DSC_4991_m.jpg", "DSC_4991_s.jpg", "DSC_4991_xs.jpg"
+        const imageName = getImageNameFromThumbnail(thumbName);
+        imagesFromThumbs.add(imageName);
+    }
+    const missingImages = Array.from(imagesFromThumbs).filter(imageName => {
+        return files.findIndex(storageImage => storageImage.name === imageName) === -1;
+    });
+    return missingImages;
+};
 
 export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const firebaseContext = useFirebaseContext();
     const [ rows, setRows ] = React.useState({});
     const [ selectedItems, setSelectedItems ] = React.useState(new Set());
     const [ storageRef, setStorageRef ] = React.useState(firebaseContext.storageRef());
-    const [ thumbs, setThumbs ] = React.useState(new Set());
+    const [ thumbs, setThumbs ] = React.useState(null);
     const [ errors, setErrors ] = React.useState(new Set());
     const thumbsRef = React.useRef(null);
     const destinationProps = React.useRef({
         year: null,
         title: null
     });
+    const dbImages = useDestinationImages(destinationProps.current);
 
     const setThumbsFromRef = React.useCallback(() => {
         if (thumbsRef.current !== null && thumbsRef.current !== undefined) {
@@ -96,8 +135,11 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
                 setRows({
                     folders: foldersFromStorage,
                     files: result.items.filter((item) => !firebaseContext.isGhostFile(item)),
-                    missingFolders: missingFolders
+                    missingFolders: missingFolders,
+                    missingFilesFromThumbs: undefined, // Thumbs exist but the storage item is missing
+                    missingFilesFromDb: undefined // Database entry exists while the storage item is missing
                 })
+                setErrors(new Set());
                 return setThumbsFromRef();
             })
     }, [storageRef, firebaseContext, foldersFromDb, setThumbsFromRef]);
@@ -105,6 +147,23 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     React.useEffect(() => {
         fetchItems();
     }, [fetchItems])
+
+    React.useEffect(() => {
+        if (dbImages === undefined || rows.files === undefined || thumbs === null) {
+            return;
+        }
+
+        const missingImagesFromThumbs = new Set(getMissingImagesVersusThumbnails(rows.files, thumbs));
+        const missingImagesFromDatabase = new Set(getMissingImagesVersusDatabase(rows.files, dbImages));
+
+        setRows(prevRows => {
+            return {
+                ...prevRows,
+                missingFilesFromThumbs: missingImagesFromThumbs,
+                missingFilesFromDb: missingImagesFromDatabase,
+            }
+        });
+    }, [thumbs, dbImages, rows.files])
 
     const setItemStatus = React.useCallback((fullPath, status) => {
         setErrors(prevErrors => {
@@ -121,8 +180,8 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const onSetBucketPath = React.useCallback((bucketPath) => {
         unstable_batchedUpdates(() => {
             destinationProps.current = extractDestinationProps(bucketPath);
-            setErrors(new Set());
             setRows({});
+            setThumbs(null);
             setStorageRef(firebaseContext.storageRef(bucketPath));
             setSelectedItems(new Set());
         });
@@ -173,17 +232,40 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         })
     }, [storageRef, firebaseContext, fetchItems]);
 
+    const getImageFromDatabase = React.useCallback((imageName) => {
+        if (dbImages === null) {
+            return null;
+        }
+        if (dbImages === undefined) {
+            // Should not happen
+            throw new Error("Oups...la liste des images en base n'est pas définie...");
+        }
+        return dbImages.find(image => image.name === imageName);
+
+    }, [dbImages]);
+
     const totalRows = (rows.files ? rows.files.length : 0) + (rows.folders ? rows.folders.length : 0);
+    const isReady =
+        dbImages !== undefined &&
+        thumbs !== null &&
+        rows.missingFolders !== undefined &&
+        rows.files !== undefined &&
+        rows.folders !== undefined &&
+        rows.missingFilesFromThumbs !== undefined &&
+        rows.missingFilesFromDb !== undefined;
 
     const imageContext = {
-        ready: rows.missingFolders !== undefined && rows.files !== undefined && rows.folders !== undefined,
+        ready: isReady,
         rows,
         storageRef,
+        bucketPath: storageRef.fullPath,
         onSetBucketPath,
         destinationProps: destinationProps.current,
+        isDestinationFolder: destinationProps.current.year !== null && destinationProps.current.title,
         thumbs,
         fetchItems,
         setItemStatus,
+        getImageFromDatabase,
         errors,
         onRowClick: handleOnRowClick,
         onSelectAll: onSelectAllClick,
@@ -194,7 +276,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         manySelected: selectedItems.size > 0 && selectedItems.size < totalRows,
         selectionCount: selectedItems.size,
         selection: () => Array.from(selectedItems),
-        refreshThumbnails: throttle(refreshThumbnails, 1000, false /* leading */, true /* trailing */),
+        refreshThumbnails: throttle(refreshThumbnails, 1000, true /* leading */, true /* trailing */),
         createFolder: createFolder
     };
 

@@ -1,17 +1,20 @@
 import React from 'react';
 import MissingStorageItemRow from "./MissingStorageItemRow";
 import { ITEM_TYPE_FOLDER } from './common';
+import { useImageContext } from './ImageContext';
 
-const MissingStorageFolders = ({dbFolders}) => {
+const MissingStorageFolders = () => {
 
-    if (dbFolders === null || dbFolders ===  undefined) {
+    const imageContext = useImageContext();
+
+    if (imageContext.rows.missingFolders === null) {
         return null;
     }
 
     return (
         <React.Fragment>
         {
-            dbFolders.map((folder, index) => {
+            imageContext.rows.missingFolders.map((folder, index) => {
                 return <MissingStorageItemRow
                             key={folder.name}
                             itemName={folder.name}
