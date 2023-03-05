@@ -38,7 +38,7 @@ const TagStatus = ({row, onSetStatus}) => {
                     newStatus = STATUS_SUCCESS;
                 } else {
                     newStatus = STATUS_ERROR;
-                    newMessage = "L'image n'a pas de tags...";
+                    newMessage = "L'image n'a pas de tags en base...";
                 }
             } else {
                 // The current image is not in database

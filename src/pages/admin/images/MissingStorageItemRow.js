@@ -140,6 +140,11 @@ const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = fa
     React.useEffect(() => {
         const setContextItemStatus = imageContext.setItemStatus;
         setContextItemStatus(itemName, "error");
+        // Cleanup function to decrease error count in case the removed item has an issue
+        return function clearStatus() {
+            const setContextItemStatus = imageContext.setItemStatus;
+            setContextItemStatus(itemName, "success");
+        }
     }, [itemName, imageContext.setItemStatus]);
 
     return (

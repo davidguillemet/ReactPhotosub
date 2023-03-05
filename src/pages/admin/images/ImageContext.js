@@ -136,8 +136,8 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
                     folders: foldersFromStorage,
                     files: result.items.filter((item) => !firebaseContext.isGhostFile(item)),
                     missingFolders: missingFolders,
-                    missingFilesFromThumbs: undefined, // Thumbs exist but the storage item is missing
-                    missingFilesFromDb: undefined // Database entry exists while the storage item is missing
+                    missingFilesFromThumbs: undefined, // Set: Thumbs exist but the storage item is missing
+                    missingFilesFromDb: undefined // Set: Database entry exists while the storage item is missing
                 })
                 setErrors(new Set());
                 return setThumbsFromRef();
@@ -255,19 +255,38 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         rows.missingFilesFromDb !== undefined;
 
     const imageContext = {
+        // true is all information has been collected
         ready: isReady,
+
+        // all items from current path including thumbnails
         rows,
+        thumbs,
+
+        // Information about the current path
         storageRef,
         bucketPath: storageRef.fullPath,
         onSetBucketPath,
+
+        // Information about the possible current destination
         destinationProps: destinationProps.current,
         isDestinationFolder: destinationProps.current.year !== null && destinationProps.current.title,
-        thumbs,
+
+        // Methods to refresh items/thumbnails
         fetchItems,
-        setItemStatus,
+        refreshThumbnails: throttle(refreshThumbnails, 1000, true /* leading */, true /* trailing */),
+        createFolder: createFolder,
+
+        // Get the database image row from the full path if it exists
         getImageFromDatabase,
+
+        // Error handling
+        setItemStatus,
         errors,
+
+        // Click handlers (in practice = open a folder)
         onRowClick: handleOnRowClick,
+
+        // Selection management
         onSelectAll: onSelectAllClick,
         onUnselectAll: onUnselectAllClick,
         onRowSelected: onRowSelected,
@@ -276,8 +295,6 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         manySelected: selectedItems.size > 0 && selectedItems.size < totalRows,
         selectionCount: selectedItems.size,
         selection: () => Array.from(selectedItems),
-        refreshThumbnails: throttle(refreshThumbnails, 1000, true /* leading */, true /* trailing */),
-        createFolder: createFolder
     };
 
     return (
