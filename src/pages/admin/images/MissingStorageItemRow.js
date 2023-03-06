@@ -9,7 +9,6 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { STATUS_ERROR, STATUS_NOT_AVAILABLE, STATUS_PENDING, StorageItemStatus } from './itemStatus/StorageItemStatus';
 import { useImageContext } from './ImageContext';
 import { useUploadContext } from './upload/UploadContext';
-import { useQueryContext } from 'components/queryContext';
 import { useDataProvider } from 'components/dataProvider';
 
 const ThumbIssueStatus = ({itemName, error}) => {
@@ -66,7 +65,6 @@ const ThumbIssueStatus = ({itemName, error}) => {
 
 const DatabaseIssueStatus = ({itemName, error, type}) => {
 
-    const queryContext = useQueryContext();
     const dataProvider = useDataProvider();
     const imageContext = useImageContext();
     const uploadContext = useUploadContext();
@@ -92,11 +90,15 @@ const DatabaseIssueStatus = ({itemName, error, type}) => {
         const itemFullPath = `${imageContext.bucketPath}/${itemName}`;
         dataProvider.removeImageFromDatabase(itemFullPath)
             .finally(() => {
-                queryContext.clearDestinationImages( // Throttling
-                    imageContext.destinationProps.year,
-                    imageContext.destinationProps.title);
+                const clearImageQueries = imageContext.clearImageQueries;
+                clearImageQueries();
             })
-    }, [queryContext, dataProvider, imageContext.destinationProps, imageContext.bucketPath, itemName]);
+    }, [
+        dataProvider,
+        imageContext.clearImageQueries,
+        imageContext.bucketPath,
+        itemName
+    ]);
 
     const errorCaption =
         type === ITEM_TYPE_FILE ?

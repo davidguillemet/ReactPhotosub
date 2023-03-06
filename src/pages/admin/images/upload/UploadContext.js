@@ -1,6 +1,5 @@
 import React from 'react';
 import { useDataProvider } from 'components/dataProvider';
-import { useQueryContext } from 'components/queryContext';
 import { useImageContext } from '../ImageContext';
 
 const UploadContext = React.createContext(null);
@@ -8,7 +7,6 @@ const UploadContext = React.createContext(null);
 export const UploadContextProvider = ({children}) => {
 
     const dataProvider = useDataProvider();
-    const queryContext = useQueryContext();
     const imageContext = useImageContext();
     const [ filesToUpload, setFilesToUpload ] = React.useState([]);
     const dbProcessing = React.useRef(new Set());
@@ -35,13 +33,16 @@ export const UploadContextProvider = ({children}) => {
         dbProcessing.current.add(fileFullPath);
         return dataProvider.insertImageInDatabase(fileFullPath)
             .then(() => {
-                queryContext.clearDestinationImages( // Throttling
-                    imageContext.destinationProps.year,
-                    imageContext.destinationProps.title);
+                const clearImageQueries = imageContext.clearImageQueries;
+                clearImageQueries();
             }).catch((e) => {
                 // TODO
             });
-    }, [dataProvider, queryContext, imageContext.destinationProps]);
+    }, [
+        dataProvider,
+        imageContext.clearImageQueries,
+        imageContext.destinationProps
+    ]);
 
     const _launchThumbProcessing = React.useCallback((fileFullPath) => {
         thumbProcessing.current.add(fileFullPath);

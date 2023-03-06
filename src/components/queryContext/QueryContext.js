@@ -113,7 +113,13 @@ export const QueryContextProvider = ({children}) => {
         useRemoveFavorite: () => useMutation((path) => dataProvider.removeFavorite(path)),
         setFavoritesData: (uid, favorites) => queryClient.setQueryData(['favorites', uid], favorites),
 
-        useFetchImageFolders: () => useQuery(['imageFolders'], () => dataProvider.getImageFolders())
+        useFetchImageFolders: () => useQuery(['imageFolders'], () => dataProvider.getImageFolders()),
+        clearImageFolders: throttle(
+            () => {
+                queryClient.invalidateQueries({ queryKey: ['imageFolders'] })
+            },
+            1000, false /* leading */, true /* Trailing */
+        )
     });
 
     return (

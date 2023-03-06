@@ -10,7 +10,6 @@ import { HorizontalSpacing } from 'template/spacing';
 import { ConfirmDialog } from 'dialogs';
 import { useTranslation } from 'utils';
 import { useToast } from 'components/notifications';
-import { useQueryContext } from 'components/queryContext';
 import { useOverlay } from 'components/loading';
 import { useDataProvider } from 'components/dataProvider';
 
@@ -20,7 +19,6 @@ const isImageFile = (fullPath) => {
 
 const ActionToolbar = () => {
     const dataProvider = useDataProvider();
-    const queryContext = useQueryContext();
     const imageContext = useImageContext();
     const { toast } = useToast();
     const t = useTranslation("pages.admin.images");
@@ -68,12 +66,11 @@ const ActionToolbar = () => {
             .then(() => {
                 const fetchItems = imageContext.fetchItems
                 const refreshThumbnails = imageContext.refreshThumbnails;
+                const clearImageQueries = imageContext.clearImageQueries;
                 unstable_batchedUpdates(() => {
                     if (hasImage) {
                         refreshThumbnails();
-                        queryContext.clearDestinationImages( // Throttling
-                            imageContext.destinationProps.year,
-                            imageContext.destinationProps.title);
+                        clearImageQueries();
                     }
                     fetchItems();
                 })
@@ -87,13 +84,12 @@ const ActionToolbar = () => {
                 setProcessing(false);
             });
     }, [
-        queryContext,
         toast,
         setProcessing,
-        imageContext.destinationProps,
         imageContext.selection,
         imageContext.fetchItems,
         imageContext.refreshThumbnails,
+        imageContext.clearImageQueries,
         imageContext.onUnselectAll,
         deleteItem
     ]);

@@ -88,6 +88,7 @@ const getMissingImagesVersusThumbnails = (files, thumbs) => {
 
 export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const firebaseContext = useFirebaseContext();
+    const queryContext = useQueryContext();
     const [ rows, setRows ] = React.useState({});
     const [ selectedItems, setSelectedItems ] = React.useState(new Set());
     const [ storageRef, setStorageRef ] = React.useState(firebaseContext.storageRef());
@@ -251,6 +252,12 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         return deleteItems(thumbnailsToRemove); // Return a Promise
     }, [thumbs, firebaseContext.deleteItems]);
 
+    const clearImageQueries = React.useCallback(() => {
+        // Throttling
+        queryContext.clearDestinationImages(destinationProps.current.year, destinationProps.current.title);
+        queryContext.clearImageFolders(); 
+    }, [queryContext]);
+
     const totalRows = (rows.files ? rows.files.length : 0) + (rows.folders ? rows.folders.length : 0);
     const isReady =
         dbImages !== undefined &&
@@ -283,6 +290,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         createFolder,
         deleteThumbnails,
         refreshThumbnails: throttle(refreshThumbnails, 1000, true /* leading */, true /* trailing */),
+        clearImageQueries,
 
         // Get the database image row from the full path if it exists
         getImageFromDatabase,
