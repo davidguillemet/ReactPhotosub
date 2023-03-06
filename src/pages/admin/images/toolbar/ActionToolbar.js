@@ -9,10 +9,8 @@ import { Paragraph } from 'template/pageTypography';
 import { HorizontalSpacing } from 'template/spacing';
 import { ConfirmDialog } from 'dialogs';
 import { useTranslation } from 'utils';
-import { useFirebaseContext } from 'components/firebase';
 import { useToast } from 'components/notifications';
 import { useQueryContext } from 'components/queryContext';
-import { getThumbnailsFromImageName } from 'utils';
 import { useOverlay } from 'components/loading';
 import { useDataProvider } from 'components/dataProvider';
 
@@ -24,7 +22,6 @@ const ActionToolbar = () => {
     const dataProvider = useDataProvider();
     const queryContext = useQueryContext();
     const imageContext = useImageContext();
-    const firebaseContext = useFirebaseContext();
     const { toast } = useToast();
     const t = useTranslation("pages.admin.images");
 
@@ -40,27 +37,33 @@ const ActionToolbar = () => {
         setConfirmDeleteOen(true);
     }, []);
 
-    const deleteItem = React.useCallback((itemFullPath) => {
+    const deleteItem = React.useCallback((itemName) => {
         const promises = [];
+        const itemFullPath = `${imageContext.bucketPath}/${itemName}`;
         promises.push(dataProvider.removeStorageItem(itemFullPath));
-        if (isImageFile(itemFullPath)) {
-            const deleteItems = firebaseContext.deleteItems;
-            promises.push(deleteItems(getThumbnailsFromImageName(itemFullPath)));
+        if (isImageFile(itemName)) {
+            const deleteThumbnails = imageContext.deleteThumbnails;
+            promises.push(deleteThumbnails(itemFullPath));
             if (imageContext.isDestinationFolder) {
                 promises.push(dataProvider.removeImageFromDatabase(itemFullPath));
             }
         }
         return Promise.all(promises);
 
-    }, [dataProvider, firebaseContext.deleteItems, imageContext.isDestinationFolder]);
+    }, [
+        dataProvider,
+        imageContext.bucketPath,
+        imageContext.isDestinationFolder,
+        imageContext.deleteThumbnails
+    ]);
 
     const onDeleteItems = React.useCallback(() => {
         setProcessing(true);
         const getSelection = imageContext.selection;
         const selection = getSelection();
         // Delete storage items
-        const hasImage = selection.some(itemFullPath => isImageFile(itemFullPath));
-        const promises = selection.map(itemFullPath => deleteItem(itemFullPath));
+        const hasImage = selection.some(itemName => isImageFile(itemName));
+        const promises = selection.map(itemName => deleteItem(itemName));
         return Promise.all(promises)
             .then(() => {
                 const fetchItems = imageContext.fetchItems

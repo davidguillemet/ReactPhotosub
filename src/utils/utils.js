@@ -125,10 +125,17 @@ export function getImageNameFromThumbnail(thumbName) {
 }
 
 export function getThumbnailsFromImageName(itemFullName) {
-    return _thumbnailSpecs.map(thumbSpec => _getThumbSrc(itemFullName, thumbSpec.fileSuffix));
+    return _thumbnailSpecs.map(thumbSpec => _getThumbSrc(itemFullName, thumbSpec));
 }
 
-function _getThumbSrc(encodedSrc, fileSuffix) {
+export function getFileNameFromFullPath(fullPath) {
+    // fullPath is like "xx/yy/zz/fileName.ext"
+    const lastSlashPosition = fullPath.lastIndexOf("/");
+    const fileName = fullPath.substring(lastSlashPosition + 1);
+    return fileName;
+}
+
+function _getThumbSrc(encodedSrc, thumbSpec) {
     // src is like https://<host>/folder1/folder2/DSC_2264.jpg
     // we want a new path to the thumbnail as https://<host>/folder1/folder2/thumbs/DSC_2264_[s|m|l|xs].jpg
     const src = decodeURIComponent(encodedSrc);
@@ -138,17 +145,17 @@ function _getThumbSrc(encodedSrc, fileSuffix) {
     const fileDir = src.substring(0, lastSlashPosition);
     const fileName = src.substring(lastSlashPosition + 1, dotPosition);
     const fileExtension = src.substring(dotPosition);
-    return `${fileDir}/${_thumbsSubFolder}/${fileName}_${fileSuffix}${fileExtension}`;
+    return `${fileDir}/${_thumbsSubFolder}/${fileName}_${thumbSpec.fileSuffix}${fileExtension}`;
 }
 
 function getThumbnailFromSpec(image, sizeSpec) {
     if (typeof image === 'string') {
         // image is a string and not an image object
         // -> just return the converted url
-        return _getThumbSrc(image, sizeSpec.fileSuffix);
+        return _getThumbSrc(image, sizeSpec);
     }
     if (!image[sizeSpec.propertyName]) {
-        image[sizeSpec.propertyName] = _getThumbSrc(image.src, sizeSpec.fileSuffix)
+        image[sizeSpec.propertyName] = _getThumbSrc(image.src, sizeSpec);
     }
     return image[sizeSpec.propertyName];
 }

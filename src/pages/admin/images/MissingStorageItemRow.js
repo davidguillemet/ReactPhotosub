@@ -9,8 +9,6 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { STATUS_ERROR, STATUS_NOT_AVAILABLE, STATUS_PENDING, StorageItemStatus } from './itemStatus/StorageItemStatus';
 import { useImageContext } from './ImageContext';
 import { useUploadContext } from './upload/UploadContext';
-import { getThumbnailsFromImageName } from 'utils';
-import { useFirebaseContext } from 'components/firebase';
 import { useQueryContext } from 'components/queryContext';
 import { useDataProvider } from 'components/dataProvider';
 
@@ -18,7 +16,6 @@ const ThumbIssueStatus = ({itemName, error}) => {
 
     const imageContext = useImageContext();
     const uploadContext = useUploadContext();
-    const firebaseContext = useFirebaseContext();
 
     const [ status, setStatus ] = React.useState(error === true ? STATUS_ERROR : STATUS_NOT_AVAILABLE);
 
@@ -32,16 +29,20 @@ const ThumbIssueStatus = ({itemName, error}) => {
     }, [uploadContext.onClickUpload]);
 
     const fixDeleteThumbnails = React.useCallback(() => {
-        const itemFullPath = `${imageContext.bucketPath}/${itemName}`;
-        const thumbnails = getThumbnailsFromImageName(itemFullPath);
-        const deleteItems = firebaseContext.deleteItems;
         setStatus(STATUS_PENDING);
-        deleteItems(thumbnails)
+        const itemFullPath = `${imageContext.bucketPath}/${itemName}`;
+        const deleteThumbnails = imageContext.deleteThumbnails;
+        deleteThumbnails(itemFullPath)
             .finally(() => {
                 const refreshThumbnails = imageContext.refreshThumbnails;
                 refreshThumbnails();
             })
-    }, [imageContext.bucketPath, imageContext.refreshThumbnails, firebaseContext.deleteItems, itemName]);
+    }, [
+        imageContext.bucketPath,
+        imageContext.deleteThumbnails,
+        imageContext.refreshThumbnails,
+        itemName
+    ]);
 
     return (
         <StorageItemStatus

@@ -1,7 +1,7 @@
 import React from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import { buildLoadingState, withLoading } from 'components/hoc';
-import { throttle } from 'utils';
+import { getFileNameFromFullPath, getThumbnailsFromImageName, throttle } from 'utils';
 import { useFirebaseContext } from 'components/firebase';
 import { useQueryContext } from 'components/queryContext';
 import { getImageNameFromThumbnail } from 'utils';
@@ -191,8 +191,8 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         let selection;
         if (event.target.checked) {
             selection = new Set([
-                ...rows.files.map(item => item.fullPath),
-                ...rows.folders.map(prefix => prefix.fullPath)
+                ...rows.files.map(item => item.name),
+                ...rows.folders.map(prefix => prefix.name)
             ])
         } else {
             selection = new Set();
@@ -213,16 +213,16 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         setSelectedItems(prevSelection => {
             const newSelection = new Set(prevSelection);
             if (selected === true) {
-                newSelection.add(row.fullPath);
+                newSelection.add(row.name);
             } else {
-                newSelection.delete(row.fullPath);
+                newSelection.delete(row.name);
             }
             return newSelection;
         })
     }, []);
 
     const isSelected = React.useCallback((row) => {
-        return selectedItems.has(row.fullPath);
+        return selectedItems.has(row.name);
     }, [selectedItems]);
 
     const createFolder = React.useCallback((folderName) => {
@@ -243,6 +243,13 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         return dbImages.find(image => image.name === imageName);
 
     }, [dbImages]);
+
+    const deleteThumbnails = React.useCallback((itemFullPath) => {
+        const itemThumbnails = getThumbnailsFromImageName(itemFullPath);
+        const thumbnailsToRemove = itemThumbnails.filter(thumbFullPath => thumbs.has(getFileNameFromFullPath(thumbFullPath)));
+        const deleteItems = firebaseContext.deleteItems;
+        return deleteItems(thumbnailsToRemove); // Return a Promise
+    }, [thumbs, firebaseContext.deleteItems]);
 
     const totalRows = (rows.files ? rows.files.length : 0) + (rows.folders ? rows.folders.length : 0);
     const isReady =
@@ -271,10 +278,11 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         destinationProps: destinationProps.current,
         isDestinationFolder: destinationProps.current.year !== null && destinationProps.current.title,
 
-        // Methods to refresh items/thumbnails
+        // Methods to manage items/thumbnails
         fetchItems,
+        createFolder,
+        deleteThumbnails,
         refreshThumbnails: throttle(refreshThumbnails, 1000, true /* leading */, true /* trailing */),
-        createFolder: createFolder,
 
         // Get the database image row from the full path if it exists
         getImageFromDatabase,
