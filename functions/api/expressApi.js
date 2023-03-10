@@ -7,8 +7,10 @@ const express = require("express");
 const compression = require("compression");
 const {convertPathToUrl, bucket, logger} = require("../utils/firebase");
 const {isAuthenticated, isAuthorized} = require("./middlewares/authenticated");
-const appCheckVerification = require("./middlewares/appCheckVerification");
 const cors = require("cors");
+// -> issue when keeping a browser tab idle, from instagram
+//    in-app browser or with Prerender.io
+// const appCheckVerification = require("./middlewares/appCheckVerification");
 
 // Get a connection pool for postgreSql
 const {pool} = require("../utils/pool-postgresql");
@@ -30,7 +32,7 @@ mainapi.use(express.urlencoded({extended: true}));
 mainapi.use(cors({origin: true}));
 
 // Firebase appCheck verification
-mainapi.use(appCheckVerification);
+// mainapi.use(appCheckVerification);
 
 const configuration = {
     pool,

@@ -36,8 +36,8 @@ const createAxiosInstance = (firebaseContext) => {
             const token = await currentUSer.getIdToken(true);
             config.headers.Authorization = `Bearer ${token}`;
         }
-        const appCheckToken = await firebaseContext.getAppCheckToken();
-        config.headers['X-Firebase-AppCheck'] = appCheckToken;
+        // const appCheckToken = await firebaseContext.getAppCheckToken();
+        // config.headers['X-Firebase-AppCheck'] = appCheckToken;
         return config;
     });
 

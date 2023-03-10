@@ -1,6 +1,6 @@
 import React from 'react';
 import { initializeApp } from "firebase/app"
-import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "firebase/app-check";
+// import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "firebase/app-check";
 import { getAuth, connectAuthEmulator, signOut } from "firebase/auth";
 import {
     getStorage,
@@ -15,7 +15,7 @@ import {
 import { getAnalytics, logEvent } from "firebase/analytics";
 
 import FirebaseContext from './firebaseContext';
-import { useToast } from '../notifications';
+// import { useToast } from '../notifications';
 
 const firebaseApp = initializeApp({
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -28,14 +28,14 @@ const firebaseApp = initializeApp({
 });
 
 const isDev = process.env.NODE_ENV === "development";
-if (isDev) {
-    window.self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-}
+// if (isDev) {
+//     window.self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+// }
 
-const appCheck = initializeAppCheck(firebaseApp, {
-    provider: new ReCaptchaV3Provider(process.env.REACT_APP_RECAPTCHA_V3_SITE_KEY),
-    isTokenAutoRefreshEnabled: true
-});
+// const appCheck = initializeAppCheck(firebaseApp, {
+//     provider: new ReCaptchaV3Provider(process.env.REACT_APP_RECAPTCHA_V3_SITE_KEY),
+//     isTokenAutoRefreshEnabled: true
+// });
 
 const firebaseAuth = getAuth(firebaseApp);
 const firebaseStorage = getStorage(firebaseApp);
@@ -50,21 +50,21 @@ if (isDev) {
 const _ghostFileName = ".ghost";
 
 const FirebaseProvider = ({children}) => {
-    const { toast } = useToast();
+    // const { toast } = useToast();
 
-    const getAppCheckToken = React.useCallback(async () => {
-        try {
-            const appCheckTokenResponse = await getToken(appCheck, /* forceRefresh= */ false);
-            return appCheckTokenResponse.token;
-        } catch (err) {
-            toast.error(err.message);
-            return "";
-        }
-    }, [toast]);
+    // const getAppCheckToken = React.useCallback(async () => {
+    //     try {
+    //         const appCheckTokenResponse = await getToken(appCheck, /* forceRefresh= */ false);
+    //         return appCheckTokenResponse.token;
+    //     } catch (err) {
+    //         toast.error(err.message);
+    //         return "";
+    //     }
+    // }, [toast]);
 
     const firebaseContext = React.useRef({
         auth: firebaseAuth,
-        getAppCheckToken,
+        //getAppCheckToken,
         signOut: () => {
             signOut(firebaseAuth);
         },
