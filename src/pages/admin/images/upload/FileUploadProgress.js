@@ -23,17 +23,28 @@ const FileUploadProgress = ({file, start}) => {
     const [progress, setProgress] = React.useState(0);
     const [error, setError] = React.useState(null);
     const uploadTaskRef = React.useRef(null);
+    const unsubscribe = React.useRef(null);
 
     React.useEffect(() => {
-        let unsubscribe = null;
-        if (start === true)
+        return () => {
+            if (unsubscribe.current !== null) {
+                unsubscribe.current();
+            }
+            if (uploadTaskRef.current !== null && uploadTaskRef.current.snapshot.state === 'running') {
+                uploadTaskRef.current.cancel();
+            }
+        }
+    }, []);
+
+    React.useEffect(() => {
+        if (start === true && uploadTaskRef.current === null)
         {
             // launch firebase upload
             // see documentation at https://firebase.google.com/docs/storage/web/upload-files
             const fileStorageRef = firebaseContext.storageRef(file.fullPath);
             uploadTaskRef.current = firebaseContext.upload(fileStorageRef, file.nativeFile, { contentType: file.nativeFile.type });
 
-            unsubscribe = uploadTaskRef.current.on('state_changed', 
+            unsubscribe.current = uploadTaskRef.current.on('state_changed', 
                 (snapshot) => {
                     // Observe state change events such as progress, pause, and resume
                     // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -51,15 +62,6 @@ const FileUploadProgress = ({file, start}) => {
                     onFileUploaded(file.fullPath);
                 }
             );
-        }
-
-        return () => {
-            if (unsubscribe !== null) {
-                unsubscribe();
-            }
-            if (uploadTaskRef.current !== null && uploadTaskRef.current.snapshot.state === 'running') {
-                uploadTaskRef.current.cancel();
-            }
         }
     }, [file, start, firebaseContext, uploadContext.onFileUploaded]);
 

@@ -154,7 +154,6 @@ const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = fa
         <TableRow
             role="checkbox"
             tabIndex={-1}
-            key={itemName}
         >
             <TableCell padding="checkbox">
                 <Checkbox

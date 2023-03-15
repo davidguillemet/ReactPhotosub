@@ -31,7 +31,6 @@ const StorageFileRow = ({row, selected}) => {
             hover
             role="checkbox"
             tabIndex={-1}
-            key={row.name}
             selected={selected}
         >
             <TableCell padding="checkbox">
