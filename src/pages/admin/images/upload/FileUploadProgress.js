@@ -2,7 +2,6 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { useFirebaseContext } from 'components/firebase';
-import { useUploadContext } from './UploadContext';
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 20,
@@ -16,10 +15,9 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
 }));
 
-const FileUploadProgress = ({file, start}) => {
+const FileUploadProgress = ({file, start, onFileUploaded}) => {
 
     const firebaseContext = useFirebaseContext();
-    const uploadContext = useUploadContext();
     const [progress, setProgress] = React.useState(0);
     const [error, setError] = React.useState(null);
     const uploadTaskRef = React.useRef(null);
@@ -58,12 +56,11 @@ const FileUploadProgress = ({file, start}) => {
                 () => {
                     // Handle successful uploads on complete
                     // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-                    const onFileUploaded = uploadContext.onFileUploaded;
                     onFileUploaded(file.fullPath);
                 }
             );
         }
-    }, [file, start, firebaseContext, uploadContext.onFileUploaded]);
+    }, [file, start, firebaseContext, onFileUploaded]);
 
     if (error) {
         return error.message
