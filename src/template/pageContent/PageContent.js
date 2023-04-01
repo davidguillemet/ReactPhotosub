@@ -24,13 +24,25 @@ const RouteComponent = ({route, subscribeDrawer}) => {
     }
 }
 
+const isImageLocation = (locationSearch) => {
+    return locationSearch.startsWith("?image=");
+}
+
 const PageContent = React.forwardRef(({onHistoryChanged, subscribeDrawer}, ref) => {
     const history = useHistory();
 
-    useEffect(() => history.listen(() => {
-        onHistoryChanged();
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-    }), [history, onHistoryChanged])
+    const previousLocationSearch = React.useRef("");
+
+    useEffect(() => {
+        history.listen((location, action) => {
+            onHistoryChanged();
+            if (!isImageLocation(location.search) && !isImageLocation(previousLocationSearch.current)) {
+                // Scroll to the top of the new page, unless we display an image in the expanded view (new location)
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+            }
+            previousLocationSearch.current = location.search;
+        });
+    }, [history, onHistoryChanged])
 
     return (
         <Container
