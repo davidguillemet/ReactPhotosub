@@ -123,10 +123,10 @@ const Navigation = lazyComponent(({destination}) => {
     return (
         <Grid container spacing={{ xs: 0.5, md: 1}} sx={{width: '100%'}}>
             <Grid item xs={6}>
-                <NavigationItem destination={destination.next} type="left" caption="Suivant"/>  
+                <NavigationItem destination={destination.prev} type="left" caption="Précédent"/>
             </Grid>
             <Grid item xs={6}>
-                <NavigationItem destination={destination.prev} type="right" caption="Précédent"/>
+                <NavigationItem destination={destination.next} type="right" caption="Suivant"/>
             </Grid>
         </Grid>
     )
