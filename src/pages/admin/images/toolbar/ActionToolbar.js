@@ -115,7 +115,7 @@ const ActionToolbar = () => {
                         <CloseIcon fontSize="small" sx={{color: theme => theme.palette.secondary.contrastText}}/>
                     </IconButton>
                     <HorizontalSpacing />
-                    <Paragraph sx={{color: theme => theme.palette.secondary.contrastText}}>{`${imageContext.selectionCount} item(s)`}</Paragraph>
+                    <Paragraph sx={{color: theme => theme.palette.secondary.contrastText}}>{`${imageContext.selectionCount} item(s) sélectionné(s)`}</Paragraph>
                     <HorizontalSpacing factor={4} />
                     <Button variant="contained" onClick={handleOnClickDelete}>{"Supprimer"}</Button>
                 </Stack>

@@ -94,6 +94,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const [ storageRef, setStorageRef ] = React.useState(firebaseContext.storageRef());
     const [ thumbs, setThumbs ] = React.useState(null);
     const [ errors, setErrors ] = React.useState(new Set());
+    const itemCount = React.useRef(0);
     const thumbsRef = React.useRef(null);
     const destinationProps = React.useRef({
         year: null,
@@ -133,9 +134,15 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
                 const foldersFromStorage = result.prefixes.filter(isNotThumbsFolder);
                 const missingFolders = getMissingStorageFolders(storageRef.fullPath, foldersFromStorage, foldersFromDb);
                 thumbsRef.current = result.prefixes.find(isThumbsFolder);
+                if (storageRef.parent === null) {
+                    // Sort in reverse order only for the first level (destination years)
+                    foldersFromStorage.sort((f1, f2) => f2.name.localeCompare(f1.name))
+                }
+                const filesFromStorage = result.items.filter((item) => !firebaseContext.isGhostFile(item));
+                itemCount.current = foldersFromStorage.length + filesFromStorage.length;
                 setRows({
                     folders: foldersFromStorage,
-                    files: result.items.filter((item) => !firebaseContext.isGhostFile(item)),
+                    files: filesFromStorage,
                     missingFolders: missingFolders,
                     missingFilesFromThumbs: undefined, // Set: Thumbs exist but the storage item is missing
                     missingFilesFromDb: undefined // Set: Database entry exists while the storage item is missing
@@ -275,6 +282,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         // all items from current path including thumbnails
         rows,
         thumbs,
+        itemCount: itemCount.current,
 
         // Information about the current path
         storageRef,

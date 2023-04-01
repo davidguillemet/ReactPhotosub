@@ -17,6 +17,7 @@ import TableFolders from './TableFolders';
 import TableFiles from './TableFiles';
 import TableToolbar from './toolbar/TableToolbar';
 import { CircularProgress } from '@mui/material';
+import { Paragraph } from 'template/pageTypography';
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -29,6 +30,7 @@ const Images = () => {
     const imageContext = useImageContext();
     return (
         <React.Fragment>
+        <Paragraph>{`${imageContext.itemCount} item(s) dans le répertoire Storage`}</Paragraph>
         <TableContainer component={Paper} sx={{display: 'flex', flexDirection: 'column'}}>
             <TableToolbar />
             <Table sx={{ width: "100%" }} size="medium">
