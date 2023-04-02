@@ -1,3 +1,5 @@
+const path = require("path");
+
 module.exports = function(app, config) {
     // Authentication required for the following routes:
     app.use("/uploadedInteriors", config.isAuthenticated);
@@ -53,11 +55,22 @@ module.exports = function(app, config) {
             const deleteData = req.body;
             const fileToDelete = deleteData.fileName;
             res.locals.errorMessage = "La suppression de l'image a échoué.";
-            return config.bucket.deleteFiles({
-                prefix: `userUpload/${res.locals.uid}/interiors/${fileToDelete}`,
+            const userFolder = `userUpload/${res.locals.uid}/interiors`;
+            const promises = [];
+            // Remove original file
+            promises.push(config.bucket.deleteFiles({
+                prefix: `${userFolder}/${fileToDelete}`,
                 delimiter: "/",
-            }).then((filesResponse) => {
-                res.status(200).send(`Successfully deleting image ${fileToDelete}.`).end();
-            }).catch(next);
+            }));
+            // Remove all thumbnails = prefix as file name without extension in thumbs folder
+            const filePathProps = path.parse(fileToDelete);
+            promises.push(config.bucket.deleteFiles({
+                prefix: `${userFolder}/thumbs/${filePathProps.name}`,
+                delimiter: "/",
+            }));
+            return Promise.all(promises)
+                .then((/* filesResponses */) => {
+                    res.status(200).send(`Successfully deleting image ${fileToDelete}.`).end();
+                }).catch(next);
         });
 };
