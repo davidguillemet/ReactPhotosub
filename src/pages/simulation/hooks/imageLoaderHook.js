@@ -95,10 +95,11 @@ const useImageLoader = (user, simulations, listType) => {
         }
     }, [userInteriorIsUsed, simulations, userInteriors, interiors]);
 
-    const addUploadedInterior = useCallback((fileSrc, sizeRatio) => {
+    const addUploadedInterior = useCallback((fileArray, sizeRatioArray) => {
         // Add the new uploaded image to the user interiors' array
+        const images = fileArray.map((fileSrc, index) => buildImage({src: fileSrc, sizeRatio: sizeRatioArray[index]}, true));
         queryClient.setQueryData(['userInteriors', user.uid], [
-            buildImage({src: fileSrc, sizeRatio: sizeRatio}, true),
+            ...images,
             ...allInteriors.filter(image => image.uploaded === true)
         ]);
     }, [buildImage, allInteriors, queryClient, user]);

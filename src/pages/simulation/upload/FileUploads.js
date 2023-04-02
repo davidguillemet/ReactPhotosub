@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
@@ -19,6 +20,7 @@ import FileUpload from 'components/upload/FileUpload';
 const STEP_UPLOAD = "step::upload";
 const STEP_THUMBNAILS = "step::thumbnail";
 const STEP_ERROR = "step::error";
+const STEP_SUCCESS = "step::success";
 
 const ThumbnailGeneration = () => {
     return (
@@ -27,8 +29,9 @@ const ThumbnailGeneration = () => {
             flexDirection: 'row',
             alignItems: 'center'
         }}>
+            <HorizontalSpacing factor={2} />
             <CircularProgress size={30} />
-            <HorizontalSpacing factor={1} />
+            <HorizontalSpacing factor={2} />
             <Typography
                 variant="caption"
                 style={{
@@ -66,6 +69,27 @@ const ThumbnailError = ({error}) => {
     );
 }
 
+const UploadSuccess = () => {
+    return (
+        <Box style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center'
+        }}>
+            <Typography
+                variant="caption"
+                style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: 200
+                }}>
+                Fichier chargé avec succès
+            </Typography>
+        </Box>
+    );
+}
+
 const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUploaded}, ref) => {
 
     const dataProvider = useDataProvider();
@@ -91,11 +115,12 @@ const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUpload
         dataProvider.createInteriorThumbnails(fileFullPath.current).then((fileProps) => {
             const { sizeRatio } = fileProps;
             onFileUploaded(file.name, sizeRatio);
-            onCancel(file);
+        }).then(() => {
+            setStep({ name: STEP_SUCCESS, error: null });
         }).catch(error => {
             setStep({ name: STEP_ERROR, error: error });
         });
-    }, [dataProvider, file, onCancel, onFileUploaded]);
+    }, [dataProvider, file, onFileUploaded]);
 
     return (
         <Box ref={ref}>
@@ -107,18 +132,26 @@ const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUpload
                     alignItems: 'center'
                 }} 
             >
-                <IconButton color="secondary" aria-label="menu" onClick={handleCancel} size="large">
-                    <CancelOutlinedIcon />
-                </IconButton>
+                {
+                    step.name === STEP_SUCCESS ?
+                    <IconButton color="secondary" aria-label="menu" onClick={null} size="large">
+                        <CheckCircleOutlineOutlinedIcon />
+                    </IconButton> :
+                    <IconButton color="secondary" aria-label="menu" onClick={handleCancel} size="large">
+                        <CancelOutlinedIcon />
+                    </IconButton>
+                }
                 <Typography style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</Typography>
                 <HorizontalSpacing factor={2} />
-                <Box sx={{display: "flex", flexDirection: "row", flexGrow: 1, justifyContent: "center"}}>
+                <Box sx={{display: "flex", flexDirection: "row", flexGrow: 1}}>
                 {
                     step.name === STEP_UPLOAD ?
                     <FileUpload file={file} fileFullPath={fileFullPath.current} start={true} onFileUploaded={onFileUploadCompleted} /> :
                     step.name === STEP_THUMBNAILS ?
                     <ThumbnailGeneration /> :
-                    <ThumbnailError error={step.error}/>
+                    step.name === STEP_ERROR ?
+                    <ThumbnailError error={step.error}/> :
+                    <UploadSuccess />
                 }
                 </Box>
                 <HorizontalSpacing factor={2} />
@@ -127,9 +160,10 @@ const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUpload
     );
 });
 
-const FileUploads = ({caption, uploadRef, onFileUploaded}) => {
+const FileUploads = ({caption, uploadRef, onFilesUploaded}) => {
 
-    const [uploadFiles, setUploadFiles] = useState([]);
+    const [filesToUpload, setFilesToUpload] = useState([]);
+    const uploadedFiles = React.useRef(new Map());
 
     const handleFileSelection = (event) => {
         const { target: { files } } = event;
@@ -140,14 +174,23 @@ const FileUploads = ({caption, uploadRef, onFileUploaded}) => {
         // Reset the input value to be able to upload the same file again
         // For example after having removed it
         event.target.value = "";
-        setUploadFiles(_files);
+        setFilesToUpload(_files);
     }
 
     const onCancel = useCallback((canceledFile) => {
-        setUploadFiles(prevFiles => {
+        setFilesToUpload(prevFiles => {
             return prevFiles.filter(file => file !== canceledFile);
         });
+        uploadedFiles.current.delete(canceledFile.name);
     }, []);
+
+    const onFileUploaded = useCallback((fileName, fileSizeRatio) => {
+        uploadedFiles.current.set(fileName, fileSizeRatio);
+        if (uploadedFiles.current.size === filesToUpload.length) {
+            setFilesToUpload([]);
+            onFilesUploaded(uploadedFiles.current);
+        }
+    }, [filesToUpload, onFilesUploaded]);
 
     return (
         <React.Fragment>
@@ -167,7 +210,7 @@ const FileUploads = ({caption, uploadRef, onFileUploaded}) => {
                     variant="contained"
                     component="span"
                     startIcon={<CloudUploadIcon />}
-                    disabled={uploadFiles.length > 0}
+                    disabled={filesToUpload.length > 0}
                 >
                     {caption}
                 </Button>
@@ -178,7 +221,7 @@ const FileUploads = ({caption, uploadRef, onFileUploaded}) => {
             }}>
                 <TransitionGroup component={null}>
                 {
-                    uploadFiles.map((file) => {
+                    filesToUpload.map((file) => {
                         const progressRef = React.createRef(null);
                         return (
                             <CSSTransition
