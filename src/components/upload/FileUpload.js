@@ -15,7 +15,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
 }));
 
-const FileUploadProgress = ({file, start, onFileUploaded}) => {
+const FileUpload = ({file, fileFullPath, start, onFileUploaded}) => {
 
     const firebaseContext = useFirebaseContext();
     const [progress, setProgress] = React.useState(0);
@@ -39,8 +39,8 @@ const FileUploadProgress = ({file, start, onFileUploaded}) => {
         {
             // launch firebase upload
             // see documentation at https://firebase.google.com/docs/storage/web/upload-files
-            const fileStorageRef = firebaseContext.storageRef(file.fullPath);
-            uploadTaskRef.current = firebaseContext.upload(fileStorageRef, file.nativeFile, { contentType: file.nativeFile.type });
+            const fileStorageRef = firebaseContext.storageRef(fileFullPath);
+            uploadTaskRef.current = firebaseContext.upload(fileStorageRef, file, { contentType: file.type });
 
             unsubscribe.current = uploadTaskRef.current.on('state_changed', 
                 (snapshot) => {
@@ -56,11 +56,11 @@ const FileUploadProgress = ({file, start, onFileUploaded}) => {
                 () => {
                     // Handle successful uploads on complete
                     // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-                    onFileUploaded(file.fullPath);
+                    onFileUploaded(fileFullPath);
                 }
             );
         }
-    }, [file, start, firebaseContext, onFileUploaded]);
+    }, [file, fileFullPath, start, firebaseContext, onFileUploaded]);
 
     if (error) {
         return error.message
@@ -70,4 +70,4 @@ const FileUploadProgress = ({file, start, onFileUploaded}) => {
     );
 }
 
-export default FileUploadProgress;
+export default FileUpload;

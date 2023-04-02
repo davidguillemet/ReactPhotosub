@@ -1,6 +1,6 @@
 import { TableRow, TableCell, Checkbox, Chip } from "@mui/material";
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
-import FileUploadProgress from './FileUploadProgress';
+import FileUpload from 'components/upload';
 import { useUploadContext } from "./UploadContext";
 
 const UploadStorageItemRow = ({file, start}) => {
@@ -28,7 +28,12 @@ const UploadStorageItemRow = ({file, start}) => {
                 <Chip icon={<InsertPhotoIcon />} label={file.name} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
             </TableCell>
             <TableCell colSpan={3} align="left" sx={{paddingTop: 0, paddingBottom: 0}} >
-                <FileUploadProgress file={file} start={start} onFileUploaded={uploadContext.onFileUploaded}/>
+                <FileUpload
+                    file={file.nativeFile}
+                    fileFullPath={file.fullPath}
+                    start={start}
+                    onFileUploaded={uploadContext.onFileUploaded}
+                />
             </TableCell>
         </TableRow>
     )

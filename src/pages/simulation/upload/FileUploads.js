@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
@@ -6,42 +6,19 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
-import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
+import { VerticalSpacing, HorizontalSpacing } from '../../../template/spacing';
 import { Typography } from '@mui/material';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import ErrorIcon from '@mui/icons-material/Error';
-import { useToast } from '../notifications';
+import { useToast } from 'components/notifications';
 
 import './fileUploadStyles.css';
-import { useFirebaseContext } from '../firebase';
-import { useDataProvider } from '../dataProvider';
+import { useDataProvider } from 'components/dataProvider';
+import FileUpload from 'components/upload/FileUpload';
 
 const STEP_UPLOAD = "step::upload";
 const STEP_THUMBNAILS = "step::thumbnail";
 const STEP_ERROR = "step::error";
-
-const UploadProgress = ({progress}) => {
-    return (
-        <Box style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center'
-        }}>
-            <CircularProgress variant="determinate" thickness={15} value={progress} size={30}/>
-            <HorizontalSpacing factor={1} />
-            <Typography
-                variant="caption"
-                style={{
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    maxWidth: 200
-                }}>
-                Chargement du fichier...
-            </Typography>
-        </Box>
-    );
-};
 
 const ThumbnailGeneration = () => {
     return (
@@ -50,7 +27,7 @@ const ThumbnailGeneration = () => {
             flexDirection: 'row',
             alignItems: 'center'
         }}>
-            <CircularProgress thickness={15} size={30} />
+            <CircularProgress size={30} />
             <HorizontalSpacing factor={1} />
             <Typography
                 variant="caption"
@@ -91,12 +68,11 @@ const ThumbnailError = ({error}) => {
 
 const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUploaded}, ref) => {
 
-    const firebaseContext = useFirebaseContext();
     const dataProvider = useDataProvider();
     const [step, setStep] = useState({ name: STEP_UPLOAD, error: null });
-    const [progress, setProgress] = useState(0);
-    const uploadTaskRef = useRef(null);
     const { toast } = useToast();
+
+    const fileFullPath = React.useRef(`${storageRef.fullPath}/${file.name}`);
 
     const handleCancel = useCallback(() => {
         // Task is stopped by the cleanup function above
@@ -110,46 +86,16 @@ const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUpload
         }
     }, [step, handleCancel, toast]);
 
-    useEffect(() => {
-        // launch firebase upload
-        // see documentation at https://firebase.google.com/docs/storage/web/upload-files
-        const parentPath = storageRef.fullPath;
-        const fileFullPath = `${parentPath}/${file.name}`;
-        const fileStorageRef = firebaseContext.storageRef(fileFullPath);
-        uploadTaskRef.current = firebaseContext.upload(fileStorageRef, file, { contentType: file.type });
-
-        uploadTaskRef.current.on('state_changed', 
-            (snapshot) => {
-                // Observe state change events such as progress, pause, and resume
-                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                setProgress(progress);
-            }, 
-            (error) => {
-                // Handle unsuccessful uploads
-                console.error(error);
-                setStep({ name: STEP_ERROR, error: error });
-            }, 
-            () => {
-                // Handle successful uploads on complete
-                // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-                setStep({ name: STEP_THUMBNAILS, error: null });
-                dataProvider.createInteriorThumbnails(fileFullPath).then((fileProps) => {
-                    const { sizeRatio } = fileProps;
-                    onFileUploaded(file.name, sizeRatio);
-                    onCancel(file);
-                }).catch(error => {
-                    setStep({ name: STEP_ERROR, error: error });
-                });
-            }
-        );
-
-        return () => {
-            if (uploadTaskRef.current.snapshot.state === 'running') {
-                uploadTaskRef.current.cancel();
-            }
-        }
-    }, [file, storageRef, onCancel, onFileUploaded, dataProvider, firebaseContext]);
+    const onFileUploadCompleted = React.useCallback(() => {
+        setStep({ name: STEP_THUMBNAILS, error: null });
+        dataProvider.createInteriorThumbnails(fileFullPath.current).then((fileProps) => {
+            const { sizeRatio } = fileProps;
+            onFileUploaded(file.name, sizeRatio);
+            onCancel(file);
+        }).catch(error => {
+            setStep({ name: STEP_ERROR, error: error });
+        });
+    }, [dataProvider, file, onCancel, onFileUploaded]);
 
     return (
         <Box ref={ref}>
@@ -159,28 +105,29 @@ const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUpload
                     display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'center'
-                }}
+                }} 
             >
                 <IconButton color="secondary" aria-label="menu" onClick={handleCancel} size="large">
                     <CancelOutlinedIcon />
                 </IconButton>
-                <Typography style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>{file.name}</Typography>
+                <Typography style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</Typography>
                 <HorizontalSpacing factor={2} />
-                <div style={{ flex: 1}} />
+                <Box sx={{display: "flex", flexDirection: "row", flexGrow: 1, justifyContent: "center"}}>
                 {
                     step.name === STEP_UPLOAD ?
-                    <UploadProgress progress={progress} /> :
+                    <FileUpload file={file} fileFullPath={fileFullPath.current} start={true} onFileUploaded={onFileUploadCompleted} /> :
                     step.name === STEP_THUMBNAILS ?
                     <ThumbnailGeneration /> :
                     <ThumbnailError error={step.error}/>
                 }
+                </Box>
                 <HorizontalSpacing factor={2} />
             </Paper>
         </Box>
     );
 });
 
-const FileUpload = ({caption, uploadRef, onFileUploaded}) => {
+const FileUploads = ({caption, uploadRef, onFileUploaded}) => {
 
     const [uploadFiles, setUploadFiles] = useState([]);
 
@@ -257,4 +204,4 @@ const FileUpload = ({caption, uploadRef, onFileUploaded}) => {
     );
 }
 
-export default FileUpload;
+export default FileUploads;

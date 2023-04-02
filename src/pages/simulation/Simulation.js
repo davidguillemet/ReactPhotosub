@@ -23,7 +23,7 @@ import BorderInput from './BorderInput';
 import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import ImageSlider from '../../components/imageSlider';
 import SimulationDisplay from './SimulationDisplay';
-import FileUpload from '../../components/fileUpload/FileUpload';
+import FileUploads from './upload/FileUploads';
 
 import {setBackground, resize, borderWidth, borderColor, shadow, addImage, setImage} from './actions/SimulationActions';
 
@@ -233,7 +233,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
             <Typography variant="h4" style={{fontWeight: "100"}}>1. Sélectionnez une ambiance</Typography>
             {
                 userUploadRef &&
-                <FileUpload
+                <FileUploads
                     caption="Ajoutez des ambiances"
                     uploadRef={userUploadRef}
                     onFileUploaded={onFileUploaded}
