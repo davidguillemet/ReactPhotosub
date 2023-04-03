@@ -11,7 +11,7 @@ import { useAuthContext } from '../authentication';
 import './styles.css';
 import { useFavorites } from '../favorites';
 
-const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
+const FavoriteButton = ({image, size = 'medium', style, color }) => {
 
     const authContext = useAuthContext();
     const favoritesContext = useFavorites();
@@ -69,15 +69,16 @@ const FavoriteButton = ({image, fontSize = 'default', style, color }) => {
             }
             onClick={authContext.user && updating === false ? handleFavoriteClick : null}
             style={buttonStyle}
+            size={size}
         >
             {
                 updating ?
-                <AutorenewIcon fontSize={fontSize} sx={{
+                <AutorenewIcon fontSize="inherit" sx={{
                     animation: 'favoriteUpdate 1.2s linear infinite' // see styles.css for favoriteUpdate
                 }}/> : 
                 isInFavorites ?
-                <FavoriteIcon fontSize={fontSize}/> :
-                <FavoriteIconOutlined fontSize={fontSize} />
+                <FavoriteIcon fontSize="inherit"/> :
+                <FavoriteIconOutlined fontSize="inherit" />
             }
         </TooltipIconButton>
     );

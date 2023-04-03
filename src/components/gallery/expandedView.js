@@ -54,7 +54,7 @@ const useStyles = makeStyles({
 
 const StyleImage = styled('img')(({ theme }) => ({ }));
 
-function StopButtonWithCircularProgress({ onClick, onCompletedRef, duration }) {
+function StopButtonWithCircularProgress({ onClick, onCompletedRef, duration, size, height}) {
     const [progress, setProgress] = useState(0);
 
     const timerRef = useRef(null);
@@ -93,12 +93,18 @@ function StopButtonWithCircularProgress({ onClick, onCompletedRef, duration }) {
         <TooltipIconButton
             tooltip={"Arrêter le diaporama"}
             onClick={handleClick}
+            size={size}
         >
-            <StopIcon fontSize='medium'></StopIcon>
-            <CircularProgress variant="determinate" value={progress} style={{
-                position: "absolute",
-                margin: 'auto'
+            <StopIcon fontSize='inherit'></StopIcon>
+            <CircularProgress
+                variant="determinate"
+                value={progress}
+                style={{
+                    position: "absolute",
+                    margin: 'auto'
                 }}
+                size={height-4}
+                thickness={5}
             />
         </TooltipIconButton>
     );
@@ -372,14 +378,17 @@ const ExpandedView = React.forwardRef(({
                                 onClick={handleStopClick}
                                 onCompletedRef={handleNextImageRef}
                                 duration={5000}
-                                key={currentImage.id}/
-                            > :
+                                key={currentImage.id}
+                                size={toolbarIconSize}
+                                height={headerBarRef.current.offsetHeight}
+                            /> :
                             <TooltipIconButton
                                 tooltip="Lancer le diaporama"
                                 onClick={handlePlayClick}
                                 disabled={playable === false}
+                                size={toolbarIconSize}
                             >
-                                <PlayArrowIcon fontSize={toolbarIconSize}></PlayArrowIcon>
+                                <PlayArrowIcon fontSize="inherit"></PlayArrowIcon>
                             </TooltipIconButton>
                     }
 
@@ -387,29 +396,32 @@ const ExpandedView = React.forwardRef(({
                         <TooltipIconButton
                             tooltip={infoVisible ? "Cacher les détails" : "Afficher les détails"}
                             onClick={handleInfoClick}
+                            size={toolbarIconSize}
                         >
                             {
                                 infoVisible ?
-                                <InfoIcon fontSize={toolbarIconSize}></InfoIcon> :
-                                <InfoOutlined fontSize={toolbarIconSize}></InfoOutlined>
+                                <InfoIcon fontSize="inherit"></InfoIcon> :
+                                <InfoOutlined fontSize="inherit"></InfoOutlined>
                             }
                         </TooltipIconButton>
-                        <FavoriteButton fontSize={toolbarIconSize} image={currentImage} />
+                        <FavoriteButton size={toolbarIconSize} image={currentImage} />
                         <TooltipIconButton
                             tooltip={fullScreen ? "Réduire" : "Plein écran"}
                             onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}
+                            size={toolbarIconSize}
                         >
                         {   
                             fullScreen ?
-                            <FullscreenExitIcon fontSize={toolbarIconSize} /> :
-                            <FullscreenIcon fontSize={toolbarIconSize} />
+                            <FullscreenExitIcon fontSize="inherit" /> :
+                            <FullscreenIcon fontSize="inherit" />
                         }
                         </TooltipIconButton>
                         <TooltipIconButton
                             tooltip={showThumbnails ? "Masquer les vignettes" : "Afficher les vignettes"}
                             onClick={handleClickToggleThumbnails}
+                            size={toolbarIconSize}
                         >
-                            <AppsIcon fontSize={toolbarIconSize} />
+                            <AppsIcon fontSize="inherit" />
                         </TooltipIconButton>
                     </React.Fragment>
 
@@ -439,8 +451,10 @@ const ExpandedView = React.forwardRef(({
                         <HorizontalSpacing></HorizontalSpacing> :
                         <TooltipIconButton
                             tooltip="Fermer la visionneuse"
-                            onClick={handleCloseClick}>
-                            <CloseIcon fontSize={toolbarIconSize}></CloseIcon>
+                            onClick={handleCloseClick}
+                            size={toolbarIconSize}
+                        >
+                            <CloseIcon fontSize="inherit"></CloseIcon>
                         </TooltipIconButton>
                     }
                 </Box>

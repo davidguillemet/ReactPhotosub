@@ -2,7 +2,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Zoom from '@mui/material/Zoom';
 import IconButton from '@mui/material/IconButton';
 
-const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style, edge = false}) => {
+const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style, size = 'large', edge = false}) => {
 
     return (
         <Tooltip
@@ -24,7 +24,7 @@ const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style,
                 onClick={onClick}
                 disabled={disabled}
                 style={style}
-                size="large">
+                size={size}>
                 {children}
             </IconButton>
         </Tooltip>
