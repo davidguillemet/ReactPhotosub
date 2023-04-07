@@ -40,13 +40,19 @@ const ThumbnailStatus = ({row, onSetStatus}) => {
     })
 
     const onFixThumbnails = React.useCallback(() => {
-        uploadContext.generateThumbnails(row.fullPath);
+        const generateThumbnails = uploadContext.generateThumbnails;
+        const refreshThumbnails = imageContext.refreshThumbnails;
+        generateThumbnails(row.fullPath).then(() => refreshThumbnails());
         onSetStatus(STATUS_PENDING);
         setStatus({
             status: STATUS_PENDING,
             message: ""
         });
-    }, [uploadContext, row, onSetStatus]);
+    }, [
+        uploadContext.generateThumbnails,
+        imageContext.refreshThumbnails,
+        onSetStatus,
+        row]);
 
     React.useEffect(() => {
         let message = null;
@@ -75,11 +81,7 @@ const ThumbnailStatus = ({row, onSetStatus}) => {
         }
 
         if (uploadContext.isThumbProcessing(row.fullPath)) {
-            if (status !== STATUS_SUCCESS) {
-                status = STATUS_PENDING;
-            } else {
-                uploadContext.onThumbProcessingCompleted(row.fullPath);
-            }
+            status = STATUS_PENDING;
         }
 
         onSetStatus(status);

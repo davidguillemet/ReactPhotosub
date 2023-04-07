@@ -94,6 +94,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const [ storageRef, setStorageRef ] = React.useState(firebaseContext.storageRef());
     const [ thumbs, setThumbs ] = React.useState(null);
     const [ errors, setErrors ] = React.useState(new Set());
+    const initialFetchCompleted = React.useRef(false);
     const itemCount = React.useRef(0);
     const thumbsRef = React.useRef(null);
     const destinationProps = React.useRef({
@@ -148,12 +149,17 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
                     missingFilesFromDb: undefined // Set: Database entry exists while the storage item is missing
                 })
                 setErrors(new Set());
+                setThumbs(null);
                 return setThumbsFromRef();
             })
     }, [storageRef, firebaseContext, foldersFromDb, setThumbsFromRef]);
 
     React.useEffect(() => {
-        fetchItems();
+        // Initial fetch Items
+        if (initialFetchCompleted.current === false) {
+            fetchItems();
+            initialFetchCompleted.current = true;
+        }
     }, [fetchItems])
 
     React.useEffect(() => {
@@ -187,6 +193,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
 
     const onSetBucketPath = React.useCallback((bucketPath) => {
         unstable_batchedUpdates(() => {
+            initialFetchCompleted.current = false;
             destinationProps.current = extractDestinationProps(bucketPath);
             setRows({});
             setThumbs(null);
@@ -269,9 +276,9 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const isReady =
         dbImages !== undefined &&
         thumbs !== null &&
-        rows.missingFolders !== undefined &&
-        rows.files !== undefined &&
         rows.folders !== undefined &&
+        rows.files !== undefined &&
+        rows.missingFolders !== undefined &&
         rows.missingFilesFromThumbs !== undefined &&
         rows.missingFilesFromDb !== undefined;
 
@@ -291,7 +298,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
 
         // Information about the possible current destination
         destinationProps: destinationProps.current,
-        isDestinationFolder: destinationProps.current.year !== null && destinationProps.current.title,
+        isDestinationFolder: destinationProps.current.year !== null && destinationProps.current.title !== null,
 
         // Methods to manage items/thumbnails
         fetchItems,

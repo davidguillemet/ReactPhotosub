@@ -48,9 +48,7 @@ const TagStatus = ({row, onSetStatus}) => {
         }
 
         if (uploadContext.isDbProcessing(row.fullPath)) {
-            if (newStatus !== STATUS_SUCCESS) {
-                newStatus = STATUS_PENDING;
-            }
+            newStatus = STATUS_PENDING;
         }
 
         onSetStatus(newStatus);

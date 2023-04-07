@@ -2,6 +2,8 @@ import React from 'react';
 import { useDataProvider } from 'components/dataProvider';
 import { useImageContext } from '../ImageContext';
 
+const _maxParallelUpload = 3;
+
 const UploadContext = React.createContext(null);
 
 export const UploadContextProvider = ({children}) => {
@@ -9,78 +11,113 @@ export const UploadContextProvider = ({children}) => {
     const dataProvider = useDataProvider();
     const imageContext = useImageContext();
     const [ filesToUpload, setFilesToUpload ] = React.useState([]);
+    const [ uploadingCursor, setUploadingCursor ] = React.useState(-1);
+    const fileIndices = React.useRef(null);
+    const lastCursor = React.useRef(-1);
+    const uploadErrors = React.useRef(new Set());
     const dbProcessing = React.useRef(new Set());
     const thumbProcessing = React.useRef(new Set());
 
     const setUploadSelection = React.useCallback((files, parentFolder) => {
-        const fileWrappers = files.map(file => {
-            return {
+        fileIndices.current = new Map();
+        lastCursor.current = files.length - 1;
+        const fileWrappers = files.map((file, index) => {
+            const fullPath = `${parentFolder}/${file.name}`;
+            fileIndices.current.set(fullPath, index);
+            const fileWrapper = {
                 name: file.name,
-                fullPath: `${parentFolder}/${file.name}`,
+                fullPath: fullPath,
                 size: file.size,
                 nativeFile: file
-            }
-        })
+            };
+            return fileWrapper;
+        });
+        setUploadingCursor(Math.min(fileWrappers.length - 1, _maxParallelUpload - 1));
         setFilesToUpload(fileWrappers);
     }, []);
 
-    // TODO : Don't use destinationProps here since it might have changed since beginning of upload
-    // IF the user changed the current folder after having started an upload
-    const _launchDbProcessing = React.useCallback((fileFullPath) => {
-        if (imageContext.destinationProps.year === null || imageContext.destinationProps.title === null) {
+    const insertInDatabase = React.useCallback((fileFullPath) => {
+        if (!imageContext.isDestinationFolder) {
             return Promise.resolve();
         }
         dbProcessing.current.add(fileFullPath);
         return dataProvider.insertImageInDatabase(fileFullPath)
             .then(() => {
-                const clearImageQueries = imageContext.clearImageQueries;
-                clearImageQueries();
+                dbProcessing.current.delete(fileFullPath);
             }).catch((e) => {
                 // TODO
             });
-    }, [
-        dataProvider,
-        imageContext.clearImageQueries,
-        imageContext.destinationProps
-    ]);
+    }, [dataProvider, imageContext.isDestinationFolder]);
 
-    const _launchThumbProcessing = React.useCallback((fileFullPath) => {
+    const generateThumbnails = React.useCallback((fileFullPath) => {
         thumbProcessing.current.add(fileFullPath);
         const thumbPromise =
             imageContext.isDestinationFolder ?
             dataProvider.refreshThumbnails(fileFullPath) :
             dataProvider.createInteriorThumbnails(fileFullPath);
-        return thumbPromise.then(() => {
-                const refresh = imageContext.refreshThumbnails; // Throttling
-                refresh();
-            }).catch((e) => {
-                // TODO
-            });
-    }, [dataProvider, imageContext.isDestinationFolder, imageContext.refreshThumbnails]);
 
-    const onFileUploaded = React.useCallback((fileFullPath) => {
+        return thumbPromise.then(() => {
+            thumbProcessing.current.delete(fileFullPath);
+        }).catch((e) => {
+                // TODO
+        });
+    }, [dataProvider, imageContext.isDestinationFolder]);
+
+    const onAllFilesProcessed = React.useCallback(() => {
+        // Clear upload state, and keep only failing uploads.
+        setFilesToUpload(files => files.filter(f => uploadErrors.current.has(f.fullPath)));
+        setUploadingCursor(-1);
+        fileIndices.current = null;
+        lastCursor.current = -1;
+
+        // Fetch items to update list
         const fetchItems = imageContext.fetchItems;
-        // TODO : it's not possible to use throttling with the Promise fetchItems, but
-        //        we should find a way to limit the number of calls to fetchItems
-        //        when we upload many files.
+        const clearImageQueries = imageContext.clearImageQueries;
         fetchItems().then(() => {
-            _launchDbProcessing(fileFullPath);
-            _launchThumbProcessing(fileFullPath);
-            setFilesToUpload(files => files.filter(f => f.fullPath !== fileFullPath));
-        })
-    }, [imageContext.fetchItems, _launchDbProcessing, _launchThumbProcessing]);
+            clearImageQueries();
+        });
+    }, [imageContext.fetchItems, imageContext.clearImageQueries])
+
+    const onFileProcessed = React.useCallback((fileFullPath, error) => {
+        setUploadingCursor(cursor => cursor + 1);
+        if (error) {
+            uploadErrors.add(fileFullPath);
+        }
+    }, []);
+
+    React.useEffect(() => {
+        if (uploadingCursor > lastCursor.current) {
+            onAllFilesProcessed();
+        }
+    }, [uploadingCursor, onAllFilesProcessed])
+
+    const canStartUpload = React.useCallback((fileFullPath) => {
+        const fileIndex = fileIndices.current.get(fileFullPath);
+        return (fileIndex <= uploadingCursor);
+    }, [uploadingCursor]);
+
+    const isUploading = React.useCallback((fullPath) => {
+        return filesToUpload.some(fileToUpload => fileToUpload.fullPath === fullPath)
+    }, [filesToUpload]);
+
+    const isDbProcessing = React.useCallback((fullPath) => {
+        return dbProcessing.current.has(fullPath);
+    }, []);
+
+    const isThumbProcessing = React.useCallback((fullPath) => {
+        return thumbProcessing.current.has(fullPath);
+    }, []);
 
     const uploadContext = {
         files: filesToUpload,
         setUploadSelection,
-        onFileUploaded,
-        generateThumbnails: _launchThumbProcessing,
-        insertInDatabase: _launchDbProcessing,
-        isUploading: (fullPath) => filesToUpload.some(fileToUpload => fileToUpload.fullPath === fullPath),
-        isDbProcessing:  (fullPath) => dbProcessing.current.has(fullPath),
-        onDbProcessingCompleted: (fullPath) => dbProcessing.current.delete(fullPath),
-        isThumbProcessing: (fullPath) => thumbProcessing.current.has(fullPath),
-        onThumbProcessingCompleted: (fullPath) => thumbProcessing.current.delete(fullPath),
+        canStartUpload,
+        onFileProcessed,
+        generateThumbnails,
+        insertInDatabase,
+        isUploading,
+        isDbProcessing,
+        isThumbProcessing
     };
 
     return (

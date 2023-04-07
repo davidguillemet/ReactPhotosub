@@ -2,8 +2,6 @@ import React from 'react';
 import { useUploadContext } from './UploadContext';
 import UploadStorageItemRow from './UploadStorageItemRow';
 
-const maxParallelUpload = 5;
-
 const UploadTableRows = () => {
 
     const uploadContext = useUploadContext();
@@ -19,7 +17,6 @@ const UploadTableRows = () => {
                 return <UploadStorageItemRow
                             key={file.name}
                             file={file}
-                            start={index < maxParallelUpload}
                         />
             })
         }
