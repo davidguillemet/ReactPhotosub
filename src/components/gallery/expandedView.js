@@ -360,6 +360,9 @@ const ExpandedView = React.forwardRef(({
                         position: 'absolute',
                         left: '50%',
                         transform: 'translateX(-50%)'
+                    }),
+                    ...(isMobile && {
+                        padding: 0.5
                     })
                 }}
             >
