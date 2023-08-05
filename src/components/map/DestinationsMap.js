@@ -309,7 +309,12 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
                 title: destination.location,
                 latitude: destination.latitude,
                 longitude: destination.longitude,
-                destinations: [ destination ]
+                destinations: [
+                    {
+                        ...destination,
+                        date: formatDate(new Date(destination.date))
+                    }
+                ]
             }
             unstable_batchedUpdates(() => {
                 setDestinationsPerLocation([ location ]);

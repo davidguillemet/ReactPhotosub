@@ -198,7 +198,7 @@ export function getThumbnailSrc(image, containerWidth, containerHeight) {
         }
     }
 
-    return image.src;
+    return typeof image === 'string' ? image : image.src;
 }
 
 export function clearThumbnailSrc(image) {

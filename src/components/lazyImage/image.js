@@ -70,7 +70,7 @@ const LazyImage = ({
             loaded.current = true;
         }
     }
-    
+
     const onError = event => {
         event.target.classList.add('has-error');
     }
@@ -94,7 +94,6 @@ const LazyImage = ({
     return (
         <Box
             ref={container}
-            key={image.id}
             sx={{
                 position: 'relative',
                 maxWidth: width,
