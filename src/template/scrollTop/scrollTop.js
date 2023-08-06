@@ -32,10 +32,12 @@ const ScrollTop = ({anchorSelector}) => {
 
     useEffect(() => {
         const onScroll = () => {
-            const scrolled = document.documentElement.scrollTop;
-            const maxHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrollPercent = (scrolled / maxHeight) * 100;
-            setScroll(scrollPercent);
+            window.requestAnimationFrame(() => {
+                const scrolled = document.documentElement.scrollTop;
+                const maxHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrollPercent = (scrolled / maxHeight) * 100;
+                setScroll(scrollPercent);
+            })
         };
         window.addEventListener("scroll", onScroll);
 

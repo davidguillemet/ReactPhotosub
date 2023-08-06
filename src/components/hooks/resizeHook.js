@@ -11,8 +11,13 @@ export default function useResizeObserver(watchScroll) {
   const element = useRef(null);
 
   const onResize = useCallback(entries => {
-    const { width, height } = entries[0].contentRect;
-    setSize({ width, height });
+    window.requestAnimationFrame(() => {
+        if (!Array.isArray(entries) || !entries.length) {
+          return;
+        }
+        const { width, height } = entries[0].contentRect;
+        setSize({ width, height });
+    })
   }, []);
 
   const onScroll = useCallback(() => {
