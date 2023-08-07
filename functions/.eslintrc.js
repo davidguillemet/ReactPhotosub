@@ -14,8 +14,9 @@ module.exports = {
         "max-len": ["error", 300],
         "require-jsdoc": 0,
     },
-    parser: "babel-eslint",
+    parser: "@babel/eslint-parser",
     parserOptions: {
+        requireConfigFile: false,
         sourceType: "module",
         ecmaVersion: 8,
     },
