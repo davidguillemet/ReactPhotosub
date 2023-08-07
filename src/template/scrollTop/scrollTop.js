@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { green } from '@mui/material/colors';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
@@ -6,11 +6,7 @@ import Zoom from '@mui/material/Zoom';
 import Fab from '@mui/material/Fab';
 import CircularProgress from '@mui/material/CircularProgress';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { useEffect } from 'react';
 import { throttle } from '../../utils';
-
-import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer';
-const ResizeObserver = window.ResizeObserver || ResizeObserverPolyfill;
 
 const Div = styled('div')(() => {});
 
@@ -30,26 +26,22 @@ const ScrollTop = ({anchorSelector}) => {
         }
     };
 
-    useEffect(() => {
-        const onScroll = () => {
-            window.requestAnimationFrame(() => {
-                const scrolled = document.documentElement.scrollTop;
-                const maxHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-                const scrollPercent = (scrolled / maxHeight) * 100;
-                setScroll(scrollPercent);
-            })
-        };
-        window.addEventListener("scroll", onScroll);
-
-        const resizeObserver = new ResizeObserver(throttle(onScroll, 50, false, true));
-        resizeObserver.observe(document.documentElement);
-
+    React.useLayoutEffect(() => {
+        const updateScroll = () => {
+            const scrolled = document.documentElement.scrollTop;
+            const maxHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollPercent = (scrolled / maxHeight) * 100;
+            setScroll(scrollPercent);
+        }
+        const throttleUpdateScroll = throttle(updateScroll, 100, false, true);
+        window.addEventListener("scroll", throttleUpdateScroll);
+        window.addEventListener('resize', throttleUpdateScroll);
         return () => {
-            window.removeEventListener('scroll', onScroll);
-            resizeObserver.disconnect();
+            window.removeEventListener('scroll', throttleUpdateScroll);
+            window.removeEventListener('resize', throttleUpdateScroll);
         }
     }, []);
-    
+
     return (
         <Zoom in={trigger}>
             <Div
