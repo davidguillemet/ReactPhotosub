@@ -1,4 +1,8 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import IconButton from '@mui/material/IconButton';
+import ExpandLessOutlinedIcon from '@mui/icons-material/ExpandLessOutlined';
+import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
+
 import {isMobile} from 'react-device-detect';
 import Alert from '@mui/material/Alert';
 import Dialog from '@mui/material/Dialog';
@@ -9,6 +13,7 @@ import { withLoading, buildLoadingState } from '../../components/hoc';
 import MasonryGallery from '../masonryGallery';
 import { BlockQuote } from '../../template/pageTypography';
 import { useHistory, useLocation } from 'react-router-dom';
+import { Box, Collapse } from '@mui/material';
 
 const GROUP_BY_YEAR = "year";
 
@@ -87,15 +92,72 @@ const groupFavorites = (images, groupBy, sortOrder) => {
     return [ groups, allImages];
 }
 
-const GroupGallery = ({images, onReady, renderItem}) => (
-    <MasonryGallery
-        items={images}
-        colWidth={isMobile ? 170 : 350}
-        heightProvider={(item, itemWidth) => itemWidth / item.sizeRatio}
-        renderItem={renderItem}
-        onReady={onReady}
-    />
-)
+const GroupGallery = ({images, onReady, renderItem}) => {
+
+    const heightProvider = useCallback((item, itemWidth) => {
+        return itemWidth / item.sizeRatio;
+    }, []);
+
+    return (
+        <MasonryGallery
+            items={images}
+            colWidth={isMobile ? 170 : 350}
+            heightProvider={heightProvider}
+            renderItem={renderItem}
+            onReady={onReady}
+        />
+    )
+}
+
+const GroupGalleryWithHeader = ({group, allImages, onReady, renderItem}) => {
+    const [isExpanded, setIsExpanded] = useState(true);
+
+    const onToggleExpanded = useCallback(() => {
+        setIsExpanded(prevValue => !prevValue);
+    }, []);
+
+    return (
+        <Stack sx={{width: '100%'}}>
+            <BlockQuote sx={{
+                mb: 1,
+                mt: 3,
+                ml: 0,
+                pl: 1,
+                pr: 1,
+                fontWeight: "bold",
+                color: theme => theme.palette.primary.contrastText,
+                bgcolor: theme => theme.palette.primary.light}}
+            >
+                <Stack
+                    sx={{width: '100%'}} direction='row'
+                    justifyContent="space-between"
+                    alignItems="center"
+                >
+                    <Box>{group.key} - {`${group.images.length} images`}</Box>
+                    <IconButton
+                        sx={{color: theme => theme.palette.primary.contrastText}}
+                        onClick={onToggleExpanded}
+                    >
+                        {
+                            isExpanded
+                            ? <ExpandLessOutlinedIcon fontSize="large" />
+                            : <ExpandMoreOutlinedIcon fontSize="large" />
+                        }
+                    </IconButton>
+                </Stack>
+            </BlockQuote>
+            <Collapse in={isExpanded === true}>
+                <GroupGallery
+                    images={group.images}
+                    key={group.key}
+                    onReady={onReady}
+                    renderItem={renderItem}
+                    allImages={allImages}
+                />
+            </Collapse>
+        </Stack>
+    )
+}
 
 function getViewImage(querySearch) {
     const queryParameters = new URLSearchParams(querySearch)
@@ -120,7 +182,7 @@ const Gallery = ({
 
     const [expandedImageIndex, setExpandedImageIndex] = useState(null);
 
-    const [ groups, allImages] = useMemo(() => groupFavorites(images, groupBy, sort), [images, groupBy, sort]);
+    const [groups, allImages] = useMemo(() => groupFavorites(images, groupBy, sort), [images, groupBy, sort]);
 
     // location.search has been modified after history.push
     useEffect(() => {
@@ -154,7 +216,15 @@ const Gallery = ({
         }
     }, [pushHistory, images, history, location.search, location.pathname]);
 
-    const renderItem = (item, index, width, groupIndex) => {
+    const onImageClick = useCallback((imageIndex) => {
+        handleOnImageClick(imageIndex);
+    }, [handleOnImageClick]);
+
+    const onCloseModal = useCallback(() => {
+        handleOnImageClick(null);
+    }, [handleOnImageClick]);
+
+    const renderItem = useCallback((item, index, width, groupIndex) => {
         const offset = groups[groupIndex].offset;
         return (
             <LazyImage
@@ -164,15 +234,7 @@ const Gallery = ({
                 width={width}
             />
         )
-    };
-
-    function onImageClick(imageIndex) {
-        handleOnImageClick(imageIndex);
-    }
-
-    function onCloseModal() {
-        handleOnImageClick(null);
-    }
+    }, [groups, onImageClick]);
 
     if (images.length === 0 && emptyMessage !== null) {
         return (
@@ -182,34 +244,23 @@ const Gallery = ({
 
     return (
         <React.Fragment>
-
             {
                 groups.map((group, groupIndex) => {
                     return (
                         group.key !== null ?
-                        <Stack sx={{width: '100%'}} key={group.key}>
-                            <BlockQuote sx={{
-                                mb: 1,
-                                mt: 3,
-                                ml: 0,
-                                pl: 1,
-                                fontWeight: "bold",
-                                color: theme => theme.palette.primary.contrastText,
-                                bgcolor: theme => theme.palette.primary.light}}
-                            >
-                                {group.key}
-                            </BlockQuote>
-                            <GroupGallery
-                                images={group.images}
-                                key={group.key}
-                                onReady={onReady}
-                                renderItem={(item, index, width) => renderItem(item, index, width, groupIndex)}
-                                allImages={allImages}/>
-                        </Stack>
+                        <GroupGalleryWithHeader
+                            group={group}
+                            key={group.key}
+                            groupIndex={groupIndex}
+                            onReady={onReady}
+                            renderItem={(item, index, width) => renderItem(item, index, width, groupIndex)}
+                            allImages={allImages}
+                        />
                         :
                         <GroupGallery
                             images={group.images}
                             key={group.key}
+                            groupIndex={groupIndex}
                             onReady={onReady}
                             renderItem={(item, index, width) => renderItem(item, index, width, groupIndex)}
                             allImages={allImages}/>
