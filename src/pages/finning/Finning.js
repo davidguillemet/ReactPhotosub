@@ -23,7 +23,7 @@ const _menuListItems = [
 ];
 
 const Anchor = ({index}) => (
-    <a id={`anchor${index}`} />
+    <span id={`anchor${index}`} />
 )
 
 const CustomDivider = () => <Divider variant="middle" sx={{ my: 3, mx: '20%', borderBottomWidth: 3, borderBottomColor: (theme) => theme.palette.primary.light}}/>
