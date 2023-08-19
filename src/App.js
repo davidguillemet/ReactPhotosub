@@ -44,6 +44,7 @@ import { useDarkMode } from './template/theme';
 import { TranslationProvider, useTranslation } from './utils';
 import { OverlayProvider } from './components/loading/loadingOverlay';
 import { DataManagerProvider } from './components/dataProvider';
+import { HelmetProvider } from 'react-helmet-async';
 
 import LanguageSelector from './components/language';
 
@@ -400,6 +401,7 @@ const App = (props) => {
             <StyledEngineProvider injectFirst>
                 <ChainedProviders
                     providers={[
+                        HelmetProvider,
                         OverlayProvider,
                         TranslationProvider,
                         DarkModeProvider,
