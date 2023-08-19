@@ -23,21 +23,9 @@ const DatabaseStatus = ({row, onSetStatus}) => {
 
     const onInsertImageInDatabase = React.useCallback(() => {
         const insertInDatabase = uploadContext.insertInDatabase;
-        insertInDatabase(row.fullPath)
-        .catch((e) => { 
-            setStatus({
-                status: STATUS_ERROR,
-                message: e.message
-            });
-        });
-        onSetStatus(STATUS_PENDING);
-        setStatus({
-            status: STATUS_PENDING,
-            message: ""
-        });
+        insertInDatabase(row.fullPath);
     }, [
         uploadContext.insertInDatabase,
-        onSetStatus,
         row
     ]);
 
@@ -45,12 +33,23 @@ const DatabaseStatus = ({row, onSetStatus}) => {
 
         let newMessage = null;
         let newStatus = null;
-        
-        if (!row.name.endsWith(".jpg")) {
+
+        const uploadContext_isDbProcessing = uploadContext.isDbProcessing;
+        const uploadContext_hasDbProcessingError = uploadContext.hasDbProcessingError;
+        const uploadContext_getDbProcessingError = uploadContext.getDbProcessingError;
+
+        if (uploadContext_isDbProcessing(row.fullPath)) {
+            newStatus = STATUS_PENDING;
+        } else if (uploadContext_hasDbProcessingError(row.fullPath)) {
+            const error = uploadContext_getDbProcessingError(row.fullPath);
+            newStatus = STATUS_ERROR;
+            newMessage = error;
+        } else if (!row.name.endsWith(".jpg")) {
             // Not an image from a destination
             newStatus = STATUS_NOT_AVAILABLE;
         } else {
-            const imageFromDb = imageContext.getImageFromDatabase(row.name);
+            const imageContext_getImageFromDatabase = imageContext.getImageFromDatabase;
+            const imageFromDb = imageContext_getImageFromDatabase(row.name);
             if (imageFromDb === null) {
                 // The parent folder is not a destination
                 newStatus = STATUS_NOT_AVAILABLE;
@@ -64,17 +63,20 @@ const DatabaseStatus = ({row, onSetStatus}) => {
             }
         }
 
-        if (uploadContext.isDbProcessing(row.fullPath)) {
-            newStatus = STATUS_PENDING;
-        }
-
         onSetStatus(newStatus);
         setStatus({
             status: newStatus,
             message: newMessage
         });
 
-    }, [uploadContext, imageContext, row, onSetStatus]);
+    }, [
+        uploadContext.isDbProcessing,
+        uploadContext.hasDbProcessingError,
+        uploadContext.getDbProcessingError,
+        imageContext.getImageFromDatabase,
+        row,
+        onSetStatus
+    ]);
 
     return (
          <StorageItemStatus

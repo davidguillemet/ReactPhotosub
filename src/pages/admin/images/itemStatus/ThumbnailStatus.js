@@ -41,29 +41,28 @@ const ThumbnailStatus = ({row, onSetStatus}) => {
 
     const onFixThumbnails = React.useCallback(() => {
         const generateThumbnails = uploadContext.generateThumbnails;
-        generateThumbnails(row.fullPath)
-        .catch((e) => { 
-            setStatus({
-                status: STATUS_ERROR,
-                message: e.message
-            });
-        });
-        onSetStatus(STATUS_PENDING);
-        setStatus({
-            status: STATUS_PENDING,
-            message: ""
-        });
+        generateThumbnails(row.fullPath);
     }, [
         uploadContext.generateThumbnails,
-        onSetStatus,
-        row]);
+        row
+    ]);
 
     React.useEffect(() => {
         let message = null;
         let status = null;
         const statusInfo = {};
-        
-        if (!row.name.endsWith(".jpg")) {
+
+        const uploadContext_isThumbProcessing = uploadContext.isThumbProcessing;
+        const uploadContext_hasThumbProcessingError = uploadContext.hasThumbProcessingError;
+        const uploadContext_getThumbProcessingError = uploadContext.getThumbProcessingError;
+
+        if (uploadContext_isThumbProcessing(row.fullPath)) {
+            status = STATUS_PENDING;
+        } else if (uploadContext_hasThumbProcessingError(row.fullPath)) {
+            const error = uploadContext_getThumbProcessingError(row.fullPath);
+            status = STATUS_ERROR;
+            message = error;
+        } else if (!row.name.endsWith(".jpg")) {
             // Not an image from a destination
             status = STATUS_NOT_AVAILABLE;
         } else if (allThumbsCreated(row, imageContext.thumbs, statusInfo)) {
@@ -84,16 +83,19 @@ const ThumbnailStatus = ({row, onSetStatus}) => {
             status = STATUS_ERROR;
         }
 
-        if (uploadContext.isThumbProcessing(row.fullPath)) {
-            status = STATUS_PENDING;
-        }
-
         onSetStatus(status);
         setStatus({
             status,
             message
         });
-    }, [uploadContext, imageContext.thumbs, row, onSetStatus]);
+    }, [
+        uploadContext.isThumbProcessing,
+        uploadContext.hasThumbProcessingError,
+        uploadContext.getThumbProcessingError,
+        imageContext.thumbs,
+        row,
+        onSetStatus
+    ]);
 
     return (
         <StorageItemStatus

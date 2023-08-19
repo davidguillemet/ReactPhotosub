@@ -24,11 +24,15 @@ const TagStatus = ({row, onSetStatus}) => {
         let newMessage = null;
         let newStatus = null;
 
-        if (!row.name.endsWith(".jpg")) {
+        const uploadContext_isDbProcessing = uploadContext.isDbProcessing;
+        if (uploadContext_isDbProcessing(row.fullPath)) {
+            newStatus = STATUS_PENDING;
+        } else if (!row.name.endsWith(".jpg")) {
             // Not an image from a destination
             newStatus = STATUS_NOT_AVAILABLE;
         } else {
-            const imageFromDb = imageContext.getImageFromDatabase(row.name);
+            const imageContext_getImageFromDatabase = imageContext.getImageFromDatabase;
+            const imageFromDb = imageContext_getImageFromDatabase(row.name);
             if (imageFromDb === null) {
                 // The parent folder is not a destination
                 newStatus = STATUS_NOT_AVAILABLE;
@@ -47,17 +51,18 @@ const TagStatus = ({row, onSetStatus}) => {
             }
         }
 
-        if (uploadContext.isDbProcessing(row.fullPath)) {
-            newStatus = STATUS_PENDING;
-        }
-
         onSetStatus(newStatus);
         setStatus({
             status: newStatus,
             message: newMessage
         });
 
-    }, [uploadContext, imageContext, row, onSetStatus]);
+    }, [
+        uploadContext.isDbProcessing,
+        imageContext.getImageFromDatabase,
+        imageContext,
+        row,
+        onSetStatus]);
 
     return <StorageItemStatus {...status} />;
 }

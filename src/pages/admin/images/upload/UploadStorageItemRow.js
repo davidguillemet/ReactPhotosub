@@ -3,63 +3,16 @@ import { TableRow, TableCell, Checkbox, Chip } from "@mui/material";
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import FileUpload from 'components/upload';
 import { useUploadContext } from "./UploadContext";
-import BorderLinearProgress from 'components/borderLinearProgress';
-
-const STEP_UPLOAD = "ste::upload";
-const STEP_POST_PROCESS = "step::post_process";
-const STEP_SUCCESS = "step::success";
-const STEP_ERROR = "step::error";
-
-const FilePostProcessing = ({fileFullPath, onSuccess, onError}) => {
-
-    const uploadContext = useUploadContext();
-
-    React.useEffect(() => {
-        const generateThumbs = uploadContext.generateThumbnails;
-        const thumbPromise = generateThumbs(fileFullPath);
-
-        const insertInDatabase = uploadContext.insertInDatabase;
-        const dataBasePromise = insertInDatabase(fileFullPath);
-        
-        Promise.all([thumbPromise, dataBasePromise]).then((results) => {
-            onSuccess();
-        }).catch(e => {
-            onError(e);
-        });
-    }, [
-        uploadContext.generateThumbnails,
-        uploadContext.insertInDatabase,
-        fileFullPath,
-        onSuccess,
-        onError
-    ]);
-
-    return (
-        <BorderLinearProgress sx={{width: "100%"}}/>
-    );
-}
 
 const UploadStorageItemRow = ({file}) => {
 
     const uploadContext = useUploadContext();
-    const [step, setStep] = React.useState(STEP_UPLOAD);
 
     const onFileUploaded = React.useCallback(() => {
         // launch file post processing after upload
-        setStep(STEP_POST_PROCESS);
-    }, []);
-
-    const onPostProcessSuccess = React.useCallback(() => {
-        // Notify the upload context that this file has been processed successfully
-        const onFileProcessed = uploadContext.onFileProcessed;
-        onFileProcessed(file.fullPath);
-        setStep(STEP_SUCCESS);
-    }, [file, uploadContext.onFileProcessed]);
-
-    const onPostProcessError = React.useCallback(() => {
-        // Notify the upload context that this file has been processed with error
-        setStep(STEP_ERROR);
-    }, []);
+        const postProcessUploadedFile = uploadContext.postProcessUploadedFile;
+        postProcessUploadedFile(file.fullPath);
+    }, [file, uploadContext.postProcessUploadedFile]);
 
     return (
         <TableRow
@@ -82,24 +35,12 @@ const UploadStorageItemRow = ({file}) => {
                 <Chip icon={<InsertPhotoIcon />} label={file.name} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
             </TableCell>
             <TableCell colSpan={3} align="left" sx={{paddingTop: 0, paddingBottom: 0}} >
-                {
-                    step === STEP_UPLOAD ?
-                    <FileUpload
-                        file={file.nativeFile}
-                        fileFullPath={file.fullPath}
-                        start={uploadContext.canStartUpload(file.fullPath)}
-                        onFileUploaded={onFileUploaded}
-                    /> :
-                    step === STEP_POST_PROCESS ?
-                    <FilePostProcessing
-                        fileFullPath={file.fullPath}
-                        onSuccess={onPostProcessSuccess}
-                        onError={onPostProcessError}
-                    /> :
-                    step === STEP_SUCCESS ?
-                    <BorderLinearProgress variant="determinate" value={100} sx={{width: "100%"}}/> : // SUCCESS
-                    "ERROR"   // ERROR (TODO)
-                }
+                <FileUpload
+                    file={file.nativeFile}
+                    fileFullPath={file.fullPath}
+                    start={uploadContext.canStartUpload(file.fullPath)}
+                    onFileUploaded={onFileUploaded}
+                /> :
             </TableCell>
         </TableRow>
     )
