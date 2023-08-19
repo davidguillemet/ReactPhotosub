@@ -41,8 +41,13 @@ const ThumbnailStatus = ({row, onSetStatus}) => {
 
     const onFixThumbnails = React.useCallback(() => {
         const generateThumbnails = uploadContext.generateThumbnails;
-        const refreshThumbnails = imageContext.refreshThumbnails;
-        generateThumbnails(row.fullPath).then(() => refreshThumbnails());
+        generateThumbnails(row.fullPath)
+        .catch((e) => { 
+            setStatus({
+                status: STATUS_ERROR,
+                message: e.message
+            });
+        });
         onSetStatus(STATUS_PENDING);
         setStatus({
             status: STATUS_PENDING,
@@ -50,7 +55,6 @@ const ThumbnailStatus = ({row, onSetStatus}) => {
         });
     }, [
         uploadContext.generateThumbnails,
-        imageContext.refreshThumbnails,
         onSetStatus,
         row]);
 

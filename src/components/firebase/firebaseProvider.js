@@ -89,6 +89,10 @@ const FirebaseProvider = ({children}) => {
         createFolder: (currentFolderRef, folder) => {
             const ghostFileRef = ref(firebaseStorage, `${currentFolderRef.fullPath}/${folder}/${_ghostFileName}`);
             return uploadString(ghostFileRef, "empty file", "raw", { contentType: "text/plain" })
+            .then(ghostFile => {
+                // Return the created folder (parent of ghost file)
+                return ghostFile.ref.parent;
+            })
         },
         isGhostFile: (item) => item.name === _ghostFileName,
         getDownloadURL: getDownloadURL,

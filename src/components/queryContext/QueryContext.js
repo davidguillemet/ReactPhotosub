@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { throttle } from '../../utils';
 import { useDataProvider } from '../dataProvider/dataManagerProvider';
 import { useFirebaseContext } from '../firebase';
 
@@ -69,14 +68,24 @@ export const QueryContextProvider = ({children}) => {
             enabled: year !== null && year !== undefined && title !== null && title !== undefined,
             structuralSharing: false // To force a refresh even if the data is the same after query invalidation (Image management in Admin)
         }),
-        clearDestinationImages: throttle(
-            (year, title) => {
-                queryClient.invalidateQueries({
-                    queryKey: ['destinationimages', year, title]
-                })
-            },
-            1000, false /* leading */, true /* Trailing */
-        ),
+        addDestinationImage: (year, title, newImage) => {
+            const queryKey = ['destinationimages', year, title];
+            const prevData = queryClient.getQueryData(queryKey);
+            prevData.push(newImage);
+            queryClient.setQueryData(queryKey, [...prevData]);
+
+            const prevImageFolders = queryClient.getQueryData(['imageFolders']);
+            const newImageFolder = `${year}/${title}`
+            if (prevImageFolders.findIndex(folder => folder.path === newImageFolder) === -1) {
+                queryClient.setQueryData(['imageFolders'], [...prevImageFolders, {path: newImageFolder}]);
+            }
+        },
+        removeDestinationImage: (year, title, imageFullPath) => {
+            const queryKey = ['destinationimages', year, title];
+            const prevData = queryClient.getQueryData(queryKey);
+            const newData = prevData.filter(image => `${image.path}/${image.name}` !== imageFullPath);
+            queryClient.setQueryData(queryKey, newData);
+        },
 
         useFetchInteriors: (thenFunc) => useQuery(['interiors'], () => dataProvider.getInteriors().then(thenFunc)),
         useFetchUserInteriors: (uid, thenFunc) => useQuery(['userInteriors', uid], () => dataProvider.getUploadedInteriors(uid).then(thenFunc)),
@@ -114,12 +123,13 @@ export const QueryContextProvider = ({children}) => {
         setFavoritesData: (uid, favorites) => queryClient.setQueryData(['favorites', uid], favorites),
 
         useFetchImageFolders: () => useQuery(['imageFolders'], () => dataProvider.getImageFolders()),
-        clearImageFolders: throttle(
-            () => {
-                queryClient.invalidateQueries({ queryKey: ['imageFolders'] })
-            },
-            1000, false /* leading */, true /* Trailing */
-        )
+        removeImageFolder: (year, title) => {
+            const queryKey = ['imageFolders'];
+            const prevFolders = queryClient.getQueryData(queryKey);
+            const folderToRemove = `${year}/${title}`
+            const newFolders = prevFolders.filter(folder => folder.path !== folderToRemove);
+            queryClient.setQueryData(queryKey, newFolders)
+        }
     });
 
     return (

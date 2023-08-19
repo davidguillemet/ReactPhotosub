@@ -22,9 +22,14 @@ const DatabaseStatus = ({row, onSetStatus}) => {
     })
 
     const onInsertImageInDatabase = React.useCallback(() => {
-        const clearImageQueries = imageContext.clearImageQueries;
         const insertInDatabase = uploadContext.insertInDatabase;
-        insertInDatabase(row.fullPath).then(() => clearImageQueries());
+        insertInDatabase(row.fullPath)
+        .catch((e) => { 
+            setStatus({
+                status: STATUS_ERROR,
+                message: e.message
+            });
+        });
         onSetStatus(STATUS_PENDING);
         setStatus({
             status: STATUS_PENDING,
@@ -32,7 +37,6 @@ const DatabaseStatus = ({row, onSetStatus}) => {
         });
     }, [
         uploadContext.insertInDatabase,
-        imageContext.clearImageQueries,
         onSetStatus,
         row
     ]);

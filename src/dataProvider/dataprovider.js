@@ -259,8 +259,23 @@ DataProvider.prototype.deleteLocation = function(locationId) {
 
 // Images / Thumbnails
 DataProvider.prototype.insertImageInDatabase = function(fullPath) {
-    return this.axios.put('/admin/images', {
-        fullPath
+    return this.axios.put('/admin/images', { fullPath })
+    .then (response => {
+        // The response contains the inserted image
+        // {
+        //     "name": "DSC_9149.jpg",
+        //     "path": "2026/essai1",
+        //     "title": "",
+        //     "description": "",
+        //     "tags": <string arrray>,
+        //     "caption": null,
+        //     "captionTags": null,
+        //     "width": 1328,
+        //     "height": 2000,
+        //     "sizeRatio": 0.664,
+        //     "create": "2012-09-01T18:21:06.00"
+        // }
+        return response.data; // contains the inserted image
     });
 }
 DataProvider.prototype.removeImageFromDatabase = function(fullPath) {
@@ -282,6 +297,8 @@ DataProvider.prototype.createInteriorThumbnails = function(fullPath) {
 }
 
 // Storage
+// It seems it is not possible to remove a folder using the Firebase API
+// We use our own API to use the Storage SDK to remove files and folders
 DataProvider.prototype.removeStorageItem = function(folderFullPath) {
     return this.axios.delete('/admin/bucket', {data: { path: folderFullPath } })
 }

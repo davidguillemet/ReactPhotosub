@@ -78,7 +78,7 @@ module.exports = function(app, config) {
         .get(function(req, res, next) {
             res.locals.errorMessage = `Failed to load images for destination '${getDestinationPath(req)}'`;
             return config.pool({i: "images"})
-                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create, i.tags IS NOT NULL as tags"))
+                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create, i.tags"))
                 .where("i.path", getDestinationPath(req))
                 .orderBy("i.create", "asc")
                 .then((images) => {

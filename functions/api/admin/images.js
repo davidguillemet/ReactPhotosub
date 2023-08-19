@@ -12,7 +12,7 @@ module.exports = function(admin, config) {
             .onConflict(["name", "path"])
             .merge()
             .then(() => {
-                res.status(200).send(`Successfully inserting image ${fileFullPath}.`).end();
+                res.json(newImage);
             }).catch(next);
     };
 

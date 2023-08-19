@@ -1,10 +1,12 @@
 import React from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import { buildLoadingState, withLoading } from 'components/hoc';
-import { getFileNameFromFullPath, getThumbnailsFromImageName, throttle } from 'utils';
+import { getFileNameFromFullPath, getThumbnailsFromImageName } from 'utils';
 import { useFirebaseContext } from 'components/firebase';
 import { useQueryContext } from 'components/queryContext';
 import { getImageNameFromThumbnail } from 'utils';
+import { useDataProvider } from 'components/dataProvider';
+import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER } from './common';
 
 const ImageContext = React.createContext(null);
 
@@ -88,6 +90,7 @@ const getMissingImagesVersusThumbnails = (files, thumbs) => {
 
 export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const firebaseContext = useFirebaseContext();
+    const dataProvider = useDataProvider();
     const queryContext = useQueryContext();
     const [ rows, setRows ] = React.useState({});
     const [ selectedItems, setSelectedItems ] = React.useState(new Set());
@@ -95,12 +98,13 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const [ thumbs, setThumbs ] = React.useState(null);
     const [ errors, setErrors ] = React.useState(new Set());
     const initialFetchCompleted = React.useRef(false);
-    const itemCount = React.useRef(0);
     const thumbsRef = React.useRef(null);
     const destinationProps = React.useRef({
         year: null,
         title: null
     });
+
+    // The images in database for the current destination folder
     const dbImages = useDestinationImages(destinationProps.current);
 
     const setThumbsFromRef = React.useCallback(() => {
@@ -117,34 +121,61 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         }
     }, [firebaseContext]);
 
-    const refreshThumbnails = React.useCallback(() => {
-        if (thumbsRef.current === null || thumbsRef.current === undefined) {
-            return firebaseContext.list(storageRef, { })
-                .then(result => {
-                    thumbsRef.current = result.prefixes.find(isThumbsFolder);
-                    return setThumbsFromRef();
-                });
-        } else {
-            return setThumbsFromRef();
-        }
-    }, [firebaseContext, storageRef, setThumbsFromRef]);
+    const addStorageItems = React.useCallback((newItems, itemType) => {
+        setRows(prevRows => {
+            const propName = itemType === ITEM_TYPE_FILE ? "files" : "folders";
+            // In case of duplicate, remove the previous and keep the new one that
+            // contains the native file we use for the upload task
+            const newSet = new Set(newItems.map(item => item.fullPath));
+            const prevItemsWithoutNew = prevRows[propName].filter(item => !newSet.has(item.fullPath));
+            return {
+                ...prevRows,
+                [propName]: [ ...prevItemsWithoutNew, ...newItems ]
+            }
+        });
+    }, []);
+
+    const removeStorageItems = React.useCallback((itemFullPaths, itemType) => {
+        setRows(prevRows => {
+            const propName = itemType === ITEM_TYPE_FILE ? "files" : "folders";
+            const removeSet = new Set(itemFullPaths);
+            const newItems = prevRows[propName].filter(item => !removeSet.has(item.fullPath));
+            return {
+                ...prevRows,
+                [propName]: [ ...newItems ]
+            }
+        });
+    }, []);
+
+    const addThumbs = React.useCallback((newThumbs) => {
+        setThumbs(prevThumbs => new Set([ ...prevThumbs, ...newThumbs]));
+    }, []);
+
+    const removeThumbs = React.useCallback((thumbsToRemove) => {
+        setThumbs(prevThumbs => {
+            const newSet = new Set(prevThumbs);
+            thumbsToRemove.forEach(thumb => newSet.delete(thumb));
+            return newSet;
+        });
+    }, []);
 
     const fetchItems = React.useCallback(() => {
         return firebaseContext.list(storageRef, { })
             .then(result => {
                 const foldersFromStorage = result.prefixes.filter(isNotThumbsFolder);
-                const missingFolders = getMissingStorageFolders(storageRef.fullPath, foldersFromStorage, foldersFromDb);
                 thumbsRef.current = result.prefixes.find(isThumbsFolder);
-                if (storageRef.parent === null) {
-                    // Sort in reverse order only for the first level (destination years)
-                    foldersFromStorage.sort((f1, f2) => f2.name.localeCompare(f1.name))
-                }
-                const filesFromStorage = result.items.filter((item) => !firebaseContext.isGhostFile(item));
-                itemCount.current = foldersFromStorage.length + filesFromStorage.length;
+                const filesFromStorage = result.items
+                    .filter((item) => !firebaseContext.isGhostFile(item))
+                    .map(storageFile => {
+                        return {
+                            fullPath: storageFile.fullPath,
+                            name: storageFile.name
+                        }
+                    });
                 setRows({
                     folders: foldersFromStorage,
                     files: filesFromStorage,
-                    missingFolders: missingFolders,
+                    missingFolders: undefined,
                     missingFilesFromThumbs: undefined, // Set: Thumbs exist but the storage item is missing
                     missingFilesFromDb: undefined // Set: Database entry exists while the storage item is missing
                 })
@@ -152,7 +183,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
                 setThumbs(null);
                 return setThumbsFromRef();
             })
-    }, [storageRef, firebaseContext, foldersFromDb, setThumbsFromRef]);
+    }, [storageRef, firebaseContext, setThumbsFromRef]);
 
     React.useEffect(() => {
         // Initial fetch Items
@@ -161,6 +192,23 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
             initialFetchCompleted.current = true;
         }
     }, [fetchItems])
+
+    React.useEffect(() => {
+        if (rows.folders === undefined) {
+            return;
+        }
+        setRows(prevRows => {
+            const missingFolders = getMissingStorageFolders(storageRef.fullPath, prevRows.folders, foldersFromDb)
+            return {
+                ...prevRows,
+                missingFolders: missingFolders
+            }
+        })
+    }, [
+        rows.folders,
+        storageRef.fullPath,
+        foldersFromDb
+    ])
 
     React.useEffect(() => {
         if (dbImages === undefined || rows.files === undefined || thumbs === null) {
@@ -178,6 +226,18 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
             }
         });
     }, [thumbs, dbImages, rows.files])
+
+    React.useEffect(() => {
+        // When dbImages has been changed, for example after having removed an image for the current destination,
+        // we have to check if it's empty, in which case we have to remove the current destination folder
+        // from foldersFromDb
+        if (dbImages !== undefined && dbImages !== null && dbImages.length === 0) {
+            const queryContext_removeImageFolder = queryContext.removeImageFolder;
+            const { year, title } = destinationProps.current;
+            queryContext_removeImageFolder(year, title);
+        }
+
+    }, [dbImages, queryContext.removeImageFolder])
 
     const setItemStatus = React.useCallback((fullPath, status) => {
         setErrors(prevErrors => {
@@ -240,12 +300,24 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         return selectedItems.has(row.name);
     }, [selectedItems]);
 
+    const getItemFullPath = React.useCallback((itemName) => {
+        const root = storageRef.fullPath;
+        if (root !== '') {
+            return `${root}/${itemName}`;
+        }
+        return itemName;
+    }, [storageRef.fullPath])
+
     const createFolder = React.useCallback((folderName) => {
         return firebaseContext.createFolder(storageRef, folderName)
-        .then(() => {
-            return fetchItems();
+        .then((folderRef) => {
+            addStorageItems([folderRef], ITEM_TYPE_FOLDER);
         })
-    }, [storageRef, firebaseContext, fetchItems]);
+    }, [
+        storageRef,
+        firebaseContext,
+        addStorageItems
+    ]);
 
     const getImageFromDatabase = React.useCallback((imageName) => {
         if (dbImages === null) {
@@ -262,15 +334,31 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const deleteThumbnails = React.useCallback((itemFullPath) => {
         const itemThumbnails = getThumbnailsFromImageName(itemFullPath);
         const thumbnailsToRemove = itemThumbnails.filter(thumbFullPath => thumbs.has(getFileNameFromFullPath(thumbFullPath)));
-        const deleteItems = firebaseContext.deleteItems;
-        return deleteItems(thumbnailsToRemove); // Return a Promise
-    }, [thumbs, firebaseContext.deleteItems]);
+        const firebaseContext_deleteItems = firebaseContext.deleteItems;
+        return firebaseContext_deleteItems(thumbnailsToRemove)
+        .then(() => {
+            removeThumbs(thumbnailsToRemove.map(fullPath => getFileNameFromFullPath(fullPath)));
+        });
+    }, [thumbs, firebaseContext.deleteItems, removeThumbs]);
 
-    const clearImageQueries = React.useCallback(() => {
-        // Throttling
-        queryContext.clearDestinationImages(destinationProps.current.year, destinationProps.current.title);
-        queryContext.clearImageFolders(); 
-    }, [queryContext]);
+    const deleteStorageItem = React.useCallback((itemFullPath, itemType) => {
+        return dataProvider.removeStorageItem(itemFullPath)
+        .then(() => {
+            removeStorageItems([itemFullPath], itemType);
+        });
+    }, [dataProvider, removeStorageItems]);
+
+    const deleteImageFromDatabase = React.useCallback((itemFullPath) => {
+        return dataProvider.removeImageFromDatabase(itemFullPath)
+        .then(() => {
+            const { year, title } = destinationProps.current;
+            const queryContext_removeDestinationImage = queryContext.removeDestinationImage;
+            queryContext_removeDestinationImage(year, title, itemFullPath);
+        });
+    }, [
+        dataProvider,
+        queryContext.removeDestinationImage
+    ]);
 
     const totalRows = (rows.files ? rows.files.length : 0) + (rows.folders ? rows.folders.length : 0);
     const isReady =
@@ -289,23 +377,28 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         // all items from current path including thumbnails
         rows,
         thumbs,
-        itemCount: itemCount.current,
+        itemCount: totalRows,
 
         // Information about the current path
         storageRef,
-        bucketPath: storageRef.fullPath,
+        getItemFullPath,
         onSetBucketPath,
+        isRoot: storageRef.parent === null,
+        folderName: storageRef.name,
 
         // Information about the possible current destination
         destinationProps: destinationProps.current,
         isDestinationFolder: destinationProps.current.year !== null && destinationProps.current.title !== null,
 
         // Methods to manage items/thumbnails
-        fetchItems,
         createFolder,
         deleteThumbnails,
-        refreshThumbnails: throttle(refreshThumbnails, 1000, true /* leading */, true /* trailing */),
-        clearImageQueries,
+        deleteStorageItem,
+        deleteImageFromDatabase,
+
+        addStorageItems,
+        removeStorageItems,
+        addThumbs,
 
         // Get the database image row from the full path if it exists
         getImageFromDatabase,

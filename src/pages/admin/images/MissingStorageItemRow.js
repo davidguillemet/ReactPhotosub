@@ -9,7 +9,6 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { STATUS_ERROR, STATUS_NOT_AVAILABLE, STATUS_PENDING, StorageItemStatus } from './itemStatus/StorageItemStatus';
 import { useImageContext } from './ImageContext';
 import { useUploadContext } from './upload/UploadContext';
-import { useDataProvider } from 'components/dataProvider';
 
 const ThumbIssueStatus = ({itemName, error}) => {
 
@@ -29,17 +28,16 @@ const ThumbIssueStatus = ({itemName, error}) => {
 
     const fixDeleteThumbnails = React.useCallback(() => {
         setStatus(STATUS_PENDING);
-        const itemFullPath = `${imageContext.bucketPath}/${itemName}`;
+        const getItemFullPath = imageContext.getItemFullPath;
+        const itemFullPath = getItemFullPath(itemName);
         const deleteThumbnails = imageContext.deleteThumbnails;
         deleteThumbnails(itemFullPath)
-            .finally(() => {
-                const refreshThumbnails = imageContext.refreshThumbnails;
-                refreshThumbnails();
-            })
+        .catch(e => {
+            setStatus(STATUS_ERROR);
+        });
     }, [
-        imageContext.bucketPath,
+        imageContext.getItemFullPath,
         imageContext.deleteThumbnails,
-        imageContext.refreshThumbnails,
         itemName
     ]);
 
@@ -65,7 +63,6 @@ const ThumbIssueStatus = ({itemName, error}) => {
 
 const DatabaseIssueStatus = ({itemName, error, type}) => {
 
-    const dataProvider = useDataProvider();
     const imageContext = useImageContext();
     const uploadContext = useUploadContext();
 
@@ -87,16 +84,15 @@ const DatabaseIssueStatus = ({itemName, error, type}) => {
 
     const removeImageFromDatabase = React.useCallback(() => {
         setStatus(STATUS_PENDING);
-        const itemFullPath = `${imageContext.bucketPath}/${itemName}`;
-        dataProvider.removeImageFromDatabase(itemFullPath)
-            .finally(() => {
-                const clearImageQueries = imageContext.clearImageQueries;
-                clearImageQueries();
-            })
+        const deleteImageFromDatabase = imageContext.deleteImageFromDatabase;
+        const getItemFullPath = imageContext.getItemFullPath;
+        deleteImageFromDatabase(getItemFullPath(itemName))
+        .catch(e => {
+            setStatus(STATUS_ERROR);
+        })
     }, [
-        dataProvider,
-        imageContext.clearImageQueries,
-        imageContext.bucketPath,
+        imageContext.deleteImageFromDatabase,
+        imageContext.getItemFullPath,
         itemName
     ]);
 
@@ -154,6 +150,7 @@ const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = fa
         <TableRow
             role="checkbox"
             tabIndex={-1}
+            sx={{bgcolor: theme => theme.palette.grey[100]}}
         >
             <TableCell padding="checkbox">
                 <Checkbox

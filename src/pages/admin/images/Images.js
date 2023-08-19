@@ -10,7 +10,6 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { useQueryContext } from 'components/queryContext';
 import MissingStorageFolders from './MissingStorageFolders';
-import UploadTableRows from './upload/UploadTableRows';
 import { ImageContextProvider, useImageContext } from './ImageContext';
 import { UploadContextProvider } from './upload/UploadContext';
 import TableFolders from './TableFolders';
@@ -30,7 +29,7 @@ const Images = () => {
     const imageContext = useImageContext();
     return (
         <React.Fragment>
-        <Paragraph>{`${imageContext.itemCount} item(s) dans le répertoire Storage`}</Paragraph>
+        <Paragraph>{`${imageContext.itemCount} item(s) dans le répertoire ${imageContext.isRoot ? "racine" : imageContext.folderName}`}</Paragraph>
         <TableContainer component={Paper} sx={{display: 'flex', flexDirection: 'column'}}>
             <TableToolbar />
             <Table sx={{ width: "100%" }} size="medium">
@@ -62,7 +61,6 @@ const Images = () => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    <UploadTableRows />
                     {
                         // Don't use withLoading since a CircularProgress cannot be a child of TableBody
                         imageContext.ready === true && 
@@ -91,7 +89,7 @@ const ImagesController = () => {
     return (
         <ImageContextProvider foldersFromDb={folders}>
             <UploadContextProvider>
-                <Images foldersFromDb={folders} />
+                <Images />
             </UploadContextProvider>
         </ImageContextProvider>
     )

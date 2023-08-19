@@ -3,8 +3,6 @@ import { TableRow, TableCell, Checkbox, Chip } from "@mui/material";
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import FileUpload from 'components/upload';
 import { useUploadContext } from "./UploadContext";
-import { useImageContext } from '../ImageContext';
-import { useDataProvider } from 'components/dataProvider';
 import BorderLinearProgress from 'components/borderLinearProgress';
 
 const STEP_UPLOAD = "ste::upload";
@@ -14,29 +12,26 @@ const STEP_ERROR = "step::error";
 
 const FilePostProcessing = ({fileFullPath, onSuccess, onError}) => {
 
-    const dataProvider = useDataProvider();
-    const imageContext = useImageContext();
     const uploadContext = useUploadContext();
 
     React.useEffect(() => {
         const generateThumbs = uploadContext.generateThumbnails;
         const thumbPromise = generateThumbs(fileFullPath);
 
-        const dataBasePromise =
-            imageContext.isDestinationFolder ?
-            dataProvider.insertImageInDatabase(fileFullPath) :
-            Promise.resolve();
+        const insertInDatabase = uploadContext.insertInDatabase;
+        const dataBasePromise = insertInDatabase(fileFullPath);
         
-        Promise.all([thumbPromise, dataBasePromise]).then(() => {
+        Promise.all([thumbPromise, dataBasePromise]).then((results) => {
             onSuccess();
+        }).catch(e => {
+            onError(e);
         });
-
     }, [
         uploadContext.generateThumbnails,
-        imageContext.isDestinationFolder,
-        dataProvider,
+        uploadContext.insertInDatabase,
         fileFullPath,
-        onSuccess
+        onSuccess,
+        onError
     ]);
 
     return (

@@ -3,12 +3,10 @@ import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { VerticalSpacing } from 'template/spacing';
 import { useUploadContext } from './UploadContext';
-import { useImageContext } from '../ImageContext';
 
 const FileUploadSelection = React.forwardRef(({caption, disabled}, ref) => {
 
     const uploadContext = useUploadContext();
-    const imageContext = useImageContext();
 
     const handleFileSelection = (event) => {
         const { target: { files } } = event;
@@ -19,7 +17,7 @@ const FileUploadSelection = React.forwardRef(({caption, disabled}, ref) => {
         // Reset the input value to be able to upload the same file again
         // For example after having removed it
         event.target.value = "";
-        uploadContext.setUploadSelection(_files, imageContext.bucketPath);
+        uploadContext.setUploadSelection(_files);
     }
 
     return (

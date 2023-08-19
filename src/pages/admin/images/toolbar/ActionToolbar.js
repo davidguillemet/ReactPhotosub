@@ -1,7 +1,6 @@
 import React from 'react';
 import Fade from '@mui/material/Fade';
 import Box from '@mui/material/Box'
-import {unstable_batchedUpdates} from 'react-dom';
 import { IconButton, Stack, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useImageContext } from '../ImageContext';
@@ -11,14 +10,13 @@ import { ConfirmDialog } from 'dialogs';
 import { useTranslation } from 'utils';
 import { useToast } from 'components/notifications';
 import { useOverlay } from 'components/loading';
-import { useDataProvider } from 'components/dataProvider';
+import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER } from '../common';
 
 const isImageFile = (fullPath) => {
     return fullPath.endsWith(".jpg");
 }
 
 const ActionToolbar = () => {
-    const dataProvider = useDataProvider();
     const imageContext = useImageContext();
     const { toast } = useToast();
     const t = useTranslation("pages.admin.images");
@@ -37,22 +35,27 @@ const ActionToolbar = () => {
 
     const deleteItem = React.useCallback((itemName) => {
         const promises = [];
-        const itemFullPath = `${imageContext.bucketPath}/${itemName}`;
-        promises.push(dataProvider.removeStorageItem(itemFullPath));
+        const getItemFullPath = imageContext.getItemFullPath;
+        const itemFullPath = getItemFullPath(itemName);
+        const isImage = isImageFile(itemFullPath);
+        const deleteStorageItem = imageContext.deleteStorageItem;
+        promises.push(deleteStorageItem(itemFullPath, isImage ? ITEM_TYPE_FILE : ITEM_TYPE_FOLDER));
         if (isImageFile(itemName)) {
             const deleteThumbnails = imageContext.deleteThumbnails;
             promises.push(deleteThumbnails(itemFullPath));
             if (imageContext.isDestinationFolder) {
-                promises.push(dataProvider.removeImageFromDatabase(itemFullPath));
+                const deleteImageFromDatabase = imageContext.deleteImageFromDatabase;
+                promises.push(deleteImageFromDatabase(itemFullPath));
             }
         }
         return Promise.all(promises);
 
     }, [
-        dataProvider,
-        imageContext.bucketPath,
+        imageContext.getItemFullPath,
         imageContext.isDestinationFolder,
-        imageContext.deleteThumbnails
+        imageContext.deleteThumbnails,
+        imageContext.deleteStorageItem,
+        imageContext.deleteImageFromDatabase
     ]);
 
     const onDeleteItems = React.useCallback(() => {
@@ -60,21 +63,8 @@ const ActionToolbar = () => {
         const getSelection = imageContext.selection;
         const selection = getSelection();
         // Delete storage items
-        const hasImage = selection.some(itemName => isImageFile(itemName));
         const promises = selection.map(itemName => deleteItem(itemName));
         return Promise.all(promises)
-            .then(() => {
-                const fetchItems = imageContext.fetchItems
-                const refreshThumbnails = imageContext.refreshThumbnails;
-                const clearImageQueries = imageContext.clearImageQueries;
-                unstable_batchedUpdates(() => {
-                    if (hasImage) {
-                        refreshThumbnails();
-                        clearImageQueries();
-                    }
-                    fetchItems();
-                })
-            })
             .catch((e) => {
                 toast.error(e.message);
             })
@@ -87,9 +77,6 @@ const ActionToolbar = () => {
         toast,
         setProcessing,
         imageContext.selection,
-        imageContext.fetchItems,
-        imageContext.refreshThumbnails,
-        imageContext.clearImageQueries,
         imageContext.onUnselectAll,
         deleteItem
     ]);

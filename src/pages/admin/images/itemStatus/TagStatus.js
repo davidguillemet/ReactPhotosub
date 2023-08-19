@@ -34,7 +34,7 @@ const TagStatus = ({row, onSetStatus}) => {
                 newStatus = STATUS_NOT_AVAILABLE;
             } else if (imageFromDb !== undefined) {
                 // The current image is in database, check tags
-                if (imageFromDb.tags === true) {
+                if (imageFromDb.tags !== null) {
                     newStatus = STATUS_SUCCESS;
                 } else {
                     newStatus = STATUS_ERROR;

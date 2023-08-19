@@ -1,6 +1,9 @@
 import React from 'react';
 import { useDataProvider } from 'components/dataProvider';
 import { useImageContext } from '../ImageContext';
+import { useQueryContext } from 'components/queryContext';
+import { getThumbnailsFromImageName, getFileNameFromFullPath } from 'utils';
+import { ITEM_TYPE_FILE } from '../common';
 
 const _maxParallelUpload = 3;
 
@@ -9,6 +12,7 @@ const UploadContext = React.createContext(null);
 export const UploadContextProvider = ({children}) => {
 
     const dataProvider = useDataProvider();
+    const queryContext = useQueryContext();
     const imageContext = useImageContext();
     const [ filesToUpload, setFilesToUpload ] = React.useState([]);
     const [ uploadingCursor, setUploadingCursor ] = React.useState(-1);
@@ -18,11 +22,12 @@ export const UploadContextProvider = ({children}) => {
     const dbProcessing = React.useRef(new Set());
     const thumbProcessing = React.useRef(new Set());
 
-    const setUploadSelection = React.useCallback((files, parentFolder) => {
+    const setUploadSelection = React.useCallback((files) => {
         fileIndices.current = new Map();
         lastCursor.current = files.length - 1;
+        const getItemFullPath = imageContext.getItemFullPath;
         const fileWrappers = files.map((file, index) => {
-            const fullPath = `${parentFolder}/${file.name}`;
+            const fullPath = getItemFullPath(file.name);
             fileIndices.current.set(fullPath, index);
             const fileWrapper = {
                 name: file.name,
@@ -34,7 +39,12 @@ export const UploadContextProvider = ({children}) => {
         });
         setUploadingCursor(Math.min(fileWrappers.length - 1, _maxParallelUpload - 1));
         setFilesToUpload(fileWrappers);
-    }, []);
+        const addStorageItems = imageContext.addStorageItems
+        addStorageItems(fileWrappers, ITEM_TYPE_FILE);
+    }, [
+        imageContext.addStorageItems,
+        imageContext.getItemFullPath
+    ]);
 
     const insertInDatabase = React.useCallback((fileFullPath) => {
         if (!imageContext.isDestinationFolder) {
@@ -42,12 +52,14 @@ export const UploadContextProvider = ({children}) => {
         }
         dbProcessing.current.add(fileFullPath);
         return dataProvider.insertImageInDatabase(fileFullPath)
-            .then(() => {
+            .then((newImage) => {
+                const { year, title } = imageContext.destinationProps;
+                queryContext.addDestinationImage(year, title, newImage);
                 dbProcessing.current.delete(fileFullPath);
             }).catch((e) => {
                 // TODO
             });
-    }, [dataProvider, imageContext.isDestinationFolder]);
+    }, [dataProvider, imageContext.isDestinationFolder, imageContext.destinationProps, queryContext]);
 
     const generateThumbnails = React.useCallback((fileFullPath) => {
         thumbProcessing.current.add(fileFullPath);
@@ -57,11 +69,24 @@ export const UploadContextProvider = ({children}) => {
             dataProvider.createInteriorThumbnails(fileFullPath);
 
         return thumbPromise.then(() => {
+
+            // Add thumbnails in imageContext
+            const itemThumbnails = 
+                getThumbnailsFromImageName(fileFullPath)
+                .map(thumbFullPath => getFileNameFromFullPath(thumbFullPath));
+
+            const addThumbs = imageContext.addThumbs;
+            addThumbs(itemThumbnails);
+
             thumbProcessing.current.delete(fileFullPath);
         }).catch((e) => {
                 // TODO
         });
-    }, [dataProvider, imageContext.isDestinationFolder]);
+    }, [
+        dataProvider,
+        imageContext.isDestinationFolder,
+        imageContext.addThumbs
+    ]);
 
     const onAllFilesProcessed = React.useCallback(() => {
         // Clear upload state, and keep only failing uploads.
@@ -69,14 +94,7 @@ export const UploadContextProvider = ({children}) => {
         setUploadingCursor(-1);
         fileIndices.current = null;
         lastCursor.current = -1;
-
-        // Fetch items to update list
-        const fetchItems = imageContext.fetchItems;
-        const clearImageQueries = imageContext.clearImageQueries;
-        fetchItems().then(() => {
-            clearImageQueries();
-        });
-    }, [imageContext.fetchItems, imageContext.clearImageQueries])
+    }, [])
 
     const onFileProcessed = React.useCallback((fileFullPath, error) => {
         setUploadingCursor(cursor => cursor + 1);
@@ -109,7 +127,6 @@ export const UploadContextProvider = ({children}) => {
     }, []);
 
     const uploadContext = {
-        files: filesToUpload,
         setUploadSelection,
         canStartUpload,
         onFileProcessed,
