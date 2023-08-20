@@ -9,6 +9,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { STATUS_ERROR, STATUS_NOT_AVAILABLE, STATUS_PENDING, StorageItemStatus } from './itemStatus/StorageItemStatus';
 import { useImageContext } from './ImageContext';
 import { useUploadContext } from './upload/UploadContext';
+import TagStatus from './itemStatus/TagStatus';
 
 const ThumbIssueStatus = ({itemName, error}) => {
 
@@ -172,7 +173,9 @@ const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = fa
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
                 <DatabaseIssueStatus itemName={itemName} type={type} error={dbIssue} />
             </TableCell>
-            <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>{" - "}</TableCell>
+            <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
+                <TagStatus name={itemName} fullPath={imageContext.getItemFullPath(itemName)} />
+            </TableCell>
         </TableRow>
     )
 }

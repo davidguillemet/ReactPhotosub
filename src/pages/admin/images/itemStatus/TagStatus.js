@@ -10,7 +10,7 @@ import {
 import { useUploadContext } from '../upload/UploadContext';
 import { useImageContext } from '../ImageContext';
 
-const TagStatus = ({row, onSetStatus}) => {
+const TagStatus = ({name, fullPath, onSetStatus}) => {
     const uploadContext = useUploadContext();
     const imageContext = useImageContext();
 
@@ -25,14 +25,14 @@ const TagStatus = ({row, onSetStatus}) => {
         let newStatus = null;
 
         const uploadContext_isDbProcessing = uploadContext.isDbProcessing;
-        if (uploadContext_isDbProcessing(row.fullPath)) {
+        if (uploadContext_isDbProcessing(fullPath)) {
             newStatus = STATUS_PENDING;
-        } else if (!row.name.endsWith(".jpg")) {
+        } else if (!name.endsWith(".jpg")) {
             // Not an image from a destination
             newStatus = STATUS_NOT_AVAILABLE;
         } else {
             const imageContext_getImageFromDatabase = imageContext.getImageFromDatabase;
-            const imageFromDb = imageContext_getImageFromDatabase(row.name);
+            const imageFromDb = imageContext_getImageFromDatabase(name);
             if (imageFromDb === null) {
                 // The parent folder is not a destination
                 newStatus = STATUS_NOT_AVAILABLE;
@@ -51,7 +51,9 @@ const TagStatus = ({row, onSetStatus}) => {
             }
         }
 
-        onSetStatus(newStatus);
+        if (onSetStatus) {
+            onSetStatus(newStatus);
+        }
         setStatus({
             status: newStatus,
             message: newMessage
@@ -61,7 +63,8 @@ const TagStatus = ({row, onSetStatus}) => {
         uploadContext.isDbProcessing,
         imageContext.getImageFromDatabase,
         imageContext,
-        row,
+        fullPath,
+        name,
         onSetStatus]);
 
     return <StorageItemStatus {...status} />;

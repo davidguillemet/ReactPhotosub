@@ -16,6 +16,26 @@ module.exports = function(admin, config) {
             }).catch(next);
     };
 
+    admin.route("/images/errors")
+        // Return all errors related to images in database (missing tags, ...)
+        .get(async function(req, res, next) {
+            res.locals.errorMessage = "Failed to get errors about images in database";
+            return config.pool({i: "images"})
+                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create"))
+                .where({tags: null})
+                .orderBy("i.create", "asc")
+                .then((images) => {
+                    images.forEach((image) => {
+                        // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
+                        image.src = config.convertPathToUrl(image.path + "/" + image.name);
+                    });
+                    const errors = {
+                        noTags: images,
+                    };
+                    res.json(errors);
+                }).catch(next);
+        });
+
     admin.route("/images")
         // Process an image from Storage and insert it in database (called from Admin page)
         .put(async function(req, res, next) {

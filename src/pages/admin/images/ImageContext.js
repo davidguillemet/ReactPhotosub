@@ -408,6 +408,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         onSetBucketPath,
         folderType: getFolderType(),
         folderName: storageRef.name,
+        folderPath: storageRef.fullPath,
 
         // Information about the possible current destination
         destinationProps: destinationProps.current,

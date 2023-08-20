@@ -18,6 +18,7 @@ import TableToolbar from './toolbar/TableToolbar';
 import { CircularProgress } from '@mui/material';
 import { Paragraph } from 'template/pageTypography';
 import { FOLDER_TYPE } from './common';
+import ImageErrors from './globalErrors/ImageErrors';
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -31,6 +32,7 @@ const Images = () => {
     const folderName = imageContext.folderType === FOLDER_TYPE.root ? "racine" : imageContext.folderName;
     return (
         <React.Fragment>
+        <ImageErrors />
         <Paragraph>{`${imageContext.itemCount} item(s) dans le répertoire ${folderName}`}</Paragraph>
         <TableContainer component={Paper} sx={{display: 'flex', flexDirection: 'column'}}>
             <TableToolbar />

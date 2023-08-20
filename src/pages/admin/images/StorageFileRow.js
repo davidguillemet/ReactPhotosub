@@ -51,7 +51,7 @@ const StorageFileRow = ({row, selected}) => {
                 <DatabaseStatus row={row} onSetStatus={setDbStatus} />
             </TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
-                <TagStatus row={row} onSetStatus={setTagStatus} />
+                <TagStatus name={row.name} fullPath={row.fullPath} onSetStatus={setTagStatus} />
             </TableCell>
         </TableRow>
     )

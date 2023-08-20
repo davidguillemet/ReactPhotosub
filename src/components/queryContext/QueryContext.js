@@ -3,6 +3,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataProvider } from '../dataProvider/dataManagerProvider';
 import { useFirebaseContext } from '../firebase';
 
+const findImageIndex = (imageArr, imageOrFullPath) => {
+    if (typeof imageOrFullPath === 'string') {
+        const fullPath = imageOrFullPath;
+        return imageArr.findIndex(image => `${image.path}/${image.name}` === fullPath);
+    } else {
+        const image = imageOrFullPath;
+        return imageArr.findIndex(img => image.name === img.name && image.path === img.path);
+    }
+}
+
 const QueryContext = createContext(null);
 
 export const QueryContextProvider = ({children}) => {
@@ -71,7 +81,15 @@ export const QueryContextProvider = ({children}) => {
         addDestinationImage: (year, title, newImage) => {
             const queryKey = ['destinationimages', year, title];
             const prevData = queryClient.getQueryData(queryKey);
-            prevData.push(newImage);
+            // We might upload the same image again,in which case we must replace the image in the data
+            const imageIndex = findImageIndex(prevData, newImage);
+            if (imageIndex === -1) {
+                // New image
+                prevData.push(newImage);
+            } else {
+                // Upload again an existing image
+                prevData.splice(imageIndex, 1, newImage);
+            }
             queryClient.setQueryData(queryKey, [...prevData]);
 
             const prevImageFolders = queryClient.getQueryData(['imageFolders']);
@@ -79,12 +97,36 @@ export const QueryContextProvider = ({children}) => {
             if (prevImageFolders.findIndex(folder => folder.path === newImageFolder) === -1) {
                 queryClient.setQueryData(['imageFolders'], [...prevImageFolders, {path: newImageFolder}]);
             }
+
+            const prevImageErrors = queryClient.getQueryData(['imageErrors']);
+            if (prevImageErrors.noTags) {
+                const errorImgIndex = findImageIndex(prevImageErrors.noTags, newImage);
+                if (errorImgIndex !== -1 && newImage.tags !== null) {
+                    // Remove the image from errors since it contains tag now
+                    prevImageErrors.noTags.splice(errorImgIndex, 1);
+                    queryClient.setQueryData(['imageErrors'], prevImageErrors);
+                } else if (errorImgIndex === -1 && newImage.tags === null) {
+                    // The new uploaded image has no tags and is not yet part of the errors
+                    prevImageErrors.noTags.push(newImage);
+                    queryClient.setQueryData(['imageErrors'], prevImageErrors);
+                }
+            }
         },
         removeDestinationImage: (year, title, imageFullPath) => {
             const queryKey = ['destinationimages', year, title];
             const prevData = queryClient.getQueryData(queryKey);
             const newData = prevData.filter(image => `${image.path}/${image.name}` !== imageFullPath);
             queryClient.setQueryData(queryKey, newData);
+
+            const prevImageErrors = queryClient.getQueryData(['imageErrors']);
+            if (prevImageErrors.noTags && prevImageErrors.noTags.length > 0) {
+                const errorImgIndex = findImageIndex(prevImageErrors.noTags, imageFullPath);
+                if (errorImgIndex !== -1) {
+                    // The removed image has no tags, just remove it from the error list
+                    prevImageErrors.noTags.splice(errorImgIndex, 1);
+                    queryClient.setQueryData(['imageErrors'], prevImageErrors);
+                }
+            }
         },
 
         useFetchInteriors: (thenFunc) => useQuery(['interiors'], () => dataProvider.getInteriors().then(thenFunc)),
@@ -129,7 +171,9 @@ export const QueryContextProvider = ({children}) => {
             const folderToRemove = `${year}/${title}`
             const newFolders = prevFolders.filter(folder => folder.path !== folderToRemove);
             queryClient.setQueryData(queryKey, newFolders)
-        }
+        },
+
+        useFetchImageErrors: () => useQuery(['imageErrors'], () => dataProvider.getImageErrors())
     });
 
     return (

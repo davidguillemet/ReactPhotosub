@@ -296,6 +296,11 @@ DataProvider.prototype.createInteriorThumbnails = function(fullPath) {
     });
 }
 
+DataProvider.prototype.getImageErrors = function() {
+    return this.axios.get('admin/images/errors')
+    .then(response => response.data);
+}
+
 // Storage
 // It seems it is not possible to remove a folder using the Firebase API
 // We use our own API to use the Storage SDK to remove files and folders
