@@ -62,20 +62,6 @@ export function shuffleArray(initialArray) {
     return newArray;
 }
 
-const _blurrySubFolder = 'blurry';
-
-export function getBlurrySrc(src) {
-    // src is like https://<host>/homeslideshow/DSC_2264.jpg
-    // we want a new path to the blurry version as https://<host>/homeslideshow/blurry/DSC_2264.jpg
-    const path = src.split("/");
-    path.splice(path.length - 1, 0, _blurrySubFolder);
-    return path.join("/");
-}
-
-export function isBlurrySrc(src) {
-    return src.includes(_blurrySubFolder);
-}
-
 export const THUMB_XS = 150;
 export const THUMB_S  = 300;
 export const THUMB_M = 600;
