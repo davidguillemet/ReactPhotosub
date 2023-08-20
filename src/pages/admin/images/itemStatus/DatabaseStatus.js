@@ -10,6 +10,7 @@ import {
     STATUS_ERROR
 } from './StorageItemStatus';
 import { useImageContext } from '../ImageContext';
+import { FOLDER_TYPE } from '../common';
 
 const DatabaseStatus = ({row, onSetStatus}) => {
 
@@ -38,7 +39,10 @@ const DatabaseStatus = ({row, onSetStatus}) => {
         const uploadContext_hasDbProcessingError = uploadContext.hasDbProcessingError;
         const uploadContext_getDbProcessingError = uploadContext.getDbProcessingError;
 
-        if (uploadContext_isDbProcessing(row.fullPath)) {
+        if (imageContext.folderType !== FOLDER_TYPE.destination) {
+            // Image in database for destination only
+            newStatus = STATUS_NOT_AVAILABLE;
+        } else if (uploadContext_isDbProcessing(row.fullPath)) {
             newStatus = STATUS_PENDING;
         } else if (uploadContext_hasDbProcessingError(row.fullPath)) {
             const error = uploadContext_getDbProcessingError(row.fullPath);
@@ -74,6 +78,7 @@ const DatabaseStatus = ({row, onSetStatus}) => {
         uploadContext.hasDbProcessingError,
         uploadContext.getDbProcessingError,
         imageContext.getImageFromDatabase,
+        imageContext.folderType,
         row,
         onSetStatus
     ]);

@@ -6,7 +6,7 @@ import { useFirebaseContext } from 'components/firebase';
 import { useQueryContext } from 'components/queryContext';
 import { getImageNameFromThumbnail } from 'utils';
 import { useDataProvider } from 'components/dataProvider';
-import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER } from './common';
+import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER, FOLDER_TYPE} from './common';
 
 const ImageContext = React.createContext(null);
 
@@ -32,6 +32,14 @@ const extractDestinationProps = (path) => {
         title: null
     }
 }
+
+const _userUploadRegexp = /^userUpload\/[^/]+\/interiors$/i; 
+
+const isInteriorFolder = (fullPath) => {
+    // userUpload / cUA06mnoTPUnknoYdfLeZgQHvXjU / interiors
+    // interiors
+    return (fullPath === "interiors" || _userUploadRegexp.test(fullPath))
+};
 
 const getMissingStorageFolders = (currentPath, foldersFromStorage, foldersFromDb) => {
     // storage.fullPath = '2025/essai'  
@@ -360,6 +368,21 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         queryContext.removeDestinationImage
     ]);
 
+    const getFolderType = React.useCallback(() => {
+        if (storageRef.parent === null) {
+            return FOLDER_TYPE.root;
+        } else if (destinationProps.current.year !== null && destinationProps.current.title !== null) {
+            return FOLDER_TYPE.destination;
+        } else if (storageRef.fullPath === "homeslideshow") {
+            return FOLDER_TYPE.homeSlideshow;
+        } else if (storageRef.fullPath.startsWith("legacy")) {
+            return FOLDER_TYPE.legacy;
+        } else if (isInteriorFolder(storageRef.fullPath)) {
+            return FOLDER_TYPE.interior;
+        }
+        return FOLDER_TYPE.none;
+    }, [storageRef]);
+
     const totalRows = (rows.files ? rows.files.length : 0) + (rows.folders ? rows.folders.length : 0);
     const isReady =
         dbImages !== undefined &&
@@ -383,12 +406,11 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         storageRef,
         getItemFullPath,
         onSetBucketPath,
-        isRoot: storageRef.parent === null,
+        folderType: getFolderType(),
         folderName: storageRef.name,
 
         // Information about the possible current destination
         destinationProps: destinationProps.current,
-        isDestinationFolder: destinationProps.current.year !== null && destinationProps.current.title !== null,
 
         // Methods to manage items/thumbnails
         createFolder,

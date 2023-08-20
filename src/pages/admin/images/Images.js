@@ -17,6 +17,7 @@ import TableFiles from './TableFiles';
 import TableToolbar from './toolbar/TableToolbar';
 import { CircularProgress } from '@mui/material';
 import { Paragraph } from 'template/pageTypography';
+import { FOLDER_TYPE } from './common';
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -27,9 +28,10 @@ const columns = [
 
 const Images = () => {
     const imageContext = useImageContext();
+    const folderName = imageContext.folderType === FOLDER_TYPE.root ? "racine" : imageContext.folderName;
     return (
         <React.Fragment>
-        <Paragraph>{`${imageContext.itemCount} item(s) dans le répertoire ${imageContext.isRoot ? "racine" : imageContext.folderName}`}</Paragraph>
+        <Paragraph>{`${imageContext.itemCount} item(s) dans le répertoire ${folderName}`}</Paragraph>
         <TableContainer component={Paper} sx={{display: 'flex', flexDirection: 'column'}}>
             <TableToolbar />
             <Table sx={{ width: "100%" }} size="medium">

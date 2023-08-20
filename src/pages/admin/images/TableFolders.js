@@ -1,6 +1,7 @@
 import React from 'react';
 import { useImageContext } from './ImageContext';
 import StorageFolderRow from './StorageFolderRow';
+import { FOLDER_TYPE } from './common';
 
 const sortAscending = (f1, f2) => f1.name.localeCompare(f2.name);
 const sortDescending = (f1, f2) => f2.name.localeCompare(f1.name);
@@ -14,7 +15,7 @@ const TableFolders = () => {
     }
 
     // Sort in reverse order only for the first level (destination years)
-    const sortFunction = imageContext.isRoot ? sortDescending : sortAscending;
+    const sortFunction = imageContext.folderType === FOLDER_TYPE.root ? sortDescending : sortAscending;
 
     return (
         <React.Fragment>

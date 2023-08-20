@@ -3,7 +3,7 @@ import { useDataProvider } from 'components/dataProvider';
 import { useImageContext } from '../ImageContext';
 import { useQueryContext } from 'components/queryContext';
 import { getThumbnailsFromImageName, getFileNameFromFullPath } from 'utils';
-import { ITEM_TYPE_FILE } from '../common';
+import { FOLDER_TYPE, ITEM_TYPE_FILE } from '../common';
 
 const _maxParallelUpload = 3;
 
@@ -41,8 +41,10 @@ export const UploadContextProvider = ({children}) => {
     const [ processingStatus, setProcessingStatus ] = React.useState({
         dbProcessing: new Set(),
         thumbProcessing: new Set(),
+        blurryProcessing: new Set(),
         dbProcessingErrors: new Map(),
-        thumbProcessingErrors: new Map()
+        thumbProcessingErrors: new Map(),
+        blurryProcessingErrors: new Map()
     })
 
     const setUploadSelection = React.useCallback((files) => {
@@ -70,7 +72,7 @@ export const UploadContextProvider = ({children}) => {
     ]);
 
     const insertInDatabase = React.useCallback((fileFullPath) => {
-        if (!imageContext.isDestinationFolder) {
+        if (imageContext.folderType !== FOLDER_TYPE.destination) {
             return Promise.resolve();
         }
         setProcessingStatus(prevStatus => {
@@ -99,9 +101,19 @@ export const UploadContextProvider = ({children}) => {
                     }
                 })
             });
-    }, [dataProvider, imageContext.isDestinationFolder, imageContext.destinationProps, queryContext]);
+    }, [
+        dataProvider,
+        imageContext.folderType,
+        imageContext.destinationProps,
+        queryContext
+    ]);
 
     const generateThumbnails = React.useCallback((fileFullPath) => {
+        if (imageContext.folderType !== FOLDER_TYPE.destination &&
+            imageContext.folderType !== FOLDER_TYPE.interior) {
+            return Promise.resolve();
+        }
+
         setProcessingStatus(prevStatus => {
             return {
                 ...prevStatus,
@@ -110,9 +122,9 @@ export const UploadContextProvider = ({children}) => {
             }
         })
         const thumbPromise =
-            imageContext.isDestinationFolder ?
-            dataProvider.refreshThumbnails :
-            dataProvider.createInteriorThumbnails;
+            imageContext.folderType === FOLDER_TYPE.destination ?
+            dataProvider.refreshThumbnails :        // Destination
+            dataProvider.createInteriorThumbnails;  // Interior
 
         return thumbPromise.bind(dataProvider)(fileFullPath).then(() => {
 
@@ -141,7 +153,7 @@ export const UploadContextProvider = ({children}) => {
         });
     }, [
         dataProvider,
-        imageContext.isDestinationFolder,
+        imageContext.folderType,
         imageContext.addThumbs
     ]);
 

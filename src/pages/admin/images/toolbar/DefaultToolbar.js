@@ -9,6 +9,14 @@ import StorageBreadcrumbs from './BreadCrumbs';
 import FolderFormDialog from '../FolderFormDialog';
 import { useImageContext } from '../ImageContext';
 import { useUploadContext } from '../upload/UploadContext';
+import { FOLDER_TYPE } from '../common';
+
+const _uploadSupport = [
+    FOLDER_TYPE.destination,
+    FOLDER_TYPE.homeSlideshow,
+    FOLDER_TYPE.interior,
+    FOLDER_TYPE.legacy
+]
 
 const DefaultToolbar = () => {
     const uploadContext = useUploadContext();
@@ -25,6 +33,8 @@ const DefaultToolbar = () => {
     const onCloseFolderDialog = React.useCallback(() => {
         setFolderDialogOpen(false);
     }, []);
+
+    const isUploadAvailable = _uploadSupport.includes(imageContext.folderType);
 
     return (
         <Fade in={imageContext.selectionCount === 0}>
@@ -49,7 +59,7 @@ const DefaultToolbar = () => {
                     </IconButton>
                     <FileUploadSelection
                         ref={uploadButtonRef}
-                        disabled={imageContext.destinationProps.year === null || imageContext.destinationProps.title === null}
+                        disabled={!isUploadAvailable}
                     />
                 </Stack>
                 <FolderFormDialog
