@@ -7,7 +7,7 @@ import RowSelector from './RowSelector';
 import DatabaseStatus from './itemStatus/DatabaseStatus';
 import ThumbnailStatus from './itemStatus/ThumbnailStatus';
 import { getItemConsolidatedStatus } from './itemStatus/StorageItemStatus';
-import TagStatus from './itemStatus/TagStatus';
+import DataBasePropStatus from './itemStatus/DataBasePropStatus';
 import { useImageContext } from './ImageContext';
 
 const StorageFileRow = ({row, selected}) => {
@@ -16,15 +16,15 @@ const StorageFileRow = ({row, selected}) => {
 
     const [ dbStatus, setDbStatus ] = React.useState("default");
     const [ thumbStatus, setThumbStatus ] = React.useState("default");
-    const [ tagStatus, setTagStatus ] = React.useState("default");
+    const [ dbPropStatus, setDbPropStatus ] = React.useState("default");
     const [ itemStatus, setItemStatus ] = React.useState("default")
 
     React.useEffect(() => {
-        const consolidatedStatus = getItemConsolidatedStatus(dbStatus, thumbStatus, tagStatus);
+        const consolidatedStatus = getItemConsolidatedStatus(dbStatus, thumbStatus, dbPropStatus);
         const setContextItemStatus = imageContext.setItemStatus;
         setContextItemStatus(row.name, consolidatedStatus);
         setItemStatus(consolidatedStatus);
-    }, [row, dbStatus, thumbStatus, tagStatus, imageContext.setItemStatus]);
+    }, [row, dbStatus, thumbStatus, dbPropStatus, imageContext.setItemStatus]);
 
     return (
         <TableRow
@@ -51,7 +51,7 @@ const StorageFileRow = ({row, selected}) => {
                 <DatabaseStatus row={row} onSetStatus={setDbStatus} />
             </TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
-                <TagStatus name={row.name} fullPath={row.fullPath} onSetStatus={setTagStatus} />
+                <DataBasePropStatus name={row.name} fullPath={row.fullPath} onSetStatus={setDbPropStatus} />
             </TableCell>
         </TableRow>
     )

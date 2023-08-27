@@ -49,7 +49,7 @@ const ThumbnailStatus = ({row, onSetStatus}) => {
     ]);
 
     React.useEffect(() => {
-        let message = null;
+        let messages = null;
         let status = null;
         const statusInfo = {};
 
@@ -65,7 +65,7 @@ const ThumbnailStatus = ({row, onSetStatus}) => {
         } else if (uploadContext_hasThumbProcessingError(row.fullPath)) {
             const error = uploadContext_getThumbProcessingError(row.fullPath);
             status = STATUS_ERROR;
-            message = error;
+            messages = [error];
         } else if (!row.name.endsWith(".jpg")) {
             // Not an image from a destination
             status = STATUS_NOT_AVAILABLE;
@@ -76,13 +76,13 @@ const ThumbnailStatus = ({row, onSetStatus}) => {
             // Some thumbnails are missing
             if (statusInfo.missing !== undefined) {
                 if (statusInfo.missing.length === _thumbnailSpecs.length) {
-                    message = "Il manque toutes les vignettes";
+                    messages = ["Il manque toutes les vignettes"];
                 } else {
-                    message = "Il manque des vignettes: " + statusInfo.missing.join(", ");
+                    messages = ["Il manque des vignettes: " + statusInfo.missing.join(", ")];
                 }
             } else {
                 // Should not happen...
-                message = "Il manque des vignettes";
+                messages = ["Il manque des vignettes"];
             }
             status = STATUS_ERROR;
         }
@@ -90,7 +90,7 @@ const ThumbnailStatus = ({row, onSetStatus}) => {
         onSetStatus(status);
         setStatus({
             status,
-            message
+            messages
         });
     }, [
         uploadContext.isThumbProcessing,

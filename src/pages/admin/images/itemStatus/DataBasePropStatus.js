@@ -9,54 +9,66 @@ import {
 } from './StorageItemStatus';
 import { useUploadContext } from '../upload/UploadContext';
 import { useImageContext } from '../ImageContext';
+import { GlobalImageErrors } from 'common/GlobalErrors';
 
-const TagStatus = ({name, fullPath, onSetStatus}) => {
+const getStatus = (image) => {
+    let status = STATUS_SUCCESS;
+    const messages = [];
+
+    GlobalImageErrors.forEach(errorType => {
+        if (errorType.hasError(image)) {
+            status = STATUS_ERROR;
+            messages.push(errorType.getErrorMessage(image));
+        }
+    });
+
+    return [
+        status,
+        messages
+    ];
+}
+
+const DataBasePropStatus = ({name, fullPath, onSetStatus}) => {
     const uploadContext = useUploadContext();
     const imageContext = useImageContext();
 
     const [ status, setStatus ] = React.useState({
         status: STATUS_UNKNOWN,
-        message: ""
+        messages: null
     })
 
     React.useEffect(() => {
 
-        let newMessage = null;
-        let newStatus = null;
+        let messages = null;
+        let status = null;
 
         const uploadContext_isDbProcessing = uploadContext.isDbProcessing;
         if (uploadContext_isDbProcessing(fullPath)) {
-            newStatus = STATUS_PENDING;
+            status = STATUS_PENDING;
         } else if (!name.endsWith(".jpg")) {
             // Not an image from a destination
-            newStatus = STATUS_NOT_AVAILABLE;
+            status = STATUS_NOT_AVAILABLE;
         } else {
             const imageContext_getImageFromDatabase = imageContext.getImageFromDatabase;
             const imageFromDb = imageContext_getImageFromDatabase(name);
             if (imageFromDb === null) {
                 // The parent folder is not a destination
-                newStatus = STATUS_NOT_AVAILABLE;
+                status = STATUS_NOT_AVAILABLE;
             } else if (imageFromDb !== undefined) {
-                // The current image is in database, check tags
-                if (imageFromDb.tags !== null) {
-                    newStatus = STATUS_SUCCESS;
-                } else {
-                    newStatus = STATUS_ERROR;
-                    newMessage = "L'image n'a pas de tags en base...";
-                }
+                [ status, messages ] = getStatus(imageFromDb);
             } else {
                 // The current image is not in database
                 // DatabaseStatus will display the status message
-                newStatus = STATUS_NOT_AVAILABLE;
+                status = STATUS_NOT_AVAILABLE;
             }
         }
 
         if (onSetStatus) {
-            onSetStatus(newStatus);
+            onSetStatus(status);
         }
         setStatus({
-            status: newStatus,
-            message: newMessage
+            status,
+            messages
         });
 
     }, [
@@ -70,4 +82,4 @@ const TagStatus = ({name, fullPath, onSetStatus}) => {
     return <StorageItemStatus {...status} />;
 }
 
-export default TagStatus;
+export default DataBasePropStatus;

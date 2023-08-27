@@ -20,20 +20,34 @@ module.exports = function(admin, config) {
         // Return all errors related to images in database (missing tags, ...)
         .get(async function(req, res, next) {
             res.locals.errorMessage = "Failed to get errors about images in database";
-            return config.pool({i: "images"})
+            const missingTags = config.pool({i: "images"})
                 .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create"))
                 .where({tags: null})
-                .orderBy("i.create", "asc")
-                .then((images) => {
-                    images.forEach((image) => {
-                        // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
-                        image.src = config.convertPathToUrl(image.path + "/" + image.name);
-                    });
-                    const errors = {
-                        noTags: images,
-                    };
-                    res.json(errors);
-                }).catch(next);
+                .orderBy("i.create", "desc");
+
+            const missingTitle = config.pool({i: "images"})
+                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create"))
+                .where((builder) => builder.whereNotNull("title").andWhere({description: null}))
+                .orWhere((builder) => builder.whereNotNull("description").andWhere({title: null}))
+                .orderBy("i.create", "desc");
+
+            const promises = [missingTags, missingTitle];
+
+            Promise.all(promises).then(([imagesWithoutTags, imagesWithoutTitle]) => {
+                imagesWithoutTags.forEach((image) => {
+                    // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
+                    image.src = config.convertPathToUrl(image.path + "/" + image.name);
+                });
+                imagesWithoutTitle.forEach((image) => {
+                    // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
+                    image.src = config.convertPathToUrl(image.path + "/" + image.name);
+                });
+                const errors = {
+                    missingTags: imagesWithoutTags,
+                    missingTitle: imagesWithoutTitle,
+                };
+                res.json(errors);
+            }).catch(next);
         });
 
     admin.route("/images")

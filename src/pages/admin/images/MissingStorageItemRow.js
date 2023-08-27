@@ -9,7 +9,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { STATUS_ERROR, STATUS_NOT_AVAILABLE, STATUS_PENDING, StorageItemStatus } from './itemStatus/StorageItemStatus';
 import { useImageContext } from './ImageContext';
 import { useUploadContext } from './upload/UploadContext';
-import TagStatus from './itemStatus/TagStatus';
+import DataBasePropStatus from './itemStatus/DataBasePropStatus';
 
 const ThumbIssueStatus = ({itemName, error}) => {
 
@@ -45,7 +45,7 @@ const ThumbIssueStatus = ({itemName, error}) => {
     return (
         <StorageItemStatus
             status={status}
-            message={"Des vignettes existent pour cette image qui n'existe pas dans Storage."}
+            messages={["Des vignettes existent pour cette image qui n'existe pas dans Storage."]}
             remediation={[
                 {
                     onFix: fixMissingFile,
@@ -127,7 +127,7 @@ const DatabaseIssueStatus = ({itemName, error, type}) => {
     return (
         <StorageItemStatus
             status={status}
-            message={errorCaption}
+            messages={[errorCaption]}
             errorIcon={FolderOpenIcon}
             remediation={remediation}
         />
@@ -174,7 +174,7 @@ const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = fa
                 <DatabaseIssueStatus itemName={itemName} type={type} error={dbIssue} />
             </TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
-                <TagStatus name={itemName} fullPath={imageContext.getItemFullPath(itemName)} />
+                <DataBasePropStatus name={itemName} fullPath={imageContext.getItemFullPath(itemName)} />
             </TableCell>
         </TableRow>
     )

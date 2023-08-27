@@ -32,8 +32,8 @@ const DatabaseStatus = ({row, onSetStatus}) => {
 
     React.useEffect(() => {
 
-        let newMessage = null;
-        let newStatus = null;
+        let messages = null;
+        let status = null;
 
         const uploadContext_isDbProcessing = uploadContext.isDbProcessing;
         const uploadContext_hasDbProcessingError = uploadContext.hasDbProcessingError;
@@ -41,36 +41,36 @@ const DatabaseStatus = ({row, onSetStatus}) => {
 
         if (imageContext.folderType !== FOLDER_TYPE.destination) {
             // Image in database for destination only
-            newStatus = STATUS_NOT_AVAILABLE;
+            status = STATUS_NOT_AVAILABLE;
         } else if (uploadContext_isDbProcessing(row.fullPath)) {
-            newStatus = STATUS_PENDING;
+            status = STATUS_PENDING;
         } else if (uploadContext_hasDbProcessingError(row.fullPath)) {
             const error = uploadContext_getDbProcessingError(row.fullPath);
-            newStatus = STATUS_ERROR;
-            newMessage = error;
+            status = STATUS_ERROR;
+            messages = [error];
         } else if (!row.name.endsWith(".jpg")) {
             // Not an image from a destination
-            newStatus = STATUS_NOT_AVAILABLE;
+            status = STATUS_NOT_AVAILABLE;
         } else {
             const imageContext_getImageFromDatabase = imageContext.getImageFromDatabase;
             const imageFromDb = imageContext_getImageFromDatabase(row.name);
             if (imageFromDb === null) {
                 // The parent folder is not a destination
-                newStatus = STATUS_NOT_AVAILABLE;
+                status = STATUS_NOT_AVAILABLE;
             } else if (imageFromDb !== undefined) {
                 // The current image is in database -> OK
-                newStatus = STATUS_SUCCESS; 
+                status = STATUS_SUCCESS; 
             } else {
                 // The current image is not in database
-                newStatus = STATUS_ERROR;
-                newMessage = "L'image existe dans Storage mais pas en base";
+                status = STATUS_ERROR;
+                messages = ["L'image existe dans Storage mais pas en base"];
             }
         }
 
-        onSetStatus(newStatus);
+        onSetStatus(status);
         setStatus({
-            status: newStatus,
-            message: newMessage
+            status,
+            messages
         });
 
     }, [

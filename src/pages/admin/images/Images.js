@@ -24,7 +24,7 @@ const columns = [
   { id: 'name', label: 'Name' },
   { id: 'thumbStatus', label: 'Thumbnail Status' }, // Ok if all thumbnails have been created
   { id: 'dbStatus', label: 'Database Status' },     // Ok if the image exists in database
-  { id: 'tags', label: 'Tags' }                     // Ok if the tags column is not null
+  { id: 'tags', label: '...' }                     // Ok if the tags column is not null
 ];
 
 const Images = () => {

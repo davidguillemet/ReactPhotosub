@@ -2,16 +2,7 @@ import React, { createContext, useContext, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataProvider } from '../dataProvider/dataManagerProvider';
 import { useFirebaseContext } from '../firebase';
-
-const findImageIndex = (imageArr, imageOrFullPath) => {
-    if (typeof imageOrFullPath === 'string') {
-        const fullPath = imageOrFullPath;
-        return imageArr.findIndex(image => `${image.path}/${image.name}` === fullPath);
-    } else {
-        const image = imageOrFullPath;
-        return imageArr.findIndex(img => image.name === img.name && image.path === img.path);
-    }
-}
+import { CheckErrorsAfterAddImage, CheckErrorsAfterRemoveImage } from 'common/GlobalErrors';
 
 const QueryContext = createContext(null);
 
@@ -82,7 +73,7 @@ export const QueryContextProvider = ({children}) => {
             const queryKey = ['destinationimages', year, title];
             const prevData = queryClient.getQueryData(queryKey);
             // We might upload the same image again,in which case we must replace the image in the data
-            const imageIndex = findImageIndex(prevData, newImage);
+            const imageIndex = prevData.findIndex(img => newImage.name === img.name && newImage.path === img.path);
             if (imageIndex === -1) {
                 // New image
                 prevData.push(newImage);
@@ -99,17 +90,9 @@ export const QueryContextProvider = ({children}) => {
             }
 
             const prevImageErrors = queryClient.getQueryData(['imageErrors']);
-            if (prevImageErrors.noTags) {
-                const errorImgIndex = findImageIndex(prevImageErrors.noTags, newImage);
-                if (errorImgIndex !== -1 && newImage.tags !== null) {
-                    // Remove the image from errors since it contains tag now
-                    prevImageErrors.noTags.splice(errorImgIndex, 1);
-                    queryClient.setQueryData(['imageErrors'], prevImageErrors);
-                } else if (errorImgIndex === -1 && newImage.tags === null) {
-                    // The new uploaded image has no tags and is not yet part of the errors
-                    prevImageErrors.noTags.push(newImage);
-                    queryClient.setQueryData(['imageErrors'], prevImageErrors);
-                }
+            const newImageErrors = CheckErrorsAfterAddImage(prevImageErrors, newImage);
+            if (newImageErrors !== null) {
+                queryClient.setQueryData(['imageErrors'], newImageErrors);
             }
         },
         removeDestinationImage: (year, title, imageFullPath) => {
@@ -119,13 +102,9 @@ export const QueryContextProvider = ({children}) => {
             queryClient.setQueryData(queryKey, newData);
 
             const prevImageErrors = queryClient.getQueryData(['imageErrors']);
-            if (prevImageErrors.noTags && prevImageErrors.noTags.length > 0) {
-                const errorImgIndex = findImageIndex(prevImageErrors.noTags, imageFullPath);
-                if (errorImgIndex !== -1) {
-                    // The removed image has no tags, just remove it from the error list
-                    prevImageErrors.noTags.splice(errorImgIndex, 1);
-                    queryClient.setQueryData(['imageErrors'], prevImageErrors);
-                }
+            const newImageErrors = CheckErrorsAfterRemoveImage(prevImageErrors, imageFullPath);
+            if (newImageErrors !== null) {
+                queryClient.setQueryData(['imageErrors'], newImageErrors);
             }
         },
 

@@ -3,6 +3,12 @@ import { CircularProgress, IconButton, Stack, Tooltip } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
+import HtmlTooltip from 'components/htmlTooltip';
+
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 
 export const STATUS_UNKNOWN = "unknown";
 export const STATUS_SUCCESS = "success";
@@ -22,7 +28,7 @@ export function getItemConsolidatedStatus() {
     }
 }
 
-const StorageItemStatusContent = ({status, message, errorIcon, remediation = null}) => {
+const StorageItemStatusContent = ({status, messages, errorIcon, remediation = null}) => {
     const ErrorIcon = errorIcon ?? ErrorOutlineIcon;
 
     if (status === STATUS_UNKNOWN) {
@@ -37,12 +43,24 @@ const StorageItemStatusContent = ({status, message, errorIcon, remediation = nul
     if (status === STATUS_SUCCESS) {
         return <CheckCircleOutlineIcon fontSize='small' color="success" />;
     }
-    // STATUS_ERROR
+    // STATUS_ERROR = the property messages is expected as an array of error messages
     return (
         <React.Fragment>
-            <Tooltip title={message}>
+            <HtmlTooltip title={
+                <React.Fragment>
+                    <List dense={true}>
+                        {
+                            messages && messages.map((message, index) => 
+                                <ListItem key={`${index}`}>
+                                    <ListItemIcon><ErrorOutlineIcon color="error" /></ListItemIcon>
+                                    <ListItemText primary={message} />
+                                </ListItem>
+                            )
+                        }
+                    </List>
+                </React.Fragment>}>
                 <ErrorIcon fontSize='small' color="error" />
-            </Tooltip>
+            </HtmlTooltip>
             {
                 remediation !== null && remediation.map((remediation, index) => {
                     const FixIcon = remediation.fixIcon ?? AutoFixHighOutlinedIcon;
