@@ -1,6 +1,6 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Chip, Box, Link} from "@mui/material";
+import { TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Chip, Box, Link, Tooltip} from "@mui/material";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Alert from '@mui/material/Alert';
@@ -54,6 +54,8 @@ const ImageErrorTableRow = ({file, errorType}) => {
         file
     ]);
 
+    const ItemErrorIcon = errorType.icon;
+
     return (
         <TableRow>
             <TableCell align={'left'} sx={{paddingTop: 1, paddingBottom: 1}}>
@@ -61,11 +63,19 @@ const ImageErrorTableRow = ({file, errorType}) => {
             </TableCell>
             <TableCell align={'left'} sx={{paddingTop: 0, paddingBottom: 0}}>
                 <Box sx={{display: "flex", flexDirection: "row", alignItems: "center", paddingTop: 0, paddingBottom: 0}}>
-                    <FolderOpenIcon sx={{mr: 1, ml: 2, opacity: 0.6}}></FolderOpenIcon>
+                    <FolderOpenIcon sx={{mr: 1, ml: 0, opacity: 0.6}}></FolderOpenIcon>
                     <Link component="button" onClick={handleOnRowClick}>{`${file.path}/`}</Link>
                 </Box>
             </TableCell>
-            <TableCell align={'left'} sx={{paddingTop: 0, paddingBottom: 0}}>{errorType.getErrorMessage(file)}</TableCell>
+            <TableCell align={'left'} sx={{paddingTop: 0, paddingBottom: 0}}>
+                <Tooltip
+                    title={errorType.getErrorMessage(file)}
+                    arrow
+                    placement="right"
+                >
+                    <ItemErrorIcon sx={{mr: 1, ml: 0, opacity: 0.6}}></ItemErrorIcon>
+                </Tooltip>
+            </TableCell>
         </TableRow>
     )
 }
@@ -135,7 +145,7 @@ const ImageErrorsUi = withLoading(({errors}) => {
                     <TableHead>
                         <TableRow>
                             <TableCell align={'left'} >Fichier</TableCell>
-                            <TableCell align={'left'} >Chemin</TableCell>
+                            <TableCell align={'left'} >Répertoire</TableCell>
                             <TableCell align={'left'} >Erreur</TableCell>
                         </TableRow>
                     </TableHead>
