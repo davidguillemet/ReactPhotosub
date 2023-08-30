@@ -40,7 +40,7 @@ const UploadStorageItemRow = ({file}) => {
                     fileFullPath={file.fullPath}
                     start={uploadContext.canStartUpload(file.fullPath)}
                     onFileUploaded={onFileUploaded}
-                /> :
+                />
             </TableCell>
         </TableRow>
     )
