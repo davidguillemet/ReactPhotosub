@@ -10,7 +10,7 @@ import { ConfirmDialog } from 'dialogs';
 import { useTranslation } from 'utils';
 import { useToast } from 'components/notifications';
 import { useOverlay } from 'components/loading';
-import { FOLDER_TYPE, ITEM_TYPE_FILE, ITEM_TYPE_FOLDER } from '../common';
+import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER, hasDatabaseImage } from '../common';
 
 const isImageFile = (fullPath) => {
     return fullPath.endsWith(".jpg");
@@ -43,7 +43,7 @@ const ActionToolbar = () => {
         if (isImageFile(itemName)) {
             const deleteThumbnails = imageContext.deleteThumbnails;
             promises.push(deleteThumbnails(itemFullPath));
-            if (imageContext.folderType === FOLDER_TYPE.destination) {
+            if (hasDatabaseImage(imageContext.folderType)) {
                 const deleteImageFromDatabase = imageContext.deleteImageFromDatabase;
                 promises.push(deleteImageFromDatabase(itemFullPath));
             }

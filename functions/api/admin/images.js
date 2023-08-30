@@ -12,6 +12,7 @@ module.exports = function(admin, config) {
             .onConflict(["name", "path"])
             .merge()
             .then(() => {
+                newImage.src = config.convertPathToUrl(newImage.path + "/" + newImage.name);
                 res.json(newImage);
             }).catch(next);
     };

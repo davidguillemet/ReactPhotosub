@@ -3,7 +3,7 @@ import { useDataProvider } from 'components/dataProvider';
 import { useImageContext } from '../ImageContext';
 import { useQueryContext } from 'components/queryContext';
 import { getThumbnailsFromImageName, getFileNameFromFullPath } from 'utils';
-import { FOLDER_TYPE, ITEM_TYPE_FILE } from '../common';
+import { FOLDER_TYPE, ITEM_TYPE_FILE, hasDatabaseImage, requireThumbnails } from '../common';
 
 const _maxParallelUpload = 3;
 
@@ -72,7 +72,7 @@ export const UploadContextProvider = ({children}) => {
     ]);
 
     const insertInDatabase = React.useCallback((fileFullPath) => {
-        if (imageContext.folderType !== FOLDER_TYPE.destination) {
+        if (!hasDatabaseImage(imageContext.folderType)) {
             return Promise.resolve();
         }
         setProcessingStatus(prevStatus => {
@@ -109,8 +109,7 @@ export const UploadContextProvider = ({children}) => {
     ]);
 
     const generateThumbnails = React.useCallback((fileFullPath) => {
-        if (imageContext.folderType !== FOLDER_TYPE.destination &&
-            imageContext.folderType !== FOLDER_TYPE.interior) {
+        if (!requireThumbnails(imageContext.folderType)) {
             return Promise.resolve();
         }
 
@@ -124,7 +123,7 @@ export const UploadContextProvider = ({children}) => {
         const thumbPromise =
             imageContext.folderType === FOLDER_TYPE.destination ?
             dataProvider.refreshThumbnails :        // Destination
-            dataProvider.createInteriorThumbnails;  // Interior
+            dataProvider.createInteriorThumbnails;  // Interior/homeslideshow/etc
 
         return thumbPromise.bind(dataProvider)(fileFullPath).then(() => {
 

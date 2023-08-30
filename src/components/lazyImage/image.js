@@ -134,7 +134,7 @@ const LazyImage = ({
             }
 
             {
-                disabled === false &&
+                disabled === false && onClick &&
                 <ButtonBase
                     onClick={handleImageClick}
                     style={{

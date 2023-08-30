@@ -197,7 +197,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
             // https://firebasestorage.googleapis.com/v0/b/photosub.appspot.com/o/userUpload%2FO30yfAqRCnS99zc1VoKMjIt9IEg1%2Finteriors%2FDSC_1388-Modifier.jpg?alt=media&token=796f88e2-d1b2-4827-b0f5-da9008e778bb
             // While we just need the following:
             // https://storage.googleapis.com/photosub.appspot.com/userUpload%2FO30yfAqRCnS99zc1VoKMjIt9IEg1%2Finteriors%2FDSC_1388-Modifier.jpg
-            files.push(`${firebaseContext.storageHost}/${firebaseContext.storageBucket}/userUpload/${user.uid}/interiors/${fileName}`);
+            files.push(`${firebaseContext.rootPublicUrl}/userUpload/${user.uid}/interiors/${fileName}`);
             sizes.push(sizeRatio);
         }
         // Add the new uploaded images to the interiors' array

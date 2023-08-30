@@ -9,14 +9,7 @@ import StorageBreadcrumbs from './BreadCrumbs';
 import FolderFormDialog from '../FolderFormDialog';
 import { useImageContext } from '../ImageContext';
 import { useUploadContext } from '../upload/UploadContext';
-import { FOLDER_TYPE } from '../common';
-
-const _uploadSupport = [
-    FOLDER_TYPE.destination,
-    FOLDER_TYPE.homeSlideshow,
-    FOLDER_TYPE.interior,
-    FOLDER_TYPE.legacy
-]
+import { canUpload } from '../common';
 
 const DefaultToolbar = () => {
     const uploadContext = useUploadContext();
@@ -34,7 +27,7 @@ const DefaultToolbar = () => {
         setFolderDialogOpen(false);
     }, []);
 
-    const isUploadAvailable = _uploadSupport.includes(imageContext.folderType);
+    const isUploadAvailable = canUpload(imageContext.folderType);
 
     return (
         <Fade in={imageContext.selectionCount === 0}>

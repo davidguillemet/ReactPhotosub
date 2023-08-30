@@ -69,8 +69,7 @@ const FirebaseProvider = ({children}) => {
             signOut(firebaseAuth);
         },
         storage: firebaseStorage,
-        storageHost,
-        storageBucket: firebaseStorage.app.options.storageBucket,
+        rootPublicUrl: `${storageHost}/${firebaseStorage.app.options.storageBucket}`,
         storageRef: (path) => {
             return ref(firebaseStorage, path);
         },

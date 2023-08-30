@@ -9,7 +9,7 @@ import {
 import { _thumbnailSpecs } from 'utils';
 import { useUploadContext } from '../upload/UploadContext';
 import { useImageContext } from '../ImageContext';
-import { FOLDER_TYPE } from '../common';
+import { requireThumbnails } from '../common';
 
 const allThumbsCreated = (ref, thumbs, statusInfo) => {
     const itemFullName = ref.name; // "filename.jpg"
@@ -57,8 +57,8 @@ const ThumbnailStatus = ({row, onSetStatus}) => {
         const uploadContext_hasThumbProcessingError = uploadContext.hasThumbProcessingError;
         const uploadContext_getThumbProcessingError = uploadContext.getThumbProcessingError;
 
-        if (imageContext.folderType !== FOLDER_TYPE.destination && imageContext.folderType !== FOLDER_TYPE.interior) {
-            // Thumbnails for destination and interiors only
+        if (!requireThumbnails(imageContext.folderType)) {
+            // Thumbnails not required
             status = STATUS_NOT_AVAILABLE;
         } else if (uploadContext_isThumbProcessing(row.fullPath)) {
             status = STATUS_PENDING;
