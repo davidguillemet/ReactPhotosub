@@ -47,7 +47,7 @@ function extractCriteriaList(queryString) {
 }
 
 function getFinalColumnSelection(config) {
-    return config.pool().raw("\"id\", \"name\", \"path\", \"title\", \"description\", \"sizeRatio\", \"create\", count(*) OVER() AS total_count");
+    return config.pool().raw("\"id\", \"name\", \"path\", \"title\", \"description\", \"sizeRatio\", \"create\", \"tags\", count(*) OVER() AS total_count");
 }
 
 function getWhereFunctionFromSingleCriteria(builder, criteria) {
@@ -102,7 +102,7 @@ function buildSearchQueryExact(config, criteriaList, page, pageSize) {
 }
 
 function getSelectFromFlatTags(sqlQuery) {
-    return sqlQuery.distinct("id", "name", "path", "title", "description", "sizeRatio", "create").from(_flatTagsRows);
+    return sqlQuery.distinct("id", "name", "path", "title", "description", "sizeRatio", "create", "tags").from(_flatTagsRows);
 }
 
 function addWhereClauseFromFlatTags(sqlQuery, criteria) {
@@ -127,7 +127,7 @@ function buildSearchQueryNotExact(config, criteriaList, page, pageSize) {
     const sqlQuery = config.pool()
         .with(
             _flatTagsRows,
-            config.pool().raw(`select id, name, path, title, description, "sizeRatio", "create", coalesce(caption, '') as caption, unnest(coalesce(tags, '{X}')) as ${_unnestedTagColumn} from images`))
+            config.pool().raw(`select id, name, path, title, description, "sizeRatio", "create", "tags", coalesce(caption, '') as caption, unnest(coalesce(tags, '{X}')) as ${_unnestedTagColumn} from images`))
         .with(
             "results",
             (qb) => {
