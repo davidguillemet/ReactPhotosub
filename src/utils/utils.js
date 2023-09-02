@@ -32,9 +32,10 @@ function parseSingleDescription(desc) {
 }
 
 export function parseImageDescription(image) {
+    // Return 2 properties fr and en as the supported languages
     return {
-        french: parseSingleDescription(image.title),
-        english: parseSingleDescription(image.description)
+        fr: parseSingleDescription(image.title),
+        en: parseSingleDescription(image.description)
     };
 }
 

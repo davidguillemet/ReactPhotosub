@@ -500,6 +500,15 @@ const ExpandedView = React.forwardRef(({
                     slideCount={images.length}
                 />
 
+                <ImageInfo
+                    style={{
+                        mb: fullScreen ? 1 : 0,
+                        opacity: infoVisible ? 1 : 0,
+                        transition: 'opacity 0.8s'
+                    }}
+                    image={currentImage}
+                    displayDestination={displayDestination}
+                />
 
                 {
                     !isMobile && 
@@ -549,16 +558,6 @@ const ExpandedView = React.forwardRef(({
                 </Dialog>
 
             </Box>
-
-            <Collapse in={infoVisible}>
-                <ImageInfo
-                    style={{
-                        mb: fullScreen ? 1 : 0
-                    }}
-                    image={currentImage}
-                    displayDestination={displayDestination}
-                />
-            </Collapse>
 
             <Collapse in={showThumbnails}>
                 <Paper sx={{

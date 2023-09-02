@@ -35,7 +35,13 @@ const Overlay = ({image, id}) => {
                 backgroundColor: 'rgba(0, 0, 0, 0.3)'
             }
         }>
-            <ImageDescription image={image} />
+            <Box sx={{
+                position: 'absolute',
+                top: '50%',
+                transform: 'translateY(-50%)',
+            }}>
+                <ImageDescription image={image} />
+            </Box>
         </Box>
     )
 }

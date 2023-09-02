@@ -7,7 +7,7 @@ import { useReactQuery } from '../reactQuery';
 const DestinationLinkContent = ({destination}) => {
     return (
         <Typography
-            variant="body2"
+            variant="body"
             sx={{
                 mt: 0.5,
                 mb: 0,

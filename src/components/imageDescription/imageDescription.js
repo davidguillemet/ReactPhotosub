@@ -1,9 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Typography from '@mui/material/Typography';
-import { parseImageDescription } from '../../utils';
+import { parseImageDescription, useLanguage } from '../../utils';
+import { VerticalSpacing } from 'template/spacing';
+import { Box } from '@mui/material';
 
-const ImageDescription = ({image, language = "french" }) => {
+const getDescriptionFromLanguage = (captions, requiredLanguage) => {
+    const otherLanguage = requiredLanguage === 'fr' ? 'en' : 'fr';
+    return captions[requiredLanguage] || captions[otherLanguage]
+}
 
+const ImageDescription = ({ image }) => {
+
+    const t = useLanguage();
+    const [ descriptionIndex ] = useState(0);
+    const vernacularIndex = 0; // Always the first vernacular name
     /**
      * captions = {
      *  french: [
@@ -23,24 +33,32 @@ const ImageDescription = ({image, language = "french" }) => {
      * }
      */
     const captions = useMemo(() => parseImageDescription(image), [image]);
+    const description = useMemo(() => getDescriptionFromLanguage(captions, t.language), [captions, t.language])
 
-    if (captions[language] === null) {
-        return null;
+    if (!description) {
+        return (
+            <Typography variant="subtitle1" style={{ marginBottom: 0, color: 'white' }}>
+                Aucune description
+            </Typography>
+        )
     }
 
     return (
-        <React.Fragment>
-            <Typography variant="subtitle1" sx={{ m: 0, lineHeight: 1.25}}>
-            {
-                captions[language][0].vernacular[0]
-            }
+        <Box sx={{
+            display: "flex",
+            flexDirection: "column",
+            flex: 1,
+            my: 0,
+            mx: 0
+        }}>
+            <Typography variant="subtitle1" sx={{ m: 0, lineHeight: 1.25, color: 'white'}}>
+                { description[descriptionIndex].vernacular[vernacularIndex] }
             </Typography>
-            <Typography variant="subtitle2" sx={{ m: 0, lineHeight: 1.25, fontStyle: 'italic'}}>
-                {
-                    captions[language][0].scientific
-                }
+            <VerticalSpacing factor={1} />
+            <Typography variant="subtitle2" sx={{ m: 0, lineHeight: 1.25, fontStyle: 'italic', color: 'white'}}>
+                { `(${description[descriptionIndex].scientific})` }
             </Typography>
-        </React.Fragment>
+        </Box>
     );
 }
 
