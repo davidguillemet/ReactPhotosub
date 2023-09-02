@@ -1,4 +1,5 @@
 import React from 'react';
+import { gsap } from "gsap";
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Chip from '@mui/material/Chip';
@@ -8,20 +9,64 @@ import ImageDestinationLink from './imageDestinationLink';
 import { VerticalSpacing } from 'template/spacing';
 import { Stack } from '@mui/material';
 
-const ImageInfo = ({image, displayDestination, style}) => {
+const imageInfoId = "imageInfoId";
+const imageInfoAnimationDuration = 0.5;
+
+const ImageInfo = ({image, displayDestination, style, container, visible}) => {
+
+    const overlayRef = React.useRef(null);
+
+    const showAction = React.useRef(null);
+    const hiddeAction = React.useRef(null);
+    const effectFirstRoundTrip = React.useRef(true);
+
+    React.useEffect(() => {
+        if (effectFirstRoundTrip.current === true) {
+            effectFirstRoundTrip.current = false;
+            return;
+        }
+        const selector = gsap.utils.selector(container);
+        if (visible) {
+            if (hiddeAction.current !== null) {
+                hiddeAction.current.kill();
+                hiddeAction.current = null;
+            }
+            overlayRef.current.classList.add('visible');
+            showAction.current = gsap.timeline();
+            showAction.current.to(selector(`#${imageInfoId}`), { duration: imageInfoAnimationDuration, opacity: 1 })
+            .then(() => {
+                showAction.current = null;
+            })
+        } else {
+            hiddeAction.current = gsap.timeline();
+            hiddeAction.current.to(selector(`#${imageInfoId}`), { duration: imageInfoAnimationDuration, opacity: 0 })
+            .then(() => {
+                hiddeAction.current = null;
+                if (!visible) {
+                    overlayRef.current.classList.remove('visible');
+                }
+            });
+        }
+    }, [visible, container]);
 
     return (
         <Box
+            ref={overlayRef}
+            id={imageInfoId}
             sx={{
                 ...style,
                 position: 'absolute',
                 width: '100%',
                 height: '100%',
-                display: 'flex',
+                display: 'none',
                 flexDirection: 'column',
                 py: 0.5,
                 textAlign: 'center',
-                bgcolor: 'rgb(0,0,0,0.4)'
+                bgcolor: 'rgb(0,0,0,0.4)',
+                opacity: 0,
+                '&.visible' : {
+                    display: 'flex'
+                }
             }}
         >
             <Paper

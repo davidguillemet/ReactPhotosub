@@ -501,13 +501,13 @@ const ExpandedView = React.forwardRef(({
                 />
 
                 <ImageInfo
+                    container={slideContainerResizeObserver.element}
                     style={{
-                        mb: fullScreen ? 1 : 0,
-                        opacity: infoVisible ? 1 : 0,
-                        transition: 'opacity 0.8s'
+                        mb: fullScreen ? 1 : 0
                     }}
                     image={currentImage}
                     displayDestination={displayDestination}
+                    visible={infoVisible}
                 />
 
                 {
@@ -520,7 +520,8 @@ const ExpandedView = React.forwardRef(({
                             style={{
                                 left: 10
                             }}
-                            size="large">
+                            size="large"
+                        >
                             <ArrowBackIosRoundedIcon fontSize='large' />
                         </IconButton>
                     </Collapse>
@@ -536,7 +537,8 @@ const ExpandedView = React.forwardRef(({
                             style={{
                                 right: 10
                             }}
-                            size="large">
+                            size="large"
+                        >
                             <ArrowForwardIosRoundedIcon fontSize='large' />
                         </IconButton>
                     </Collapse>
