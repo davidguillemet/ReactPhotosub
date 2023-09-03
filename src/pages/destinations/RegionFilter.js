@@ -6,13 +6,14 @@ import {unstable_batchedUpdates} from 'react-dom';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import { useTranslation } from '../../utils';
+import { useLanguage, useTranslation } from 'utils';
 
 const StyledListItem = styled('li')(({theme}) => ({
 }));
 
 const RegionFilterUI = ({hierarchy, onChange}) => {
 
+    const lang = useLanguage();
     const t = useTranslation("pages.destinations");
     const [filter, setFilter] = useState([]);
     const [options, setOptions] = useState([]);
@@ -36,6 +37,8 @@ const RegionFilterUI = ({hierarchy, onChange}) => {
             onChange(regionSet);
         }
     };
+
+    const regionTitleProp = lang === 'fr' ? 'title' : 'title_en';
 
     return (
         <React.Fragment>
@@ -73,7 +76,7 @@ const RegionFilterUI = ({hierarchy, onChange}) => {
             filterSelectedOptions={false}
             options={options}
             noOptionsText={t("noRegion")}
-            getOptionLabel={(option) => option.title}
+            getOptionLabel={(option) => option[regionTitleProp]}
             defaultValue={[]}
             renderInput={(params) => (
                 <TextField
@@ -97,7 +100,7 @@ const RegionFilterUI = ({hierarchy, onChange}) => {
                     }}
                 >
                     <Chip
-                        label={option.title}
+                        label={option[regionTitleProp]}
                         clickable={true}
                         color={selected? 'primary' : 'default'}
                     />
@@ -106,7 +109,7 @@ const RegionFilterUI = ({hierarchy, onChange}) => {
             renderTags={(tagValue, getTagProps) =>
                 tagValue.map((option, index) => (
                     <Chip
-                        label={option.title}
+                        label={option[regionTitleProp]}
                         {...getTagProps({ index })}
                         disabled={index < tagValue.length - 1}
                     />
@@ -120,21 +123,25 @@ const RegionFilterUI = ({hierarchy, onChange}) => {
     )
 }
 
-const compareRegions = (a, b) => a.title === b.title ? 0 : a.title < b.title ? -1 : 1;
+const compareRegions = (lang) => {
+    const titleProperty = lang === 'fr' ? 'title' : 'title_en';
+    return (a, b) => a[titleProperty] === b[titleProperty] ? 0 : a[titleProperty] < b[titleProperty] ? -1 : 1;
+}
 
-function buildRegionHierarchy(destinations) {
+function buildRegionHierarchy(destinations, language) {
     const regionMap = new Map();
     destinations.forEach(destination => {
         destination.regionpath.forEach(region => {
             regionMap.set(region.id, region);
         });
     });
-    return Array.from(regionMap.values()).sort(compareRegions);
+    return Array.from(regionMap.values()).sort(compareRegions(language));
 }
 
 const RegionFilter = ({destinations, onChange}) => {
 
-    const hierarchy = useMemo(() => buildRegionHierarchy(destinations), [destinations]);
+    const t = useLanguage();
+    const hierarchy = useMemo(() => buildRegionHierarchy(destinations, t.language), [destinations, t.language]);
 
     return <RegionFilterUI hierarchy={hierarchy} onChange={onChange} />
 }
