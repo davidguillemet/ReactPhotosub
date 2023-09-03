@@ -10,7 +10,7 @@ module.exports = function(app, config) {
         .get(async function(req, res, next) {
             res.locals.errorMessage = "Le chargement des favoris a échoué.";
             return config.pool({i: "images"})
-                .select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio", "i.create")
+                .select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio", "i.create", "i.tags")
                 .join(config.pool().raw(`user_data as u ON u.uid = '${res.locals.uid}' and concat(i.path, '/', i.name) = ANY(u.favorites)`))
                 .orderBy("i.create", "desc") // Last image first
                 .then((images) => {

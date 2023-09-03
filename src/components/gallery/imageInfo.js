@@ -6,8 +6,7 @@ import Chip from '@mui/material/Chip';
 import {isMobile} from 'react-device-detect';
 import ImageDescription from '../imageDescription';
 import ImageDestinationLink from './imageDestinationLink';
-import { VerticalSpacing } from 'template/spacing';
-import { Stack } from '@mui/material';
+import { Alert, Stack } from '@mui/material';
 
 const imageInfoId = "imageInfoId";
 const imageInfoAnimationDuration = 0.5;
@@ -58,6 +57,7 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
                 position: 'absolute',
                 width: '100%',
                 height: '100%',
+                maxHeight: '100%',
                 display: 'none',
                 flexDirection: 'column',
                 py: 0.5,
@@ -74,36 +74,42 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
                 sx={{
                     display: 'flex',
                     justifyContent: 'center',
-                    padding: 2,
+                    padding: isMobile ? 1 : 2,
                     bgcolor: 'rgb(0,0,0,0.3)',
                     position: 'absolute',
                     top: '50%',
                     left: '50%',
+                    maxHeight: '100%',
                     transform: 'translateY(-50%) translateX(-50%)',
                     ...(isMobile ? {
-                        width: '95%'
+                        width: '100%',
+                        scroll: 'auto'
                     } : {
                         minWidth: '70%'
                     })
                 }}
             >
-                <Stack direction={'column'} >
+                <Stack
+                    direction={'column'}
+                    spacing={1}
+                    sx={{overflowY: 'scroll'}}
+                >
                     <ImageDescription image={image} />
                     {
                         displayDestination &&
                         <React.Fragment>
-                            <VerticalSpacing />
                             <ImageDestinationLink image={image} />
                         </React.Fragment>
                     }
-                    <VerticalSpacing />
                     <Box>
                     {
+                        image.tags ?
                         image.tags.map(tag => {
                             return (
                             <Chip color="primary" key={tag} label={tag} size="small" sx={{marginRight: 0.5, marginTop: 0.5, color: 'white'}} />
                             )
-                        })
+                        }) :
+                        <Alert severity='warning'>Pas de tags...</Alert>
                     }
                     </Box>
                 </Stack>

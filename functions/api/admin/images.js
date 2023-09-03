@@ -22,12 +22,12 @@ module.exports = function(admin, config) {
         .get(async function(req, res, next) {
             res.locals.errorMessage = "Failed to get errors about images in database";
             const missingTags = config.pool({i: "images"})
-                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create"))
+                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create, i.tags"))
                 .where({tags: null})
                 .orderBy("i.create", "desc");
 
             const missingTitle = config.pool({i: "images"})
-                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create"))
+                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create, i.tags"))
                 .where((builder) => builder.whereNotNull("title").andWhere({description: null}))
                 .orWhere((builder) => builder.whereNotNull("description").andWhere({title: null}))
                 .orderBy("i.create", "desc");

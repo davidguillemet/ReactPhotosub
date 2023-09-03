@@ -27,7 +27,7 @@ module.exports = function(app, config) {
                     select ARRAY(
                         select row_to_json(favorite_rows) as favorites
                         from (
-                            select i.id, i.name, i.path, i.title, i.description, i."sizeRatio", i.create from images i, user_data u
+                            select i.id, i.name, i.path, i.title, i.description, i."sizeRatio", i.create, i.tags from images i, user_data u
                             where u.uid = ? and concat(i.path, '/', i.name) = ANY(u.favorites)
                         ) favorite_rows
                     ) favorites
