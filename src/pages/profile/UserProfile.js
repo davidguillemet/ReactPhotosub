@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import {unstable_batchedUpdates} from 'react-dom';
 import Button from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit';
@@ -18,6 +18,7 @@ import Form, {
     FIELD_TYPE_PASSWORD
 } from '../../components/form';
 import { useDataProvider } from '../../components/dataProvider';
+import { useTranslation } from 'utils';
 
 const getFormValues = (user) => {
     return {
@@ -29,8 +30,56 @@ const getFormValues = (user) => {
     }
 }
 
+const getFields = (t) => {
+    const fields = [
+        {
+            id: "email",
+            label: t("email"),
+            required: true,
+            errorText: t("emailError"),
+            type: FIELD_TYPE_EMAIL,
+            multiline: false,
+            default: ""
+        },
+        {
+            id: "displayName",
+            label: t("name"),
+            required: true,
+            errorText: t("nameError"),
+            type: FIELD_TYPE_TEXT,
+            default: ""
+        },
+        {
+            id: "password",
+            label: t("password"),
+            required: false,
+            type: FIELD_TYPE_PASSWORD,
+            multiline: false,
+            default: ""
+        },
+        {
+            id: "password_confirm",
+            label: t("passwordConfirm"),
+            required: false,
+            type: FIELD_TYPE_PASSWORD,
+            multiline: false,
+            default: ""
+        },
+        {
+            id: "emailVerified",
+            label: t("emailVerified"),
+            readOnly: true,
+            type: FIELD_TYPE_CHECK_BOX,
+            default: false
+        },
+    ]
+    fields.language = t.language;
+    return fields;
+}
+
 const UserProfile = (props) => {
 
+    const t = useTranslation("pages.profile");
     const authContext = useAuthContext();
     const dataProvider = useDataProvider();
     const { toast } = useToast();
@@ -44,50 +93,18 @@ const UserProfile = (props) => {
         action: null
     });
 
-    const fields = useRef([
-        {
-            id: "email",
-            label: "Adresse mail",
-            required: true,
-            errorText: "Merci d'indiquer une adresse mail valide.",
-            type: FIELD_TYPE_EMAIL,
-            multiline: false,
-            default: ""
-        },
-        {
-            id: "displayName",
-            label: "Votre nom",
-            required: true,
-            errorText: "Merci d'indiquer un .",
-            type: FIELD_TYPE_TEXT,
-            default: ""
-        },
-        {
-            id: "password",
-            label: "Mot de passe",
-            required: false,
-            type: FIELD_TYPE_PASSWORD,
-            multiline: false,
-            default: ""
-        },
-        {
-            id: "password_confirm",
-            label: "Confirmation du mot de passe",
-            required: false,
-            type: FIELD_TYPE_PASSWORD,
-            multiline: false,
-            default: ""
-        },
-        {
-            id: "emailVerified",
-            label: "eMail vérifié",
-            readOnly: true,
-            type: FIELD_TYPE_CHECK_BOX,
-            default: false
-        },
-    ]);
+    const [ fields, setFields ] = useState(() => getFields(t));
 
     const [values, setValues] = useState(() => getFormValues(authContext.user));
+
+    useEffect(() => {
+        setFields(prevFields => {
+            if (prevFields.language !== t.language) {
+                return getFields(t);
+            }
+            return prevFields;
+        });
+    }, [t]);
 
     const onIdTokenRevocation = useCallback((email, password) => {
         return authContext.reauthenticateWithCredential(email, password);
@@ -104,8 +121,8 @@ const UserProfile = (props) => {
         // Check possible password + confirmation
         if (values.password.length > 0 || values.password_confirm.length > 0) {
             if (values.password !== values.password_confirm) {
-                fields.current.filter(field => field.id.startsWith("password")).forEach(field => field.error = true);
-                return Promise.reject(new Error("La confirmation du mot de passe n'est pas correcte."))
+                fields.filter(field => field.id.startsWith("password")).forEach(field => field.error = true);
+                return Promise.reject(new Error(t("passwordConfirmError")))
             }
         } else {
             // Delete password from values if field is empty (i.e. no password change)
@@ -141,23 +158,23 @@ const UserProfile = (props) => {
                 return onIdTokenRevocation(values.email, values.password);
             }
             else if (err.cause?.code === "auth/invalid-password") {
-                fields.current.filter(field => field.id.startsWith("password")).forEach(field => field.error = true);
+                fields.filter(field => field.id.startsWith("password")).forEach(field => field.error = true);
             } else if (err.cause?.code === "auth/invalid-email" || err.cause?.code === "auth/email-already-exists") {
-                fields.current.find(field => field.id === "email").error = true;
+                fields.find(field => field.id === "email").error = true;
             } else if (err.cause?.code === "auth/invalid-display-name") {
-                fields.current.find(field => field.id === "displayName").error = true;
+                fields.find(field => field.id === "displayName").error = true;
             }
             throw err;
         });
-    }, [authContext, dataProvider, onIdTokenRevocation]);
+    }, [authContext, dataProvider, onIdTokenRevocation, fields, t]);
 
     const onCancelChanges = useCallback(() => {
-        fields.current.forEach(field => field.error = false);
+        fields.forEach(field => field.error = false);
         unstable_batchedUpdates(() => {
             setReadOnly(true);
             setValues(getFormValues(authContext.user));
         });
-    }, [authContext.user]);
+    }, [authContext.user, fields]);
 
     const onClickDeleteAccount = useCallback(() => {
         setOpenDeleteConfirmation(true);
@@ -200,7 +217,7 @@ const UserProfile = (props) => {
     return (
         <React.Fragment>
             <Form
-                fields={fields.current}
+                fields={fields}
                 initialValues={values}
                 submitAction={onSubmitUserForm}
                 submitCaption="Valider"
@@ -214,8 +231,9 @@ const UserProfile = (props) => {
                     <Button
                         onClick={onClickModify}
                         variant="contained"
-                        startIcon={<EditIcon/>}>
-                        Modifier les informations
+                        startIcon={<EditIcon/>}
+                    >
+                        {t("btn:modifyData")}
                     </Button>
                 </React.Fragment>
             }
@@ -227,7 +245,7 @@ const UserProfile = (props) => {
                 startIcon={<DeleteIcon/>}
                 disabled={authContext.admin === true}
             >
-                Supprimer le compte
+                {t("btn:removeProfile")}
             </Button>
             <EnterPasswordDlg
                 open={openPasswordDlg.open}
@@ -239,12 +257,12 @@ const UserProfile = (props) => {
                 open={openDeleteConfirmation}
                 onOpenChanged={setOpenDeleteConfirmation}
                 onValidate={onConfirmDeleteAccount}
-                title="Suppression du compte"
+                title={t("title:removeProfile")}
                 dialogContent={[
-                    'Confirmez-vous la suppression de votre compte ?',
-                    'Attention, cette action est irreversible.',
-                    'Vos éventuels favoris et compositions seront effacés.',
-                    'Vous pourrez à tout moment créer un nouveau compte avec la même adresse mail.'
+                    t("removeProfileContent1"),
+                    t("removeProfileContent2"),
+                    t("removeProfileContent3"),
+                    t("removeProfileContent4")
                 ]}
             />
         </React.Fragment>
@@ -252,10 +270,11 @@ const UserProfile = (props) => {
 }
 
 const UserProfileController = withUser(() => {
+    const t = useTranslation("pages.profile");
 
     return (
         <React.Fragment>
-            <PageTitle>Mon Profil</PageTitle>
+            <PageTitle>{t("title")}</PageTitle>
             <VerticalSpacing factor={1} />
             <UserProfile />
          </React.Fragment>

@@ -9,7 +9,7 @@ import Paper from '@mui/material/Paper';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Chip from '@mui/material/Chip';
-import { formatDate, formatDateShort } from '../../utils';
+import { formatDate, formatDateShort, useLanguage, regionTitle } from 'utils';
 import Gallery from '../../components/gallery';
 import { PageSubTitle, PageHeader, Paragraph } from '../../template/pageTypography';
 import LazyDialog from '../../dialogs/LazyDialog';
@@ -25,9 +25,10 @@ import { HelmetDestination } from '../../template/seo';
 import { useReactQuery } from '../../components/reactQuery';
 
 const RegionChip = ({region}) => {
+    const { language } = useLanguage();
 
     return (
-        <Chip label={region.title} sx={{m: 0, mr: 0.5, mt: 0.5}} color="primary" variant="outlined"/>
+        <Chip label={regionTitle(region, language)} sx={{m: 0, mr: 0.5, mt: 0.5}} color="primary" variant="outlined"/>
     )
 }
 
@@ -50,15 +51,14 @@ const RegionPath = ({regions}) => {
 }
 
 const NavigationItem = ({destination, type, caption}) => {
+    const { language } = useLanguage();
     if (destination === null) {
         return null;
     }
 
     const destinationDate = new Date(destination.date);
-    const formattedDate =
-        isMobile ?
-        formatDateShort(destinationDate) :
-        formatDate(destinationDate);
+    const dateFormatter = isMobile ? formatDateShort : formatDate;
+    const formattedDate = dateFormatter(destinationDate, language);
 
     const noWrapAndEllipsis = {
         whiteSpace: "nowrap",
@@ -134,9 +134,10 @@ const Navigation = lazyComponent(({destination}) => {
 
 const DestinationDetails = ({destination}) => {
 
+    const { language } = useLanguage();
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [hasSummary, setHasSummary] = useState(false);
-    const formattedDate = useMemo(() => formatDate(new Date(destination.date)), [destination]);
+    const formattedDate = useMemo(() => formatDate(new Date(destination.date), language), [destination, language]);
 
     const toggleOpenSummary = useCallback(() => {
         setSummaryOpen(open => !open);

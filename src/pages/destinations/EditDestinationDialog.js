@@ -13,9 +13,11 @@ import Form, {
     FIELD_TYPE_SWITCH
 } from '../../components/form';
 import { useQueryContext } from '../../components/queryContext';
+import { useTranslation } from 'utils';
 
 const EditDestinationDialog = ({open, destination, onClose}) => {
 
+    const t = useTranslation("pages.destinations");
     const queryContext = useQueryContext();
 
     const addDestinationMutation = queryContext.useAddDestination();
@@ -52,35 +54,35 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
         setFields([
             {
                 id: "title",
-                label: "Titre",
+                label: t("form:titleField"),
                 required: true,
-                errorText: "Merci d'indiquer un titre de destination.",
+                errorText: t("form:titleError"),
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
                 default: ""
             },
             {
                 id: "date",
-                label: "Date",
+                label: t("form:dateField"),
                 required: true,
-                errorText: "Merci d'indiquer la date du voyage.",
+                errorText: t("form:dateError"),
                 type: FIELD_TYPE_DATE,
                 default: ""
             },
             {
                 id: "location",
-                label: "Lieu",
+                label: t("form:locationField"),
                 required: true,
-                errorText: "Merci d'indiquer le lieu de la destination.",
+                errorText: t("form:locationError"),
                 type: FIELD_TYPE_SELECT,
                 options: getLocations,
                 default: ""
             },
             {
                 id: "path",
-                label: "Chemin vers les images",
+                label: t("form:imagePathField"),
                 required: true,
-                errorText: "Merci d'indiquer un chemin vers les images de type <year>/<location>.",
+                errorText: t("form:imagePathError"),
                 type: FIELD_TYPE_SELECT,
                 options: getImageFolders,
                 mapping: {
@@ -95,9 +97,9 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
             },
             {
                 id: "cover",
-                label: "Image de couverture",
+                label: t("form:coverField"),
                 required: true,
-                errorText: "Merci d'indiquer une image de couverture.",
+                errorText: t("form:coverError"),
                 type: FIELD_TYPE_SELECT,
                 default: "",
                 options: getImagesFromPath,
@@ -112,18 +114,18 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
             },
             {
                 id: "macro",
-                label: "Contient des images macro",
+                label: t("form:hasMacro"),
                 type: FIELD_TYPE_SWITCH,
                 default: false
             },
             {
                 id: "wide",
-                label: "Contient des images grand-angle",
+                label: t("form:hasWideAngle"),
                 type: FIELD_TYPE_SWITCH,
                 default: false
             }
         ]);
-    }, [getImagesFromPath, getImageFolders, getLocations]);
+    }, [getImagesFromPath, getImageFolders, getLocations, t]);
 
     const [isOpen, setIsOpen] = useState(open);
     const [values, setValues] = useState(null);
@@ -151,7 +153,7 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
 
     const handleClose = React.useCallback(() => {
         unstable_batchedUpdates(() => {
-            // reiniti all properties...
+            // reinit all properties...
             setIsOpen(false);
             onClose();
             fields.forEach(field => delete field.error);
@@ -170,11 +172,11 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
 
     const getDialogTitle = React.useCallback(() => {
         if (destination === null) {
-            return "Nouvelle destination"
+            return t("title:newDestination")
         } else {
-            return "Modifier la destination"
+            return t("title:editDestination")
         }
-    }, [destination]);
+    }, [destination, t]);
 
     return (
         <div>
@@ -191,7 +193,7 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
                         fields={fields}
                         initialValues={values}
                         submitAction={onSubmitDestinationForm}
-                        submitCaption="Valider"
+                        submitCaption={t("validate")}
                         onCancel={handleClose}
                     />
                 </DialogContent>

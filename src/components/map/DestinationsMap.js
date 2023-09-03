@@ -6,7 +6,7 @@ import { useRouteMatch } from "react-router-dom";
 import {unstable_batchedUpdates} from 'react-dom';
 import { GoogleMap, InfoWindow, MarkerClusterer, useJsApiLoader } from '@react-google-maps/api';
 import { useQueryContext } from '../queryContext';
-import { formatDate, getThumbnailSrc } from '../../utils';
+import { formatDate, getThumbnailSrc, useLanguage } from '../../utils';
 import { DestinationsPath } from '../../navigation/routes';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
@@ -298,6 +298,7 @@ export const LocationsMap = ({locations, isFullScreen = false, onClose, resetOnC
 
 const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = false, onClose, isDestinationPage}) => {
 
+    const { language } = useLanguage();
     const [destinationsPerLocation, setDestinationsPerLocation] = useState([]);
 
     // Set destinations per location for the single destination page
@@ -312,7 +313,7 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
                 destinations: [
                     {
                         ...destination,
-                        date: formatDate(new Date(destination.date))
+                        date: formatDate(new Date(destination.date), language)
                     }
                 ]
             }
@@ -323,7 +324,7 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
         }
     // Don't need dependency with isDestinationPage
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [destinations]);
+    }, [destinations, language]);
 
     // Set destinations per location for the destinations page
     useEffect(() => {
@@ -343,7 +344,7 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
 
             const modifiedDestination = {
                 ...destination,
-                date: formatDate(new Date(destination.date)),
+                date: formatDate(new Date(destination.date), language),
                 cover: getThumbnailSrc(destination.cover, _infoCoverWidth)
             };
             let locationInstance;
@@ -362,7 +363,7 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
         })
     // Don't need dependency with isDestinationPage
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [destinations, locations]);
+    }, [destinations, locations, language]);
 
     return <LocationsMap locations={destinationsPerLocation} isFullScreen={isFullScreen} onClose={onClose} />
 

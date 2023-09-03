@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Helmet } from "react-helmet-async";
 import { useLocation } from "react-router-dom";
-import { getThumbnailSrc, formatDate } from '../../utils';
+import { getThumbnailSrc, formatDate, useLanguage } from '../../utils';
 
 const _pageNamePlaceHolder = '{title}';
 const _descriptionTemplate = `${_pageNamePlaceHolder} | David Guillemet - Underwater Photography`;
@@ -100,8 +100,9 @@ export const HelmetDescription = ({description, title}) => {
 }
 
 export const HelmetDestination = ({destination}) => {
+    const { language } = useLanguage();
     const destinationDate = useMemo(() => new Date(destination.date), [destination]);
-    const formattedDate = useMemo(() => formatDate(destinationDate), [destinationDate]);
+    const formattedDate = useMemo(() => formatDate(destinationDate, language), [destinationDate, language]);
     const customTitle = `${destination.title} - ${formattedDate}`;
 
     return (

@@ -24,8 +24,26 @@
             "filterTip": "Select a region to filter destinations",
             "allDestinations": "All",
             "macroDestinations": "Macro",
-            "wideAngleDestinations": "Wide angle"
-        },
+            "wideAngleDestinations": "Wide angle",
+            "title:confirmRemove": "Remove destination",
+            "confirmRemove": "Do you confirm the deletion of the destination '{0}'?",
+            "warningConfirmRemove": "Please note, this action is irreversible.",
+            "title:newDestination": "New destination",
+            "title:editDestination" : "Edit destination",
+            "validate": "Validate",
+            "form:titleField": "Title",
+            "form:titleError": "Please indicate a destination title.",
+            "form:dateField": "Date",
+            "form:dateError": "Please indicate the date of travel",
+            "form:locationField": "Location",
+            "form:locationError": "Please indicate the location of the destination",
+            "form:imagePathField": "Path to images",
+            "form:imagePathError": "Please indicate a path to the images.",
+            "form:coverField": "Cover image",
+            "form:coverError": "Please provide a cover image.",
+            "form:hasMacro": "Contains macro images",
+            "form:hasWideAngle": "Contains wide-angle images"
+          },
         "search": {
             "title": "Search",
             "button::nextResults": "Next Results"
@@ -49,6 +67,29 @@
                 "confirmDeleteItems": "Are your sure you want to delete theses pictures?",
                 "warningDeleteItems": "This action is irreversible."
             }
+        },
+        "profile": {
+            "title": "My Profile",
+            "email": "Your email address",
+            "emailError": "A valid email address is missing.",
+            "name": "Your name",
+            "nameError": "Your name is missing",
+            "password": "Password",
+            "passwordConfirm": "Password confirmation",
+            "passwordConfirmError": "The Password confirmation is not correct.",
+            "emailVerified": "Verified email",
+            "title:removeProfile": "Profile removal",
+            "btn:removeProfile": "Remove Profile",
+            "removeProfileContent1": "Do you confirm the removal of your profile?",
+            "removeProfileContent2": "Please note, this action is irreversible.",
+            "removeProfileContent3": "Your favorites and compositions will be removed.",
+            "removeProfileContent4": "You will be able to create a new profile with the same email address.",
+            "btn:modifyData": "Edit information",
+            "title:authDialog": "Authentication",
+            "desc:authDialog" : "You must re-authenticate to modify your personal data.",
+            "field:authDialog": "Enter your password",
+            "btn:cancel": "Cancel",
+            "btn:validate": "Validate"
         }
     },
     "components": {
@@ -57,6 +98,13 @@
             "exactSwitch": "Search exact words",
             "resultsCount": "{0} Result(s)",
             "helpTitle": "Search for images"
+        },
+        "form": {
+            "btn:cancel": "Cancel",
+            "field:latitude": "Latitude",
+            "field:longitude": "Longitude",
+            "field:latitudeError": "Please specify a valid latitude between {0} and {1}.",
+            "field:longitudeError": "Please specify a valid longitude between {0} and {1}."
         }
     },
     "dialogs": {

@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Chip from "@mui/material/Chip";
 import Typography from '@mui/material/Typography';
-import { formatDateShort, getThumbnailSrc } from '../../utils';
+import { formatDateShort, getThumbnailSrc, useLanguage, useTranslation, regionTitle } from 'utils';
 import DestinationLink from '../../components/destinationLink';
 import MasonryGallery from '../../components/masonryGallery';
 import { IconButton } from '@mui/material';
@@ -19,9 +19,11 @@ import { useQueryContext } from '../../components/queryContext';
 import ConfirmDialog from '../../dialogs/ConfirmDialog';
 
 const DestinationDetails = ({destination}) => {
+    const { language } = useLanguage();
+
     return (
         <React.Fragment>
-            <Typography variant="h5">{`${destination.title} - ${formatDateShort(new Date(destination.date))}`}</Typography>
+            <Typography variant="h5">{`${destination.title} - ${formatDateShort(new Date(destination.date), language)}`}</Typography>
             <Box
                 style={{
                     display: 'flex',
@@ -34,7 +36,7 @@ const DestinationDetails = ({destination}) => {
                         <Chip
                             size="small"
                             key={region.id}
-                            label={<Typography variant="caption">{region.title}</Typography>}
+                            label={<Typography variant="caption">{regionTitle(region, language)}</Typography>}
                             variant="outlined"
                             color="primary"
                             sx={{
@@ -136,6 +138,7 @@ const DestinationContent = ({item, index, width, params}) => {
 
 const DestinationGallery = ({destinations}) => {
 
+    const t = useTranslation("pages.destinations");
     const queryContext = useQueryContext();
     const authContext = useAuthContext();
     const deleteDestinationMutation = queryContext.useDeleteDestination();
@@ -204,10 +207,10 @@ const DestinationGallery = ({destinations}) => {
                 open={confirmDeleteOpen}
                 onOpenChanged={setConfirmDeleteOpen}
                 onValidate={onDeleteDestination}
-                title="Supprimer la destination"
+                title={t("title:confirmRemove")}
                 dialogContent={[
-                    `Confirmez-vous la suppression de la destination '${destinationToEdit?.title}'?`,
-                    'Attention, cette action est irreversible.'
+                    t("confirmRemove", destinationToEdit?.title),
+                    t("warningConfirmRemove")
                 ]}
             />
         </React.Fragment>

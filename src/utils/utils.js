@@ -308,3 +308,17 @@ export const isPrerenderUserAgent = () => {
     }
     return false;
 }
+
+const _getRegionTitleProp = {
+    fr: "title",
+    en: "title_en"
+};
+
+export const compareRegions = (lang) => {
+    const titleProperty = _getRegionTitleProp[lang];
+    return (a, b) => a[titleProperty] === b[titleProperty] ? 0 : a[titleProperty] < b[titleProperty] ? -1 : 1;
+}
+
+export const regionTitle = (region, lang) => {
+    return region[_getRegionTitleProp[lang]];
+}

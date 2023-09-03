@@ -10,9 +10,11 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { useTranslation } from 'utils';
 
 // action = "save" or "rename"
 export default function SimulationNameDialog({ open, onOpenChanged, onValidate, action }) {
+    const t = useTranslation("pages.profile");
     const [isOpen, setIsOpen] = useState(open);
     const [okDisabled, setOkDisabled] = useState(true);
     const [password, setPassword] = useState("");
@@ -54,8 +56,8 @@ export default function SimulationNameDialog({ open, onOpenChanged, onValidate, 
     };
 
     const dialogDetails = {
-        title: "Authentification",
-        desc: "Veuillez vous ré-authentifier pour modifier vos informations personnelles"
+        title: t("title:authDialog"),
+        desc: t("desc:authDialog")
     };
 
     return (
@@ -75,22 +77,22 @@ export default function SimulationNameDialog({ open, onOpenChanged, onValidate, 
                         autoFocus
                         margin="dense"
                         id="password"
-                        label="Veuillez saisir votre mot de passe"
+                        label={t("field:authDialog")}
                         type="password"
                         fullWidth
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary" variant="contained">
-                        Annuler
+                        {t("btn:cancel")}
                     </Button>
                     <LoadingButton
                         onClick={handleValidate}
                         variant="contained"
                         disabled={okDisabled}
                         loading={sending}
-                        >
-                        Valider
+                    >
+                        {t("btn:validate")}
                     </LoadingButton>
                 </DialogActions>
             </Dialog>

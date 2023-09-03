@@ -7,18 +7,18 @@ import LabeledDivider from '../../components/labeledDivider/labeledDivider';
 import ImageSlider from '../../components/imageSlider';
 import { VerticalSpacing } from '../../template/spacing';
 import {isMobile} from 'react-device-detect';
-import { formatDate, formatDateShort } from '../../utils';
-import ImageDescription from '../../components/imageDescription/imageDescription';
+import { formatDate, formatDateShort, useLanguage } from '../../utils';
+import ImageDescription from 'components/imageDescription';
 import Alert from '@mui/material/Alert';
 import { withLoading, buildLoadingState } from '../../components/hoc';
 import { useReactQuery } from '../../components/reactQuery';
 
-function imageFromCover(destination) {
+function imageFromCover(destination, language) {
     const dateFormater = isMobile ? formatDateShort : formatDate;
     return {
         src: destination.cover,
         // <destination title> (<destination date>)
-        title: `${destination.title} (${dateFormater(new Date(destination.date))})`,
+        title: `${destination.title} (${dateFormater(new Date(destination.date), language)})`,
         sizeRatio: 1.5, // Cover images are paysage only
         path: destination.path
     }
@@ -41,7 +41,8 @@ const EmptyRelatedDestinations = () => {
 
 const RelatedDestinationsSlider = withLoading(({destination, related, imageHeight}) => {
     const history = useHistory();
-    const images = useMemo(() => related.filter(dest => dest.id !== destination.id).map(dest => imageFromCover(dest)), [related, destination]);
+    const { language } = useLanguage();
+    const images = useMemo(() => related.filter(dest => dest.id !== destination.id).map(dest => imageFromCover(dest, language)), [related, destination, language]);
 
     const onSelectDestination = (index) => {
         history.push(`/destinations/${images[index].path}`);
@@ -65,7 +66,16 @@ const RelatedDestinationsSlider = withLoading(({destination, related, imageHeigh
                     backgroundColor: 'rgba(0, 0, 0, 0.3)'
                 }}
             >
-                <ImageDescription image={image} />
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translateX(-50%) translateY(-50%)'
+                    }}
+                >
+                    <ImageDescription image={image} />
+                </Box>
             </Box>
         )
     }, []);

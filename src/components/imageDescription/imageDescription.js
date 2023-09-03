@@ -11,7 +11,7 @@ const getDescriptionFromLanguage = (captions, requiredLanguage) => {
 
 const ImageDescription = ({ image }) => {
 
-    const t = useLanguage();
+    const { language } = useLanguage();
     const [ descriptionIndex ] = useState(0);
     const vernacularIndex = 0; // Always the first vernacular name
     /**
@@ -33,7 +33,7 @@ const ImageDescription = ({ image }) => {
      * }
      */
     const captions = useMemo(() => parseImageDescription(image), [image]);
-    const description = useMemo(() => getDescriptionFromLanguage(captions, t.language), [captions, t.language])
+    const description = useMemo(() => getDescriptionFromLanguage(captions, language), [captions, language])
 
     if (!description) {
         return (

@@ -26,6 +26,7 @@ import {
     FIELD_TYPE_LATLONG,
     FIELD_TYPE_CAPTCHA
 } from './Form';
+import { useTranslation } from 'utils';
 
 function validateEmail(email) {
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -269,16 +270,14 @@ const _latitudeRange = { min: -90.0, max: 90.0 };
 const _longitudeRange = { min: -180.0, max: 180.0 };
 const initializeLocation = (value) => {
     if (value === null || value === undefined) {
-        return null;/*{
-            latitude: null,
-            longitude: null
-        }*/
+        return null;
     } else {
         return { ...value };
     }
 }
 
 const LatLongField = ({field, value, values, handleChange, sending, readOnly, validators}) => {
+    const t = useTranslation("components.form");
     const [location, setLocation] = React.useState(null);
     const locationSource = React.useRef(null);
 
@@ -289,19 +288,19 @@ const LatLongField = ({field, value, values, handleChange, sending, readOnly, va
     });
 
     const latitudeField = React.useRef({
-        label: "latitude",
+        label: t("field:latitude"),
         id: `${field.id}::latitude`,
         key: "latitude",
-        errorText: `Veuillez spécifier une latitude valide comprise entre ${_latitudeRange.min} et ${_latitudeRange.max}`,
+        errorText: t("field:latitudeError", [_latitudeRange.min, _latitudeRange.max]),
         range: { ..._latitudeRange },
         ...latLongFieldBase.current
     });
 
     const longitudeField = React.useRef({
-        label: "longitude",
+        label: t("field:longitude"),
         id: `${field.id}::longitude`,
         key: "longitude",
-        errorText: `Veuillez spécifier une longitude valide comprise entre ${_longitudeRange.min} et ${_longitudeRange.max}.`,
+        errorText: t("field:longitudeError", [_longitudeRange.min, _longitudeRange.max]),
         range: { ..._longitudeRange },
         ...latLongFieldBase.current
     });

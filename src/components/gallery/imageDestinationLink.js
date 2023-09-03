@@ -1,10 +1,11 @@
 import { Typography } from '@mui/material';
 import DestinationLink from '../destinationLink';
 import { useQueryContext } from '../queryContext';
-import { formatDateShort } from '../../utils';
+import { formatDateShort, useLanguage } from '../../utils';
 import { useReactQuery } from '../reactQuery';
 
 const DestinationLinkContent = ({destination}) => {
+    const { language } = useLanguage();
     return (
         <Typography
             variant="body"
@@ -14,7 +15,7 @@ const DestinationLinkContent = ({destination}) => {
                 color: theme => theme.palette.link.main
             }}
         >
-            {destination.title} - {formatDateShort(new Date(destination.date))}
+            {destination.title} - {formatDateShort(new Date(destination.date), language)}
         </Typography>
     );
 };

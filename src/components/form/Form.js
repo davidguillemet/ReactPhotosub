@@ -7,6 +7,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { Button } from '@mui/material';
 import { useToast } from '../notifications';
 import { useOverlay } from '../loading/loadingOverlay';
+import { useTranslation } from 'utils';
 
 export const FIELD_TYPE_TEXT = 'text';
 export const FIELD_TYPE_NUMBER = 'number';
@@ -39,6 +40,7 @@ const Form = ({
     onChange = null,
     readOnly = false}) => {
 
+    const t = useTranslation("components.form");
     const [values, setValues] = React.useState({});
     const validators = React.useRef({});
     const { toast } = useToast();
@@ -112,7 +114,7 @@ const Form = ({
 
     return (
         <React.Fragment>
-            <Stack spacing={2} alignItems="center" sx={{width: '100%'}}>
+            <Stack spacing={2} alignItems="center" sx={{width: '100%', paddingTop: 1}}>
             {
                 fields.filter(field => !field.hidden).map(field => 
                     <FormField
@@ -137,13 +139,13 @@ const Form = ({
                         startIcon={<SendIcon />}
                         loadingPosition="start"
                         loading={sending}
-                        >
+                    >
                         {submitCaption}
                     </LoadingButton>
                     {
                         onCancel !== null &&
                         <Button variant="contained" onClick={onCancel}>
-                            Annuler
+                            {t("btn:cancel")}
                         </Button>
                     }
                 </Stack>

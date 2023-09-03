@@ -14,13 +14,11 @@ import { useQueryContext } from 'components/queryContext';
 import { buildLoadingState, withLoading } from 'components/hoc';
 import { ConfirmDialog } from 'dialogs';
 import EditLocationDialog from './EditLocationDialog';
-import { useTranslation } from 'utils';
+import { useTranslation, compareRegions, regionTitle, useLanguage } from 'utils';
 import { HorizontalSpacing } from 'template/spacing';
 import { EmptySquare, PlusSquare, MinusSquare } from './TreeViewIcons';
 import StyledTreeItem from './StyledTreeItem';
 import { useToast } from 'components/notifications';
-
-const compareRegions = (a, b) => a.title === b.title ? 0 : a.title < b.title ? -1 : 1;
 
 const LocationItem = ({location, onEdit, onDelete}) => {
 
@@ -58,6 +56,7 @@ const LocationItem = ({location, onEdit, onDelete}) => {
 
 const RegionItem = ({region, children, onEdit}) => {
 
+    const { language } = useLanguage();
     const onAddLocation = React.useCallback((event) => {
         event.stopPropagation();
         onEdit({ region: region.id });
@@ -74,7 +73,7 @@ const RegionItem = ({region, children, onEdit}) => {
                 <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
                     <Box component={TravelExploreIcon} color="inherit" sx={{ mr: 1 }} />
                     <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
-                        {region.title}
+                        {regionTitle(region, language)}
                     </Typography>
                     <IconButton onClick={onAddLocation}>
                         <AddLocationAltIcon />
@@ -87,12 +86,12 @@ const RegionItem = ({region, children, onEdit}) => {
     );
 }
 
-function buildTreeView(hierarchy, parentId, locations, onEdit, onDelete) {
-    const levelNodes = hierarchy.filter(region => region.parent === parentId).sort(compareRegions);
+function buildTreeView(hierarchy, parentId, locations, onEdit, onDelete, language) {
+    const levelNodes = hierarchy.filter(region => region.parent === parentId).sort(compareRegions(language));
     return levelNodes.map((node, index) => {
         return (
             <RegionItem key={node.id} region={node} onEdit={onEdit}>
-                { buildTreeView(hierarchy, node.id, locations, onEdit, onDelete) }
+                { buildTreeView(hierarchy, node.id, locations, onEdit, onDelete, language) }
                 {
                     locations.filter(location => location.region === node.id).map((location, index) => {
                         const nodeId = `location_${location.id}`;
@@ -110,6 +109,7 @@ function buildTreeView(hierarchy, parentId, locations, onEdit, onDelete) {
 }
 
 const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
+    const { language } = useLanguage();
     const t = useTranslation("pages.admin.regions");
     const { toast } = useToast();
     const queryContext = useQueryContext();
@@ -185,7 +185,7 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
                 defaultExpandIcon={<PlusSquare />}
                 sx={{ flexGrow: 1, overflowY: 'auto' }}
             >
-                { buildTreeView(regions, null, locations, onEditLocation, setLocationToDelete) }
+                { buildTreeView(regions, null, locations, onEditLocation, setLocationToDelete, language) }
             </TreeView>
             <ConfirmDialog
                 open={locationToDelete !== null}
