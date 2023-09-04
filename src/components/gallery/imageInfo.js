@@ -7,12 +7,14 @@ import {isMobile} from 'react-device-detect';
 import ImageDescription from '../imageDescription';
 import ImageDestinationLink from './imageDestinationLink';
 import { Alert, Stack } from '@mui/material';
+import { useTranslation } from 'utils';
 
 const imageInfoId = "imageInfoId";
 const imageInfoAnimationDuration = 0.5;
 
 const ImageInfo = ({image, displayDestination, style, container, visible}) => {
 
+    const t = useTranslation("components.gallery");
     const overlayRef = React.useRef(null);
     const paperRef = React.useRef();
 
@@ -118,7 +120,7 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
                             <Chip color="primary" key={tag} label={tag} size="small" sx={{marginRight: 0.5, marginTop: 0.5, color: 'white'}} />
                             )
                         }) :
-                        <Alert severity='warning'>Pas de tags...</Alert>
+                        <Alert severity='warning'>{t("info:noTags")}</Alert>
                     }
                     </Box>
                 </Stack>

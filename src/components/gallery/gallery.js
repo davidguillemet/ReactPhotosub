@@ -14,6 +14,7 @@ import MasonryGallery from '../masonryGallery';
 import { BlockQuote } from '../../template/pageTypography';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Box, Collapse } from '@mui/material';
+import { useTranslation } from 'utils';
 
 const GROUP_BY_YEAR = "year";
 
@@ -110,6 +111,8 @@ const GroupGallery = ({images, onReady, renderItem}) => {
 }
 
 const GroupGalleryWithHeader = ({group, allImages, onReady, renderItem}) => {
+
+    const t = useTranslation("components.gallery");
     const [isExpanded, setIsExpanded] = useState(true);
 
     const onToggleExpanded = useCallback(() => {
@@ -133,7 +136,7 @@ const GroupGalleryWithHeader = ({group, allImages, onReady, renderItem}) => {
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Box>{group.key} - {`${group.images.length} images`}</Box>
+                    <Box>{group.key} - {t("lbl:groupImageCount", group.images.length)}</Box>
                     <IconButton
                         sx={{color: theme => theme.palette.primary.contrastText}}
                         onClick={onToggleExpanded}

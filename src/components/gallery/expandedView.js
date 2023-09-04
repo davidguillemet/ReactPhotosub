@@ -18,7 +18,7 @@ import CloseIcon from '@mui/icons-material/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 import AppsIcon from '@mui/icons-material/Apps';
-import { useEventListener, getThumbnailSrc } from '../../utils';
+import { useEventListener, getThumbnailSrc, useTranslation } from '../../utils';
 import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
 import ImageInfo from './imageInfo';
@@ -55,6 +55,8 @@ const useStyles = makeStyles({
 const StyleImage = styled('img')(({ theme }) => ({ }));
 
 function StopButtonWithCircularProgress({ onClick, onCompletedRef, duration, size, height}) {
+
+    const t = useTranslation("components.gallery");
     const [progress, setProgress] = useState(0);
 
     const timerRef = useRef(null);
@@ -91,7 +93,7 @@ function StopButtonWithCircularProgress({ onClick, onCompletedRef, duration, siz
 
     return (
         <TooltipIconButton
-            tooltip={"Arrêter le diaporama"}
+            tooltip={t("btn:stopSlideshow")}
             onClick={handleClick}
             size={size}
         >
@@ -157,6 +159,7 @@ const ExpandedView = React.forwardRef(({
     hasNext = false,
     onNextPage = null}, ref) => {
 
+    const t = useTranslation("components.gallery");
     const [currentIndex, setCurrentIndex] = useState(index);
     const [infoVisible, setInfoVisible] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -386,7 +389,7 @@ const ExpandedView = React.forwardRef(({
                                 height={headerBarRef.current.offsetHeight}
                             /> :
                             <TooltipIconButton
-                                tooltip="Lancer le diaporama"
+                                tooltip={t("btn:startSlideshow")}
                                 onClick={handlePlayClick}
                                 disabled={playable === false}
                                 size={toolbarIconSize}
@@ -397,7 +400,7 @@ const ExpandedView = React.forwardRef(({
 
                     <React.Fragment>
                         <TooltipIconButton
-                            tooltip={infoVisible ? "Cacher les détails" : "Afficher les détails"}
+                            tooltip={infoVisible ? t("btn:hideDetails") : t("btn:showDetails")}
                             onClick={handleInfoClick}
                             size={toolbarIconSize}
                         >
@@ -409,7 +412,7 @@ const ExpandedView = React.forwardRef(({
                         </TooltipIconButton>
                         <FavoriteButton size={toolbarIconSize} image={currentImage} />
                         <TooltipIconButton
-                            tooltip={fullScreen ? "Réduire" : "Plein écran"}
+                            tooltip={fullScreen ? t("btn:exitFullScreen") : t("btn:enterFullScreen")}
                             onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}
                             size={toolbarIconSize}
                         >
@@ -420,7 +423,7 @@ const ExpandedView = React.forwardRef(({
                         }
                         </TooltipIconButton>
                         <TooltipIconButton
-                            tooltip={showThumbnails ? "Masquer les vignettes" : "Afficher les vignettes"}
+                            tooltip={showThumbnails ? t("btn:hideThumbnails") : t("btn:showThumbnails")}
                             onClick={handleClickToggleThumbnails}
                             size={toolbarIconSize}
                         >
@@ -453,7 +456,7 @@ const ExpandedView = React.forwardRef(({
                         isPlaying ?
                         <HorizontalSpacing></HorizontalSpacing> :
                         <TooltipIconButton
-                            tooltip="Fermer la visionneuse"
+                            tooltip={t("btn:closeViewer")}
                             onClick={handleCloseClick}
                             size={toolbarIconSize}
                         >

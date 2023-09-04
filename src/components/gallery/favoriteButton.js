@@ -10,9 +10,11 @@ import TooltipIconButton from '../tooltipIconButton';
 import { useAuthContext } from '../authentication';
 import './styles.css';
 import { useFavorites } from '../favorites';
+import { useTranslation } from 'utils';
 
 const FavoriteButton = ({image, size = 'medium', style, color }) => {
 
+    const t = useTranslation("components.gallery");
     const authContext = useAuthContext();
     const favoritesContext = useFavorites();
     const [ updating, setUpdating ] = useState(false);
@@ -37,9 +39,9 @@ const FavoriteButton = ({image, size = 'medium', style, color }) => {
     }, [favoritesContext, isInFavorites, image]);
 
     const buttonStyle = {...style};
-    let title = "Ajouter aux favoris";
+    let title = t("btn:addFavorite");
     if (isInFavorites && updating === false) {
-        title = 'Retirer des favoris';
+        title = t("btn:deleteFavorite");
         buttonStyle.color = 'red';
     } else if (color) {
         buttonStyle.color = color;

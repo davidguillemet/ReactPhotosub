@@ -10,21 +10,24 @@ import { PageTitle, PageSubTitle } from '../../template/pageTypography';
 import { useQueryContext } from '../../components/queryContext';
 import { withLoading, buildLoadingState, withUser } from '../../components/hoc';
 import { useFavorites } from '../../components/favorites';
+import { useTranslation } from 'utils';
 
 const MySelectionContent = withLoading(({images}) => {
+    const t = useTranslation("pages.favorites");
     return (
         <React.Fragment>
         {
             images !== undefined &&
-            <PageSubTitle sx={{mt: 0}}>{`${images.length} Image(s)`}</PageSubTitle>
+            <PageSubTitle sx={{mt: 0}}>{t("favoritesCount", images.length)}</PageSubTitle>
         }
-        <Gallery images={images} groupBy="year" emptyMessage="Votre liste de favoris est vide."/>
+        <Gallery images={images} groupBy="year" emptyMessage={t("info:noFavorites")}/>
         </React.Fragment>
     );
 }, [ buildLoadingState("images", [null, undefined]) ]);
 
 const MySelection = withUser(() => {
 
+    const t = useTranslation("pages.favorites");
     const queryContext = useQueryContext();
     const authContext = useAuthContext();
     const favoritesContext = useFavorites();
@@ -90,7 +93,7 @@ const MySelection = withUser(() => {
                 loadingPosition="end"
                 variant="contained"
             >
-                ANNULER
+                {t("btn:cancelDeletion")}
             </LoadingButton>
             <IconButton
                 size="small"
@@ -105,13 +108,13 @@ const MySelection = withUser(() => {
 
     return (
         <React.Fragment>
-            <PageTitle>Ma Sélection</PageTitle>
+            <PageTitle>{t("title")}</PageTitle>
             <MySelectionContent images={images}></MySelectionContent>
             {
                 removedFavorites.length > 0 && 
                 <Snackbar
                     open={true}
-                    message={`${removedFavorites.length} favori(s) supprimé(s)`}
+                    message={t("info:favoritesDeleted", removedFavorites.length)}
                     action={undoAction}
                     TransitionComponent={Grow}
                 />

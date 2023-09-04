@@ -43,7 +43,14 @@
             "form:coverError": "Please provide a cover image.",
             "form:hasMacro": "Contains macro images",
             "form:hasWideAngle": "Contains wide-angle images"
-          },
+        },
+        "favorites": {
+            "title": "My Selection",
+            "favoritesCount": "{0} image(s)",
+            "info:favoritesDeleted": "{0} favorite(s) deleted",
+            "btn:cancelDeletion": "Cancel",
+            "info:noFavorites": "Your favorites list is empty."
+        },
         "search": {
             "title": "Search",
             "button::nextResults": "Next Results"
@@ -105,6 +112,21 @@
             "field:longitude": "Longitude",
             "field:latitudeError": "Please specify a valid latitude between {0} and {1}.",
             "field:longitudeError": "Please specify a valid longitude between {0} and {1}."
+        },
+        "gallery": {
+            "btn:addFavorite": "Add to favorites",
+            "btn:deleteFavorite": "Remove from favorites",
+            "lbl:groupImageCount": "{0} images",
+            "btn:stopSlideshow": "Stop slideshow",
+            "btn:startSlideshow": "Start slideshow",
+            "btn:showDetails": "Show details",
+            "btn:hideDetails": "Hide details",
+            "btn:enterFullScreen": "Full screen",
+            "btn:exitFullScreen": "Exit full screen",
+            "btn:showThumbnails": "Show thumbnails",
+            "btn:hideThumbnails": "Hide thumbnails",
+            "btn:closeViewer": "Close viewer",
+            "info:noTags": "No tags..."
         }
     },
     "dialogs": {

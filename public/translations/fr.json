@@ -44,6 +44,13 @@
             "form:hasMacro": "Contient des images macro",
             "form:hasWideAngle": "Contient des images grand-angle"
         },
+        "favorites": {
+            "title": "Ma Sélection",
+            "favoritesCount": "{0} image(s)",
+            "info:favoritesDeleted": "{0} favori(s) supprimé(s)",
+            "btn:cancelDeletion": "Annuler",
+            "info:noFavorites": "Votre liste de favoris est vide."
+        },
         "search": {
             "title": "Recherche",
             "button::nextResults": "Résultats suivants"
@@ -105,6 +112,21 @@
             "field:longitude": "Longitude",
             "field:latitudeError": "Veuillez spécifier une latitude valide comprise entre {0} et {1}.",
             "field:longitudeError": "Veuillez spécifier une longitude valide comprise entre {0} et {1}."
+        },
+        "gallery": {
+            "btn:addFavorite": "Ajouter aux favoris",
+            "btn:deleteFavorite": "Retirer des favoris",
+            "lbl:groupImageCount": "{0} images",
+            "btn:stopSlideshow": "Arrêter le diaporama",
+            "btn:startSlideshow": "Démarrer le diaporama",
+            "btn:showDetails": "Afficher les détails",
+            "btn:hideDetails": "Masquer les détails",
+            "btn:enterFullScreen": "Plein écran",
+            "btn:exitFullScreen": "Réduire",
+            "btn:showThumbnails": "Afficher les vignettes",
+            "btn:hideThumbnails": "Masquer les vignettes",
+            "btn:closeViewer": "Fermer la visionneuse",
+            "info:noTags": "Pas de tags..."
         }
     },
     "dialogs": {
