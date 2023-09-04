@@ -14,6 +14,7 @@ const imageInfoAnimationDuration = 0.5;
 const ImageInfo = ({image, displayDestination, style, container, visible}) => {
 
     const overlayRef = React.useRef(null);
+    const paperRef = React.useRef();
 
     const showAction = React.useRef(null);
     const hiddeAction = React.useRef(null);
@@ -48,6 +49,13 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
         }
     }, [visible, container]);
 
+    React.useEffect(() => {
+        paperRef.current.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }, [image]);
+
     return (
         <Box
             ref={overlayRef}
@@ -70,20 +78,21 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
             }}
         >
             <Paper
+                ref={paperRef}
                 elevation={4}
                 sx={{
                     display: 'flex',
                     justifyContent: 'center',
-                    padding: isMobile ? 1 : 2,
-                    bgcolor: 'rgb(0,0,0,0.3)',
+                    padding: 0,
+                    bgcolor: 'rgb(0,0,0,0.5)',
                     position: 'absolute',
+                    overflowY: 'auto',
                     top: '50%',
                     left: '50%',
                     maxHeight: '100%',
                     transform: 'translateY(-50%) translateX(-50%)',
                     ...(isMobile ? {
-                        width: '100%',
-                        scroll: 'auto'
+                        width: '100%'
                     } : {
                         minWidth: '70%'
                     })
@@ -92,7 +101,7 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
                 <Stack
                     direction={'column'}
                     spacing={1}
-                    sx={{overflowY: 'scroll'}}
+                    sx={{m: 1, p: 0}}
                 >
                     <ImageDescription image={image} />
                     {
