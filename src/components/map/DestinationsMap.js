@@ -146,7 +146,13 @@ const CustomFullScreen = ({destinations, fullScreen, onClose}) => {
     );
 }
 
-export const LocationsMap = ({locations, isFullScreen = false, onClose, resetOnChange = true, onMapClick}) => {
+export const LocationsMap = ({
+    locations,
+    isFullScreen = false,
+    onClose,
+    resetOnChange = true,
+    onMapClick,
+    isDestinationPage = false}) => {
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
@@ -163,10 +169,10 @@ export const LocationsMap = ({locations, isFullScreen = false, onClose, resetOnC
     const mapInitialized = React.useRef(false);
 
     const handleMarkerClick = React.useCallback((location) => {
-        if (location.destinations !== undefined) {
+        if (!isDestinationPage) {
             setSelectedLocation(location);
         }
-    }, []);
+    }, [isDestinationPage]);
 
     useEffect(() => {
         if (clusterer === null) {
@@ -187,7 +193,9 @@ export const LocationsMap = ({locations, isFullScreen = false, onClose, resetOnC
                 },
                 icon: "/diver.png"
             });
-            marker.addListener("click", () => handleMarkerClick(location));
+            if (!isDestinationPage) {
+                marker.addListener("click", () => handleMarkerClick(location));
+            }
             return marker;
         });
         clusterer.addMarkers(markers);
@@ -214,7 +222,7 @@ export const LocationsMap = ({locations, isFullScreen = false, onClose, resetOnC
         }
 
         mapInitialized.current = true;
-    }, [clusterer, locations, handleMarkerClick, onMapClick, resetOnChange])
+    }, [clusterer, locations, handleMarkerClick, onMapClick, resetOnChange, isDestinationPage])
 
     const handleMapLoaded = React.useCallback((map) => {
         setMap(map)
@@ -365,8 +373,12 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [destinations, locations, language]);
 
-    return <LocationsMap locations={destinationsPerLocation} isFullScreen={isFullScreen} onClose={onClose} />
-
+    return <LocationsMap
+                locations={destinationsPerLocation}
+                isFullScreen={isFullScreen}
+                onClose={onClose}
+                isDestinationPage={isDestinationPage}
+            />
 }, [
     buildLoadingState("locations", [undefined])
 ]);
