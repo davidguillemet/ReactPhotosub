@@ -9,7 +9,7 @@ import Paper from '@mui/material/Paper';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Chip from '@mui/material/Chip';
-import { formatDate, formatDateShort, useLanguage, regionTitle } from 'utils';
+import { formatDate, formatDateShort, useLanguage, regionTitle, useTranslation } from 'utils';
 import Gallery from '../../components/gallery';
 import { PageSubTitle, PageHeader, Paragraph } from '../../template/pageTypography';
 import LazyDialog from '../../dialogs/LazyDialog';
@@ -120,13 +120,14 @@ const NavigationItem = ({destination, type, caption}) => {
 }
 
 const Navigation = lazyComponent(({destination}) => {
+    const t = useTranslation("pages.destination");
     return (
         <Grid container spacing={{ xs: 0.5, md: 1}} sx={{width: '100%'}}>
             <Grid item xs={6}>
-                <NavigationItem destination={destination.prev} type="left" caption="Précédent"/>
+                <NavigationItem destination={destination.prev} type="left" caption={t("btn:prevDestination")}/>
             </Grid>
             <Grid item xs={6}>
-                <NavigationItem destination={destination.next} type="right" caption="Suivant"/>
+                <NavigationItem destination={destination.next} type="right" caption={t("btn:nextDestination")}/>
             </Grid>
         </Grid>
     )
@@ -134,6 +135,7 @@ const Navigation = lazyComponent(({destination}) => {
 
 const DestinationDetails = ({destination}) => {
 
+    const t = useTranslation("pages.destination");
     const { language } = useLanguage();
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [hasSummary, setHasSummary] = useState(false);
@@ -172,7 +174,7 @@ const DestinationDetails = ({destination}) => {
             }
             {
                 hasSummary &&
-                <Button sx={{m: 0, mt: 1, px: 1}} size={isMobile ? "small": "medium"} onClick={toggleOpenSummary} variant="contained">Voir le Résumé</Button>
+                <Button sx={{m: 0, mt: 1, px: 1}} size={isMobile ? "small": "medium"} onClick={toggleOpenSummary} variant="contained">{t("btn:seeSummary")}</Button>
             }
             <LazyDialog
                 open={summaryOpen}

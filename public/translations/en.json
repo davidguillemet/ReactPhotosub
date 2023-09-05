@@ -20,6 +20,13 @@
         "home": {
 
         },
+        "destination": {
+            "btn:prevDestination": "Previous",
+            "btn:nextDestination": "Next",
+            "btn:seeSummary": "See summary",
+            "info:noRelatedDest": "No related destination",
+            "relatedDestinations": "Related destinations"
+        },
         "destinations": {
             "title": "All destinations",
             "count": "{0} Destination(s)",

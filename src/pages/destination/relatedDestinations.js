@@ -7,7 +7,7 @@ import LabeledDivider from '../../components/labeledDivider/labeledDivider';
 import ImageSlider from '../../components/imageSlider';
 import { VerticalSpacing } from '../../template/spacing';
 import {isMobile} from 'react-device-detect';
-import { formatDate, formatDateShort, useLanguage } from '../../utils';
+import { formatDate, formatDateShort, useLanguage, useTranslation } from '../../utils';
 import ImageDescription from 'components/imageDescription';
 import Alert from '@mui/material/Alert';
 import { withLoading, buildLoadingState } from '../../components/hoc';
@@ -25,6 +25,7 @@ function imageFromCover(destination, language) {
 }
 
 const EmptyRelatedDestinations = () => {
+    const t = useTranslation("pages.destination");
     return (
         <Box style={{
             display: 'flex',
@@ -34,7 +35,7 @@ const EmptyRelatedDestinations = () => {
             justifyContent: 'center',
             alignItems: 'center'
         }}>
-            <Alert severity="info" elevation={4} variant="filled">Aucune destination similaire</Alert>
+            <Alert severity="info" elevation={4} variant="filled">{t("info:noRelatedDest")}</Alert>
         </Box>
     );
 }
@@ -107,9 +108,10 @@ const RelatedDestinationsSliderController = lazyComponent(({destination}) => {
 }, { height: imageHeight });
 
 const RelatedDestinations = ({destination}) => {
+    const t = useTranslation("pages.destination");
     return (
         <Box sx={{ width: "100%"}} >
-            <LabeledDivider label="Destinations Similaires"></LabeledDivider>
+            <LabeledDivider label={t("relatedDestinations")}></LabeledDivider>
             <VerticalSpacing factor={2} />
             <RelatedDestinationsSliderController destination={destination} />
         </Box>
