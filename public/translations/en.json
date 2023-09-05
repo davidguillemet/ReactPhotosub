@@ -13,6 +13,10 @@
         "logout": "Logout"
     },
     "pages" : {
+        "404": {
+            "title": "Oops...",
+            "explanation": "It seems that the page you requested does not exist or has been deleted."
+        },
         "home": {
 
         },

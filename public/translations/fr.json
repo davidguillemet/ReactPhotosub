@@ -13,6 +13,10 @@
         "logout": "Déconnexion"
     },
     "pages" : {
+        "404": {
+            "title": "Oups...",
+            "explanation": "Il semblerait que la page que vous avez demandée n'existe pas ou a été supprimée."
+        },
         "home": {
 
         },
