@@ -10,12 +10,79 @@ import Form, {
     FIELD_TYPE_CAPTCHA
 } from '../../components/form';
 import { useDataProvider } from '../../components/dataProvider';
+import { useTranslation } from 'utils';
+
+const getFields = (t) => {
+    const fields = [
+        {
+            id: "name",
+            label: t("field:name"),
+            required: true,
+            errorText: t("error:name"),
+            type: FIELD_TYPE_TEXT,
+            multiline: false,
+            default: null
+        },
+        {
+            id: "email",
+            label: t("field:email"),
+            required: true,
+            errorText: t("error:email"),
+            type: FIELD_TYPE_EMAIL,
+            multiline: false,
+            default: null
+        },
+        {
+            id: "subject",
+            label: t("field:object"),
+            required: true,
+            errorText: t("error:object"),
+            type: FIELD_TYPE_TEXT,
+            multiline: false,
+            default: null
+        },
+        {
+            id: "message",
+            label: t("field:message"),
+            required: true,
+            errorText: t("error:message"),
+            type: FIELD_TYPE_TEXT,
+            multiline: true,
+            default: null
+        },
+        {
+            id: "sendcopy",
+            label: t("switch:sendCopy"),
+            type: FIELD_TYPE_SWITCH,
+            default: false
+        },
+        {
+            id: "token",
+            required: true,
+            type: FIELD_TYPE_CAPTCHA,
+            default: null
+        }
+    ]
+    fields.language = t.language;
+    return fields;
+}
 
 const Contact = () => {
 
+    const t = useTranslation("pages.contact");
     const dataProvider = useDataProvider();
     const authContext = useAuthContext();
     const [initialValues, setInitialValues] = useState(null);
+    const [ fields, setFields ] = useState(() => getFields(t));
+
+    useEffect(() => {
+        setFields(prevFields => {
+            if (prevFields.language !== t.language) {
+                return getFields(t);
+            }
+            return prevFields;
+        });
+    }, [t]);
 
     useEffect(() => {
         const user = authContext.user;
@@ -29,56 +96,6 @@ const Contact = () => {
         setInitialValues(initialValues);
     }, [authContext.user])
 
-    const fields = React.useRef([
-        {
-            id: "name",
-            label: "Votre nom",
-            required: true,
-            errorText: "Merci d'indiquer votre nom.",
-            type: FIELD_TYPE_TEXT,
-            multiline: false,
-            default: null
-        },
-        {
-            id: "email",
-            label: "Votre adresse de messagerie",
-            required: true,
-            errorText: "Merci d'indiquer une adresse de messagerie valide.",
-            type: FIELD_TYPE_EMAIL,
-            multiline: false,
-            default: null
-        },
-        {
-            id: "subject",
-            label: "Le titre de votre message",
-            required: true,
-            errorText: "Merci d'indiquer l'objet de votre message.",
-            type: FIELD_TYPE_TEXT,
-            multiline: false,
-            default: null
-        },
-        {
-            id: "message",
-            label: "Votre message",
-            required: true,
-            errorText: "Merci de saisir un message.",
-            type: FIELD_TYPE_TEXT,
-            multiline: true,
-            default: null
-        },
-        {
-            id: "sendcopy",
-            label: "Recevoir une copie de votre message",
-            type: FIELD_TYPE_SWITCH,
-            default: false
-        },
-        {
-            id: "token",
-            required: true,
-            type: FIELD_TYPE_CAPTCHA,
-            default: null
-        }
-    ]);
 
     const [isDirty, setIsDirty] = React.useState(false);
 
@@ -93,17 +110,17 @@ const Contact = () => {
 
     return (
         <React.Fragment>
-            <PageTitle>Pour me contacter</PageTitle>
+            <PageTitle>{t("title")}</PageTitle>
 
             <Form
-                fields={fields.current}
+                fields={fields}
                 initialValues={initialValues}
                 submitAction={onSubmitMessageForm}
                 onChange={onChange}
-                validationMessage="Votre message a bien été envoyé. Merci!"
+                validationMessage={t("info:success")}
             />
 
-            <Prompt when={isDirty} message={"Votre message n'a pas été envoyé après les dernières modifications.\nContinuer la navigation?"} />
+            <Prompt when={isDirty} message={t("warning:leave")} />
 
         </React.Fragment>
     );

@@ -70,6 +70,10 @@ const Form = ({
             field.dependencies.forEach(dep => dependencies[dep] = "");
         }
 
+        if (onChange) {
+            onChange();
+        }
+
         unstable_batchedUpdates(() => {
             setIsDirty(true);
             setValues(oldValues => {
@@ -80,7 +84,7 @@ const Form = ({
                 }
             })
         });
-    }, []);
+    }, [onChange]);
 
     const onSubmit = (e) => {
         e.preventDefault();

@@ -20,6 +20,20 @@
         "home": {
 
         },
+        "contact": {
+            "title": "Pour me contacter",
+            "field:name": "Votre nom",
+            "error:name": "Merci d'indiquer votre nom.",
+            "field:email": "Votre adresse de messagerie",
+            "error:email": "Merci d'indiquer une adresse de messagerie valide.",
+            "field:object": "Le titre de votre message",
+            "error:object": "Merci dz saisir un titre pour votre message.",
+            "field:message": "Votre message",
+            "error:message": "Merci de saisir un message.",
+            "switch:sendCopy": "Recevoir une copie de votre message",
+            "info:success": "Votre message a bien été envoyé. Merci!",
+            "warning:leave": "Votre message n'a pas été envoyé après les dernières modifications.\nContinuer la navigation?"
+        },
         "destination": {
             "btn:prevDestination": "Précédent",
             "btn:nextDestination": "Suivant",

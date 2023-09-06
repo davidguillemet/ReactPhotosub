@@ -20,6 +20,20 @@
         "home": {
 
         },
+        "contact": {
+            "title": "To contact me",
+            "field:name": "Your name",
+            "error:name": "Please enter your name.",
+            "field:email": "Your email address",
+            "error:email": "Please enter a valid email address.",
+            "field:object": "The title of your message",
+            "error:object": "Please enter a title for your message.",
+            "field:message": "Your message",
+            "error:message": "Please enter a message.",
+            "switch:sendCopy": "Receive a copy of your message",
+            "info:success": "Your message has been sent. Thank you!",
+            "warning:leave": "Your message was not sent after the last edits.\nDo you confirm you want to leave this page ?"
+        },
         "destination": {
             "btn:prevDestination": "Previous",
             "btn:nextDestination": "Next",
