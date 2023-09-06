@@ -8,7 +8,7 @@ import { VerticalSpacing } from '../../template/spacing';
 import { isFromDb, isDirty, getDbIndex } from '../../dataProvider';
 import SimulationToolBar from './SimulationToolBar';
 import Simulation from './Simulation';
-import LazyDialog from '../../dialogs/LazyDialog';
+import { LazyDialog } from 'dialogs';
 
 import { useAuthContext } from '../../components/authentication';
 import { useQueryContext } from '../../components/queryContext';

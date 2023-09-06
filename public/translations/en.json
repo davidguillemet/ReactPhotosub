@@ -17,6 +17,9 @@
             "title": "Oops...",
             "explanation": "It seems that the page you requested does not exist or has been deleted."
         },
+        "about": {
+            "title": "About me"
+        },
         "home": {
 
         },

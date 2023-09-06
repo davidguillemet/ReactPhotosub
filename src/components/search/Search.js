@@ -18,7 +18,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import ErrorIcon from '@mui/icons-material/Error';
 
 import { uniqueID, useTranslation, useLanguage } from '../../utils';
-import LazyDialog from '../../dialogs/LazyDialog';
+import { LazyDialog } from 'dialogs';
 import { useQueryContext } from '../queryContext';
 import { Paragraph } from '../../template/pageTypography';
 import { useStateWithDep } from '../hooks';

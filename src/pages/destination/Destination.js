@@ -12,7 +12,7 @@ import Chip from '@mui/material/Chip';
 import { formatDate, formatDateShort, useLanguage, regionTitle, useTranslation } from 'utils';
 import Gallery from '../../components/gallery';
 import { PageSubTitle, PageHeader, Paragraph } from '../../template/pageTypography';
-import LazyDialog from '../../dialogs/LazyDialog';
+import { LazyDialog } from 'dialogs';
 import { withLoading, buildLoadingState } from '../../components/hoc';
 import { useQueryContext } from '../../components/queryContext';
 import DestinationLink from '../../components/destinationLink';

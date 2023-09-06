@@ -17,6 +17,9 @@
             "title": "Oups...",
             "explanation": "Il semblerait que la page que vous avez demandée n'existe pas ou a été supprimée."
         },
+        "about": {
+            "title": "A Propos"
+        },
         "home": {
 
         },
