@@ -5,8 +5,11 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { useTranslation } from 'utils';
 
 export default function SimulationDeletionDialog({ open, name, onOpenChanged, onValidate }) {
+
+    const t = useTranslation("pages.composition");
 
     const handleClose = () => {
         onOpenChanged(false);
@@ -27,17 +30,17 @@ export default function SimulationDeletionDialog({ open, name, onOpenChanged, on
                 open={open}
                 onClose={handleClose}
             >
-                <DialogTitle id="form-dialog-title">Suppression</DialogTitle>
+                <DialogTitle id="form-dialog-title">{t("dlgTitle:delete")}</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>{`Confirmez-vous la supression de la simulation '${name}' ?`}</DialogContentText>
-                    <DialogContentText>Attention, cette action est irreversible.</DialogContentText>
+                    <DialogContentText>{t("dlg:confirm1", name)}</DialogContentText>
+                    <DialogContentText>{t("dlg:confirm2", name)}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary" variant="outlined">
-                        Annuler
+                        {t("dlg:cancelDeletion")}
                     </Button>
                     <Button onClick={handleValidate} color="primary" variant="outlined">
-                        Valider
+                        {t("dlg:validateDeletion")}
                     </Button>
                 </DialogActions>
             </Dialog>

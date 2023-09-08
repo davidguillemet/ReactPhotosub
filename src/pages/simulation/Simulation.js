@@ -34,6 +34,7 @@ import { withLoading, buildLoadingState } from '../../components/hoc';
 import { useFirebaseContext } from '../../components/firebase';
 import ErrorAlert from '../../components/error/error';
 import { QUERY_ERROR } from '../../components/reactQuery';
+import { useTranslation } from 'utils';
 
 const borderColors = [
     "#FFFFFF",
@@ -43,6 +44,8 @@ const borderColors = [
 ];
 
 const EmptySimulationImages = ({type, images, searchResult}) => {
+    const t = useTranslation("pages.composition");
+
     if (images === null) {
         // to avoid blinking component display when transitioning
         return null;
@@ -68,11 +71,9 @@ const EmptySimulationImages = ({type, images, searchResult}) => {
 
     if (type === LIST_FAVORITES || type === LIST_SEARCH) {
         const message = 
-            type === LIST_FAVORITES ?
-            "Votre liste de favoris est vide." :
-            searchResult.totalCount >= 0 ?
-            "Votre recherche n'a retourné aucun résultat." :
-            "Saisissez un critère pour lancer une recherche.";
+            type === LIST_FAVORITES ? t("noFavorites") :
+            searchResult.totalCount >= 0 ? t("noSearchResults") :
+            t("enterSearchCriteria");
 
             const severity =
             type === LIST_FAVORITES || searchResult.totalCount < 0 ?
@@ -98,6 +99,7 @@ const EmptySimulationImages = ({type, images, searchResult}) => {
 
 const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
+    const t = useTranslation("pages.composition");
     const firebaseContext = useFirebaseContext();
     const [listType, setListType] = useState(LIST_HOME_SLIDESHOW);
     const [interiors, images, setSearchImages, addUploadedInterior, deleteUploadedInterior] = useImageLoader(user, simulations, listType);
@@ -236,11 +238,11 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     return (
         <Box sx={{ maxWidth: 1200, width: '100%'}}>
 
-            <Typography variant="h4" style={{fontWeight: "100"}}>1. Sélectionnez une ambiance</Typography>
+            <Typography variant="h4" style={{fontWeight: "100"}}>{t("interiorSelection")}</Typography>
             {
                 userUploadRef &&
                 <FileUploads
-                    caption="Ajoutez des ambiances"
+                    caption={t("btn:addScenery")}
                     uploadRef={userUploadRef}
                     onFilesUploaded={onFilesUploaded}
                 />
@@ -264,24 +266,24 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
             <VerticalSpacing factor={3} />
 
-            <Typography variant="h4" style={{fontWeight: "100"}}>2. Insérez des images</Typography>
+            <Typography variant="h4" style={{fontWeight: "100"}}>{t("imageSelection")}</Typography>
             <VerticalSpacing factor={1} />
             <ToggleButtonGroup exclusive value={listType} onChange={handleListType} >
                 <ToggleButton value={LIST_HOME_SLIDESHOW} >
-                    <Tooltip title="Présélection">
+                    <Tooltip title={t("imageType:preSelection")}>
                         <CollectionsIcon />
                     </Tooltip>
                 </ToggleButton>
                 {
                     user &&
                     <ToggleButton value={LIST_FAVORITES} >
-                        <Tooltip title="Favoris">
+                        <Tooltip title={t("imageType:favorites")}>
                             <FavoriteIcon />
                         </Tooltip>
                     </ToggleButton>
                 }
                 <ToggleButton value={LIST_SEARCH} >
-                    <Tooltip title="Recherche">
+                    <Tooltip title={t("imageType:search")}>
                         <SearchIcon />
                     </Tooltip>
                 </ToggleButton>
@@ -343,7 +345,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                         color: theme => theme.palette.text.primary
                     }}
                 >
-                    <Typography variant="h4" style={{fontWeight: "100"}}>3. Configurez le Cadre</Typography>
+                    <Typography variant="h4" style={{fontWeight: "100"}}>{t("frameSelection")}</Typography>
                 </FormLabel>
 
                 <Box style={{
@@ -351,7 +353,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     alignItems: 'center',
                     justifyContent: "center",
                     width: "100%"}}>
-                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>Epaisseur:</Typography>
+                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>{t("frameThickness")}</Typography>
                     <HorizontalSpacing factor={isMobile ? 2 : 6} />
                     <BorderInput
                         value={simulation.border.width}
@@ -369,7 +371,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     justifyContent: "center",
                     width: "100%"}}
                 >
-                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>Couleur:</Typography>
+                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>{t("frameColor")}</Typography>
                     <HorizontalSpacing factor={isMobile ? 2 : 6} />
                     <FormControl
                         variant="outlined"
@@ -419,7 +421,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     justifyContent: "center",
                     width: "100%"}}
                 >
-                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>Ombre:</Typography>
+                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>{t("frameShadow")}</Typography>
                     <HorizontalSpacing factor={isMobile ? 2 : 6} />
                     <Slider
                         value={simulation.shadow}

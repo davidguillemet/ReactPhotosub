@@ -16,6 +16,7 @@ import { useToast } from 'components/notifications';
 import './fileUploadStyles.css';
 import { useDataProvider } from 'components/dataProvider';
 import FileUpload from 'components/upload/FileUpload';
+import { useTranslation } from 'utils';
 
 const STEP_UPLOAD = "step::upload";
 const STEP_THUMBNAILS = "step::thumbnail";
@@ -23,6 +24,7 @@ const STEP_ERROR = "step::error";
 const STEP_SUCCESS = "step::success";
 
 const ThumbnailGeneration = () => {
+    const t = useTranslation("pages.composition");
     return (
         <Box style={{
             display: 'flex',
@@ -40,7 +42,7 @@ const ThumbnailGeneration = () => {
                     textOverflow: 'ellipsis',
                     maxWidth: 200
                 }}>
-                Création des vignettes...
+                {t("progress:createThumbs")}
             </Typography>
         </Box>
     );
@@ -70,6 +72,7 @@ const ThumbnailError = ({error}) => {
 }
 
 const UploadSuccess = () => {
+    const t = useTranslation("pages.composition");
     return (
         <Box style={{
             display: 'flex',
@@ -84,7 +87,7 @@ const UploadSuccess = () => {
                     textOverflow: 'ellipsis',
                     maxWidth: 200
                 }}>
-                Fichier chargé avec succès
+                {t("uploadSuccess")}
             </Typography>
         </Box>
     );

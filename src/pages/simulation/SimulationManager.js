@@ -52,6 +52,7 @@ const initialState = {
 
 const SimulationManager = withLoading(({user, fetchedSimulations}) => {
 
+    const t = useTranslation("pages.composition");
     const queryContext = useQueryContext();
 
     const { state, dispatch } = React.useContext(SimulationContext);
@@ -84,7 +85,7 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
         if (isFromDb(simulationData)) {
             updateSimulation.mutateAsync(simulationData).then(res => {
                 dispatch(setSimulationDirty(false, state.currentIndex));
-                toast.success(`la composition '${simulationData.name}' a été sauvegardée.`)
+                toast.success(t("save:success", simulationData.name))
             }).catch (err => {
                 // Empty
             }).finally(() => {
@@ -102,19 +103,19 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
                     throw new Error(message);
                 }
                 dispatch(setSimulationDbIndex(dbIndex, state.currentIndex));
-                toast.success(`La composition '${simulationData.name}' a été sauvegardée.`);
+                toast.success(t("save:success", simulationData.name));
             }).catch (err => {
                 // Empty
             }).finally(() => {
                 setActionIsRunning(false);
             })
         } 
-    }, [setActionIsRunning, toast, state, addMutation, updateSimulation, dispatch]);
+    }, [setActionIsRunning, toast, state, addMutation, updateSimulation, dispatch, t]);
 
     const onAdd = useCallback((name) => {
         dispatch(addSimulation(name));
-        toast.success(`La composition '${name}' a été ajoutée.`);
-    }, [dispatch, toast]);
+        toast.success(t("add:success", name));
+    }, [dispatch, toast, t]);
 
     const onDelete = useCallback(() => {
 
@@ -128,14 +129,14 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
 
         removePromise.then((res) => {
             dispatch(deleteSimulation(state.currentIndex, res));
-            toast.success(`La composition '${simulationToRemove.name}' a été supprimée.`);
+            toast.success(t("delete:success", simulationToRemove.name));
         }).catch (err => {
             // Empty
         }).finally(() => {
             setActionIsRunning(false);
         })
 
-    }, [setActionIsRunning, state, dispatch, toast, removeSimulation]);
+    }, [setActionIsRunning, state, dispatch, toast, removeSimulation, t]);
 
     const promptMessage = useMemo(() => {
         let message = "Des modifications sont en cours.\n"
@@ -222,7 +223,7 @@ const SimulationManagerController = () => {
      return (
         <React.Fragment>
 
-            <PageTitle>Composition</PageTitle>
+            <PageTitle>{t("title")}</PageTitle>
 
             <Button variant="contained" startIcon={<HelpIcon />} onClick={toggleHelpOpen}>{t("button::help")}</Button>
 
@@ -230,7 +231,7 @@ const SimulationManagerController = () => {
                 <SimulationManagerDispatcher user={authContext.user} />
             </SimulationContext.Provider>
 
-            <LazyDialog title={"Composition Murale"} path={`simulation/help.${language}`} open={helpOpen} handleClose={toggleHelpOpen} />
+            <LazyDialog title={t("help:title")} path={`simulation/help.${language}`} open={helpOpen} handleClose={toggleHelpOpen} />
 
         </React.Fragment>
     )

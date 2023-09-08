@@ -21,12 +21,14 @@ import TooltipIconButton from '../../components/tooltipIconButton';
 import {simulationHasName} from './actions/SimulationReducer';
 import { setCurrentSimulationIndex, toggleLock, rename } from './actions/SimulationActions';
 import { withLoading, buildLoadingState, withUser } from '../../components/hoc';
+import { useTranslation } from 'utils';
 
 const NAME_DIALOG_ACTION_NEW = "new";
 const NAME_DIALOG_ACTION_SAVE = "save";
 const NAME_DIALOG_ACTION_RENAME = "rename";
 
 const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, dispatch}) => {
+    const t = useTranslation("pages.composition");
     const [action, setAction] = useState(NAME_DIALOG_ACTION_SAVE);
     const [nameDlgOpen, setNameDlgOpen] = useState(false);
     const [deletionDlgOpen, setDeletionDlgOpen] = useState(false);
@@ -140,7 +142,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
 
             <Toolbar variant="dense">
                 <TooltipIconButton
-                    tooltip={"Sauvegarder"}
+                    tooltip={t("btn:save")}
                     onClick={handleSave}
                     disabled={isDirty(simulation) === false}
                     edge="start"
@@ -149,7 +151,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                 </TooltipIconButton>
 
                 <TooltipIconButton
-                    tooltip={'Renommer'}
+                    tooltip={t("btn:rename")}
                     onClick={onRenameCurrent}
                     edge="start"
                 >
@@ -157,7 +159,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                 </TooltipIconButton>
 
                 <TooltipIconButton
-                    tooltip={simulation.isLocked ? "Déverrouiller": "Verrouiller"}
+                    tooltip={simulation.isLocked ? t("btn:unlock") : t("btn:lock")}
                     onClick={handleToggleLock}
                     edge="start"
                 >
@@ -169,7 +171,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                 </TooltipIconButton>
 
                 <TooltipIconButton
-                    tooltip="Ajouter une simulation"
+                    tooltip={t("btn:add")}
                     onClick={handleAdd}
                     edge="start"
                 >
@@ -179,7 +181,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                 <Divider orientation="vertical" flexItem />
 
                 <TooltipIconButton
-                    tooltip={"Supprimer"}
+                    tooltip={t("btn:delete")}
                     onClick={() => setDeletionDlgOpen(true)}
                     disabled={simulations.length === 1 && isFromDb(simulations[0]) === false}
                     style={{
