@@ -79,6 +79,18 @@
             "btn:cancelDeletion": "Cancel",
             "info:noFavorites": "Your favorites list is empty."
         },
+        "finning": {
+            "title": "Finning, Késako ?",
+            "euroInitiative1": "European Citizen Initiative",
+            "euroInitiative2": "Give your support!",
+            "introduction": "You have probably already heard of finning in relation to the harvesting of shark fins, but what does this practice consist of and what are the consequences for the animal and for the eco-systems?",
+            "menuItem1": "A devastating practice",
+            "menuItem2": "Indiscriminate fishing",
+            "menuItem3": "The balance of the oceans threatened",
+            "menuItem4": "A traditional dish",
+            "menuItem5": "The list is long...",
+            "menuItem6": "Some videos"
+        },
         "search": {
             "title": "Search",
             "button::nextResults": "Next Results"
@@ -159,6 +171,9 @@
         }
     },
     "components": {
+        "error": {
+           "caption": "Oops...An error has occurred"
+        },
         "search": {
             "inputPlaceHolder": "Search within {0} images...",
             "exactSwitch": "Search exact words",
@@ -186,9 +201,24 @@
             "btn:hideThumbnails": "Hide thumbnails",
             "btn:closeViewer": "Close viewer",
             "info:noTags": "No tags..."
+        },
+        "hoc": {
+            "withUser": {
+                "adminRestriction": "This page is only accessible to the administrator",
+                "userRestriction" : "This page is only accessible to logged in users"
+            }
+        },
+        "imageDescription": {
+            "noDescription": "No description"
+        },
+        "theme": {
+            "dark": "Dark",
+            "light": "Light",
+            "systemSuffix": " (System)"
         }
     },
     "dialogs": {
-        "button::close": "Close"
+        "button::close": "Close",
+        "moduleNotFound": "Module '{0}' not found."
     }
 }

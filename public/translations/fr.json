@@ -79,6 +79,18 @@
             "btn:cancelDeletion": "Annuler",
             "info:noFavorites": "Votre liste de favoris est vide."
         },
+        "finning": {
+            "title": "Le Finning, Késako ?",
+            "euroInitiative1": "Initiative Citoyenne Européenne",
+            "euroInitiative2": "Apportez votre soutien !",
+            "introduction": "Vous avez sûrement déjà entendu parler du \"finning\" à propos de la \"récolte\" des ailerons de requin, mais en quoi consiste cette pratique et quelles en sont les conséquences pour l'animal et pour les éco-systèmes ?",
+            "menuItem1": "Une Pratique dévastatrice",
+            "menuItem2": "Une Pêche sans discernement",
+            "menuItem3": "L'équilibre des océans menacé",
+            "menuItem4": "Un mets traditionnel",
+            "menuItem5": "La liste est longue...",
+            "menuItem6": "Quelques vidéos"
+        },
         "search": {
             "title": "Recherche",
             "button::nextResults": "Résultats suivants"
@@ -159,6 +171,9 @@
         }
     },
     "components": {
+        "error": {
+           "caption": "Oups...Une erreur s'est produite"
+        },
         "search": {
             "inputPlaceHolder": "Rechercher parmi {0} images...",
             "exactSwitch": "Rechercher les termes exacts",
@@ -186,9 +201,24 @@
             "btn:hideThumbnails": "Masquer les vignettes",
             "btn:closeViewer": "Fermer la visionneuse",
             "info:noTags": "Pas de tags..."
+        },
+        "hoc": {
+            "withUser": {
+                "adminRestriction": "Cette page n'est accessible qu'à l'administrateur",
+                "userRestriction" : "Cette page n'est accessible qu'aux utilisateurs connectés"
+            }
+        },
+        "imageDescription": {
+            "noDescription": "Aucune description"
+        },
+        "theme": {
+            "dark": "Sombre",
+            "light": "Clair",
+            "systemSuffix": " (Système)"
         }
     },
     "dialogs": {
-        "button::close": "Fermer"
+        "button::close": "Fermer",
+        "moduleNotFound": "Module '{0}' introuvable."
     }
 }

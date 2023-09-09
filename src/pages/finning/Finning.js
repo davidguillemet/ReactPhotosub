@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PageTitle, PageHeader, PageSubTitle, Paragraph, BlockQuote } from '../../template/pageTypography';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
@@ -12,15 +12,20 @@ import Divider from '@mui/material/Divider';
 import Video from '../../components/video';
 
 import 'fontsource-roboto/100.css';
+import { useTranslation } from 'utils';
 
-const _menuListItems = [
-    "Une Pratique dévastatrice",
-    "Une Pêche sans discernement",
-    "L'équilibre des océans menacé",
-    "Un mets traditionnel",
-    "La liste est longue...",
-    "Quelques vidéos"
-];
+const getMenuItems = (t) => {
+    const menuItems = [
+        t("menuItem1"),
+        t("menuItem2"),
+        t("menuItem3"),
+        t("menuItem4"),
+        t("menuItem5"),
+        t("menuItem6")
+    ];
+    menuItems.language = t.language;
+    return menuItems;
+}
 
 const Anchor = ({index}) => (
     <span id={`anchor${index}`} />
@@ -46,10 +51,22 @@ const FinningListItem = ({caption, index}) => {
 }
 
 const Finning = () => {
+    const t = useTranslation("pages.finning");
+    const [ menuItems, setMenuItems] = React.useState(() => getMenuItems(t));
+
+    useEffect(() => {
+        setMenuItems(prevItems => {
+            if (prevItems.language === t.language) {
+                return prevItems;
+            }
+            return getMenuItems(t);
+        });
+    }, [t])
+
     return (
         <React.Fragment>
-            <PageTitle>Le Finning, Késako ?</PageTitle>
-            <PageHeader sx={{color: 'red', fontWeight: 400, textAlign: 'center'}}>Initiative Citoyenne Européenne<br></br>Apportez votre soutien !</PageHeader>
+            <PageTitle>{t("title")}</PageTitle>
+            <PageHeader sx={{color: 'red', fontWeight: 400, textAlign: 'center'}}>{t("euroInitiative1")}<br></br>{t("euroInitiative2")}</PageHeader>
             <Link href="https://www.stop-finning.eu/" target="_blank">
             <Box sx={{ width: '100%', bgcolor: 'black', p: '20px', mb: 3}}>
                 <img src="/logo-stop-finning.png" alt="Stop Finninf" style={{maxWidth: '100%'}}/>
@@ -58,7 +75,7 @@ const Finning = () => {
             <Box sx={{
                 width: '100%',
             }}>
-                <PageHeader>Vous avez sûrement déjà entendu parler du "finning" à propos de la "récolte" des ailerons de requin, mais en quoi consiste cette pratique et quelles en sont les conséquences pour l'animal et pour les éco-systèmes ?</PageHeader>
+                <PageHeader>{t("introduction")}</PageHeader>
                 <BlockQuote sx={{
                     pl: 0
                 }}>
@@ -70,7 +87,7 @@ const Finning = () => {
                         dense={true}
                     >
                         {
-                            _menuListItems.map((caption, index) => <FinningListItem key={index} caption={caption} index={index} />)
+                            menuItems.map((caption, index) => <FinningListItem key={index} caption={caption} index={index} />)
                         }
                     </List>
                 </BlockQuote>

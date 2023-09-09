@@ -35,12 +35,12 @@ import './App.css';
 import { VerticalSpacing } from './template/spacing';
 
 import ChainedProviders from './components/chainedProviders';
-import { CustomThemeProvider, DarkModeProvider, DarkModeSelector } from './template/theme';
+import { DarkModeProvider, DarkModeSelector, useDarkMode } from 'components/theme';
+import CustomThemeProvider from 'template/theme';
 import { QueryContextProvider } from './components/queryContext';
 import { AuthProvider } from './components/authentication';
 import { FavoritesProvider } from './components/favorites';
 import { ReactQueryClientProvider } from './components/reactQuery';
-import { useDarkMode } from './template/theme';
 import { TranslationProvider, useTranslation } from './utils';
 import { OverlayProvider } from './components/loading/loadingOverlay';
 import { DataManagerProvider } from './components/dataProvider';

@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import { useDarkMode } from './darkModeProvider';
+import { useTranslation } from 'utils';
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   width: 62,
@@ -53,6 +54,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 
 const DarkModeSelector = () => {
 
+    const t = useTranslation("components.theme");
     const { darkMode, systemDarkMode, setDarkMode } = useDarkMode();
 
     const handleChangeMode = useCallback((event) => {
@@ -60,7 +62,7 @@ const DarkModeSelector = () => {
         setDarkMode(isDarkMode);
     }, [setDarkMode]);
 
-    const currentMode = `${darkMode ? "Sombre" : "Clair"}${systemDarkMode === darkMode ? " (Système)" : ""}`;
+    const currentMode = `${darkMode ? t("dark") : t("light")}${systemDarkMode === darkMode ? t("systemSuffix") : ""}`;
 
     return (
         <Tooltip title={currentMode}>

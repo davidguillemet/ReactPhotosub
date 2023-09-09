@@ -23,7 +23,7 @@ const ItemContainer = ({item, index, top, left, width, height, renderItem, rende
             const RenderComponent = renderComponent;
             return <RenderComponent item={item} index={index} width={width} params={renderExtraParams} />
         }
-        throw new Error("Missing Masonrylayout rendered");
+        throw new Error("Missing Masonrylayout renderer");
     }
 
     return (

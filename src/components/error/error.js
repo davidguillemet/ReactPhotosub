@@ -1,6 +1,8 @@
 import { Alert, Box } from '@mui/material';
+import { useTranslation } from 'utils';
 
 const ErrorAlert = ({maxWidth}) => {
+    const t = useTranslation("components.error");
     return (
         <Box sx={{
             display: 'flex',
@@ -9,7 +11,7 @@ const ErrorAlert = ({maxWidth}) => {
             alignItems: 'center',
             px: 1
         }}>
-            <Alert severity="error" variant="filled" sx={{my: 0, py: 0}}>Oups...Une erreur s'est produite</Alert>
+            <Alert severity="error" variant="filled" sx={{my: 0, py: 0}}>{t("caption")}</Alert>
         </Box>
     )
 }

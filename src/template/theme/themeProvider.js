@@ -1,7 +1,7 @@
 import React from 'react';
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 import { ThemeProvider } from '@mui/material/styles';
-import { useDarkMode } from './darkModeProvider';
+import { useDarkMode } from 'components/theme';
 
 const paletteDarkMode = {
     mode: 'dark',

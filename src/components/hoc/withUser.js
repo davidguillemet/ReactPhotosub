@@ -3,16 +3,16 @@ import Alert from '@mui/material/Alert';
 import { VerticalSpacing } from "../../template/spacing";
 import React from "react";
 import { Loading } from "./Loading";
+import { useTranslation } from "utils";
 
 const Unauthorized = ({admin}) => {
+    const t = useTranslation("components.hoc.withUser")
     return (
         <React.Fragment>
             <VerticalSpacing factor={2} />
             <Alert severity="warning" elevation={4} variant="filled">
             { 
-                admin === true ?
-                "Cette page n'est accessible qu'à l'administrateur" :
-                "Cette page n'est accessible qu'aux utilisateurs connectés"
+                admin === true ? t("adminRestriction") : t("userRestriction")
             }
             </Alert>
         </React.Fragment>

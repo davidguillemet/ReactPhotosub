@@ -17,7 +17,7 @@ import LocationDialog from './LocationDialog';
 import LocationInfoWindow from './LocationInfoWindow';
 import { withLoading, buildLoadingState } from '../hoc';
 import { useReactQuery } from '../reactQuery';
-import { useDarkMode } from '../../template/theme';
+import { useDarkMode } from 'components/theme';
 
 const _infoCoverWidth = 150;
 // Center in the middle of the atlantic ocean

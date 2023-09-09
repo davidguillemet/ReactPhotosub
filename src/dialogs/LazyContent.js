@@ -10,9 +10,10 @@ const LazyContent = ({path, silentError = false}) => {
         return importLazyModule(path, silentError);
     }, [path, silentError]);
 
+    // The property name is used for ModuleNotFound...
     return (
         <React.Suspense fallback={<Loading/>}>
-            <LazySummaryView />
+            <LazySummaryView name={path} />
         </React.Suspense>
     );
 }
