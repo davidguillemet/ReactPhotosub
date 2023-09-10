@@ -195,6 +195,7 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
                         submitAction={onSubmitDestinationForm}
                         submitCaption={t("validate")}
                         onCancel={handleClose}
+                        validationMessage={t("validationMessage")}
                     />
                 </DialogContent>
 

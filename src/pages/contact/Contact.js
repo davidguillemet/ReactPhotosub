@@ -116,6 +116,7 @@ const Contact = () => {
                 fields={fields}
                 initialValues={initialValues}
                 submitAction={onSubmitMessageForm}
+                submitCaption={t("submitCaption")}
                 onChange={onChange}
                 validationMessage={t("info:success")}
             />

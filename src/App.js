@@ -397,16 +397,16 @@ const AppContent = React.forwardRef((props, ref) => {
 const App = (props) => {
 
     return (
-        <Box sx={{ display: 'flex' }} >
+        <Box sx={{ display: 'flex' }} id="AppContainer">
             <StyledEngineProvider injectFirst>
                 <ChainedProviders
                     providers={[
                         HelmetProvider,
                         OverlayProvider,
+                        ToastContextProvider,
                         TranslationProvider,
                         DarkModeProvider,
                         CustomThemeProvider,
-                        ToastContextProvider,
                         ReactQueryClientProvider,
                         FirebaseProvider,
                         DataManagerProvider,

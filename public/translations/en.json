@@ -35,7 +35,8 @@
             "error:message": "Please enter a message.",
             "switch:sendCopy": "Receive a copy of your message",
             "info:success": "Your message has been sent. Thank you!",
-            "warning:leave": "Your message was not sent after the last edits.\nDo you confirm you want to leave this page ?"
+            "warning:leave": "Your message was not sent after the last edits.\nDo you confirm you want to leave this page ?",
+            "submitCaption": "Send"
         },
         "destination": {
             "btn:prevDestination": "Previous",
@@ -70,7 +71,8 @@
             "form:coverField": "Cover image",
             "form:coverError": "Please provide a cover image.",
             "form:hasMacro": "Contains macro images",
-            "form:hasWideAngle": "Contains wide-angle images"
+            "form:hasWideAngle": "Contains wide-angle images",
+            "validationMessage": "The changes have been saved successfully."
         },
         "favorites": {
             "title": "My Selection",
@@ -167,7 +169,8 @@
             "desc:authDialog" : "You must re-authenticate to modify your personal data.",
             "field:authDialog": "Enter your password",
             "btn:cancel": "Cancel",
-            "btn:validate": "Validate"
+            "btn:validate": "Validate",
+            "validationMessage": "The changes have been saved successfully."
         }
     },
     "components": {
@@ -217,8 +220,10 @@
             "systemSuffix": " (System)"
         }
     },
-    "dialogs": {
+        "dialogs": {
         "button::close": "Close",
-        "moduleNotFound": "Module '{0}' not found."
+        "moduleNotFound": "Module '{0}' not found.",
+        "cancel": "Cancel",
+        "validate": "Validate"
     }
 }

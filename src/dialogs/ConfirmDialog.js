@@ -5,16 +5,16 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { useTranslation } from 'utils';
 
 export default function ConfirmDialog({
     open,
     title,
     dialogContent,
-    actions = { cancel: "Annuler", validate: "Valider" },
     onOpenChanged,
     onValidate
 }) {
-
+    const t = useTranslation("dialogs");
     const handleClose = () => {
         onOpenChanged(false);
     };
@@ -42,10 +42,10 @@ export default function ConfirmDialog({
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary" variant="outlined">
-                    {actions['cancel']}
+                    {t("cancel")}
                     </Button>
                     <Button onClick={handleValidate} color="primary" variant="outlined">
-                    {actions['validate']}
+                    {t("validate")}
                     </Button>
                 </DialogActions>
             </Dialog>

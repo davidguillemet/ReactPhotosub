@@ -35,7 +35,8 @@
             "error:message": "Merci de saisir un message.",
             "switch:sendCopy": "Recevoir une copie de votre message",
             "info:success": "Votre message a bien été envoyé. Merci!",
-            "warning:leave": "Votre message n'a pas été envoyé après les dernières modifications.\nContinuer la navigation?"
+            "warning:leave": "Votre message n'a pas été envoyé après les dernières modifications.\nContinuer la navigation?",
+            "submitCaption": "Envoyer"
         },
         "destination": {
             "btn:prevDestination": "Précédent",
@@ -70,7 +71,8 @@
             "form:coverField": "Image de couverture",
             "form:coverError": "Merci d'indiquer une image de couverture.",
             "form:hasMacro": "Contient des images macro",
-            "form:hasWideAngle": "Contient des images grand-angle"
+            "form:hasWideAngle": "Contient des images grand-angle",
+            "validationMessage": "Les modifications ont été enregistrées avec succès."
         },
         "favorites": {
             "title": "Ma Sélection",
@@ -167,7 +169,8 @@
             "desc:authDialog" : "Veuillez vous ré-authentifier pour modifier vos informations personnelles",
             "field:authDialog": "Veuillez saisir votre mot de passe",
             "btn:cancel": "Annuler",
-            "btn:validate": "Valider"
+            "btn:validate": "Valider",
+            "validationMessage": "Les modifications ont été enregistrées avec succès."
         }
     },
     "components": {
@@ -219,6 +222,8 @@
     },
     "dialogs": {
         "button::close": "Fermer",
-        "moduleNotFound": "Module '{0}' introuvable."
+        "moduleNotFound": "Module '{0}' introuvable.",
+        "cancel": "Annuler",
+        "validate": "Valider"
     }
 }

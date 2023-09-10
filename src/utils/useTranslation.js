@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { Loading } from '../components/hoc';
-import { useOverlay } from '../components/loading';
+import { Loading } from 'components/hoc';
+import { useOverlay } from 'components/loading';
+import { useToast } from 'components/notifications';
+import { Box } from '@mui/material';
 
 const TranslationContext = React.createContext(null);
 
 const LANGUAGE_FR = "fr";
 const LANGUAGE_EN = "en";
-const LANGUAGE_FALLBACK = 'fr';
+const LANGUAGE_FALLBACK = 'en';
 
 const unknownKey = (key) => `[[${key}]]`;
 const isUnknown = (caption) => caption.startsWith("[[")
@@ -38,6 +40,7 @@ const loadLanguageResources = (language) => {
 
 export const TranslationProvider = ({children}) => {
 
+    const { toast } = useToast();
     const [language, setLanguage] = useState(null);
     const resources = useRef(null);
     const fallBackResources = useRef(null); 
@@ -45,7 +48,7 @@ export const TranslationProvider = ({children}) => {
 
     const { setOverlay } = useOverlay();
 
-    const loadLanguage = useCallback((language) => {
+    const loadLanguage = useCallback((language, prevLanguage = null) => {
         setOverlay(true);
         const promises = [loadLanguageResources(language)];
         if (fallBackResources.current === null && language !== LANGUAGE_FALLBACK) {
@@ -60,11 +63,15 @@ export const TranslationProvider = ({children}) => {
             }
             setLanguage(language);
         }).catch(err => {
-            setLanguage(LANGUAGE_FR);
+            if (prevLanguage === null || prevLanguage !== language) {
+                // potential endless loop
+                loadLanguage(LANGUAGE_FALLBACK, language);
+            }
+            toast.error(err.message);
         }).finally(() => {
             setOverlay(false)
         });
-    }, [setOverlay]);
+    }, [setOverlay, toast]);
 
     useEffect(() => {
         loadLanguage(getNavigatorLanguage());
@@ -114,7 +121,19 @@ export const TranslationProvider = ({children}) => {
     }, [language, getTranslation]);
 
     if (resources.current === null) {
-        return <Loading />
+        return (
+            <Box
+                id="languageLoadingBox"
+                sx={{
+                    display: "flex",
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center"
+                }}
+            >
+                <Loading />
+            </Box>
+        )
     }
 
     return (

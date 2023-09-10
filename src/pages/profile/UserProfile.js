@@ -220,9 +220,10 @@ const UserProfile = (props) => {
                 fields={fields}
                 initialValues={values}
                 submitAction={onSubmitUserForm}
-                submitCaption="Valider"
+                submitCaption={t("btn:validate")}
                 readOnly={readOnly}
                 onCancel={onCancelChanges}
+                validationMessage={t("validationMessage")}
             />
             {
                 readOnly &&
