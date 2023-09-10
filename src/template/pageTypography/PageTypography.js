@@ -1,4 +1,5 @@
 import { styled } from '@mui/material/styles';
+import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import 'fontsource-roboto/100.css';
 import 'fontsource-roboto/300.css';
@@ -9,6 +10,12 @@ const SubTitleTypography = ({children, ...other}) => (<Typography variant="h3" c
 const HeaderTypography = ({children, ...other}) => (<Typography variant="h4" {...other}>{children}</Typography>);
 const ParagraphTypography = ({children, ...other}) => (<Typography variant="h6" {...other}>{children}</Typography>);
 const BodyTypography = ({children, ...other}) => (<Typography variant="body1" {...other}>{children}</Typography>);
+
+export const Anchor = ({index}) => (
+    <span id={`anchor${index}`} />
+)
+
+export const CustomDivider = () => <Divider variant="middle" sx={{ my: 3, mx: '20%', borderBottomWidth: 3, borderBottomColor: (theme) => theme.palette.primary.light}}/>
 
 export const PageTitle = styled(TitleTypography)(({ theme }) => ({
     fontWeight: "300",
