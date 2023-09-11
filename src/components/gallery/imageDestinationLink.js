@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import DestinationLink from '../destinationLink';
 import { useQueryContext } from '../queryContext';
-import { formatDateShort, useLanguage } from '../../utils';
+import { formatDateShort, useLanguage, destinationTitle } from '../../utils';
 import { useReactQuery } from '../reactQuery';
 
 const DestinationLinkContent = ({destination}) => {
@@ -15,7 +15,7 @@ const DestinationLinkContent = ({destination}) => {
                 color: theme => theme.palette.link.main
             }}
         >
-            {destination.title} - {formatDateShort(new Date(destination.date), language)}
+            {destinationTitle(destination, language)} - {formatDateShort(new Date(destination.date), language)}
         </Typography>
     );
 };

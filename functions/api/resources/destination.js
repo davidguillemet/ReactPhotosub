@@ -46,7 +46,7 @@ module.exports = function(app, config) {
             return config.pool().raw(
                 `WITH destination AS (
                     SELECT
-                    d.title, d.date, d.cover, d.path, d.id, d.macro, d.wide, d.regionpath,
+                    d.title, d.title_en, d.date, d.cover, d.path, d.id, d.macro, d.wide, d.regionpath,
                     l.title as location, l.longitude, l.latitude, l.link, l.region
                     from locations l, destinations_with_regionpath d
                     where l.id = d.location and d.path = ?
@@ -57,7 +57,7 @@ module.exports = function(app, config) {
                 nextDest AS (
                     SELECT destinations.* from destinations, destination where destinations.date > destination.date ORDER BY destinations.date ASC LIMIT 1
                 )
-                SELECT d.title, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link, d.macro, d.wide, d.regionpath,
+                SELECT d.title, d.title_en, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link, d.macro, d.wide, d.regionpath,
                        (select row_to_json(prevDest.*) from prevDest) as prev,
                        (select row_to_json(nextDest.*) from nextDest) as next
                 from destination d`, getDestinationPath(req))

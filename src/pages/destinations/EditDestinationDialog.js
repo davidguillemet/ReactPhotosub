@@ -54,9 +54,18 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
         setFields([
             {
                 id: "title",
-                label: t("form:titleField"),
+                label: t("form:titleField_fr"),
                 required: true,
-                errorText: t("form:titleError"),
+                errorText: t("form:titleError_fr"),
+                type: FIELD_TYPE_TEXT,
+                multiline: false,
+                default: ""
+            },
+            {
+                id: "title_en",
+                label: t("form:titleField_en"),
+                required: true,
+                errorText: t("form:titleError_en"),
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
                 default: ""
@@ -140,6 +149,7 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
         } else {
             setValues({
                 "title": destination.title,
+                "title_en": destination.title_en,
                 "date": destination.date.substring(0, 10), // 2020-03-10.....
                 "location": destination.location,
                 "path": destination.path,

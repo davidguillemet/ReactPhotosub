@@ -9,7 +9,7 @@ import Paper from '@mui/material/Paper';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Chip from '@mui/material/Chip';
-import { formatDate, formatDateShort, useLanguage, regionTitle, useTranslation } from 'utils';
+import { formatDate, formatDateShort, useLanguage, regionTitle, useTranslation, destinationTitle } from 'utils';
 import Gallery from '../../components/gallery';
 import { PageSubTitle, PageHeader, Paragraph } from '../../template/pageTypography';
 import { LazyDialog } from 'dialogs';
@@ -100,7 +100,7 @@ const NavigationItem = ({destination, type, caption}) => {
                         }}
                         variant={isMobile ? "h6" : "h4"}
                     >
-                        {destination.title}
+                        {destinationTitle(destination, language)}
                     </PageHeader>
                     <Paragraph sx={{my: 0, fontWeight: "100", textAlign: type, ...noWrapAndEllipsis}}>
                         { formattedDate }
@@ -166,7 +166,7 @@ const DestinationDetails = ({destination}) => {
                 alignItems: 'flex-start'
             }}>
             <HelmetDestination destination={destination} />
-            <PageSubTitle component="h1" sx={{m: 0, color: theme => theme.palette.primary.contrastText, whiteSpace: "nowrap", fontWeight: 300}}>{destination.title}</PageSubTitle>
+            <PageSubTitle component="h1" sx={{m: 0, color: theme => theme.palette.primary.contrastText, whiteSpace: "nowrap", fontWeight: 300}}>{destinationTitle(destination, language)}</PageSubTitle>
             <PageHeader sx={{m: 0, color: theme => theme.palette.primary.contrastText}}>{formattedDate}</PageHeader>
             {
                 destination.link &&
@@ -179,7 +179,7 @@ const DestinationDetails = ({destination}) => {
             <LazyDialog
                 open={summaryOpen}
                 handleClose={toggleOpenSummary}
-                title={`${destination.title} - ${formattedDate}`}
+                title={`${destinationTitle(destination, language)} - ${formattedDate}`}
                 path={`summaries/${destination.path}`}
             />
         </Paper>

@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Chip from "@mui/material/Chip";
 import Typography from '@mui/material/Typography';
-import { formatDateShort, getThumbnailSrc, useLanguage, useTranslation, regionTitle } from 'utils';
+import { formatDateShort, getThumbnailSrc, useLanguage, useTranslation, regionTitle, destinationTitle } from 'utils';
 import DestinationLink from '../../components/destinationLink';
 import MasonryGallery from '../../components/masonryGallery';
 import { IconButton } from '@mui/material';
@@ -23,7 +23,7 @@ const DestinationDetails = ({destination}) => {
 
     return (
         <React.Fragment>
-            <Typography variant="h5">{`${destination.title} - ${formatDateShort(new Date(destination.date), language)}`}</Typography>
+            <Typography variant="h5">{`${destinationTitle(destination, language)} - ${formatDateShort(new Date(destination.date), language)}`}</Typography>
             <Box
                 style={{
                     display: 'flex',
@@ -56,6 +56,7 @@ const DestinationDetails = ({destination}) => {
 
 const DestinationContent = ({item, index, width, params}) => {
 
+    const { language } = useLanguage();
     const destination = item;
     const authContext = useAuthContext();
     const { onEdit, onDelete } = params;
@@ -98,7 +99,7 @@ const DestinationContent = ({item, index, width, params}) => {
                 <img
                     className="image"
                     src={getThumbnailSrc(destination.cover, width)}
-                    alt={destination.title}
+                    alt={destinationTitle(destination, language)}
                     style={{
                         height: '100%',
                         width: '100%',
@@ -203,16 +204,19 @@ const DestinationGallery = ({destinations}) => {
                 destination={destinationToEdit}
                 onClose={onCloseDestinationEditor}
             />
-            <ConfirmDialog
-                open={confirmDeleteOpen}
-                onOpenChanged={setConfirmDeleteOpen}
-                onValidate={onDeleteDestination}
-                title={t("title:confirmRemove")}
-                dialogContent={[
-                    t("confirmRemove", destinationToEdit?.title),
-                    t("warningConfirmRemove")
-                ]}
-            />
+            {
+                destinationToEdit &&
+                <ConfirmDialog
+                    open={confirmDeleteOpen}
+                    onOpenChanged={setConfirmDeleteOpen}
+                    onValidate={onDeleteDestination}
+                    title={t("title:confirmRemove")}
+                    dialogContent={[
+                        t("confirmRemove", destinationTitle(destinationToEdit, t.language)),
+                        t("warningConfirmRemove")
+                    ]}
+                />
+            }
         </React.Fragment>
     )
 }

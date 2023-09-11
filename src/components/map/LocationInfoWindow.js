@@ -1,6 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import DestinationLink from '../destinationLink';
+import { useLanguage, destinationTitle } from 'utils';
 
 const useStyles = makeStyles(() => ({
     locationTitle: {
@@ -70,12 +71,13 @@ const useStyles = makeStyles(() => ({
 
 const LocationInfoWindow = ({location, coverWidth}) => {
 
+    const { language } = useLanguage();
     const classes = useStyles();
 
     return (
         <div id="content">
             <div className={classes.locationTitle}>
-                <h2>{location.destinations[0].title}</h2>
+                <h2>{destinationTitle(location.destinations[0], language)}</h2>
             </div>
             <div className={classes.locationTitle}>
                 <div className={classes.linkLabel}>{location.title}</div>

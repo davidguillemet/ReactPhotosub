@@ -22,6 +22,7 @@ module.exports = function(admin, config) {
                 .where("id", destination.id)
                 .update({
                     "title": destination.title,
+                    "title_en": destination.title_en,
                     "date": destination.date,
                     "location": destination.location,
                     "path": destination.path,
