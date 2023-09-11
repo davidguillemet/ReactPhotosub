@@ -15,85 +15,79 @@ preRenderApp.use(preRender);
 const _pageNamePlaceHolder = "{title}";
 const _descriptionTemplate = `${_pageNamePlaceHolder} | David Guillemet - Underwater Photography`;
 const _shortTitleTemplate = `${_pageNamePlaceHolder} | David Guillemet`;
-const _defaultImage = "https://storage.googleapis.com/photosub.appspot.com/2017/rajaampat/thumbs/DSC_5683_m.jpg";
+const _defaultImage = process.env.OPEN_GRAPH_DEFAULT_IMAGE;
 
 const _destinationRegexp = /\/destinations\/(?<year>[0-9]{4})\/(?<location>[a-z]+)/;
+const _imageNameRegexp = /^(?<baseUrl>.+)\/(?<name>[^./]+)\.jpg$/;
 
-const _locationCaptions = {
-    "ambon": "Ambon",
-    "tulamben": "Tulamben",
-    "dominica": "Dominica",
-    "lapaz": "La Paz",
-    "romblon": "Romblon",
-    "anilao": "Anilao",
-    "gili": "Gili Air",
-    "sardinerun": "Sardine Run",
-    "palau": "Palau",
-    "teman": "Raja Ampat",
-    "corepen": "Dampier Strait",
-    "sudan": "Sudan",
-    "mozambique": "Ponta Do Ouro",
-    "umkomaas": "Aliwal Shoal",
-    "rajaampat": "Raja Ampat",
-    "maumere": "Maumere",
-    "redsea": "Red Sea",
-    "alor": "Alor",
-    "saintes": "The Saints",
-    "bahamas": "Bahamas",
-    "dampier": "Dampier Strait",
-    "misool": "Misool",
-    "bandasea": "Banda Sea",
-    "azores": "Azores",
+const getDestinationProperties = async (year, title, pool) => {
+    const data = await pool("destinations").select().where("path", `${year}/${title}`);
+    return data[0];
 };
 
-const getPageTitle = (req) => {
+const toMediumThumbnail = (imageName) => {
+    const match = imageName.match(_imageNameRegexp);
+    const imageNameWithoutExt = match.groups["name"];
+    const baseUrl = match.groups["baseUrl"];
+    const thumbSrc = `${baseUrl}/thumbs/${imageNameWithoutExt}_m.jpg`;
+    return thumbSrc;
+};
+
+const getPageProperties = async (req, pool, firebaseConfig) => {
+    let image = _defaultImage;
+    let pageName = "Home";
+
     const path = req.path;
     if (path === "/destinations") {
-        return "Destinations";
-    }
-    if (path.startsWith("/destinations")) {
+        pageName = "Destinations";
+    } else if (path.startsWith("/destinations")) {
         // /destinations/2020/romblon
         // -> "Romblon - 2020"
         const match = path.match(_destinationRegexp);
         const year = match.groups["year"];
-        const location = match.groups["location"];
-        const locCaption = _locationCaptions[location] || location;
-        return `${locCaption} - ${year}`;
+        const locationCode = match.groups["location"];
+        const destination = await getDestinationProperties(year, locationCode, pool);
+        const locationName = destination.title_en || destination.title;
+        image = `${destination.path}/${destination.cover}`;
+        pageName = `${locationName} - ${year}`;
+    } else if (path === "/search") {
+        pageName = "Search";
+    } else if (path === "/finning") {
+        pageName = "Finning";
+    } else if (path === "/composition") {
+        pageName = "Composition";
+    } else if (path === "/about") {
+        pageName = "About";
+    } else if (path === "/contact") {
+        pageName = "Contact";
     }
-    if (path === "/search") {
-        return "Search";
-    }
-    if (path === "/finning") {
-        return "Finning";
-    }
-    if (path === "/composition") {
-        return "Composition";
-    }
-    if (path === "/about") {
-        return "About";
-    }
-    if (path === "/contact") {
-        return "Contact";
-    }
-    return "Home";
+
+    return {
+        pageName,
+        image: toMediumThumbnail(firebaseConfig.convertPathToUrl(image)),
+    };
 };
 
-preRenderApp.get("*", (req, res) => {
-    return fs.readFile("./web/index.html", "utf8", (err, htmlData) => {
-        const pageName = getPageTitle(req);
-        const title = _shortTitleTemplate.replace(_pageNamePlaceHolder, pageName);
-        const description = _descriptionTemplate.replace(_pageNamePlaceHolder, pageName);
-        htmlData = htmlData
-            .replace(/__HTML_TITLE__/g, title)
-            .replace(/__META_TITLE__/g, description)
-            .replace(/__META_DESCRIPTION__/g, description)
-            .replace(/__META_IMAGE__/g, _defaultImage);
-        return res.send(htmlData);
+module.exports = function(pool, firebaseConfig) {
+    preRenderApp.get("*", (req, res) => {
+        return fs.readFile("./web/index.html", "utf8", async (err, htmlData) => {
+            const {pageName, image} = await getPageProperties(req, pool, firebaseConfig);
+            const title = _shortTitleTemplate.replace(_pageNamePlaceHolder, pageName);
+            const description = _descriptionTemplate.replace(_pageNamePlaceHolder, pageName);
+            htmlData = htmlData
+                .replace(/__HTML_TITLE__/g, title)
+                .replace(/__META_TITLE__/g, description)
+                .replace(/__META_DESCRIPTION__/g, description)
+                .replace(/__META_IMAGE__/g, image);
+            return res.send(htmlData);
+        });
     });
-});
 
-exports.preRender = functions
-    .runWith({secrets: [
-        "PRERENDER_TOKEN",
-    ]})
-    .https.onRequest(preRenderApp);
+    const preRender = functions
+        .runWith({secrets: [
+            "PRERENDER_TOKEN",
+        ]})
+        .https.onRequest(preRenderApp);
+
+    return preRender;
+};
