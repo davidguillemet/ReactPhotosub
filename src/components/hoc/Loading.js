@@ -3,11 +3,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 import ErrorAlert from '../error';
 import { QUERY_ERROR } from '../reactQuery';
 
-export const Loading = ({size, marginTop = 3}) => {
+export const Loading = ({size, sx = { }}) => {
     return (
         <CircularProgress
             sx={{
-                mt: marginTop
+                ...sx
             }}
             size={size}
         />

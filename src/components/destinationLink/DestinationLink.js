@@ -10,6 +10,6 @@ const DestinationLink = withLoading(({destination, children}) => {
             {children}
         </Link>
     );
-}, [buildLoadingState("destination", [undefined])]);
+}, [buildLoadingState("destination", [undefined])], { size: 20 });
 
 export default DestinationLink;

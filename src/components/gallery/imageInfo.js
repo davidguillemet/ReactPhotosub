@@ -108,9 +108,19 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
                     <ImageDescription image={image} />
                     {
                         displayDestination &&
-                        <React.Fragment>
+                        <Box
+                            sx={{
+                                p: 0,
+                                m: 0,
+                                height: "24px",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }}
+                        >
                             <ImageDestinationLink image={image} />
-                        </React.Fragment>
+                        </Box>
                     }
                     <Box>
                     {
