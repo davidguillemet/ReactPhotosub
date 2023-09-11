@@ -3,7 +3,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import ErrorAlert from '../error';
 import { QUERY_ERROR } from '../reactQuery';
 
-export const Loading = ({size, sx = { }}) => {
+export const Loading = ({size = 40, sx = { mt: 3 }}) => {
     return (
         <CircularProgress
             sx={{
