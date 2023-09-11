@@ -7,7 +7,7 @@ import LabeledDivider from '../../components/labeledDivider/labeledDivider';
 import ImageSlider from '../../components/imageSlider';
 import { VerticalSpacing } from '../../template/spacing';
 import {isMobile} from 'react-device-detect';
-import { formatDate, formatDateShort, useLanguage, useTranslation } from '../../utils';
+import { formatDate, formatDateShort, useLanguage, useTranslation, destinationTitle } from '../../utils';
 import ImageDescription from 'components/imageDescription';
 import Alert from '@mui/material/Alert';
 import { withLoading, buildLoadingState } from '../../components/hoc';
@@ -18,7 +18,7 @@ function imageFromCover(destination, language) {
     return {
         src: destination.cover,
         // <destination title> (<destination date>)
-        title: `${destination.title} (${dateFormater(new Date(destination.date), language)})`,
+        title: `${destinationTitle(destination, language)} (${dateFormater(new Date(destination.date), language)})`,
         sizeRatio: 1.5, // Cover images are paysage only
         path: destination.path
     }
