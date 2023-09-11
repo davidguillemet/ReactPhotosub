@@ -1,3 +1,6 @@
+// loads environment variables from a .env
+require("dotenv").config();
+
 const functions = require("firebase-functions");
 
 // Get a connection pool for postgreSql
@@ -28,4 +31,9 @@ exports.mainapi = functions
     .https
     .onRequest(mainapi);
 
-exports.preRender = functions.https.onRequest(preRender);
+exports.preRender = functions
+    .runWith({secrets: [
+        "POSTGRESQL_PASSWORD",
+    ]})
+    .https
+    .onRequest(preRender);

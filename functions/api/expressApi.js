@@ -1,8 +1,5 @@
 // See https://firebase.google.com/docs/hosting/functions
 
-// loads environment variables from a .env
-require("dotenv").config();
-
 const express = require("express");
 const compression = require("compression");
 const {isAuthenticated, isAuthorized} = require("./middlewares/authenticated");
