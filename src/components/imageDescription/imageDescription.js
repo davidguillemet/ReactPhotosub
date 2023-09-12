@@ -55,10 +55,16 @@ const ImageDescription = ({ image }) => {
             <Typography variant="subtitle1" sx={{ m: 0, lineHeight: 1.25, color: 'white'}}>
                 { description[descriptionIndex].vernacular[vernacularIndex] }
             </Typography>
-            <VerticalSpacing factor={1} />
-            <Typography variant="subtitle2" sx={{ m: 0, lineHeight: 1.25, fontStyle: 'italic', color: 'white'}}>
-                { `(${description[descriptionIndex].scientific})` }
-            </Typography>
+            {
+                // The title/description might contain only a caption without any scientific name (Xxx xxx)
+                description[descriptionIndex].scientific &&
+                <React.Fragment>
+                    <VerticalSpacing factor={1} />
+                    <Typography variant="subtitle2" sx={{ m: 0, lineHeight: 1.25, fontStyle: 'italic', color: 'white'}}>
+                        { `(${description[descriptionIndex].scientific})` }
+                    </Typography>
+                </React.Fragment>
+            }
         </Box>
     );
 }
