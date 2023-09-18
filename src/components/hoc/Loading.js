@@ -7,7 +7,10 @@ export const Loading = ({size = 40, sx = { mt: 3 }}) => {
     return (
         <CircularProgress
             sx={{
-                ...sx
+                mt: 3,
+                ...(sx && {
+                    ...sx,
+                })
             }}
             size={size}
         />

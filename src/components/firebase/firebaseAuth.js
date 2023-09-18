@@ -21,6 +21,7 @@ import Paper from '@mui/material/Paper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import MenuList from '@mui/material/MenuList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { isMobile } from 'react-device-detect';
 
 import { useAuthContext } from '../authentication';
 import { routes, NavigationLink, ROUTES_NAMESPACE } from '../../navigation/routes';
@@ -55,13 +56,15 @@ const LoadingUserState = () => {
     return (
         <Box
             sx={{
+                display: 'flex',
                 position: 'absolute',
+                alignItems: 'center',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                right: 20
+                right: isMobile ? 10 : 20
             }}
         >
-            <Loading size={20} marginTop={0} />
+            <Loading size={24} sx={{mt: 0, color: 'white'}}/>
         </Box>
     )
 }
