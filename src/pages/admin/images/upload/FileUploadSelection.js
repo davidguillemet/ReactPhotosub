@@ -1,7 +1,6 @@
 import React from 'react';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { VerticalSpacing } from 'template/spacing';
 import { useUploadContext } from './UploadContext';
 
 const FileUploadSelection = React.forwardRef(({caption, disabled}, ref) => {
@@ -22,13 +21,13 @@ const FileUploadSelection = React.forwardRef(({caption, disabled}, ref) => {
 
     return (
         <React.Fragment>
-            <VerticalSpacing factor={1} />
             <input
                 accept="image/*"
                 id="contained-button-file"
                 multiple
                 type="file"
                 onChange={handleFileSelection}
+                disabled={disabled}
                 style={{
                     display: 'none'
                 }}
