@@ -9,8 +9,8 @@ const ItemContainer = ({item, index, top, left, width, height, renderItem, rende
 
     useLayoutEffect(() => {
         if (isVisible) {
-            gsap.from(element, {duration: 0.8, y: 200/*, scale: 0*/});
-            gsap.to(element, {duration: 0.8, opacity: 1});
+            gsap.from(element, {duration: 0.8, scale: 0, y: 100});
+            gsap.to(element, {duration: 0.8, opacity: 1, scale: 1, ease: "power4.easeOut"});
         }
     }, [isVisible, element])
 
