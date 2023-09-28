@@ -40,7 +40,7 @@ const Overlay = ({image, id}) => {
                 top: '50%',
                 transform: 'translateY(-50%)',
             }}>
-                <ImageDescription image={image} />
+                <ImageDescription image={image} withNavigation={false}/>
             </Box>
         </Box>
     )
