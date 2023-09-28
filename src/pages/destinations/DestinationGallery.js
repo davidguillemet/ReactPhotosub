@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Chip from "@mui/material/Chip";
 import Typography from '@mui/material/Typography';
-import { formatDateShort, getThumbnailSrc, useLanguage, useTranslation, regionTitle, destinationTitle } from 'utils';
+import { formatDate, getThumbnailSrc, useLanguage, useTranslation, regionTitle, destinationTitle } from 'utils';
 import DestinationLink from '../../components/destinationLink';
 import MasonryGallery from '../../components/masonryGallery';
 import { IconButton } from '@mui/material';
@@ -23,7 +23,8 @@ const DestinationDetails = ({destination}) => {
 
     return (
         <React.Fragment>
-            <Typography variant="h5">{`${destinationTitle(destination, language)} - ${formatDateShort(new Date(destination.date), language)}`}</Typography>
+            <Typography variant="h5">{destinationTitle(destination, language)}</Typography>
+            <Typography variant='h6' sx={{fontWeight: 300}}>{formatDate(new Date(destination.date), language)}</Typography>
             <Box
                 style={{
                     display: 'flex',
