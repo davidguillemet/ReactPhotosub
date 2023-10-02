@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import { parseImageDescription, useLanguage, useTranslation } from '../../utils';
@@ -30,7 +30,13 @@ const ImageDescription = ({ image, withNavigation = true}) => {
     const classes = useStyles();
     const { language } = useLanguage();
     const [ descriptionIndex, setDescriptionIndex ] = useState(0);
+    const [ description, setDescription ] = useState(() => getDescriptionFromLanguage(parseImageDescription(image), language))
     const vernacularIndex = 0; // Always the first vernacular name
+
+    React.useEffect(() => {
+        setDescription(getDescriptionFromLanguage(parseImageDescription(image), language));
+        setDescriptionIndex(0);
+    }, [image, language]);
 
     const handlePreviousDescription = React.useCallback(() => {
         setDescriptionIndex(index => index - 1);
@@ -53,11 +59,9 @@ const ImageDescription = ({ image, withNavigation = true}) => {
      *  ],
      *  english: [
      *      ...
-     *  ] 
+     *  ]
      * }
      */
-    const captions = useMemo(() => parseImageDescription(image), [image]);
-    const description = useMemo(() => getDescriptionFromLanguage(captions, language), [captions, language])
 
     if (!description) {
         return (
