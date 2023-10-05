@@ -7,7 +7,9 @@ import { useLanguage } from "../../utils";
 const LanguageSelector = () => {
     const { language, supportedLanguages, setLanguage } = useLanguage();
     const handleChange = useCallback((event, newLanguage) => {
-        setLanguage(newLanguage);
+        if (newLanguage) { // null if we click on the current language
+            setLanguage(newLanguage);
+        }
     }, [setLanguage]);
 
     const languageNames = useMemo(() => new Intl.DisplayNames([language], {type: 'language'}), [language]);
