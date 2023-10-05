@@ -22,7 +22,10 @@ const _imageNameRegexp = /^(?<baseUrl>.+)\/(?<name>[^./]+)\.jpg$/;
 
 const getDestinationProperties = async (year, title, pool) => {
     const data = await pool("destinations").select().where("path", `${year}/${title}`);
-    return data[0];
+    if (data.length > 0) {
+        return data[0];
+    }
+    return null;
 };
 
 const toMediumThumbnail = (imageName) => {
@@ -44,12 +47,16 @@ const getPageProperties = async (req, pool, firebaseConfig) => {
         // /destinations/2020/romblon
         // -> "Romblon - 2020"
         const match = path.match(_destinationRegexp);
-        const year = match.groups["year"];
-        const locationCode = match.groups["location"];
-        const destination = await getDestinationProperties(year, locationCode, pool);
-        const locationName = destination.title_en || destination.title;
-        image = `${destination.path}/${destination.cover}`;
-        pageName = `${locationName} - ${year}`;
+        if (match !== null) {
+            const year = match.groups["year"];
+            const locationCode = match.groups["location"];
+            const destination = await getDestinationProperties(year, locationCode, pool);
+            if (destination !== null) {
+                const locationName = destination.title_en || destination.title;
+                image = `${destination.path}/${destination.cover}`;
+                pageName = `${locationName} - ${year}`;
+            }
+        }
     } else if (path === "/search") {
         pageName = "Search";
     } else if (path === "/finning") {
