@@ -147,7 +147,10 @@
             "images" : {
                 "title:deleteItems": "Supprimer des images",
                 "confirmDeleteItems": "Confirmez-vous la suppression de ces images?",
-                "warningDeleteItems":  "Cette action est irreversible!"
+                "warningDeleteItems":  "Cette action est irreversible!",
+                "imageCount": "{0} item(s) dans le répertoire {1}",
+                "filter": "Filtrer les fichiers:",
+                "rootFolder": "racine"
             }
         },
         "profile": {

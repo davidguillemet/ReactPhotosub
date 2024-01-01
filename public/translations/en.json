@@ -147,7 +147,10 @@
             "images" : {
                 "title:deleteItems": "Delete pictures",
                 "confirmDeleteItems": "Are your sure you want to delete theses pictures?",
-                "warningDeleteItems": "This action is irreversible."
+                "warningDeleteItems": "This action is irreversible.",
+                "imageCount": "{0} item(s) in the folder {1}",
+                "filter": "Filter files:",
+                "rootFolder": "root"
             }
         },
         "profile": {

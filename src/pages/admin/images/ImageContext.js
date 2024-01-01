@@ -96,6 +96,12 @@ const getMissingImagesVersusThumbnails = (files, thumbs) => {
     return missingImages;
 };
 
+const _defaultItemStatusFilter = {
+    error: true,
+    //warning: true, // Warning status is only for pending consolidated status... not a real final status
+    success: true
+}
+
 export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const firebaseContext = useFirebaseContext();
     const dataProvider = useDataProvider();
@@ -111,6 +117,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         year: null,
         title: null
     });
+    const [ itemStatusFilter, setItemStatusFilter ] = React.useState(_defaultItemStatusFilter)
 
     // The images in database for the current destination folder
     const dbImages = useDestinationImages(destinationProps.current);
@@ -383,6 +390,32 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         return FOLDER_TYPE.none;
     }, [storageRef]);
 
+    const toggleStatusFilter = React.useCallback((status) => {
+        setItemStatusFilter(prevFilter => {
+            return {
+                ...prevFilter,
+                [status]: !prevFilter[status]
+            }
+        })
+    }, []);
+
+    const showSingleStatus = React.useCallback((status) => {
+        setItemStatusFilter(prevFilter => {
+            const newFilter = {};
+            for (const key in prevFilter) newFilter[key] = false;
+            newFilter[status] = true;
+            return newFilter;
+        })
+    }, []);
+
+    const displayStatus = React.useCallback((status) => {
+        return itemStatusFilter[status];
+    }, [itemStatusFilter]);
+
+    const setDefaultItemStatusFilter = React.useCallback(() => {
+        setItemStatusFilter(_defaultItemStatusFilter);
+    }, []);
+
     const totalRows = (rows.files ? rows.files.length : 0) + (rows.folders ? rows.folders.length : 0);
     const isReady =
         dbImages !== undefined &&
@@ -429,6 +462,13 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         // Error handling
         setItemStatus,
         errors,
+
+        // Filter items
+        showSingleStatus,
+        toggleStatusFilter,
+        displayStatus,
+        setDefaultItemStatusFilter,
+        getStatusFilter: () => itemStatusFilter,
 
         // Click handlers (in practice = open a folder)
         onRowClick: handleOnRowClick,

@@ -19,6 +19,8 @@ import { CircularProgress } from '@mui/material';
 import { Paragraph } from 'template/pageTypography';
 import { FOLDER_TYPE } from './common';
 import ImageErrors from './globalErrors/ImageErrors';
+import { useTranslation } from 'utils';
+import ItemFilter from './ItemFilter';
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -29,11 +31,13 @@ const columns = [
 
 const Images = () => {
     const imageContext = useImageContext();
-    const folderName = imageContext.folderType === FOLDER_TYPE.root ? "racine" : imageContext.folderName;
+    const t = useTranslation("pages.admin.images");
+    const folderName = imageContext.folderType === FOLDER_TYPE.root ? t("rootFolder") : imageContext.folderName;
     return (
         <React.Fragment>
         <ImageErrors />
-        <Paragraph>{`${imageContext.itemCount} item(s) dans le répertoire ${folderName}`}</Paragraph>
+        <Paragraph>{t("imageCount", [imageContext.itemCount, folderName])}</Paragraph>
+        <ItemFilter />
         <TableContainer component={Paper} sx={{display: 'flex', flexDirection: 'column'}}>
             <TableToolbar />
             <Table sx={{ width: "100%" }} size="medium">

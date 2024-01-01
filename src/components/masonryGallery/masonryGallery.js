@@ -4,7 +4,7 @@ import {isMobile} from 'react-device-detect';
 import Box from "@mui/material/Box";
 import Alert from '@mui/material/Alert';
 import { useResizeObserver } from '../../components/hooks';
-import { withLoading, buildLoadingState } from '../../components/hoc';
+import { withLoading, buildLoadingState, Loading } from '../../components/hoc';
 import MasonryLayout from './masonryLayout';
 
 const _margin = isMobile ? 2 : 5;
@@ -25,7 +25,7 @@ const MasonryGallery = ({
         itemWidth: colWidth,
         columnsCount: 0
     });
-    const isReady = useRef(false);
+    const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
         const containerWidth = resizeObserver.width;
@@ -39,11 +39,16 @@ const MasonryGallery = ({
     }, [resizeObserver.width, colWidth])
 
     useEffect(() => {
-        if (isReady.current === false && masonryProps.columnsCount > 0 && onReady !== null) {
-            isReady.current = true;
+        if (isReady === false && masonryProps.columnsCount > 0) {
+            setIsReady(true);
+        }
+    }, [masonryProps, isReady])
+
+    useEffect(() => {
+        if (isReady === true && onReady !== null) {
             onReady();
         }
-    }, [masonryProps, onReady])
+    }, [isReady, onReady])
 
     if (items.length === 0 && emptyMessage !== null) {
         return (
@@ -54,6 +59,8 @@ const MasonryGallery = ({
     return (
         <Box sx={{position: 'relative', width: '100%'}} ref={resizeObserver.ref}>
         {
+            isReady === false ?
+            <Loading></Loading> :
             <MasonryLayout
                 items={items}
                 itemWidth={masonryProps.itemWidth}

@@ -114,6 +114,11 @@ const StorageFileRow = ({row, selected}) => {
 
     const imageFromDb = imageContext.getImageFromDatabase(row.name);
     const hasThumbs = thumbStatus === "success";
+    const displayed = imageContext.displayStatus(itemStatus);
+
+    if (displayed === false) {
+        return null;
+    }
 
     return (
         <React.Fragment>
