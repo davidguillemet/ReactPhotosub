@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {isMobile} from 'react-device-detect';
 import Box from "@mui/material/Box";
 import Alert from '@mui/material/Alert';

@@ -326,3 +326,24 @@ export const regionTitle = (region, lang) => {
 export const destinationTitle = (destination, lang) => {
     return destination[_getTitleProp[lang]];
 }
+
+
+const _yearRegexp = /^[0-9]{4}$/i; 
+
+export const extractDestinationProps = (path) => {
+    const pathItems = path.split("/");
+    if (pathItems.length === 2) {
+        const title = pathItems[pathItems.length - 1];
+        const year = pathItems[pathItems.length - 2];
+        if (_yearRegexp.test(year)) {
+            return {
+                year,
+                title
+            }
+        }
+    }
+    return {
+        year: null,
+        title: null
+    }
+}

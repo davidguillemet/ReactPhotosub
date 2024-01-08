@@ -4,6 +4,31 @@ const axios = require("axios");
 const {parse} = require("path");
 const {apiBaseUrl, logger} = require("./config");
 
+const generateTagsFromDescription = (imageTitle, imageDescription) => {
+    let imageCaption = null;
+    let captionTags = null;
+    const captionSingleTerms = [];
+    const captionComposedTerms = [];
+
+    analyzeDescription(imageTitle, captionSingleTerms, captionComposedTerms);
+    analyzeDescription(imageDescription, captionSingleTerms, captionComposedTerms);
+    if (captionSingleTerms.length > 0 && captionComposedTerms.length > 0) {
+        // Create the caption string by keeping duplicates to keep term order untouched
+        imageCaption = " " + captionComposedTerms.join(" ") + " ";
+        // remove duplicates for tags array using a Set
+        const singleAndComposedTerms = captionSingleTerms.concat(captionComposedTerms);
+        const tagSet = new Set(singleAndComposedTerms);
+        captionTags = Array.from(tagSet);
+    }
+
+    return {
+        caption: imageCaption,
+        captionTags: captionTags,
+    };
+};
+
+exports.generateTagsFromDescription = generateTagsFromDescription;
+
 exports.extractExif = async function(file, fileContent) {
     let xmp = null;
 
@@ -31,21 +56,8 @@ exports.extractExif = async function(file, fileContent) {
     const imageTags = getObjectProperty(xmp, "subject", null);
     const creationDate = getObjectProperty(xmp, "CreateDate", null);
 
-    let imageCaption = null;
-    let captionTags = null;
-
-    const captionSingleTerms = [];
-    const captionComposedTerms = [];
-    analyzeDescription(imageTitle, captionSingleTerms, captionComposedTerms);
-    analyzeDescription(imageDescription, captionSingleTerms, captionComposedTerms);
-    if (captionSingleTerms.length > 0 && captionComposedTerms.length > 0) {
-        // Create the caption string by keeping duplicates to keep term order untouched
-        imageCaption = " " + captionComposedTerms.join(" ") + " ";
-        // remove duplicates for tags array using a Set
-        const singleAndComposedTerms = captionSingleTerms.concat(captionComposedTerms);
-        const tagSet = new Set(singleAndComposedTerms);
-        captionTags = Array.from(tagSet);
-    }
+    // Generate tags from image title and description
+    const tagsFromDescription = generateTagsFromDescription(imageTitle, imageDescription);
 
     // Get image size:
     const dimensions = imageSize(fileContent);
@@ -57,13 +69,12 @@ exports.extractExif = async function(file, fileContent) {
         path: filePathProps.dir,
         title: imageTitle,
         description: imageDescription,
-        tags: imageTags,
-        caption: imageCaption,
-        captionTags: captionTags,
         width: dimensions.width,
         height: dimensions.height,
         sizeRatio: dimensions.width / dimensions.height,
         create: creationDate,
+        tags: imageTags,
+        ...tagsFromDescription, // caption and captionTags
     };
 
     return newImageItem;

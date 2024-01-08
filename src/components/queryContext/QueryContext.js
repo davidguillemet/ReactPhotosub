@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataProvider } from '../dataProvider/dataManagerProvider';
 import { useFirebaseContext } from '../firebase';
 import { CheckErrorsAfterAddImage, CheckErrorsAfterRemoveImage } from 'common/GlobalErrors';
+import { extractDestinationProps } from 'utils';
 
 const QueryContext = createContext(null);
 
@@ -14,6 +15,33 @@ export const QueryContextProvider = ({children}) => {
 
     const getUser = () => firebaseContext.auth.currentUser;
     const userId = () => getUser().uid
+    const addDestinationImage = (year, title, newImage) => {
+        const queryKey = ['destinationimages', year, title];
+        const prevData = queryClient.getQueryData(queryKey);
+        // We might upload the same image again or just update image properties,
+        // in which case we must replace the image in the data
+        const imageIndex = prevData.findIndex(img => newImage.name === img.name && newImage.path === img.path);
+        if (imageIndex === -1) {
+            // New image
+            prevData.push(newImage);
+        } else {
+            // Upload again an existing image / Update image properties
+            prevData.splice(imageIndex, 1, newImage);
+        }
+        queryClient.setQueryData(queryKey, [...prevData]);
+
+        const prevImageFolders = queryClient.getQueryData(['imageFolders']);
+        const newImageFolder = `${year}/${title}`
+        if (prevImageFolders.findIndex(folder => folder.path === newImageFolder) === -1) {
+            queryClient.setQueryData(['imageFolders'], [...prevImageFolders, {path: newImageFolder}]);
+        }
+
+        const prevImageErrors = queryClient.getQueryData(['imageErrors']);
+        const newImageErrors = CheckErrorsAfterAddImage(prevImageErrors, newImage);
+        if (newImageErrors !== null) {
+            queryClient.setQueryData(['imageErrors'], newImageErrors);
+        }
+    };
 
     const queryContext = useRef({
         useFetchHomeSlideshow: () => useQuery(['homeslideshow'], () => dataProvider.getImageDefaultSelection()),
@@ -59,6 +87,14 @@ export const QueryContextProvider = ({children}) => {
             }
         }),
 
+        // Image properties
+        useUpdateImageProperties: () => useMutation((image) => dataProvider.updateImageProperties(image), {
+            onSuccess: (data) => {
+                const {year, title} = extractDestinationProps(data.path);
+                addDestinationImage(year, title, data);
+            }
+        }),
+
         useFetchRelatedDestinations: (regions, macro, wide) => useQuery(['related', ...regions, macro, wide], () => dataProvider.getRelatedDestinations(regions, macro, wide)),
         useFetchDestinationDesc: (year, title) => useQuery(['destinationdesc', year, title], () => dataProvider.getDestinationDescFromPath(year, title)),
         useFetchDestinationHeader: (year, title) => useQuery(['destinationheader', year, title], () => dataProvider.getDestinationDetailsFromPath(year, title)),
@@ -69,32 +105,7 @@ export const QueryContextProvider = ({children}) => {
             enabled: year !== null && year !== undefined && title !== null && title !== undefined,
             structuralSharing: false // To force a refresh even if the data is the same after query invalidation (Image management in Admin)
         }),
-        addDestinationImage: (year, title, newImage) => {
-            const queryKey = ['destinationimages', year, title];
-            const prevData = queryClient.getQueryData(queryKey);
-            // We might upload the same image again,in which case we must replace the image in the data
-            const imageIndex = prevData.findIndex(img => newImage.name === img.name && newImage.path === img.path);
-            if (imageIndex === -1) {
-                // New image
-                prevData.push(newImage);
-            } else {
-                // Upload again an existing image
-                prevData.splice(imageIndex, 1, newImage);
-            }
-            queryClient.setQueryData(queryKey, [...prevData]);
-
-            const prevImageFolders = queryClient.getQueryData(['imageFolders']);
-            const newImageFolder = `${year}/${title}`
-            if (prevImageFolders.findIndex(folder => folder.path === newImageFolder) === -1) {
-                queryClient.setQueryData(['imageFolders'], [...prevImageFolders, {path: newImageFolder}]);
-            }
-
-            const prevImageErrors = queryClient.getQueryData(['imageErrors']);
-            const newImageErrors = CheckErrorsAfterAddImage(prevImageErrors, newImage);
-            if (newImageErrors !== null) {
-                queryClient.setQueryData(['imageErrors'], newImageErrors);
-            }
-        },
+        addDestinationImage,
         removeDestinationImage: (year, title, imageFullPath) => {
             const queryKey = ['destinationimages', year, title];
             const prevData = queryClient.getQueryData(queryKey);

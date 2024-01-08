@@ -259,7 +259,7 @@ DataProvider.prototype.deleteLocation = function(locationId) {
 
 // Images / Thumbnails
 DataProvider.prototype.insertImageInDatabase = function(fullPath) {
-    return this.axios.put('/admin/images', { fullPath })
+    return this.axios.post('/admin/images', { fullPath })
     .then (response => {
         // The response contains the inserted image
         // {
@@ -276,6 +276,14 @@ DataProvider.prototype.insertImageInDatabase = function(fullPath) {
         //     "create": "2012-09-01T18:21:06.00"
         // }
         return response.data; // contains the inserted image
+    });
+}
+// Update image properties (tags, title, etc)
+DataProvider.prototype.updateImageProperties = function(image) {
+    return this.axios.put('/admin/images', image )
+    .then (response => {
+        // Contains the updated image
+        return response.data;
     });
 }
 DataProvider.prototype.removeImageFromDatabase = function(fullPath) {

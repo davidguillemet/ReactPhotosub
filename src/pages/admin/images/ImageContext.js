@@ -4,7 +4,7 @@ import { buildLoadingState, withLoading } from 'components/hoc';
 import { getFileNameFromFullPath, getThumbnailsFromImageName } from 'utils';
 import { useFirebaseContext } from 'components/firebase';
 import { useQueryContext } from 'components/queryContext';
-import { getImageNameFromThumbnail } from 'utils';
+import { getImageNameFromThumbnail, extractDestinationProps } from 'utils';
 import { useDataProvider } from 'components/dataProvider';
 import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER, FOLDER_TYPE} from './common';
 
@@ -12,26 +12,6 @@ const ImageContext = React.createContext(null);
 
 const isNotThumbsFolder = (item) => item.name !== "thumbs";
 const isThumbsFolder = (item) => item.name === "thumbs";
-
-const _yearRegexp = /^[0-9]{4}$/i; 
-
-const extractDestinationProps = (path) => {
-    const pathItems = path.split("/");
-    if (pathItems.length === 2) {
-        const title = pathItems[pathItems.length - 1];
-        const year = pathItems[pathItems.length - 2];
-        if (_yearRegexp.test(year)) {
-            return {
-                year,
-                title
-            }
-        }
-    }
-    return {
-        year: null,
-        title: null
-    }
-}
 
 const _userUploadRegexp = /^userUpload\/[^/]+\/interiors$/i; 
 

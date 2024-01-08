@@ -1,7 +1,7 @@
 const path = require("path");
 const imageSize = require("buffer-image-size");
 const {createThumbnails} = require("../../triggers/resizeImage");
-const {extractExif} = require("../../triggers/exifProcessing");
+const {extractExif, generateTagsFromDescription} = require("../../triggers/exifProcessing");
 
 module.exports = function(admin, config) {
     const insertImage = (newImage, req, res, next) => {
@@ -14,6 +14,22 @@ module.exports = function(admin, config) {
             .then(() => {
                 newImage.src = config.convertPathToUrl(newImage.path + "/" + newImage.name);
                 res.json(newImage);
+            }).catch(next);
+    };
+
+    const updateImageProperties = (image, req, res, next) => {
+        const tagsFromTitle = generateTagsFromDescription(image.title, image.description);
+        return config.pool("images")
+            .where({
+                "name": image.name,
+                "path": image.path,
+            }).update({
+                tags: image.tags,
+                title: image.title,
+                description: image.description,
+                ...tagsFromTitle,
+            }).then(() => {
+                res.json(image);
             }).catch(next);
     };
 
@@ -53,7 +69,7 @@ module.exports = function(admin, config) {
 
     admin.route("/images")
         // Process an image from Storage and insert it in database (called from Admin page)
-        .put(async function(req, res, next) {
+        .post(async function(req, res, next) {
             // {
             //     fullPath: "/folder/folder/DSC_6578.jpg",
             // }
@@ -68,6 +84,12 @@ module.exports = function(admin, config) {
             }).then((imageItem) => {
                 return insertImage(imageItem, req, res, next);
             }).catch(next);
+        })
+        // Update image properties (tags, title, etc)
+        .put(async function(req, res, next) {
+            const imageToUpdate = req.body;
+            res.locals.errorMessage = `Failed to update properties for image ${imageToUpdate.path}/${imageToUpdate.name}.`;
+            return updateImageProperties(imageToUpdate, req, res, next);
         })
         // Delete an image
         .delete(async function(req, res, next) {

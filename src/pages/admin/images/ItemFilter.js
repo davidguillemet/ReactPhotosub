@@ -37,7 +37,7 @@ const ItemFilter = () => {
             <Body sx={{mt: 0}}>{t("filter")}</Body>
             {
                 Object.keys(imageContext.getStatusFilter()).map(status => {
-                    return <FilterStatus status={status} />
+                    return <FilterStatus key={status} status={status} />
                 })
             }
             <IconButton onClick={reset}>

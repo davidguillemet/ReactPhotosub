@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chip, Collapse, Stack, IconButton, Box, Alert} from '@mui/material';
+import { Chip, Collapse, IconButton } from '@mui/material';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -11,79 +11,21 @@ import ThumbnailStatus from './itemStatus/ThumbnailStatus';
 import { getItemConsolidatedStatus } from './itemStatus/StorageItemStatus';
 import DataBasePropStatus from './itemStatus/DataBasePropStatus';
 import { useImageContext } from './ImageContext';
-import LazyImage from 'components/lazyImage';
-import { Body } from 'template/pageTypography';
 import { containsImage } from './common';
-import { useFirebaseContext } from 'components/firebase';
-
-const ImageDetails = ({image}) => {
-    if (!image) {
-        return null;
-    }
-    return (
-        <Stack
-            direction={'column'}
-            justifyContent="flex-start"
-            alignItems="flex-start"
-            spacing={0}
-            sx={{marginX: 1, p: 0}}
-        >
-            {
-                image.title ?
-                <Body sx={{m: 0}}>{image.title}</Body> :
-                <Alert severity='warning'>Pas de titre</Alert>
-            }
-            {
-                image.description ?
-                <Body sx={{m: 0}}>{image.description}</Body> :
-                <Alert severity='warning'>Pas de description</Alert>
-            }
-            <Box>
-                {
-                    image.tags === null ?
-                    <Alert severity='warning'>Pas de tags...</Alert> :
-                    image.tags.map(tag => {
-                        return (
-                            <Chip key={tag} label={tag} size="small" sx={{marginRight: 0.5, marginTop: 0.5}} />
-                        )
-                    })
-                }
-            </Box>
-        </Stack>
-    )
-}
+import ImagePreview from './preview/ImagePreview';
 
 const FileDetails = ({image, file, expanded}) => {
     const imageContext = useImageContext();
-    const firebaseContext = useFirebaseContext();
 
     if (!containsImage(imageContext.folderType)) {
         return null;
     }
-    if (!image) {
-        file.src = `${firebaseContext.rootPublicUrl}/${file.fullPath}`;
-    }
-    const sxProp = {
-        width: '200px'
-    }
-    if (image) {
-        sxProp.height = `${200/image.sizeRatio}px`;
-    }
+
     return (
         <TableRow>
             <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
                 <Collapse in={expanded} timeout="auto" unmountOnExit>
-                    <Stack direction={'row'} sx={{p: 1}}>
-                        <Box sx={sxProp}>
-                            <LazyImage
-                                image={image || file}
-                                width={200}
-                                withFavorite={false}
-                                withOverlay={false}
-                            />
-                         </Box>
-                         <ImageDetails image={image} />
-                    </Stack>
+                    <ImagePreview image={image} file={file} />
                 </Collapse>
             </TableCell>
         </TableRow>

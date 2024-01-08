@@ -10,6 +10,7 @@ import { useOverlay } from '../loading/loadingOverlay';
 import { useTranslation } from 'utils';
 
 export const FIELD_TYPE_TEXT = 'text';
+export const FIELD_TYPE_TAGS_FIELD = 'tagsField';
 export const FIELD_TYPE_NUMBER = 'number';
 export const FIELD_TYPE_EMAIL = 'email';
 export const FIELD_TYPE_URL = 'url';
