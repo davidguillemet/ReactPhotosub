@@ -3,9 +3,10 @@ import { Button, Chip, Stack, Box, Alert} from '@mui/material';
 import LazyImage from 'components/lazyImage';
 import { useFirebaseContext } from 'components/firebase';
 import { Body } from 'template/pageTypography';
-import EditImageDialog from './EditImageDialog';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import useFormDialog from 'dialogs/FormDialog';
+import ImageForm from './ImageForm';
 
 const ImageProperties = ({image}) => {
     if (!image) {
@@ -73,19 +74,11 @@ const ImagePreview = ({image, file}) => {
 }
 
 const ImagePreviewWrapper = ({image, children}) => {
-    const [editDialogOpen, setEditDialogOpen] = React.useState(false);
-
-    const onEditImage = React.useCallback(() => {
-        setEditDialogOpen(true);
-    }, []);
+    const { dialogProps, openDialog, FormDialog } = useFormDialog();
 
     const onCopyTags = React.useCallback(() => {
         navigator.clipboard.writeText(image.tags.join());
     }, [image]);
-
-    const onCloseEditImage = React.useCallback(() => {
-        setEditDialogOpen(false);
-    }, []);
 
     if (image) {
         const hasTags = image.tags && image.tags.length > 0;
@@ -95,14 +88,12 @@ const ImagePreviewWrapper = ({image, children}) => {
                     { children }
                     <Stack direction={'row'} sx={{marginBottom: 1}} justifyContent="flex-end" spacing={0.5}>
                         <Button startIcon={<ContentCopyIcon/>} disabled={!hasTags} variant="outlined" size="small" onClick={onCopyTags}>Copier les tags</Button>
-                        <Button startIcon={<EditIcon/>} variant="outlined" size="small" onClick={onEditImage}>Modifier</Button>
+                        <Button startIcon={<EditIcon/>} variant="outlined" size="small" onClick={openDialog}>Modifier</Button>
                     </Stack>
                 </Stack>
-                <EditImageDialog
-                    open={editDialogOpen}
-                    image={image}
-                    onClose={onCloseEditImage}
-                />
+                <FormDialog title="Modifier les propriétés de l'image" {...dialogProps}>
+                    <ImageForm image={image} />
+                </FormDialog>
             </React.Fragment>
         )
     } else {

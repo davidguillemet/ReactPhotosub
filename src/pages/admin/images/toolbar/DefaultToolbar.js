@@ -6,26 +6,19 @@ import { IconButton } from '@mui/material';
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
 import FileUploadSelection from '../upload/FileUploadSelection';
 import StorageBreadcrumbs from './BreadCrumbs';
-import FolderFormDialog from '../FolderFormDialog';
+import useFormDialog from 'dialogs/FormDialog';
 import { useImageContext } from '../ImageContext';
 import { useUploadContext } from '../upload/UploadContext';
 import { canUpload } from '../common';
+import FolderForm from '../FolderForm';
 
 const DefaultToolbar = () => {
     const uploadContext = useUploadContext();
     const imageContext = useImageContext();
-    const [ folderDialogOpen, setFolderDialogOpen ] = React.useState(false);
+    const { dialogProps, openDialog, FormDialog } = useFormDialog();      
     const uploadButtonRef = React.useRef(null);
     const openUploadSelection = () => uploadButtonRef.current.click()
     uploadContext.onClickUpload = openUploadSelection;
-
-    const handleOnClickCreateFolder = React.useCallback(() => {
-        setFolderDialogOpen(true);
-    }, []);
-
-    const onCloseFolderDialog = React.useCallback(() => {
-        setFolderDialogOpen(false);
-    }, []);
 
     const isUploadAvailable = canUpload(imageContext.folderType);
 
@@ -47,7 +40,7 @@ const DefaultToolbar = () => {
             >
                 <StorageBreadcrumbs />
                 <Stack direction="row" alignItems="center">
-                    <IconButton onClick={handleOnClickCreateFolder}>
+                    <IconButton onClick={openDialog}>
                         <CreateNewFolderOutlinedIcon sx={{color: theme => theme.palette.primary.contrastText}}></CreateNewFolderOutlinedIcon>
                     </IconButton>
                     <FileUploadSelection
@@ -55,10 +48,9 @@ const DefaultToolbar = () => {
                         disabled={!isUploadAvailable}
                     />
                 </Stack>
-                <FolderFormDialog
-                    open={folderDialogOpen}
-                    onClose={onCloseFolderDialog}
-                />
+                <FormDialog title="Création d'un répertoire" {...dialogProps} >
+                    <FolderForm />
+                </FormDialog>
             </Box>
          </Fade>
     );

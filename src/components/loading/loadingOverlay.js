@@ -33,7 +33,7 @@ const LoadingOverlay = ({ open }) => {
         <Modal
             sx={{
                 color: '#fff',
-                zIndex: (theme) => theme.zIndex.drawer + 1,
+                zIndex: (theme) => theme.zIndex.tooltip + 1,
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'center',

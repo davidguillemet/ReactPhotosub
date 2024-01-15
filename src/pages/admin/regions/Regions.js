@@ -13,12 +13,13 @@ import { useReactQuery } from 'components/reactQuery';
 import { useQueryContext } from 'components/queryContext';
 import { buildLoadingState, withLoading } from 'components/hoc';
 import { ConfirmDialog } from 'dialogs';
-import EditLocationDialog from './EditLocationDialog';
 import { useTranslation, compareRegions, regionTitle, useLanguage } from 'utils';
 import { HorizontalSpacing } from 'template/spacing';
 import { EmptySquare, PlusSquare, MinusSquare } from './TreeViewIcons';
 import StyledTreeItem from './StyledTreeItem';
 import { useToast } from 'components/notifications';
+import useFormDialog from 'dialogs/FormDialog';
+import LocationForm from './LocationForm';
 
 const LocationItem = ({location, onEdit, onDelete}) => {
 
@@ -117,7 +118,6 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
 
     const [locationToDelete, setLocationToDelete] = React.useState(null);
     const [locationToEdit, setLocationToEdit] = React.useState(null);
-    const [editDialogOpen, setEditDialogOpen] = React.useState(false);
     const [expanded, setExpanded] = React.useState([]);
 
     const onDeleteLocation = React.useCallback(() => {
@@ -134,14 +134,15 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
     }, []);
 
     const onCloseEditLocation = React.useCallback(() => {
-        setEditDialogOpen(false);
         setLocationToEdit(null);
     }, []);
 
+    const { dialogProps, openDialog, FormDialog } = useFormDialog(onCloseEditLocation);
+
     const onEditLocation = React.useCallback((location) => {
         setLocationToEdit(location);
-        setEditDialogOpen(true);
-    }, []);
+        openDialog();
+    }, [openDialog]);
 
     const handleExpandAllClick = React.useCallback(() => {
         setExpanded(regions.map(region => `${region.id}`));
@@ -171,6 +172,14 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
         });
     }, [regionMap]);
 
+    const getEditDialogTitle = React.useCallback(() => {
+        if (locationToEdit === null || locationToEdit.id === undefined) {
+            return "Nouveau lieu"
+        } else {
+            return "Modifier le lieu"
+        }
+    }, [locationToEdit]);
+
     return (
         <React.Fragment>
             <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', mb: 1}}>
@@ -197,14 +206,14 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
                     t("warningDeleteLocation")
                 ]}
             />
-            <EditLocationDialog
-                open={editDialogOpen}
-                location={locationToEdit}
-                locations={locations}
-                regions={regions}
-                onClose={onCloseEditLocation}
-                onNewLocation={handleNewLocation}
-            />
+            <FormDialog title={getEditDialogTitle()} {...dialogProps} >
+                <LocationForm
+                    location={locationToEdit}
+                    locations={locations}
+                    regions={regions}
+                    onNewLocation={handleNewLocation}
+                />
+            </FormDialog>
         </React.Fragment>
     );
 }, [buildLoadingState("regions", [undefined]), buildLoadingState("locations", [undefined])]);

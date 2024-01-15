@@ -13,10 +13,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useAuthContext } from '../../components/authentication';
-import EditDestinationDialog from './EditDestinationDialog';
 import {unstable_batchedUpdates} from 'react-dom';
 import { useQueryContext } from '../../components/queryContext';
 import ConfirmDialog from '../../dialogs/ConfirmDialog';
+import useFormDialog from 'dialogs/FormDialog';
+import DestinationForm from './DestinationForm';
 
 const DestinationDetails = ({destination}) => {
     const { language } = useLanguage();
@@ -145,21 +146,21 @@ const DestinationGallery = ({destinations}) => {
     const authContext = useAuthContext();
     const deleteDestinationMutation = queryContext.useDeleteDestination();
 
-    const [editIsOpen, setEditIsOpen] = React.useState(false);
+    const [openEditDialog, EditDestinationDialog] = useFormDialog();
     const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
     const [destinationToEdit, setDestinationToEdit] = React.useState(null);
 
     const onEditDestination = (destination) => {
         unstable_batchedUpdates(() => {
-            setEditIsOpen(true);
             setDestinationToEdit(destination);
+            openEditDialog();
         });
     }
 
     const onNewDestination = () => {
         unstable_batchedUpdates(() => {
-            setEditIsOpen(true);
             setDestinationToEdit(null);
+            openEditDialog();
         });
     }
 
@@ -169,17 +170,24 @@ const DestinationGallery = ({destinations}) => {
 
     const onClickDeleteDestination = (destination) => {
         unstable_batchedUpdates(() => {
-            setConfirmDeleteOpen(true);
             setDestinationToEdit(destination);
+            setConfirmDeleteOpen(true);
         })
     }
 
     const onCloseDestinationEditor = () => {
         unstable_batchedUpdates(() => {
-            setEditIsOpen(false);
             setDestinationToEdit(null);
         });
     };
+
+    const getDialogTitle = React.useCallback(() => {
+        if (destinationToEdit === null) {
+            return t("title:newDestination")
+        } else {
+            return t("title:editDestination")
+        }
+    }, [destinationToEdit, t]);
 
     return (
         <React.Fragment>
@@ -200,11 +208,12 @@ const DestinationGallery = ({destinations}) => {
                     onDelete: onClickDeleteDestination
                 }}
             />
-            <EditDestinationDialog
-                open={editIsOpen}
-                destination={destinationToEdit}
-                onClose={onCloseDestinationEditor}
-            />
+            <EditDestinationDialog title={getDialogTitle()}>
+                <DestinationForm
+                    destination={destinationToEdit}
+                    onCancel={onCloseDestinationEditor}
+                />
+            </EditDestinationDialog>
             {
                 destinationToEdit &&
                 <ConfirmDialog

@@ -42,7 +42,7 @@ const Form = ({
     readOnly = false}) => {
 
     const t = useTranslation("components.form");
-    const [values, setValues] = React.useState({});
+    const [values, setValues] = React.useState(() => getValuesFromFields(fields, initialValues));
     const validators = React.useRef({});
     const { toast } = useToast();
 
@@ -128,19 +128,17 @@ const Form = ({
                         value={values[field.id]}
                         values={values}
                         handleChange={handleChange}
-                        sending={sending}
                         readOnly={readOnly}
                         validators={validators.current}
                     />
                 )
             }
             {   
-                readOnly === false &&
                 <Stack spacing={2} direction="row" sx={{mt: 2}}>
                     <LoadingButton
                         onClick={onSubmit}
                         variant="contained"
-                        disabled={!isValid || !isDirty}
+                        disabled={readOnly || !isValid || !isDirty}
                         startIcon={<SendIcon />}
                         loadingPosition="start"
                         loading={sending}

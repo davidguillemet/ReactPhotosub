@@ -1,21 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent
-} from '@mui/material';
-import {unstable_batchedUpdates} from 'react-dom';
-import {isMobile} from 'react-device-detect';
 import Form, {
     FIELD_TYPE_TEXT,
     FIELD_TYPE_SELECT,
     FIELD_TYPE_DATE,
     FIELD_TYPE_SWITCH
-} from '../../components/form';
+} from 'components/form';
 import { useQueryContext } from '../../components/queryContext';
 import { useTranslation } from 'utils';
 
-const EditDestinationDialog = ({open, destination, onClose}) => {
+const DestinationForm = ({destination, onCancel}) => {
 
     const t = useTranslation("pages.destinations");
     const queryContext = useQueryContext();
@@ -23,7 +16,7 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
     const addDestinationMutation = queryContext.useAddDestination();
     const updateDestinationMutation = queryContext.useUpdateDestination();
 
-    const [fields, setFields] = useState(null);
+    const [fields, setFields] = useState([]);
 
     const getImagesFromPath = useCallback(([path]) => {
         const [ year, title ] = (path !== null && path !== undefined) ? path.split('/') : [ null, null ];
@@ -136,12 +129,7 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
         ]);
     }, [getImagesFromPath, getImageFolders, getLocations, t]);
 
-    const [isOpen, setIsOpen] = useState(open);
     const [values, setValues] = useState(null);
-
-    useEffect(() => {
-        setIsOpen(open);
-    }, [open])
 
     useEffect(() => {
         if (destination === null) {
@@ -161,15 +149,6 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
 
     }, [destination]);
 
-    const handleClose = React.useCallback(() => {
-        unstable_batchedUpdates(() => {
-            // reinit all properties...
-            setIsOpen(false);
-            onClose();
-            fields.forEach(field => delete field.error);
-        });
-    }, [onClose, fields]);
-
     const onSubmitDestinationForm = React.useCallback((values) => {
         if (destination === null) {
             // New Destination
@@ -180,38 +159,16 @@ const EditDestinationDialog = ({open, destination, onClose}) => {
         }
     }, [destination, addDestinationMutation, updateDestinationMutation]);
 
-    const getDialogTitle = React.useCallback(() => {
-        if (destination === null) {
-            return t("title:newDestination")
-        } else {
-            return t("title:editDestination")
-        }
-    }, [destination, t]);
-
     return (
-        <div>
-            <Dialog
-                fullScreen={isMobile}
-                fullWidth={true}
-                open={isOpen}
-                onClose={handleClose}
-            >
-                <DialogTitle id="form-dialog-title">{getDialogTitle()}</DialogTitle>
-
-                <DialogContent>
-                    <Form
-                        fields={fields}
-                        initialValues={values}
-                        submitAction={onSubmitDestinationForm}
-                        submitCaption={t("validate")}
-                        onCancel={handleClose}
-                        validationMessage={t("validationMessage")}
-                    />
-                </DialogContent>
-
-            </Dialog>
-        </div>
+        <Form
+            fields={fields}
+            initialValues={values}
+            submitAction={onSubmitDestinationForm}
+            submitCaption={t("validate")}
+            onCancel={onCancel}
+            validationMessage={t("validationMessage")}
+        />
     )
 }
 
-export default EditDestinationDialog;
+export default DestinationForm;

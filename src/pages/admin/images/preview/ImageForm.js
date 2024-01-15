@@ -5,10 +5,37 @@ import Form, {
     FIELD_TYPE_TEXT,
 } from 'components/form/Form';
 
+const imageFields = [
+    {
+        id: "title",
+        label: "Titre en français",
+        required: false,
+        type: FIELD_TYPE_TEXT,
+        multiline: false,
+        default: ""
+    },
+    {
+        id: "description",
+        label: "Titre en anglais",
+        required: false,
+        type: FIELD_TYPE_TEXT,
+        multiline: false,
+        default: ""
+    },
+    {
+        id: "tags",
+        label: "Tags",
+        required: true,
+        errorText: "Merci d'ajouter des tags qui caractérisent l'image (lieu, espèce, couleur, etc).",
+        type: FIELD_TYPE_TAGS_FIELD,
+        multiline: true,
+        default: []
+    },
+];
+
 const ImageForm = ({image, onChange, onCancel}) => {
 
     const queryContext = useQueryContext();
-    const [imageFields, setImageFields] = React.useState([]);
 
     const updateImageMutation = queryContext.useUpdateImageProperties();
 
@@ -24,36 +51,6 @@ const ImageForm = ({image, onChange, onCancel}) => {
         ...image
     });
 
-    React.useEffect(() => {
-        setImageFields([
-            {
-                id: "title",
-                label: "Titre en français",
-                required: false,
-                type: FIELD_TYPE_TEXT,
-                multiline: false,
-                default: ""
-            },
-            {
-                id: "description",
-                label: "Titre en anglais",
-                required: false,
-                type: FIELD_TYPE_TEXT,
-                multiline: false,
-                default: ""
-            },
-            {
-                id: "tags",
-                label: "Tags",
-                required: true,
-                errorText: "Merci d'ajouter des tags qui caractérisent l'image (lieu, espèce, couleur, etc).",
-                type: FIELD_TYPE_TAGS_FIELD,
-                multiline: true,
-                default: []
-            },
-        ]);
-    }, [image]);
-
     return (
         <Form
             fields={imageFields}
@@ -63,6 +60,7 @@ const ImageForm = ({image, onChange, onCancel}) => {
             validationMessage="Les nouvelles propriétés de l'image ont été sauvegardées."
             onChange={onChange}
             onCancel={onCancel}
+            readOnly={false}
         />
     );
 }

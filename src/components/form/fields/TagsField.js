@@ -9,22 +9,7 @@ const validateTagsFieldValue = (value) => {
 const TagsField = ({ field, value, values, handleChange, sending, readOnly, inputProps = {}, validators }) => {
 
     const [error, setError] = React.useState(false);
-    const [tagList, setTagList] = React.useState([]);
     const [inputValue, setInputValue] = React.useState("");
-
-    React.useEffect(() => {
-        if (value !== undefined) {
-            setTagList(value);
-        }
-    }, [value]);
-
-    React.useEffect(() => {
-        const isError = !validateTagsFieldValue(tagList);
-        setError(isError);
-        if (handleChange) {
-            handleChange(field, tagList);
-        }
-    }, [tagList, field, handleChange]);
 
     React.useEffect(() => {
         if (validators !== undefined) {
@@ -33,41 +18,48 @@ const TagsField = ({ field, value, values, handleChange, sending, readOnly, inpu
     }, [field, validators]);
 
     const onChange = (event, newValue) => {
-        setTagList(newValue);
+        handleChange(field, newValue);
+        const isError = !validateTagsFieldValue(newValue);
+        setError(isError);
     };
+
+    const isReadOnly = sending || readOnly || field.readOnly;
 
     return (
         <Autocomplete
+            disableClearable={isReadOnly}
+            disabled={isReadOnly}
             fullWidth
             freeSolo
             multiple
             options={[]}
             noOptionsText=""
             defaultValue={[]}
-            renderInput={(params) => (
+            renderInput={({disabled, ...params}) => (
                 <TextField
                     {...params}
                     label={field.label}
-                    placeholder="Ajouter un tag"
+                    placeholder={isReadOnly ? "" : "Ajouter un tag"}
                     helperText={error ? field.errorText : ''}
-                    error={error} />
+                    error={error}
+                    readOnly={isReadOnly}
+                    disabled={isReadOnly} />
             )}
             renderTags={(tagValue, getTagProps) => tagValue.map((option, index) => {
-                return <Chip variant="outlined" label={option} {...getTagProps({ index })} />;
+                return <Chip variant="outlined" label={option} {...getTagProps({ index })} disabled={isReadOnly} />;
             })}
             onChange={onChange}
-            value={tagList}
+            value={value}
             inputValue={inputValue}
-            readOnly={sending || readOnly || field.readOnly}
             onInputChange={(event, newInputValue) => {
                 const options = newInputValue.split(",");
                 if (options.length > 1) {
-                    const newTagList = tagList
+                    const newTagList = value
                         .concat(options)
                         .map(x => x.trim())
                         .filter(x => x);
                     // Remove possible duplicates
-                    setTagList([...new Set(newTagList)]);
+                    onChange(null, [...new Set(newTagList)]);
                     setInputValue("");
                 } else {
                     setInputValue(newInputValue);
