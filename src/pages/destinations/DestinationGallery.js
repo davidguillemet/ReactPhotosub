@@ -146,21 +146,21 @@ const DestinationGallery = ({destinations}) => {
     const authContext = useAuthContext();
     const deleteDestinationMutation = queryContext.useDeleteDestination();
 
-    const [openEditDialog, EditDestinationDialog] = useFormDialog();
+    const { dialogProps, openDialog, FormDialog } = useFormDialog();
     const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
     const [destinationToEdit, setDestinationToEdit] = React.useState(null);
 
     const onEditDestination = (destination) => {
         unstable_batchedUpdates(() => {
             setDestinationToEdit(destination);
-            openEditDialog();
+            openDialog();
         });
     }
 
     const onNewDestination = () => {
         unstable_batchedUpdates(() => {
             setDestinationToEdit(null);
-            openEditDialog();
+            openDialog();
         });
     }
 
@@ -208,12 +208,12 @@ const DestinationGallery = ({destinations}) => {
                     onDelete: onClickDeleteDestination
                 }}
             />
-            <EditDestinationDialog title={getDialogTitle()}>
+            <FormDialog title={getDialogTitle()} {...dialogProps}>
                 <DestinationForm
                     destination={destinationToEdit}
                     onCancel={onCloseDestinationEditor}
                 />
-            </EditDestinationDialog>
+            </FormDialog>
             {
                 destinationToEdit &&
                 <ConfirmDialog
