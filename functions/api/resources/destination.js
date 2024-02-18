@@ -17,6 +17,14 @@ function getDestinationPath(req) {
 }
 
 module.exports = function(app, config) {
+    const fetchAllSubGalleries = require("../utils/fetchSubGalleries")(config);
+
+    // Get sub-galleries for a specific destination from identifier
+    app.route("/destination/:id/galleries")
+        .get(function(req, res, next) {
+            return fetchAllSubGalleries(req.params.id, req, res, next);
+        });
+
     // Get minimal destination info to get the desc (title, date, cover, location)
     app.route("/destination/:year/:title/desc")
         .get(function(req, res, next) {
@@ -78,7 +86,7 @@ module.exports = function(app, config) {
         .get(function(req, res, next) {
             res.locals.errorMessage = `Failed to load images for destination '${getDestinationPath(req)}'`;
             return config.pool({i: "images"})
-                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create, i.tags"))
+                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create, i.tags, i.sub_gallery_id"))
                 .where("i.path", getDestinationPath(req))
                 .orderBy("i.create", "asc")
                 .then((images) => {

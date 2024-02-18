@@ -4,7 +4,7 @@ import { buildLoadingState, withLoading } from 'components/hoc';
 import { getFileNameFromFullPath, getThumbnailsFromImageName } from 'utils';
 import { useFirebaseContext } from 'components/firebase';
 import { useQueryContext } from 'components/queryContext';
-import { getImageNameFromThumbnail, extractDestinationProps } from 'utils';
+import { getImageNameFromThumbnail, extractDestinationPath } from 'utils';
 import { useDataProvider } from 'components/dataProvider';
 import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER, FOLDER_TYPE} from './common';
 
@@ -40,10 +40,10 @@ const getMissingStorageFolders = (currentPath, foldersFromStorage, foldersFromDb
     return Array.from(new Set(subFoldersFromDb)).map(f => { return { name: f}});
 }
 
-const useDestinationImages = ({year, title}) => {
+const useDestinationImages = (destinationPath) => {
     const queryContext = useQueryContext();
-    const { data } = queryContext.useFetchDestinationImages(year, title);
-    if (year !== null && title !== null) {
+    const { data } = queryContext.useFetchDestinationImages(destinationPath);
+    if (destinationPath !== null) {
         return data;
     } else {
         return null;
@@ -93,14 +93,11 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const [ errors, setErrors ] = React.useState(new Set());
     const initialFetchCompleted = React.useRef(false);
     const thumbsRef = React.useRef(null);
-    const destinationProps = React.useRef({
-        year: null,
-        title: null
-    });
+    const destinationPath = React.useRef(null);
     const [ itemStatusFilter, setItemStatusFilter ] = React.useState(_defaultItemStatusFilter)
 
     // The images in database for the current destination folder
-    const dbImages = useDestinationImages(destinationProps.current);
+    const dbImages = useDestinationImages(destinationPath.current);
 
     const setThumbsFromRef = React.useCallback(() => {
         if (thumbsRef.current !== null && thumbsRef.current !== undefined) {
@@ -228,8 +225,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         // from foldersFromDb
         if (dbImages !== undefined && dbImages !== null && dbImages.length === 0) {
             const queryContext_removeImageFolder = queryContext.removeImageFolder;
-            const { year, title } = destinationProps.current;
-            queryContext_removeImageFolder(year, title);
+            queryContext_removeImageFolder(destinationPath.current);
         }
 
     }, [dbImages, queryContext.removeImageFolder])
@@ -249,7 +245,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const onSetBucketPath = React.useCallback((bucketPath) => {
         unstable_batchedUpdates(() => {
             initialFetchCompleted.current = false;
-            destinationProps.current = extractDestinationProps(bucketPath);
+            destinationPath.current = extractDestinationPath(bucketPath);
             setRows({});
             setThumbs(null);
             setStorageRef(firebaseContext.storageRef(bucketPath));
@@ -346,9 +342,8 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const deleteImageFromDatabase = React.useCallback((itemFullPath) => {
         return dataProvider.removeImageFromDatabase(itemFullPath)
         .then(() => {
-            const { year, title } = destinationProps.current;
             const queryContext_removeDestinationImage = queryContext.removeDestinationImage;
-            queryContext_removeDestinationImage(year, title, itemFullPath);
+            queryContext_removeDestinationImage(destinationPath.current, itemFullPath);
         });
     }, [
         dataProvider,
@@ -358,7 +353,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const getFolderType = React.useCallback(() => {
         if (storageRef.parent === null) {
             return FOLDER_TYPE.root;
-        } else if (destinationProps.current.year !== null && destinationProps.current.title !== null) {
+        } else if (destinationPath.current !== null) {
             return FOLDER_TYPE.destination;
         } else if (storageRef.fullPath === "homeslideshow") {
             return FOLDER_TYPE.homeSlideshow;
@@ -424,7 +419,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         folderPath: storageRef.fullPath,
 
         // Information about the possible current destination
-        destinationProps: destinationProps.current,
+        destinationPath: destinationPath.current,
 
         // Methods to manage items/thumbnails
         createFolder,

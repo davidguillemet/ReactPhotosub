@@ -5,6 +5,13 @@ function validateEmail(email) {
     return re.test(String(email).toLowerCase());
 }
 
+function isInvalidValue(field, value) {
+    if (!field.invalidValues) {
+        return false;
+    }
+    return field.invalidValues.includes(value);
+}
+
 export function validateValueRange(value, range) {
     if (value === undefined || value === null || isNaN(value)) {
         return false;
@@ -31,5 +38,8 @@ export function validateFieldValue(field, fieldValue) {
     } else if (field.range) {
         isError = validateValueRange(fieldValue, field.range) === false;
     }
+
+    isError = isError || isInvalidValue(field, fieldValue);
+
     return !isError;
 }

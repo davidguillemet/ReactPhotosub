@@ -1,5 +1,13 @@
 import {getUA} from 'react-device-detect';
 
+export const sortImagesDescending = (img1, img2) => {
+    return img2.create > img1.create ? 1 : -1;
+}
+
+export const sortImagesAscending = (img1, img2) => {
+    return img1.create > img2.create ? 1 : -1;
+}
+
 export function formatDate(tripDate, locale) {
     const options = { year: 'numeric', month: 'long' };
     const formattedDate = tripDate.toLocaleDateString(locale, options);
@@ -309,41 +317,50 @@ export const isPrerenderUserAgent = () => {
     return false;
 }
 
-const _getTitleProp = {
-    fr: "title",
-    en: "title_en"
+export const getPropFromLanguage = (prop, language) => { 
+    switch (language) {
+        case 'fr':
+            return prop;
+        case 'en':
+            return `${prop}_en`;
+        default:
+            throw new Error(`Unsupported language ${language}`);
+    }
 };
 
 export const compareRegions = (lang) => {
-    const titleProperty = _getTitleProp[lang];
+    const titleProperty = getPropFromLanguage("title", lang);
     return (a, b) => a[titleProperty] === b[titleProperty] ? 0 : a[titleProperty] < b[titleProperty] ? -1 : 1;
 }
 
 export const regionTitle = (region, lang) => {
-    return region[_getTitleProp[lang]];
+    return region[getPropFromLanguage("title", lang)];
 }
 
 export const destinationTitle = (destination, lang) => {
-    return destination[_getTitleProp[lang]];
+    return destination[getPropFromLanguage("title", lang)];
 }
-
 
 const _yearRegexp = /^[0-9]{4}$/i; 
 
-export const extractDestinationProps = (path) => {
+export const extractDestinationPath = (path) => {
     const pathItems = path.split("/");
     if (pathItems.length === 2) {
         const title = pathItems[pathItems.length - 1];
         const year = pathItems[pathItems.length - 2];
         if (_yearRegexp.test(year)) {
-            return {
-                year,
-                title
-            }
+            return `${year}/${title}`
         }
     }
-    return {
-        year: null,
-        title: null
+    return null;
+}
+
+export const isDestinationPath = (path) => {
+    if (path !== null &&
+        path !== undefined &&
+        path.length > 0 &&
+        extractDestinationPath(path) !== null) {
+        return true;
     }
+    return false;
 }

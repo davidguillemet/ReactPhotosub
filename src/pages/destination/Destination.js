@@ -10,19 +10,25 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Chip from '@mui/material/Chip';
 import { formatDate, formatDateShort, useLanguage, regionTitle, useTranslation, destinationTitle } from 'utils';
-import Gallery from '../../components/gallery';
-import { PageSubTitle, PageHeader, Paragraph } from '../../template/pageTypography';
+import Gallery from 'components/gallery';
+import { PageSubTitle, PageHeader, Paragraph } from 'template/pageTypography';
 import { LazyDialog } from 'dialogs';
-import { withLoading, buildLoadingState } from '../../components/hoc';
-import { useQueryContext } from '../../components/queryContext';
-import DestinationLink from '../../components/destinationLink';
-import { VerticalSpacing } from '../../template/spacing';
-import { DestinationsMap } from '../../components/map';
-import lazyComponent from '../../components/lazyComponent';
+import { withLoading, buildLoadingState } from 'components/hoc';
+import { useQueryContext } from 'components/queryContext';
+import DestinationLink from 'components/destinationLink';
+import { VerticalSpacing } from 'template/spacing';
+import { DestinationsMap } from 'components/map';
+import lazyComponent from 'components/lazyComponent';
 import RelatedDestinations from './relatedDestinations';
 import NotFound from '../notFound';
-import { HelmetDestination } from '../../template/seo';
-import { useReactQuery } from '../../components/reactQuery';
+import { HelmetDestination } from 'template/seo';
+import { useReactQuery } from 'components/reactQuery';
+import { useAuthContext } from 'components/authentication';
+import useFormDialog from 'dialogs/FormDialog';
+import SubGalleryForm from './admin/SubGalleryForm';
+import GroupBuilderFactory from './groupBuilder';
+import { GalleryContextProvider } from './admin/GalleryContext';
+import { SubGalleryHeaderComponent } from './admin/SubGalleryHeaderComponent';
 
 const RegionChip = ({region}) => {
     const { language } = useLanguage();
@@ -186,19 +192,47 @@ const DestinationDetails = ({destination}) => {
     );
 }
 
-const DestinationDisplay = withLoading(({destination, year, title}) => {
-
+const useFetchImagesAndSubGalleries = (destination) => {
     const queryContext = useQueryContext();
-    const { data: images } = useReactQuery(queryContext.useFetchDestinationImages, [year, title]);
+    const { data: images } = useReactQuery(queryContext.useFetchDestinationImages, [destination.path]);
+    const { data: galleries } = useReactQuery(queryContext.useFetchSubGalleries, [destination]);
+
+    if (images === null || images === undefined || galleries === null || galleries === undefined) {
+        return {
+            images: null,
+            galleries: null
+        }
+    }
+
+    return {
+        images,
+        galleries
+    };
+}
+
+const DestinationDisplay = withLoading(({destination}) => {
+
+    const { language } = useLanguage();
+    const { images, galleries } = useFetchImagesAndSubGalleries(destination);
     const [ galleryIsReady, setGalleryIsReady ] = useState(false);
     const destinations = useMemo(() => [destination], [destination]);
+    const authContext = useAuthContext();
+    const { dialogProps, openDialog, FormDialog } = useFormDialog();
+    const [ subGalleryToEdit, setSubGalleryToEdit ] = useState(null);
 
     const onGalleryIsReady = useCallback(() => {
         setGalleryIsReady(true);
-    }, [])
+    }, []);
+
+    const onAddSubGallery = useCallback(() => {
+        setSubGalleryToEdit(null);
+        openDialog();
+    }, [openDialog]);
+
+    const groupBuilder = React.useMemo(() => GroupBuilderFactory(destination, galleries, language), [destination, galleries, language]);
 
     return (
-        <React.Fragment>
+        <GalleryContextProvider destination={destination} images={images} galleries={galleries}>
             <RegionPath regions={destination.regionpath}></RegionPath>
 
             <Box sx={{ width: "100%", height: isMobile ? "300px" : "400px", position: "relative" }}>
@@ -212,13 +246,33 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
 
             <VerticalSpacing factor={2} />
 
+            {
+                authContext.admin === true &&
+                <React.Fragment>
+                    <VerticalSpacing factor={2} />
+                    <Button variant="contained" onClick={onAddSubGallery}>Ajouter une sous-galerie</Button>
+                    <VerticalSpacing factor={2} />
+                </React.Fragment>
+            }
+
             <Gallery
                 images={images}
                 onReady={onGalleryIsReady}
                 displayDestination={false}
                 sort="asc"
                 pushHistory={true}
+                groupBuilder={groupBuilder}
+                groupHeaderEndComponent={authContext.admin === true ? SubGalleryHeaderComponent : null}
             />
+
+            {
+                authContext.admin === true &&
+                <React.Fragment>
+                    <VerticalSpacing factor={4} />
+                    <Button variant="contained" onClick={onAddSubGallery}>Ajouter une sous-galerie</Button>
+                    <VerticalSpacing factor={2} />
+                </React.Fragment>
+            }
 
             <VerticalSpacing factor={4} />
 
@@ -234,18 +288,25 @@ const DestinationDisplay = withLoading(({destination, year, title}) => {
                 <RelatedDestinations destination={destination} />
             }
 
-        </React.Fragment>
+            {
+                authContext.admin === true &&
+                <FormDialog title="Créer une sous-galerie" {...dialogProps}>
+                    <SubGalleryForm subGallery={subGalleryToEdit} destination={destination}/>
+                </FormDialog>
+            }
+
+        </GalleryContextProvider>
     );
 }, [buildLoadingState("destination", [null, undefined])]);
 
 const Destination = () => {
     const queryContext = useQueryContext();
     const { year, title } = useParams();
-    const { data, isError, error} = useReactQuery(queryContext.useFetchDestinationHeader, [year, title]);
+    const { data, isError, error} = useReactQuery(queryContext.useFetchDestinationHeader, [`${year}/${title}`]);
     if (isError === true && error.response && error.response.status === 404) {
         return <NotFound />
     } else {
-        return <DestinationDisplay destination={data} year={year} title={title} />
+        return <DestinationDisplay destination={data} />
     }
 };
 

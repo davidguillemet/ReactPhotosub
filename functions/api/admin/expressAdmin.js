@@ -3,6 +3,7 @@ module.exports = function(admin, config) {
 
     require("./bucket")(admin, config);
     require("./destinations")(admin, config);
+    require("./subgalleries")(admin, config);
     require("./images")(admin, config);
     require("./locations")(admin, config);
 };

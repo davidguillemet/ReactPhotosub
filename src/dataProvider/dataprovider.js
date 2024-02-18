@@ -17,8 +17,10 @@ function DataProvider(axiosInstance) {
     this.axios = axiosInstance
 }
 
-DataProvider.prototype.getDestinationProps = function(year, title, props) {
-    return this.axios.get(`/destination/${year}/${title}/${props}`)
+DataProvider.prototype.getDestinationProps = function(infoArray, props) {
+    const destinationInfo = infoArray.reduce((acc, info) => acc + info + "/", "");
+    const serviceUrl = `/destination/${destinationInfo}${props}`;
+    return this.axios.get(serviceUrl)
     .then(response => {
         if (response.status === 204) {
             return null;
@@ -65,16 +67,20 @@ DataProvider.prototype.getLocations = function() {
     });
 };
 
-DataProvider.prototype.getDestinationDescFromPath = function(year, title) {
-    return this.getDestinationProps(year, title, "desc");
+DataProvider.prototype.getDestinationDescFromPath = function(destinationPath) {
+    return this.getDestinationProps([destinationPath], "desc");
 };
 
-DataProvider.prototype.getDestinationDetailsFromPath = function(year, title) {
-    return this.getDestinationProps(year, title, "head");
+DataProvider.prototype.getDestinationDetailsFromPath = function(destinationPath) {
+    return this.getDestinationProps([destinationPath], "head");
 };
 
-DataProvider.prototype.getDestinationImagesFromPath = function(year, title) {
-    return this.getDestinationProps(year, title, "images");
+DataProvider.prototype.getDestinationImagesFromPath = function(destinationPath) {
+    return this.getDestinationProps([destinationPath], "images");
+};
+
+DataProvider.prototype.getDestinationSubGalleries = function(id) {
+    return this.getDestinationProps([id], "galleries");
 };
 
 DataProvider.prototype.getUserData = function() {
@@ -254,6 +260,38 @@ DataProvider.prototype.deleteLocation = function(locationId) {
     return this.axios.delete('/admin/locations', {data: { id: locationId } })
     .then(response => {
         return response.data; // contains the deleted location
+    });
+}
+
+// Sub Galleries
+DataProvider.prototype.createSubGallery = function(subGallery) {
+    return this.axios.post('/admin/sub_galleries', subGallery)
+    .then(response => {
+        return response.data; // contains the new sub galleries
+    });
+}
+DataProvider.prototype.updateSubGallery = function(subGallery) {
+    return this.axios.put('/admin/sub_galleries', subGallery)
+    .then(response => {
+        return response.data; // contains the new sub galleries
+    });
+}
+DataProvider.prototype.updateSubGalleryIndices = function(patchInfos) {
+    return this.axios.patch('/admin/sub_galleries', patchInfos)
+    .then(response => {
+        return response.data;
+    });
+}
+DataProvider.prototype.updateSubGalleryImages = function(patchInfos) {
+    return this.axios.patch('/admin/sub_galleries/images', patchInfos)
+    .then(response => {
+        return response.data;
+    });
+}
+DataProvider.prototype.deleteSubGallery = function(subGallery) {
+    return this.axios.delete('/admin/sub_galleries', { data: { ...subGallery }})
+    .then(response => {
+        return response.data;
     });
 }
 

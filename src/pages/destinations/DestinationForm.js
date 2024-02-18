@@ -19,8 +19,7 @@ const DestinationForm = ({destination, onCancel}) => {
     const [fields, setFields] = useState([]);
 
     const getImagesFromPath = useCallback(([path]) => {
-        const [ year, title ] = (path !== null && path !== undefined) ? path.split('/') : [ null, null ];
-        const { data, isError, error } = queryContext.useFetchDestinationImages(year, title);
+        const { data, isError, error } = queryContext.useFetchDestinationImages(path);
         if (isError === true) {
             throw error;
         }

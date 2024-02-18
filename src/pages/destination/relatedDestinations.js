@@ -20,7 +20,8 @@ function imageFromCover(destination, language) {
         // <destination title> (<destination date>)
         title: `${destinationTitle(destination, language)} (${dateFormater(new Date(destination.date), language)})`,
         sizeRatio: 1.5, // Cover images are paysage only
-        path: destination.path
+        path: destination.path,
+        id: destination.path // set an identifier for the ImageSlider (why not destination.id ??)
     }
 }
 

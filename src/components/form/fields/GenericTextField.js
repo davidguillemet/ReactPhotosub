@@ -36,10 +36,12 @@ const GenericTextField = ({ field, value, values, handleChange, sending, readOnl
             type={field.type}
             inputProps={{
                 step: field.step,
+                min: field.min,
+                max: field.max,
                 ...inputProps
             }}
             multiline={field.multiline}
-            minRows="10"
+            minRows={field.minRows || 10 }
             onChange={onChange}
             error={error}
             helperText={error ? field.errorText : ''}

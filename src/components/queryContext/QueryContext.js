@@ -3,7 +3,32 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataProvider } from '../dataProvider/dataManagerProvider';
 import { useFirebaseContext } from '../firebase';
 import { CheckErrorsAfterAddImage, CheckErrorsAfterRemoveImage } from 'common/GlobalErrors';
-import { extractDestinationProps } from 'utils';
+import { isDestinationPath } from 'utils';
+
+const DESTINATION_PROPS = {
+    HEADER: "header",
+    DESC: "desc",
+    IMAGES: "images",
+    GALLERIES: "galleries"
+};
+
+const DESTINATION_QUERY_BASE_KEY = "destination";
+
+const getFetchDestinationKey = (path, props) => {
+    return [
+        DESTINATION_QUERY_BASE_KEY,
+        path,
+        props
+    ];
+};
+
+// A destination key is like [ "destination", "<year>/<title>", "<props>" ]
+const isDestinationKey = (queryKey, path) => {
+    return  queryKey.length >= 3 &&
+            queryKey[0] === DESTINATION_QUERY_BASE_KEY &&
+            queryKey[1] === path;
+            // We could also check the props is defined as DESTINATION_PROPS property...
+}
 
 const QueryContext = createContext(null);
 
@@ -15,8 +40,8 @@ export const QueryContextProvider = ({children}) => {
 
     const getUser = () => firebaseContext.auth.currentUser;
     const userId = () => getUser().uid
-    const addDestinationImage = (year, title, newImage) => {
-        const queryKey = ['destinationimages', year, title];
+    const addDestinationImage = (newImage) => {
+        const queryKey = getFetchDestinationKey(newImage.path, DESTINATION_PROPS.IMAGES);
         const prevData = queryClient.getQueryData(queryKey);
         // We might upload the same image again or just update image properties,
         // in which case we must replace the image in the data
@@ -31,9 +56,8 @@ export const QueryContextProvider = ({children}) => {
         queryClient.setQueryData(queryKey, [...prevData]);
 
         const prevImageFolders = queryClient.getQueryData(['imageFolders']);
-        const newImageFolder = `${year}/${title}`
-        if (prevImageFolders.findIndex(folder => folder.path === newImageFolder) === -1) {
-            queryClient.setQueryData(['imageFolders'], [...prevImageFolders, {path: newImageFolder}]);
+        if (prevImageFolders.findIndex(folder => folder.path === newImage.path) === -1) {
+            queryClient.setQueryData(['imageFolders'], [...prevImageFolders, {path: newImage.path}]);
         }
 
         const prevImageErrors = queryClient.getQueryData(['imageErrors']);
@@ -56,10 +80,20 @@ export const QueryContextProvider = ({children}) => {
             }
         }),
         useDeleteDestination: () => useMutation((destination) => dataProvider.deleteDestination(destination.id), {
-            onSuccess: ({id}) => {
+            onSuccess: ({id}, destination) => {
+                if (id !== destination.id) {
+                    throw new Error("Mismatching destination ids...");
+                }
                 const prevDestinations = queryClient.getQueryData(['destinations']);
-                const newDestinations = prevDestinations.filter(d => d.id !== id);
+                const newDestinations = prevDestinations.filter(d => d.id !== destination.id);
                 queryClient.setQueryData(['destinations'], newDestinations);
+                queryClient.invalidateQueries({
+                    // Invalidate all queries related to destination path "year/title"
+                    predicate: (query) => {
+                        const shouldInvalidated = isDestinationKey(query.queryKey, destination.path);
+                        return shouldInvalidated;
+                    }
+                })
             }
         }),
         useUpdateDestination: () => useMutation((destination) => dataProvider.updateDestination(destination), {
@@ -90,24 +124,23 @@ export const QueryContextProvider = ({children}) => {
         // Image properties
         useUpdateImageProperties: () => useMutation((image) => dataProvider.updateImageProperties(image), {
             onSuccess: (data) => {
-                const {year, title} = extractDestinationProps(data.path);
-                addDestinationImage(year, title, data);
+                addDestinationImage(data);
             }
         }),
 
         useFetchRelatedDestinations: (regions, macro, wide) => useQuery(['related', ...regions, macro, wide], () => dataProvider.getRelatedDestinations(regions, macro, wide)),
-        useFetchDestinationDesc: (year, title) => useQuery(['destinationdesc', year, title], () => dataProvider.getDestinationDescFromPath(year, title)),
-        useFetchDestinationHeader: (year, title) => useQuery(['destinationheader', year, title], () => dataProvider.getDestinationDetailsFromPath(year, title)),
+        useFetchDestinationDesc: (destinationPath) => useQuery(getFetchDestinationKey(destinationPath, DESTINATION_PROPS.DESC), () => dataProvider.getDestinationDescFromPath(destinationPath)),
+        useFetchDestinationHeader: (destinationPath) => useQuery(getFetchDestinationKey(destinationPath, DESTINATION_PROPS.HEADER), () => dataProvider.getDestinationDetailsFromPath(destinationPath)),
 
-        useFetchDestinationImages: (year, title) => useQuery({
-            queryKey: ['destinationimages', year, title],
-            queryFn: () => dataProvider.getDestinationImagesFromPath(year, title),
-            enabled: year !== null && year !== undefined && title !== null && title !== undefined,
+        useFetchDestinationImages: (destinationPath) => useQuery({
+            queryKey: getFetchDestinationKey(destinationPath, DESTINATION_PROPS.IMAGES),
+            queryFn: () => dataProvider.getDestinationImagesFromPath(destinationPath),
+            enabled: isDestinationPath(destinationPath),
             structuralSharing: false // To force a refresh even if the data is the same after query invalidation (Image management in Admin)
         }),
         addDestinationImage,
-        removeDestinationImage: (year, title, imageFullPath) => {
-            const queryKey = ['destinationimages', year, title];
+        removeDestinationImage: (destinationPath, imageFullPath) => {
+            const queryKey = getFetchDestinationKey(destinationPath, DESTINATION_PROPS.IMAGES);
             const prevData = queryClient.getQueryData(queryKey);
             const newData = prevData.filter(image => `${image.path}/${image.name}` !== imageFullPath);
             queryClient.setQueryData(queryKey, newData);
@@ -155,15 +188,61 @@ export const QueryContextProvider = ({children}) => {
         setFavoritesData: (uid, favorites) => queryClient.setQueryData(['favorites', uid], favorites),
 
         useFetchImageFolders: () => useQuery(['imageFolders'], () => dataProvider.getImageFolders()),
-        removeImageFolder: (year, title) => {
+        removeImageFolder: (folderPath) => {
             const queryKey = ['imageFolders'];
             const prevFolders = queryClient.getQueryData(queryKey);
-            const folderToRemove = `${year}/${title}`
-            const newFolders = prevFolders.filter(folder => folder.path !== folderToRemove);
+            const newFolders = prevFolders.filter(folder => folder.path !== folderPath);
             queryClient.setQueryData(queryKey, newFolders)
         },
 
-        useFetchImageErrors: () => useQuery(['imageErrors'], () => dataProvider.getImageErrors())
+        useFetchImageErrors: () => useQuery(['imageErrors'], () => dataProvider.getImageErrors()),
+
+        useFetchSubGalleries: (destination) => useQuery(getFetchDestinationKey(destination.path, DESTINATION_PROPS.GALLERIES), () => dataProvider.getDestinationSubGalleries(destination.id)),
+        useAddSubGallery: () => useMutation(({subGallery, destination}) => dataProvider.createSubGallery(subGallery), {
+            onSuccess: (data, {destination}) => {
+                queryClient.setQueryData(getFetchDestinationKey(destination.path, DESTINATION_PROPS.GALLERIES), data);
+            }
+        }),
+        useUpdateSubGallery: () => useMutation(({subGallery, destination}) => dataProvider.updateSubGallery(subGallery), {
+            onSuccess: (data, {destination}) => {
+                queryClient.setQueryData(getFetchDestinationKey(destination.path, DESTINATION_PROPS.GALLERIES), data);
+            }
+        }),
+        useUpdateSubGalleryIndices: () => useMutation((updateInfos) => dataProvider.updateSubGalleryIndices(updateInfos), {
+            onSuccess: (data, updateInfos) => {
+                const destination = updateInfos.destination;
+                queryClient.setQueryData(getFetchDestinationKey(destination.path, DESTINATION_PROPS.GALLERIES), data);
+            }
+        }),
+        useUpdateSubGalleryImages: () => useMutation((updateInfos) => dataProvider.updateSubGalleryImages(updateInfos), {
+            onSuccess: (data, updateInfos) => {
+                const queryKey = getFetchDestinationKey(updateInfos.destination.path, DESTINATION_PROPS.IMAGES);
+                const destinationImages = queryClient.getQueryData(queryKey);
+                destinationImages.forEach(image => {
+                    if (updateInfos.add && updateInfos.add.includes(image.id)) {
+                        image.sub_gallery_id = updateInfos.galleryId;
+                    } else if (updateInfos.remove && updateInfos.remove.includes(image.id)) {
+                        image.sub_gallery_id = null;
+                    }
+                });
+                queryClient.setQueryData(queryKey, [...destinationImages]);
+            }
+        }),
+        useDeleteSubGallery: () => useMutation((group) => dataProvider.deleteSubGallery(group.gallery), {
+            onSuccess: (data, group) => {
+                const imagesQueryQuey = getFetchDestinationKey(group.destination.path, DESTINATION_PROPS.IMAGES);
+                const destinationImages = queryClient.getQueryData(imagesQueryQuey);
+                // Remove sub_gallery_id for impacted images
+                // -> on backend side, it has been done automatically by postgresql (foreign key)
+                destinationImages.forEach((image) => {
+                    if (image.sub_gallery_id === group.gallery.id) {
+                        image.sub_gallery_id = null;
+                    }
+                });
+                queryClient.setQueryData(imagesQueryQuey, [...destinationImages]);
+                queryClient.setQueryData(getFetchDestinationKey(group.destination.path, DESTINATION_PROPS.GALLERIES), data);
+            }
+        }),
     });
 
     return (

@@ -26,6 +26,7 @@ const FormDialog = ({title, open, onClose, children}) => {
         <div>
             <Dialog
                 fullScreen={isMobile}
+                maxWidth='lg'
                 fullWidth={true}
                 open={isOpen}
                 onClose={handleClose}

@@ -11,6 +11,7 @@ import { useQueryContext } from '../../components/queryContext';
 import { withLoading, buildLoadingState, withUser } from '../../components/hoc';
 import { useFavorites } from '../../components/favorites';
 import { useTranslation } from 'utils';
+import GroupBuilder from './groupBuilder';
 
 const MySelectionContent = withLoading(({images}) => {
     const t = useTranslation("pages.favorites");
@@ -20,7 +21,7 @@ const MySelectionContent = withLoading(({images}) => {
             images !== undefined &&
             <PageSubTitle sx={{mt: 0}}>{t("favoritesCount", images.length)}</PageSubTitle>
         }
-        <Gallery images={images} groupBy="year" emptyMessage={t("info:noFavorites")}/>
+        <Gallery images={images} groupBuilder={GroupBuilder} emptyMessage={t("info:noFavorites")}/>
         </React.Fragment>
     );
 }, [ buildLoadingState("images", [null, undefined]) ]);

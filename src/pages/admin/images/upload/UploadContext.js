@@ -84,8 +84,7 @@ export const UploadContextProvider = ({children}) => {
         });
         return dataProvider.insertImageInDatabase(fileFullPath)
             .then((newImage) => {
-                const { year, title } = imageContext.destinationProps;
-                queryContext.addDestinationImage(year, title, newImage);
+                queryContext.addDestinationImage(newImage);
                 setProcessingStatus(prevStatus => {
                     return {
                         ...prevStatus,
@@ -104,7 +103,6 @@ export const UploadContextProvider = ({children}) => {
     }, [
         dataProvider,
         imageContext.folderType,
-        imageContext.destinationProps,
         queryContext
     ]);
 

@@ -15,10 +15,10 @@ import { BlockQuote } from '../../template/pageTypography';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Box, Collapse } from '@mui/material';
 import { useTranslation } from 'utils';
+import { Body } from '../../template/pageTypography';
+import { sortImagesAscending, sortImagesDescending } from 'utils';
 
-const GROUP_BY_YEAR = "year";
-
-const createGroup = (key) => {
+export const createGroup = (key) => {
     return {
         key: key,
         images: [],
@@ -26,52 +26,16 @@ const createGroup = (key) => {
     };
 }
 
-const getImageProps = (image) => {
-    // image path is "<year>/<name>"
-    const props = image.path.split('/');
-    return {
-        year: props[0],
-        name: props[1]
-    };
-}
-
-const groupFavoritesByYear = (images) => {
-    const imagesByYear = new Map();
-    images.forEach((image) => {
-        const imageProps = getImageProps(image);
-        let yearGroup = imagesByYear.get(imageProps.year);
-        if (yearGroup === undefined) {
-            yearGroup = createGroup(imageProps.year);
-            imagesByYear.set(imageProps.year, yearGroup);
-        }
-        yearGroup.images.push(image);
-    });
-    // Return an array of groups, sorted by year, descending
-    return Array.from(imagesByYear.values()).sort((group1, group2) => { return group2.key > group1.key ? 1 : -1; });
-}
-
-const sortImagesDescending = (img1, img2) => {
-    return img2.create > img1.create ? 1 : -1;
-}
-
-const sortImagesAscending = (img1, img2) => {
-    return img1.create > img2.create ? 1 : -1;
-}
-
-const groupFavorites = (images, groupBy, sortOrder) => {
+const buildGroups = (images, groupBuilder, sortOrder) => {
     let groups = null;
 
-    if (groupBy === null) {
-        // On global group without any label (destination gallery)
+    if (groupBuilder === null) {
+        // One global group without any label (destination gallery)
         const group = createGroup(null);
         group.images = [...images];
         groups = [group];
-    } else if (groupBy === GROUP_BY_YEAR) {
-        // Group by year
-        groups = groupFavoritesByYear(images);
     } else {
-        // Unknown group
-        throw new Error(`Propriété de groupe '${groupBy}' invalide'`)
+        groups = groupBuilder(images);
     }
 
     // sort images by date for each group
@@ -110,7 +74,20 @@ const GroupGallery = ({images, onReady, renderItem}) => {
     )
 }
 
-const GroupGalleryWithHeader = ({group, allImages, onReady, renderItem}) => {
+const GalleryDesc = ({group}) => {
+    if (group.desc === null || group.desc === undefined) {
+        return null;
+    }
+    const descRows = group.desc.split("\n");
+    return descRows.map((row, index) => <Body sx={{mt: 0, mb: 0, fontWeight: "300"}} key={index}>{row}</Body>);
+}
+
+const GroupGalleryWithHeader = ({
+    group,
+    allImages,
+    onReady,
+    renderItem,
+    groupHeaderEndComponent}) => {
 
     const t = useTranslation("components.gallery");
     const [isExpanded, setIsExpanded] = useState(true);
@@ -118,6 +95,8 @@ const GroupGalleryWithHeader = ({group, allImages, onReady, renderItem}) => {
     const onToggleExpanded = useCallback(() => {
         setIsExpanded(prevValue => !prevValue);
     }, []);
+
+    const GroupHeaderEndComponent = groupHeaderEndComponent;
 
     return (
         <Stack sx={{width: '100%'}}>
@@ -137,6 +116,10 @@ const GroupGalleryWithHeader = ({group, allImages, onReady, renderItem}) => {
                     alignItems="center"
                 >
                     <Box>{group.key} - {t("lbl:groupImageCount", group.images.length)}</Box>
+                    {
+                        groupHeaderEndComponent !== null &&
+                        <GroupHeaderEndComponent group={group} />
+                    }
                     <IconButton
                         sx={{color: theme => theme.palette.primary.contrastText}}
                         onClick={onToggleExpanded}
@@ -150,6 +133,7 @@ const GroupGalleryWithHeader = ({group, allImages, onReady, renderItem}) => {
                 </Stack>
             </BlockQuote>
             <Collapse in={isExpanded === true}>
+                <GalleryDesc group={group} />
                 <GroupGallery
                     images={group.images}
                     key={group.key}
@@ -175,7 +159,8 @@ const Gallery = ({
     displayDestination = true,
     hasNext = false,
     onNextPage = null,
-    groupBy = null,
+    groupBuilder = null,
+    groupHeaderEndComponent = null,
     // By default sort images by date, descending, i.e. from the most recent to the oldest
     sort = "desc",
     pushHistory = false}) => {
@@ -185,7 +170,7 @@ const Gallery = ({
 
     const [expandedImageIndex, setExpandedImageIndex] = useState(null);
 
-    const [groups, allImages] = useMemo(() => groupFavorites(images, groupBy, sort), [images, groupBy, sort]);
+    const [groups, allImages] = useMemo(() => buildGroups(images, groupBuilder, sort), [images, groupBuilder, sort]);
 
     // location.search has been modified after history.push
     useEffect(() => {
@@ -258,6 +243,7 @@ const Gallery = ({
                             onReady={onReady}
                             renderItem={(item, index, width) => renderItem(item, index, width, groupIndex)}
                             allImages={allImages}
+                            groupHeaderEndComponent={groupHeaderEndComponent}
                         />
                         :
                         <GroupGallery
