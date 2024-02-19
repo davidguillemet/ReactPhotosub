@@ -2,7 +2,7 @@
 
 const express = require("express");
 const compression = require("compression");
-const {isAuthenticated, isAuthorized} = require("./middlewares/authenticated");
+const {isAuthenticated, isAuthorized, checkAuthentication, isAdmin} = require("./middlewares/authenticated");
 const cors = require("cors");
 // -> issue when keeping a browser tab idle, from instagram
 //    in-app browser or with Prerender.io
@@ -33,6 +33,8 @@ module.exports = function(pool, firebaseConfig) {
         pool,
         isAuthenticated,
         isAuthorized,
+        checkAuthentication,
+        isAdmin,
         ...firebaseConfig,
     };
 

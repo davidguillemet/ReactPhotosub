@@ -11,7 +11,6 @@ module.exports = function(app, config) {
             const user = await admin.auth().getUser(uid);
             if (user.email === process.env.ADMIN_EMAIL) {
                 // Check claims and set admin role if needed
-                const user = await admin.auth().getUser(uid);
                 const customClaims = user.customClaims;
                 if (customClaims === null || customClaims === undefined || customClaims.role !== "admin") {
                     config.logger.info("Set Custom claims for webmaster");

@@ -29,6 +29,7 @@ import SubGalleryForm from './admin/SubGalleryForm';
 import GroupBuilderFactory from './groupBuilder';
 import { GalleryContextProvider } from './admin/GalleryContext';
 import { SubGalleryHeaderComponent } from './admin/SubGalleryHeaderComponent';
+import { PublicationAlert } from 'components/publication';
 
 const RegionChip = ({region}) => {
     const { language } = useLanguage();
@@ -233,6 +234,7 @@ const DestinationDisplay = withLoading(({destination}) => {
 
     return (
         <GalleryContextProvider destination={destination} images={images} galleries={galleries}>
+            <PublicationAlert published={destination.published} sx={{width: "100%", mt: 2}} />
             <RegionPath regions={destination.regionpath}></RegionPath>
 
             <Box sx={{ width: "100%", height: isMobile ? "300px" : "400px", position: "relative" }}>

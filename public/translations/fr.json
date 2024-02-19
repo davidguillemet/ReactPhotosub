@@ -74,6 +74,7 @@
             "form:coverError": "Merci d'indiquer une image de couverture.",
             "form:hasMacro": "Contient des images macro",
             "form:hasWideAngle": "Contient des images grand-angle",
+            "form:published": "Published",
             "validationMessage": "Les modifications ont été enregistrées avec succès."
         },
         "favorites": {

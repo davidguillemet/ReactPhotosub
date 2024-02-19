@@ -3,9 +3,12 @@ import { EmailAuthProvider, onAuthStateChanged, reauthenticateWithCredential } f
 import AuthContext from './authContext';
 import { useFirebaseContext } from '../firebase';
 import { useToast } from '../notifications';
+import { Loading } from 'components/hoc';
+import { useQueryContext } from 'components/queryContext';
 
 const AuthProvider = ({ children }) => {
 
+    const queryContext = useQueryContext();
     const firebaseContext = useFirebaseContext();
     const { toast } = useToast();
     const userObservers = useRef([]);
@@ -37,6 +40,9 @@ const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const unregisterAuthObserver = onAuthStateChanged(firebaseContext.auth, async (user) => {
+
+            const queryContext_invalidateDestinations = queryContext.invalidateDestinations;
+            await queryContext_invalidateDestinations();
 
             if (user) { // user is signed in
 
@@ -82,7 +88,13 @@ const AuthProvider = ({ children }) => {
             }
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-    }, [firebaseContext, toast]);
+    }, [firebaseContext, toast, queryContext.invalidateDestinations]);
+
+    if (userContext.user === undefined) {
+        return (
+            <Loading size={40} />
+        );
+    }
 
     return (
         <AuthContext.Provider value={userContext}>

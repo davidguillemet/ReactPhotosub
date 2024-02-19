@@ -29,6 +29,7 @@ module.exports = function(admin, config) {
                     "cover": destination.cover,
                     "macro": destination.macro,
                     "wide": destination.wide,
+                    "published": destination.published,
                 }).then(() => {
                     return fetchAllDestinations(req, res, next);
                 }).catch(next);

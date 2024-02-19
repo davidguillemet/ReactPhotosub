@@ -74,6 +74,7 @@
             "form:coverError": "Please provide a cover image.",
             "form:hasMacro": "Contains macro images",
             "form:hasWideAngle": "Contains wide-angle images",
+            "form:published": "Publiée",
             "validationMessage": "The changes have been saved successfully."
         },
         "favorites": {

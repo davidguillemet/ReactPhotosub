@@ -12,6 +12,7 @@ import ImageDescription from 'components/imageDescription';
 import Alert from '@mui/material/Alert';
 import { withLoading, buildLoadingState } from '../../components/hoc';
 import { useReactQuery } from '../../components/reactQuery';
+import { PublicationIndicator } from 'components/publication';
 
 function imageFromCover(destination, language) {
     const dateFormater = isMobile ? formatDateShort : formatDate;
@@ -19,6 +20,7 @@ function imageFromCover(destination, language) {
         src: destination.cover,
         // <destination title> (<destination date>)
         title: `${destinationTitle(destination, language)} (${dateFormater(new Date(destination.date), language)})`,
+        published: destination.published,
         sizeRatio: 1.5, // Cover images are paysage only
         path: destination.path,
         id: destination.path // set an identifier for the ImageSlider (why not destination.id ??)
@@ -77,6 +79,16 @@ const RelatedDestinationsSlider = withLoading(({destination, related, imageHeigh
                     }}
                 >
                     <ImageDescription image={image} />
+                </Box>
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        padding: 1
+                    }}
+                >
+                    <PublicationIndicator published={image.published} />
                 </Box>
             </Box>
         )

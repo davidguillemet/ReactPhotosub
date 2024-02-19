@@ -5,6 +5,11 @@ module.exports = function(config) {
         return config.pool().select("d.*")
             .from({d: "destinations_with_regionpath"})
             .orderBy("d.date", "desc")
+            .where((builder) => {
+                if (!config.isAdmin(res)) {
+                    builder.where("d.published", true);
+                }
+            })
             .then((destinations) => {
                 destinations.forEach((destination) => {
                     // Convert cover property from '2014/misool/DSC_456.jpg' to a real url

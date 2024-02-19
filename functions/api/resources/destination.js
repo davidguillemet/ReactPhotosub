@@ -49,23 +49,25 @@ module.exports = function(app, config) {
 
     // Get a specific destination head from identifier, including region path
     app.route("/destination/:year/:title/head")
-        .get(function(req, res, next) {
+        .get(config.checkAuthentication, function(req, res, next) {
             res.locals.errorMessage = `Failed to load information for destination '${getDestinationPath(req)}'`;
+            const isAdmin = config.isAdmin(res);
+            const adminWhereClauseForPrevNext = isAdmin ? "" : " and destinations.published = true";
             return config.pool().raw(
                 `WITH destination AS (
                     SELECT
-                    d.title, d.title_en, d.date, d.cover, d.path, d.id, d.macro, d.wide, d.regionpath,
+                    d.title, d.title_en, d.date, d.cover, d.path, d.id, d.macro, d.wide, d.published, d.regionpath,
                     l.title as location, l.longitude, l.latitude, l.link, l.region
                     from locations l, destinations_with_regionpath d
                     where l.id = d.location and d.path = ?
                 ),
                 prevDest AS (
-                    SELECT destinations.* from destinations, destination where destinations.date < destination.date ORDER BY destinations.date DESC LIMIT 1
+                    SELECT destinations.* from destinations, destination where destinations.date < destination.date ${adminWhereClauseForPrevNext} ORDER BY destinations.date DESC LIMIT 1
                 ),
                 nextDest AS (
-                    SELECT destinations.* from destinations, destination where destinations.date > destination.date ORDER BY destinations.date ASC LIMIT 1
+                    SELECT destinations.* from destinations, destination where destinations.date > destination.date ${adminWhereClauseForPrevNext} ORDER BY destinations.date ASC LIMIT 1
                 )
-                SELECT d.title, d.title_en, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link, d.macro, d.wide, d.regionpath,
+                SELECT d.title, d.title_en, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link, d.macro, d.wide, d.published, d.regionpath,
                        (select row_to_json(prevDest.*) from prevDest) as prev,
                        (select row_to_json(nextDest.*) from nextDest) as next
                 from destination d`, getDestinationPath(req))
@@ -75,8 +77,13 @@ module.exports = function(app, config) {
                         res.sendStatus(404);
                     } else {
                         const destination = destinations.rows[0];
-                        convertPath(destination, config);
-                        res.json(destination);
+                        if (destination.published === false && isAdmin === false) {
+                            // HTTP 404 : destination not published and not admin user
+                            res.sendStatus(404);
+                        } else {
+                            convertPath(destination, config);
+                            res.json(destination);
+                        }
                     }
                 }).catch(next);
         });

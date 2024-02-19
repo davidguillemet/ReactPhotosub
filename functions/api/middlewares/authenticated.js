@@ -28,29 +28,53 @@ async function isAuthenticated(request, response, next) {
     }
 }
 
+async function checkAuthentication(request, response, next) {
+    const {authorization} = request.headers;
+    if (authorization) {
+        const split = authorization.split("Bearer ");
+        if (split.length === 2) {
+            const token = split[1];
+            try {
+                const decodedToken = await admin.auth().verifyIdToken(token);
+                response.locals = {...response.locals, uid: decodedToken.uid, roles: decodedToken.roles, email: decodedToken.email};
+            } catch (err) {
+                // Empty
+            }
+        }
+    }
+    return next();
+}
+
 function isAuthorized(requiredRoles) {
     return async (request, response, next) => {
-        const {roles} = response.locals;
-        if (!roles) {
-            return response.status(403).send({message: "No Role assigned", locals: response.locals});
+        if (hasAllRoles(requiredRoles, response) === true) {
+            return next();
         }
+        return response.status(403).send({message: "All required roles are not assigned"});
+    };
+}
 
-        let allRoles = true;
+function hasAllRoles(requiredRoles, response) {
+    let allRoles = false;
+    const {roles} = response.locals;
+    if (roles) {
+        allRoles = true;
         requiredRoles.forEach((requiredRole) => {
             if (!roles.includes(requiredRole)) {
                 allRoles = false;
             }
         });
+    }
+    return allRoles;
+}
 
-        if (allRoles === true) {
-            return next();
-        }
-
-        return response.status(403).send({message: "All required roles are not assigned"});
-    };
+function isAdmin(response) {
+    return hasAllRoles(["admin"], response);
 }
 
 module.exports = {
     isAuthenticated,
     isAuthorized,
+    checkAuthentication,
+    isAdmin,
 };

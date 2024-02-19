@@ -68,6 +68,20 @@ export const QueryContextProvider = ({children}) => {
     };
 
     const queryContext = useRef({
+        invalidateDestinations: async () => {
+            const mainKeyForDestinations = [
+                "destinations", //
+                "related",
+                DESTINATION_QUERY_BASE_KEY
+            ];
+            await queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const invalidate = mainKeyForDestinations.includes(query.queryKey[0]);
+                    return invalidate;
+                },
+                refetchType: 'all'
+            });
+        },
         useFetchHomeSlideshow: () => useQuery(['homeslideshow'], () => dataProvider.getImageDefaultSelection()),
         useFetchLocations: () => useQuery(['locations'], () => dataProvider.getLocations()), 
         useFetchRegions: () => useQuery(['regions'], () => dataProvider.getRegions()),

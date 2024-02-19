@@ -18,6 +18,7 @@ import { useQueryContext } from '../../components/queryContext';
 import ConfirmDialog from '../../dialogs/ConfirmDialog';
 import useFormDialog from 'dialogs/FormDialog';
 import DestinationForm from './DestinationForm';
+import { PublicationIndicator } from 'components/publication';
 
 const DestinationDetails = ({destination}) => {
     const { language } = useLanguage();
@@ -126,7 +127,12 @@ const DestinationContent = ({item, index, width, params}) => {
             </DestinationLink>
             {
                 authContext.admin === true &&
-                <Stack direction="row" sx={{position: "absolute", top: 0, right: 0}}>
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    sx={{position: "absolute", top: 0, right: 0}}
+                >
+                    <PublicationIndicator published={destination.published} />
                     <IconButton aria-label="edit" onClick={onEditDestination}>
                         <EditIcon sx={{color: "white"}}/>
                     </IconButton>

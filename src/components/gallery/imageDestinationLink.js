@@ -1,8 +1,11 @@
 import { Typography } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import { PublicationIndicator } from 'components/publication';
 import DestinationLink from '../destinationLink';
 import { useQueryContext } from '../queryContext';
 import { formatDateShort, useLanguage, destinationTitle } from '../../utils';
 import { useReactQuery } from '../reactQuery';
+import { useAuthContext } from 'components/authentication';
 
 const DestinationLinkContent = ({destination}) => {
     const { language } = useLanguage();
@@ -22,13 +25,20 @@ const DestinationLinkContent = ({destination}) => {
 
 const ImageDestinationLink = ({image}) => {
 
+    const authContext = useAuthContext();
     const queryContext = useQueryContext();
     const { data: destination } = useReactQuery(queryContext.useFetchDestinationDesc, [image.path]);
 
     return (
-        <DestinationLink destination={destination} >
-            <DestinationLinkContent destination={destination} />
-        </DestinationLink>
+        <Stack direction={"row"}>
+            <DestinationLink destination={destination} >
+                <DestinationLinkContent destination={destination} />
+            </DestinationLink>
+            {
+                authContext.admin === true &&
+                <PublicationIndicator published={destination?.published} sx={{ml: 1 }}/>
+            }
+        </Stack>
     );
 }
 

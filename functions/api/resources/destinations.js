@@ -4,10 +4,11 @@ module.exports = function(app, config) {
     // Get all Destinations
     // including the region identifier through an inner join with the locations table
     // ==> select destinations.*, locations.region from destinations inner join locations on destinations.location = locations.id
-    app.route("/destinations").get(fetchAllDestinations);
+    app.route("/destinations").get(config.checkAuthentication, fetchAllDestinations);
 
     app.route("/destinations/related")
-        .get(function(req, res, next) {
+        // Add checkAuthentication middleware
+        .get(config.checkAuthentication, function(req, res, next) {
             const region = req.query.region;
             // If only one region, region parameter is not an array...
             const regions =
@@ -29,6 +30,11 @@ module.exports = function(app, config) {
                 .whereRaw("(destinations_with_regionpath.regionpath[array_length(destinations_with_regionpath.regionpath, 1)]::json->>'id')::INTEGER = ?", [rootRegion])
                 .andWhere((builder) => {
                     builder.where("destinations_with_regionpath.macro", macro).orWhere("destinations_with_regionpath.wide", wide);
+                })
+                .andWhere((builder) => {
+                    if (!config.isAdmin(res)) {
+                        builder.where("destinations_with_regionpath.published", true);
+                    }
                 })
                 .orderBy("destinations_with_regionpath.date", "desc")
                 .then((destinations) => {

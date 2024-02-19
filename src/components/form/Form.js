@@ -23,12 +23,14 @@ export const FIELD_TYPE_LATLONG = "latlong";
 export const FIELD_TYPE_CAPTCHA = 'reCaptcha';
 
 const getValuesFromFields = (fields, initialValues) => {
-    return fields.reduce((values, field) => {
-        return {
+    const values = fields.reduce((values, field) => {
+        const newValues = {
             ...values,
-            [field.id]: initialValues && initialValues[field.id] ? initialValues[field.id] : field.default
-        }
-    }, {/* empty map */})
+            [field.id]: initialValues && Object.hasOwn(initialValues, field.id) ? initialValues[field.id] : field.default
+        };
+        return newValues;
+    }, {/* empty map */});
+    return values;
 }
 
 const Form = ({

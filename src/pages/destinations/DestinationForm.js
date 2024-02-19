@@ -124,6 +124,12 @@ const DestinationForm = ({destination, onCancel}) => {
                 label: t("form:hasWideAngle"),
                 type: FIELD_TYPE_SWITCH,
                 default: false
+            },
+            {
+                id: "published",
+                label: t("form:published"),
+                type: FIELD_TYPE_SWITCH,
+                default: true
             }
         ]);
     }, [getImagesFromPath, getImageFolders, getLocations, t]);
@@ -135,15 +141,10 @@ const DestinationForm = ({destination, onCancel}) => {
             setValues(null);
         } else {
             setValues({
-                "title": destination.title,
-                "title_en": destination.title_en,
+                ...destination,
                 "date": destination.date.substring(0, 10), // 2020-03-10.....
-                "location": destination.location,
-                "path": destination.path,
-                "cover": destination.cover.split('/').at(-1),
-                "macro": destination.macro,
-                "wide": destination.wide,
-            })
+                "cover": destination.cover.split('/').at(-1)
+            });
         }
 
     }, [destination]);
