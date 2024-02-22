@@ -106,13 +106,22 @@ export const QueryContextProvider = ({children}) => {
                     predicate: (query) => {
                         const shouldInvalidated = isDestinationKey(query.queryKey, destination.path);
                         return shouldInvalidated;
-                    }
+                    },
+                    refetchType: 'all'
                 })
             }
         }),
         useUpdateDestination: () => useMutation((destination) => dataProvider.updateDestination(destination), {
-            onSuccess: ({data}) => {
-                queryClient.setQueryData(['destinations'], data)
+            onSuccess: ({data}, destination) => {
+                queryClient.setQueryData(['destinations'], data);
+                queryClient.invalidateQueries({
+                    // Invalidate all queries related to destination path "year/title"
+                    predicate: (query) => {
+                        const shouldInvalidated = isDestinationKey(query.queryKey, destination.path);
+                        return shouldInvalidated;
+                    },
+                    refetchType: 'all'
+                })
             }
         }),
 
