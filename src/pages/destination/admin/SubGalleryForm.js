@@ -1,5 +1,5 @@
 import React from 'react';
-import Form, { FIELD_TYPE_TEXT, FIELD_TYPE_NUMBER } from "components/form";
+import Form, { FIELD_TYPE_TEXT, FIELD_TYPE_NUMBER, FIELD_TYPE_SELECT } from "components/form";
 import { useQueryContext } from 'components/queryContext';
 import { useGalleryContext } from './GalleryContext';
 
@@ -24,6 +24,14 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
         else
             return subGalleryUpdateMutation.mutateAsync({ subGallery: finalValues, destination });
     }, [destination, subGalleryAddMutation, subGalleryUpdateMutation, subGallery]);
+
+    const getLocations = React.useCallback(() => {
+        const { data, isError, error } = queryContext.useFetchLocations();
+        if (isError === true) {
+            throw error;
+        }
+        return [ {title: "Pas de lieu", value: null, id: null}, ...data];
+    }, [queryContext]);
 
     const getFirstAvailableIndex = React.useCallback(() => {
         let minAvailableIndex = 1;
@@ -84,6 +92,15 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
                 default: ""
             },
             {
+                id: "location",
+                label: "Lieu",
+                required: false,
+                errorText: "Merci de renseigner un lieu",
+                type: FIELD_TYPE_SELECT,
+                options: getLocations,
+                default: null
+            },
+            {
                 id: "index",
                 label: "Position",
                 required: true,
@@ -96,7 +113,7 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
                 invalidValues: getUsedIndices()
             },
         ]);
-    }, [getFirstAvailableIndex, getUsedIndices]);
+    }, [getFirstAvailableIndex, getUsedIndices, getLocations]);
 
     React.useEffect(() => {
         if (subGallery === null) {

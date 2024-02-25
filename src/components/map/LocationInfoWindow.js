@@ -69,7 +69,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const LocationInfoWindow = ({location, coverWidth}) => {
+const LocationInfoWindow = ({location, coverWidth, isDestinationPage}) => {
 
     const { language } = useLanguage();
     const classes = useStyles();
@@ -79,30 +79,35 @@ const LocationInfoWindow = ({location, coverWidth}) => {
             <div className={classes.locationTitle}>
                 <h2>{destinationTitle(location.destinations[0], language)}</h2>
             </div>
-            <div className={classes.locationTitle}>
-                <div className={classes.linkLabel}>{location.title}</div>
+            { 
+                isDestinationPage === false &&
+                <React.Fragment>
+                <div className={classes.locationTitle}>
+                    <div className={classes.linkLabel}>{location.title}</div>
+                    {
+                        location.link && location.link.length > 0 &&
+                        <a href={location.link} target="_blank" rel="noreferrer"><div className={classes.link}></div></a>
+                    }
+                </div>
+                <div className={classes.tripsGalery}>
                 {
-                    location.link && location.link.length > 0 &&
-                    <a href={location.link} target="_blank" rel="noreferrer"><div className={classes.link}></div></a>
+                    location.destinations.map(destination => {
+                        return (
+                            <div className={classes.tripCard} key={destination.id}>
+                                <DestinationLink destination={destination}>
+                                    <img alt="" src={destination.cover} className={classes.tripCover} width={coverWidth} />
+                                    <div className={classes.tripDateContainer}>
+                                        <div className={classes.tripDateBg}></div>
+                                        <div className={classes.tripDateLabel}>{destination.date}</div>
+                                    </div>
+                                </DestinationLink>
+                            </div>
+                        );
+                    })
                 }
-            </div>
-            <div className={classes.tripsGalery}>
-            {
-                location.destinations.map(destination => {
-                    return (
-                        <div className={classes.tripCard} key={destination.id}>
-                            <DestinationLink destination={destination}>
-                                <img alt="" src={destination.cover} className={classes.tripCover} width={coverWidth} />
-                                <div className={classes.tripDateContainer}>
-                                    <div className={classes.tripDateBg}></div>
-                                    <div className={classes.tripDateLabel}>{destination.date}</div>
-                                </div>
-                            </DestinationLink>
-                        </div>
-                    );
-                })
+                </div>
+                </React.Fragment>
             }
-            </div>
         </div>
     );
 }

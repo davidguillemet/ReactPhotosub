@@ -24,13 +24,41 @@ mainapi.use(express.urlencoded({extended: true}));
 // Fix the CORS Error
 mainapi.use(cors({origin: true}));
 
+const getTableColumns = async (pool) => {
+    const tableColumns = await pool().raw(`
+        with table_names as (
+            SELECT table_name FROM information_schema.tables
+            WHERE table_schema = 'public'
+            and table_type != 'VIEW'
+        ), column_names AS (
+            SELECT table_name, column_name FROM information_schema.columns
+            WHERE table_schema = 'public'
+            and is_identity = 'NO'
+            and table_name in (SELECT table_name from table_names)
+        )
+        SELECT table_name, array_agg(column_name::text) as columns
+        FROM column_names
+        GROUP BY table_name`);
+    const columnMap = new Map();
+    tableColumns.rows.forEach((row) => columnMap.set(row.table_name, row.columns));
+    return columnMap;
+};
+
 // Firebase appCheck verification
 // mainapi.use(appCheckVerification);
-module.exports = function(pool, firebaseConfig) {
+module.exports = async function(pool, firebaseConfig) {
     const {logger} = firebaseConfig;
-
+    let _tableColumns = null;
     const configuration = {
         pool,
+        // Defer table columns retrieval to wait for the env variables being initialized
+        // -> PostgreSQL related env variables
+        getTableColumns: async (table) => {
+            if (_tableColumns === null) {
+                _tableColumns = await getTableColumns(pool);
+            }
+            return _tableColumns.get(table);
+        },
         isAuthenticated,
         isAuthorized,
         checkAuthentication,

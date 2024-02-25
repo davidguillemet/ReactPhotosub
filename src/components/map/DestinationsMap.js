@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {isIOS} from 'react-device-detect';
 import { useRouteMatch } from "react-router-dom";
-import {unstable_batchedUpdates} from 'react-dom';
 import { GoogleMap, InfoWindow, MarkerClusterer, useJsApiLoader } from '@react-google-maps/api';
 import { useQueryContext } from '../queryContext';
 import { formatDate, getThumbnailSrc, useLanguage } from '../../utils';
@@ -169,10 +168,8 @@ export const LocationsMap = ({
     const mapInitialized = React.useRef(false);
 
     const handleMarkerClick = React.useCallback((location) => {
-        if (!isDestinationPage) {
-            setSelectedLocation(location);
-        }
-    }, [isDestinationPage]);
+        setSelectedLocation(location);
+    }, []);
 
     useEffect(() => {
         if (clusterer === null) {
@@ -193,9 +190,7 @@ export const LocationsMap = ({
                 },
                 icon: "/diver.png"
             });
-            if (!isDestinationPage) {
-                marker.addListener("click", () => handleMarkerClick(location));
-            }
+            marker.addListener("click", () => handleMarkerClick(location));
             return marker;
         });
         clusterer.addMarkers(markers);
@@ -222,7 +217,7 @@ export const LocationsMap = ({
         }
 
         mapInitialized.current = true;
-    }, [clusterer, locations, handleMarkerClick, onMapClick, resetOnChange, isDestinationPage])
+    }, [clusterer, locations, handleMarkerClick, onMapClick, resetOnChange])
 
     const handleMapLoaded = React.useCallback((map) => {
         setMap(map)
@@ -291,7 +286,11 @@ export const LocationsMap = ({
                         pixelOffset: { height: -35 }
                     }}
                 >
-                    <LocationInfoWindow location={selectedLocation} coverWidth={_infoCoverWidth} />
+                    <LocationInfoWindow
+                        location={selectedLocation}
+                        coverWidth={_infoCoverWidth}
+                        isDestinationPage={isDestinationPage}
+                    />
                 </InfoWindow>
             }
         </GoogleMap>
@@ -313,9 +312,8 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
     useEffect(() => {
 
         if (destinations !== null && isDestinationPage === true) {
-            const destination = destinations[0];
-            const location = {
-                title: destination.location,
+            const locations = destinations.map((destination) => ({
+                title: destination.title,
                 latitude: destination.latitude,
                 longitude: destination.longitude,
                 destinations: [
@@ -324,10 +322,8 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
                         date: formatDate(new Date(destination.date), language)
                     }
                 ]
-            }
-            unstable_batchedUpdates(() => {
-                setDestinationsPerLocation([ location ]);
-            })
+            }));
+            setDestinationsPerLocation(locations);
             return;
         }
     // Don't need dependency with isDestinationPage
@@ -366,9 +362,7 @@ const DestinationsMapUi = withLoading(({destinations, locations, isFullScreen = 
             locationInstance.destinations.push(modifiedDestination);    
         });
 
-        unstable_batchedUpdates(() => {
-            setDestinationsPerLocation([ ...destinationsPerlocation.values() ]);
-        })
+        setDestinationsPerLocation([ ...destinationsPerlocation.values() ]);
     // Don't need dependency with isDestinationPage
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [destinations, locations, language]);

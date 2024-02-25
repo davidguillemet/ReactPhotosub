@@ -57,15 +57,16 @@ const SelectControl = ({ field, value, values, handleChange, sending, readOnly, 
     }, [value, options, valueProperty]);
 
     const hasOptions = options !== null && options !== undefined;
+    const fieldLabel = `${field.label}${field.required ? ' *' : ''}`;
 
     return (
         <FormControl fullWidth error={error !== null}>
-            <InputLabel id="select-label">{`${field.label} *`}</InputLabel>
+            <InputLabel id="select-label">{fieldLabel}</InputLabel>
             <Select
                 labelId="select-label"
                 name={field.id}
                 value={options !== null && options !== undefined ? selectedValue : ''}
-                label={`${field.label} *`}
+                label={fieldLabel}
                 required={field.required}
                 onChange={onChange}
                 fullWidth
@@ -74,7 +75,8 @@ const SelectControl = ({ field, value, values, handleChange, sending, readOnly, 
                     return selected[captionProperty];
                 }}
             >
-                {options ?
+                {
+                    options &&
                     options.map(option => (
                         <MenuItem key={option[keyProperty]} value={option} sx={{ pv: 0 }}>
                             {option.src ?
@@ -86,8 +88,8 @@ const SelectControl = ({ field, value, values, handleChange, sending, readOnly, 
                                 field.optionComponent ?
                                     <field.optionComponent option={option} /> :
                                     option[captionProperty]}
-                        </MenuItem>)) :
-                    null}
+                        </MenuItem>))
+                }
             </Select>
             {error && <FormHelperText>{error}</FormHelperText>}
         </FormControl>

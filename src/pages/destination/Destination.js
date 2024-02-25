@@ -211,12 +211,25 @@ const useFetchImagesAndSubGalleries = (destination) => {
     };
 }
 
+const getGroupDestinations = (destination, galleries) => {
+    if (!galleries) {
+        return [];
+    }
+    return galleries
+        .filter((gallery) => gallery.location !== null) // Keep galleries with location
+        .map((gallery) => ({
+            title: gallery.location_title,
+            latitude: gallery.latitude,
+            longitude: gallery.longitude,
+            date: destination.date
+        }));
+}
+
 const DestinationDisplay = withLoading(({destination}) => {
 
     const { language } = useLanguage();
     const { images, galleries } = useFetchImagesAndSubGalleries(destination);
     const [ galleryIsReady, setGalleryIsReady ] = useState(false);
-    const destinations = useMemo(() => [destination], [destination]);
     const authContext = useAuthContext();
     const { dialogProps, openDialog, FormDialog } = useFormDialog();
     const [ subGalleryToEdit, setSubGalleryToEdit ] = useState(null);
@@ -231,6 +244,8 @@ const DestinationDisplay = withLoading(({destination}) => {
     }, [openDialog]);
 
     const groupBuilder = React.useMemo(() => GroupBuilderFactory(destination, galleries, language), [destination, galleries, language]);
+    const groupDestinations = React.useMemo(() => getGroupDestinations(destination, galleries), [destination, galleries]);
+    const destinations = useMemo(() => [destination], [destination]);
 
     return (
         <GalleryContextProvider destination={destination} images={images} galleries={galleries}>
@@ -238,7 +253,7 @@ const DestinationDisplay = withLoading(({destination}) => {
             <RegionPath regions={destination.regionpath}></RegionPath>
 
             <Box sx={{ width: "100%", height: isMobile ? "300px" : "400px", position: "relative" }}>
-                <DestinationsMap destinations={destinations} />
+                <DestinationsMap destinations={groupDestinations.length > 0 ? groupDestinations : destinations} />
                 <DestinationDetails destination={destination} />
             </Box>
 

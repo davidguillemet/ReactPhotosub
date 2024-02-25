@@ -1,6 +1,8 @@
 module.exports = function(admin, config) {
     const fetchAllSubGalleries = require("../utils/fetchSubGalleries")(config);
 
+    const {getSubGalleryPropsToUpdate} = require("../utils/updateUtils")(config);
+
     const updateImagesPromise = (ids, galleryId) => {
         return config.pool("images")
             .whereIn("id", ids)
@@ -24,11 +26,10 @@ module.exports = function(admin, config) {
         .put(async function(req, res, next) {
             const subGallery = req.body;
             res.locals.errorMessage = `Failed to update sub gallery ${subGallery.title}.`;
-            const galleryId = subGallery.id;
-            delete subGallery.id;
+            const subGalleryUpdate = await getSubGalleryPropsToUpdate(subGallery);
             return config.pool("sub_galleries")
-                .where("id", galleryId)
-                .update(subGallery)
+                .where("id", subGallery.id)
+                .update(subGalleryUpdate)
                 .then(() => {
                     return fetchAllSubGalleries(subGallery.destination_id, req, res, next);
                 }).catch(next);

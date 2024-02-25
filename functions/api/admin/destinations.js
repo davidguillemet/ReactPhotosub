@@ -1,17 +1,7 @@
 module.exports = function(admin, config) {
     const fetchAllDestinations = require("../utils/fetchDestinations")(config);
 
-    const allDestinationPropsToUpdate = [
-        "title",
-        "title_en",
-        "date",
-        "location",
-        "path",
-        "cover",
-        "macro",
-        "wide",
-        "published",
-    ];
+    const {getDestinationPropsToUpdate} = require("../utils/updateUtils")(config);
 
     admin.route("/destinations")
         // Create a new destination (admin task)
@@ -30,12 +20,7 @@ module.exports = function(admin, config) {
         .put(async function(req, res, next) {
             const destination = req.body;
             res.locals.errorMessage = `Failed to update destination ${destination.title}/${destination.path}.`;
-            const destinationUpdate = {};
-            allDestinationPropsToUpdate.forEach((destinationProp) => {
-                if (Object.hasOwn(destination, destinationProp)) {
-                    destinationUpdate[destinationProp] = destination[destinationProp];
-                }
-            });
+            const destinationUpdate = await getDestinationPropsToUpdate(destination);
             return config.pool("destinations")
                 .where("id", destination.id)
                 .update(destinationUpdate)
