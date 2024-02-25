@@ -46,7 +46,7 @@ const getTableColumns = async (pool) => {
 
 // Firebase appCheck verification
 // mainapi.use(appCheckVerification);
-module.exports = async function(pool, firebaseConfig) {
+module.exports = function(pool, firebaseConfig) {
     const {logger} = firebaseConfig;
     let _tableColumns = null;
     const configuration = {
