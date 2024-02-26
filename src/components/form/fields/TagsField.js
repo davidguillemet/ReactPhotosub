@@ -49,7 +49,7 @@ const TagsField = ({ field, value, values, handleChange, sending, readOnly, inpu
                 return <Chip variant="outlined" label={option} {...getTagProps({ index })} disabled={isReadOnly} />;
             })}
             onChange={onChange}
-            value={value}
+            value={value || []}
             inputValue={inputValue}
             onInputChange={(event, newInputValue) => {
                 const options = newInputValue.split(",");
