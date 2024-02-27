@@ -22,7 +22,8 @@ export const createGroup = (key) => {
     return {
         key: key,
         images: [],
-        offset: 0
+        offset: 0,
+        showCount: true
     };
 }
 
@@ -97,6 +98,10 @@ const GroupGalleryWithHeader = ({
     }, []);
 
     const GroupHeaderEndComponent = groupHeaderEndComponent;
+    const groupTitle =
+        group.showCount ?
+        `${group.key} - ${t("lbl:groupImageCount", group.images.length)}` :
+        group.key;
 
     return (
         <Stack sx={{width: '100%'}}>
@@ -115,7 +120,7 @@ const GroupGalleryWithHeader = ({
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Box>{group.key} - {t("lbl:groupImageCount", group.images.length)}</Box>
+                    <Box>{groupTitle}</Box>
                     {
                         groupHeaderEndComponent !== null &&
                         <GroupHeaderEndComponent group={group} />

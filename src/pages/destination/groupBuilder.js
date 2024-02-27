@@ -17,6 +17,7 @@ const GroupBuilderFactory = (destination, galleries, language) => {
             newGroup.index = gallery.index;
             newGroup.destination = destination;
             newGroup.gallery = gallery;
+            newGroup.showCount = false;
             newGroup.desc = gallery[getPropFromLanguage("desc", language)];
             groups.set(gallery.id, newGroup);
         });
