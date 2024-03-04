@@ -364,3 +364,7 @@ export const isDestinationPath = (path) => {
     }
     return false;
 }
+
+export const getSubGalleryAnchorName = (subGalleryTitle) => {
+    return subGalleryTitle.replace(/ /g, "_");
+}

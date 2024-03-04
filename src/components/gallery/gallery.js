@@ -16,7 +16,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { Box, Collapse } from '@mui/material';
 import { useTranslation } from 'utils';
 import { Body } from '../../template/pageTypography';
-import { sortImagesAscending, sortImagesDescending } from 'utils';
+import { sortImagesAscending, sortImagesDescending, getSubGalleryAnchorName } from 'utils';
 
 export const createGroup = (key) => {
     return {
@@ -120,7 +120,7 @@ const GroupGalleryWithHeader = ({
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Box>{groupTitle}</Box>
+                    <Box><span id={getSubGalleryAnchorName(group.gallery?.location_title || group.key)}>{groupTitle}</span></Box>
                     {
                         groupHeaderEndComponent !== null &&
                         <GroupHeaderEndComponent group={group} />
