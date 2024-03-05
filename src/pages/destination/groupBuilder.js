@@ -23,7 +23,7 @@ const GroupBuilderFactory = (destination, galleries, language) => {
         });
 
         images.forEach(image => {
-            if (image.sub_gallery_id === null) {
+            if (image.sub_gallery_id === null || image.sub_gallery_id === undefined) {
                 let globalGroup = groups.get(globalGroupId);
                 if (globalGroup === undefined) {
                     globalGroup = createGroup(null);
