@@ -8,10 +8,13 @@ module.exports = function(admin, config) {
         const fileFullPath = `${newImage.path}/${newImage.name}`;
         res.locals.errorMessage = `Failed to insert image ${fileFullPath}.`;
         return config.pool("images")
+            .returning("id")
             .insert(newImage)
             .onConflict(["name", "path"])
             .merge()
-            .then(() => {
+            .then((result) => {
+                const imageId = result[0];
+                newImage.id = imageId;
                 newImage.src = config.convertPathToUrl(newImage.path + "/" + newImage.name);
                 res.json(newImage);
             }).catch(next);
