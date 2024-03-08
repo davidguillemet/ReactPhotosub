@@ -14,9 +14,17 @@ module.exports = function(admin, config) {
             .merge()
             .then((result) => {
                 const imageId = result[0];
-                newImage.id = imageId;
-                newImage.src = config.convertPathToUrl(newImage.path + "/" + newImage.name);
-                res.json(newImage);
+                return config.pool()
+                    .select("*")
+                    .from("images")
+                    .where("id", imageId);
+            }).then((result) => {
+                // Select the image from the id (generated in case of new image)
+                // to get the merged columns like sub_gallery_id that is not
+                // specified while uploading
+                const image = result[0];
+                image.src = config.convertPathToUrl(image.path + "/" + image.name);
+                res.json(image);
             }).catch(next);
     };
 

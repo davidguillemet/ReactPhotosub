@@ -73,7 +73,6 @@ exports.extractExif = async function(file, fileContent) {
         height: dimensions.height,
         sizeRatio: dimensions.width / dimensions.height,
         create: creationDate,
-        sub_gallery_id: null,
         tags: imageTags,
         ...tagsFromDescription, // caption and captionTags
     };
