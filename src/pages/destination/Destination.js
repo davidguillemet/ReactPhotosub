@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useParams } from "react-router-dom";
 import {isMobile} from 'react-device-detect';
 import Stack from '@mui/material/Stack';
@@ -227,6 +228,7 @@ const getGroupDestinations = (destination, galleries) => {
 
 const DestinationDisplay = withLoading(({destination}) => {
 
+    const history = useHistory();
     const { language } = useLanguage();
     const { images, galleries } = useFetchImagesAndSubGalleries(destination);
     const [ galleryIsReady, setGalleryIsReady ] = useState(false);
@@ -242,6 +244,10 @@ const DestinationDisplay = withLoading(({destination}) => {
         setSubGalleryToEdit(null);
         openDialog();
     }, [openDialog]);
+
+    const onManageImages = useCallback(() => {
+        history.push(`/admin?tab=images&path=${encodeURIComponent(destination.path)}`)
+    }, [history, destination]);
 
     const groupBuilder = React.useMemo(() => GroupBuilderFactory(destination, galleries, language), [destination, galleries, language]);
     const groupDestinations = React.useMemo(() => getGroupDestinations(destination, galleries), [destination, galleries]);
@@ -265,11 +271,10 @@ const DestinationDisplay = withLoading(({destination}) => {
 
             {
                 authContext.admin === true &&
-                <React.Fragment>
-                    <VerticalSpacing factor={2} />
+                <Stack direction="row" spacing={1}>
                     <Button variant="contained" onClick={onAddSubGallery}>Ajouter une sous-galerie</Button>
-                    <VerticalSpacing factor={2} />
-                </React.Fragment>
+                    <Button variant="contained" onClick={onManageImages}>Gérer les images</Button>
+                </Stack>
             }
 
             <Gallery

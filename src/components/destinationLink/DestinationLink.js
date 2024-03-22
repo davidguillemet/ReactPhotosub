@@ -4,7 +4,7 @@ import { useAuthContext } from 'components/authentication';
 
 const DestinationLink = withLoading(({destination, children}) => {
     const authContext = useAuthContext();
-    if (destination === null || (destination.published === false && authContext.admin === false)) {
+    if (destination === null || (authContext.admin === false && destination.published === false)) {
         // don't display the destination if it is not published while the user is not admin
         return null;
     }

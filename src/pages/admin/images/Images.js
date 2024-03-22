@@ -1,5 +1,8 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import { Box } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
@@ -30,13 +33,24 @@ const columns = [
 ];
 
 const Images = () => {
+    const history = useHistory();
     const imageContext = useImageContext();
     const t = useTranslation("pages.admin.images");
     const folderName = imageContext.folderType === FOLDER_TYPE.root ? t("rootFolder") : imageContext.folderName;
+    const onDisplayDestination = React.useCallback(() => {
+        history.push(`/destinations/${imageContext.destinationPath}`)
+    }, [history, imageContext.destinationPath]);
     return (
-        <React.Fragment>
+        <Stack direction="column" alignItems="flex-start" spacing={1}>
         <ImageErrors />
         <Paragraph>{t("imageCount", [imageContext.itemCount, folderName])}</Paragraph>
+            <Button
+                variant="contained"
+                disabled={imageContext.folderType !== FOLDER_TYPE.destination}
+                onClick={onDisplayDestination}
+            >
+                Afficher la destination
+            </Button>
         <ItemFilter />
         <TableContainer component={Paper} sx={{display: 'flex', flexDirection: 'column'}}>
             <TableToolbar />
@@ -87,7 +101,7 @@ const Images = () => {
                 </Box>
             }
         </TableContainer>
-        </React.Fragment>
+        </Stack>
     )
 }
 

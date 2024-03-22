@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import { useLocation } from "react-router-dom";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import Gallery from '../../components/gallery';
 import Search from '../../components/search';
 import { PageTitle } from '../../template/pageTypography';
 import { useTranslation } from '../../utils';
+import { useQueryParameter } from '../../utils';
 
 const NextPageButton = ({
     onClick,
@@ -25,23 +25,18 @@ const NextPageButton = ({
     );
 };
 
-function getQuerySearch(querySearch) {
-    const queryParameters = new URLSearchParams(querySearch)
-    return queryParameters.get("query");
-}
-
 const SearchPage = () => {
 
     const t = useTranslation("pages.search");
-    const location = useLocation();
-    const [query, setQuery] = React.useState(() => getQuerySearch(location.search));
+    const getQueryParameter = useQueryParameter();
+    const [query, setQuery] = React.useState(() => getQueryParameter("query"));
 
     useEffect(() => {
-        const locationQuery = getQuerySearch(location.search);
+        const locationQuery = getQueryParameter("query");
         if (locationQuery !== query) {
-            setQuery(getQuerySearch(location.search))
+            setQuery(locationQuery)
         }
-    }, [location.search, query]);
+    }, [getQueryParameter, query]);
 
     return (
         <React.Fragment>

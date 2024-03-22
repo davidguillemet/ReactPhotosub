@@ -1,10 +1,11 @@
 import React from 'react';
-import {unstable_batchedUpdates} from 'react-dom';
+import { useHistory, useLocation } from 'react-router-dom';
+import { unstable_batchedUpdates } from 'react-dom';
 import { buildLoadingState, withLoading } from 'components/hoc';
 import { getFileNameFromFullPath, getThumbnailsFromImageName } from 'utils';
 import { useFirebaseContext } from 'components/firebase';
 import { useQueryContext } from 'components/queryContext';
-import { getImageNameFromThumbnail, extractDestinationPath } from 'utils';
+import { getImageNameFromThumbnail, extractDestinationPath, useQueryParameter } from 'utils';
 import { useDataProvider } from 'components/dataProvider';
 import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER, FOLDER_TYPE} from './common';
 
@@ -86,9 +87,12 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const firebaseContext = useFirebaseContext();
     const dataProvider = useDataProvider();
     const queryContext = useQueryContext();
+    const history = useHistory();
+    const location = useLocation();
+    const getQueryParameter = useQueryParameter();
     const [ rows, setRows ] = React.useState({});
     const [ selectedItems, setSelectedItems ] = React.useState(new Set());
-    const [ storageRef, setStorageRef ] = React.useState(firebaseContext.storageRef());
+    const [ storageRef, setStorageRef ] = React.useState(firebaseContext.storageRef(getQueryParameter("path") || ""));
     const [ thumbs, setThumbs ] = React.useState(null);
     const [ errors, setErrors ] = React.useState(new Set());
     const initialFetchCompleted = React.useRef(false);
@@ -243,15 +247,23 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     }, []);
 
     const onSetBucketPath = React.useCallback((bucketPath) => {
+        history.push({
+            pathname: location.pathname,
+            search: `?tab=images${bucketPath.length > 0 ? `&path=${encodeURIComponent(bucketPath)}` : ``}`
+        });
+    }, [history, location]);
+
+    React.useLayoutEffect(() => {
+        const pathParameter = getQueryParameter("path") || "";
         unstable_batchedUpdates(() => {
             initialFetchCompleted.current = false;
-            destinationPath.current = extractDestinationPath(bucketPath);
+            destinationPath.current = extractDestinationPath(pathParameter);
             setRows({});
             setThumbs(null);
-            setStorageRef(firebaseContext.storageRef(bucketPath));
+            setStorageRef(firebaseContext.storageRef(pathParameter));
             setSelectedItems(new Set());
         });
-    }, [firebaseContext]);
+    }, [getQueryParameter, firebaseContext]);
 
     const onSelectAllClick = React.useCallback((event) => {
         let selection;

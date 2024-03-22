@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import { Stack, Box } from '@mui/material';
 import { Breadcrumbs } from '@mui/material';
 import { IconButton, Link } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
@@ -10,6 +10,7 @@ import { useToast } from 'components/notifications';
 import { useImageContext } from '../ImageContext';
 import GlobalStatus from './GlobalStatus';
 import { useDataProvider } from 'components/dataProvider';
+import { HorizontalSpacing } from 'template/spacing';
 
 const StorageBreadcrumbs = () => {
     const dataProvider = useDataProvider();
@@ -61,7 +62,8 @@ const StorageBreadcrumbs = () => {
     }, []);
 
     return (
-        <Box sx={{display: "flex", flexDirection: "row", alignItems: "center"}} component="span">
+        <Stack direction="row" alignItems="center">
+            <HorizontalSpacing factor={1} />
             <GlobalStatus />
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{color: theme => theme.palette.primary.contrastText}}/>} sx={{ml: 2, pv: 1}} >
             {
@@ -84,7 +86,7 @@ const StorageBreadcrumbs = () => {
                 }
                 </IconButton>
             }
-        </Box>
+        </Stack>
     )
 }
 

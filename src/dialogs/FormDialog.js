@@ -23,30 +23,28 @@ const FormDialog = ({title, open, onClose, children}) => {
     }, [onClose]);
 
     return (
-        <div>
-            <Dialog
-                fullScreen={isMobile}
-                maxWidth='lg'
-                fullWidth={true}
-                open={isOpen}
-                onClose={handleClose}
-            >
-                <DialogTitle id="form-dialog-title">{title}</DialogTitle>
+        <Dialog
+            fullScreen={isMobile}
+            maxWidth='lg'
+            fullWidth={true}
+            open={isOpen}
+            onClose={handleClose}
+        >
+            <DialogTitle id="form-dialog-title">{title}</DialogTitle>
 
-                <DialogContent>
-                    {
-                        // Inject onCancel property for each child
-                        React.Children.map(children, child => {
-                            if (React.isValidElement(child)) {
-                                return React.cloneElement(child, { onCancel: onClose });
-                            }
-                            return child;
-                        })
-                    }
-                </DialogContent>
+            <DialogContent>
+                {
+                    // Inject onCancel property for each child
+                    React.Children.map(children, child => {
+                        if (React.isValidElement(child)) {
+                            return React.cloneElement(child, { onCancel: onClose });
+                        }
+                        return child;
+                    })
+                }
+            </DialogContent>
 
-            </Dialog>
-        </div>
+        </Dialog>
     )
 }
 
