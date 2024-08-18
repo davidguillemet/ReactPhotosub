@@ -226,19 +226,11 @@ const getGroupDestinations = (destination, galleries) => {
         }));
 }
 
-const DestinationDisplay = withLoading(({destination}) => {
-
-    const history = useHistory();
-    const { language } = useLanguage();
-    const { images, galleries } = useFetchImagesAndSubGalleries(destination);
-    const [ galleryIsReady, setGalleryIsReady ] = useState(false);
+const DestinationAdminTools = ({destination}) => {
     const authContext = useAuthContext();
+    const history = useHistory();
     const { dialogProps, openDialog, FormDialog } = useFormDialog();
     const [ subGalleryToEdit, setSubGalleryToEdit ] = useState(null);
-
-    const onGalleryIsReady = useCallback(() => {
-        setGalleryIsReady(true);
-    }, []);
 
     const onAddSubGallery = useCallback(() => {
         setSubGalleryToEdit(null);
@@ -248,6 +240,34 @@ const DestinationDisplay = withLoading(({destination}) => {
     const onManageImages = useCallback(() => {
         history.push(`/admin?tab=images&path=${encodeURIComponent(destination.path)}`)
     }, [history, destination]);
+
+    if (!authContext.admin) {
+        return null;
+    }
+
+    return (
+        <React.Fragment>
+            <Stack direction="row" spacing={1}>
+                <Button variant="contained" onClick={onAddSubGallery}>Ajouter une sous-galerie</Button>
+                <Button variant="contained" onClick={onManageImages}>Gérer les images</Button>
+            </Stack>
+            <FormDialog title="Créer une sous-galerie" {...dialogProps}>
+                <SubGalleryForm subGallery={subGalleryToEdit} destination={destination}/>
+            </FormDialog>
+        </React.Fragment>
+    );
+};
+
+const DestinationDisplay = withLoading(({destination}) => {
+
+    const { language } = useLanguage();
+    const { images, galleries } = useFetchImagesAndSubGalleries(destination);
+    const [ galleryIsReady, setGalleryIsReady ] = useState(false);
+    const authContext = useAuthContext();
+
+    const onGalleryIsReady = useCallback(() => {
+        setGalleryIsReady(true);
+    }, []);
 
     const groupBuilder = React.useMemo(() => GroupBuilderFactory(destination, galleries, language), [destination, galleries, language]);
     const groupDestinations = React.useMemo(() => getGroupDestinations(destination, galleries), [destination, galleries]);
@@ -269,13 +289,7 @@ const DestinationDisplay = withLoading(({destination}) => {
 
             <VerticalSpacing factor={2} />
 
-            {
-                authContext.admin === true &&
-                <Stack direction="row" spacing={1}>
-                    <Button variant="contained" onClick={onAddSubGallery}>Ajouter une sous-galerie</Button>
-                    <Button variant="contained" onClick={onManageImages}>Gérer les images</Button>
-                </Stack>
-            }
+            <DestinationAdminTools destination={destination} />
 
             <Gallery
                 images={images}
@@ -287,14 +301,9 @@ const DestinationDisplay = withLoading(({destination}) => {
                 groupHeaderEndComponent={authContext.admin === true ? SubGalleryHeaderComponent : null}
             />
 
-            {
-                authContext.admin === true &&
-                <React.Fragment>
-                    <VerticalSpacing factor={4} />
-                    <Button variant="contained" onClick={onAddSubGallery}>Ajouter une sous-galerie</Button>
-                    <VerticalSpacing factor={2} />
-                </React.Fragment>
-            }
+            <VerticalSpacing factor={2} />
+
+            <DestinationAdminTools destination={destination} />
 
             <VerticalSpacing factor={4} />
 
@@ -308,13 +317,6 @@ const DestinationDisplay = withLoading(({destination}) => {
             {
                 galleryIsReady &&
                 <RelatedDestinations destination={destination} />
-            }
-
-            {
-                authContext.admin === true &&
-                <FormDialog title="Créer une sous-galerie" {...dialogProps}>
-                    <SubGalleryForm subGallery={subGalleryToEdit} destination={destination}/>
-                </FormDialog>
             }
 
         </GalleryContextProvider>
