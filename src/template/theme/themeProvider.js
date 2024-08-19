@@ -30,7 +30,7 @@ const paletteLightMode = {
         main: "#28a745"
     },
     primary: {
-      main: '#568e98',
+      main: '#00668C',
       contrastText: '#cdd8c2',
     },
     secondary: {
@@ -43,7 +43,7 @@ const paletteLightMode = {
     success: {
       main: '#6dd072',
       contrastText: '#dbffdf'
-    },
+    }
 }
 
 const CustomThemeProvider = ({children}) => {
