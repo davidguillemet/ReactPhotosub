@@ -17,6 +17,7 @@ import { Box, Collapse } from '@mui/material';
 import { useTranslation } from 'utils';
 import { Body } from '../../template/pageTypography';
 import { sortImagesAscending, sortImagesDescending, getSubGalleryAnchorName } from 'utils';
+import { VerticalSpacing } from 'template/spacing';
 
 export const createGroup = (key) => {
     return {
@@ -138,7 +139,9 @@ const GroupGalleryWithHeader = ({
                 </Stack>
             </BlockQuote>
             <Collapse in={isExpanded === true}>
+                <VerticalSpacing factor={0.5} />
                 <GalleryDesc group={group} />
+                <VerticalSpacing factor={0.5} />
                 <GroupGallery
                     images={group.images}
                     key={group.key}
