@@ -82,7 +82,8 @@
             "favoritesCount": "{0} image(s)",
             "info:favoritesDeleted": "{0} favori(s) supprimé(s)",
             "btn:cancelDeletion": "Annuler",
-            "info:noFavorites": "Votre liste de favoris est vide."
+            "info:noFavorites": "Votre liste de favoris est vide.",
+            "info:userHasNoFavorites": "La liste de favoris de l'utilisateur est vide."
         },
         "finning": {
             "title": "Le Finning, Késako ?",

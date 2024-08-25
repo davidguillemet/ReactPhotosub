@@ -11,12 +11,14 @@ import { useAuthContext } from '../authentication';
 import './styles.css';
 import { useFavorites } from '../favorites';
 import { useTranslation } from 'utils';
+import { useGalleryContext } from './galleryContext';
 
 const FavoriteButton = ({image, size = 'medium', style, color }) => {
 
     const t = useTranslation("components.gallery");
     const authContext = useAuthContext();
     const favoritesContext = useFavorites();
+    const galleryContext = useGalleryContext();
     const [ updating, setUpdating ] = useState(false);
 
     const isInFavorites = React.useMemo(() => {
@@ -38,11 +40,13 @@ const FavoriteButton = ({image, size = 'medium', style, color }) => {
         })
     }, [favoritesContext, isInFavorites, image]);
 
+    const isDisabled = galleryContext && !galleryContext.withFavorite;
+
     const buttonStyle = {...style};
     let title = t("btn:addFavorite");
     if (isInFavorites && updating === false) {
         title = t("btn:deleteFavorite");
-        buttonStyle.color = 'red';
+        buttonStyle.color = isDisabled ? 'grey' : 'red';
     } else if (color) {
         buttonStyle.color = color;
     }
@@ -72,6 +76,7 @@ const FavoriteButton = ({image, size = 'medium', style, color }) => {
             onClick={authContext.user && updating === false ? handleFavoriteClick : null}
             style={buttonStyle}
             size={size}
+            disabled={isDisabled}
         >
             {
                 updating ?

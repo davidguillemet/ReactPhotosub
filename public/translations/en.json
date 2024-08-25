@@ -82,7 +82,8 @@
             "favoritesCount": "{0} image(s)",
             "info:favoritesDeleted": "{0} favorite(s) deleted",
             "btn:cancelDeletion": "Cancel",
-            "info:noFavorites": "Your favorites list is empty."
+            "info:noFavorites": "Your favorites list is empty.",
+            "info:userHasNoFavorites": "The user has no favorites."
         },
         "finning": {
             "title": "Finning, Késako ?",

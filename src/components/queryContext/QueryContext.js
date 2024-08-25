@@ -266,6 +266,7 @@ export const QueryContextProvider = ({children}) => {
                 queryClient.setQueryData(getFetchDestinationKey(group.destination.path, DESTINATION_PROPS.GALLERIES), data);
             }
         }),
+        useFetchUsers: () => useQuery(['users'], () => dataProvider.getUsers()),
     });
 
     return (

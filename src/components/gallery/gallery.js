@@ -18,6 +18,7 @@ import { useTranslation } from 'utils';
 import { Body } from '../../template/pageTypography';
 import { sortImagesAscending, sortImagesDescending, getSubGalleryAnchorName } from 'utils';
 import { VerticalSpacing } from 'template/spacing';
+import { GalleryContextProvider } from './galleryContext';
 
 export const createGroup = (key) => {
     return {
@@ -171,7 +172,8 @@ const Gallery = ({
     groupHeaderEndComponent = null,
     // By default sort images by date, descending, i.e. from the most recent to the oldest
     sort = "desc",
-    pushHistory = false}) => {
+    pushHistory = false,
+    withFavorite = true}) => {
 
     const history = useHistory();
     const location = useLocation();
@@ -239,7 +241,7 @@ const Gallery = ({
     }
 
     return (
-        <React.Fragment>
+        <GalleryContextProvider options={{ withFavorite }}>
             {
                 groups.map((group, groupIndex) => {
                     return (
@@ -285,7 +287,7 @@ const Gallery = ({
                     />
                 }
             </Dialog>
-        </React.Fragment>
+        </GalleryContextProvider>
     );
 }
 

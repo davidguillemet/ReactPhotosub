@@ -110,7 +110,7 @@ DataProvider.prototype.getFavorites = function(uid) {
     if (uid === null) {
         return Promise.resolve([]);
     }
-    return this.axios.get('/favorites')
+    return this.axios.get(`/favorites/${uid}`)
     .then(response => {
         return response.data;
     })
@@ -357,6 +357,11 @@ DataProvider.prototype.renameFolder = function(folder, newName) {
     return this.axios.patch(`/admin/bucket/${folder}`, {
         name: newName
     });
+}
+
+DataProvider.prototype.getUsers = function() {
+    return this.axios.get('/admin/users')
+    .then(response => response.data.users);
 }
 
 export default DataProvider;

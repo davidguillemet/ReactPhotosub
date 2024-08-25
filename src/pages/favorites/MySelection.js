@@ -12,16 +12,30 @@ import { withLoading, buildLoadingState, withUser } from '../../components/hoc';
 import { useFavorites } from '../../components/favorites';
 import { useTranslation } from 'utils';
 import GroupBuilder from './groupBuilder';
+import UserSelection from './userSelection';
+import { VerticalSpacing } from 'template/spacing';
 
-const MySelectionContent = withLoading(({images}) => {
+const MySelectionContent = withLoading(({images, uid}) => {
     const t = useTranslation("pages.favorites");
+    const authContext = useAuthContext();
+
+    const emptyMessage =
+        uid === authContext.user.uid ?
+        t("info:noFavorites") : 
+        t("info:userHasNoFavorites");
+
     return (
         <React.Fragment>
         {
             images !== undefined &&
             <PageSubTitle sx={{mt: 0}}>{t("favoritesCount", images.length)}</PageSubTitle>
         }
-        <Gallery images={images} groupBuilder={GroupBuilder} emptyMessage={t("info:noFavorites")}/>
+        <Gallery
+            images={images}
+            groupBuilder={GroupBuilder}
+            emptyMessage={emptyMessage}
+            withFavorite={uid === authContext.user.uid}
+        />
         </React.Fragment>
     );
 }, [ buildLoadingState("images", [null, undefined]) ]);
@@ -32,10 +46,16 @@ const MySelection = withUser(() => {
     const queryContext = useQueryContext();
     const authContext = useAuthContext();
     const favoritesContext = useFavorites();
-    const { data: images } = queryContext.useFetchFavorites(authContext.user && authContext.user.uid, true)
     const [ removedFavorites, setRemovedFavorites ] = useState([]);
     const [ undoRunning, setUndoRunning ] = useState(false);
     const undoTimerRef = useRef(null);
+    const [ favoritesUserUid, setFavoritesUserUid ] = useState(authContext.user && authContext.user.uid);
+
+    const { data: images } = queryContext.useFetchFavorites(favoritesUserUid, true);
+
+    useEffect(() => {
+        setFavoritesUserUid(authContext.user.uid);
+    }, [authContext.user])
 
     const favoriteAction = useCallback((images, action) => {
         switch (action) {
@@ -49,6 +69,10 @@ const MySelection = withUser(() => {
             default:
                 throw new Error(`Unknown favorite action '${action}'`)
         }
+    }, []);
+
+    const onUserChange = useCallback((newUserUid) => {
+        setFavoritesUserUid(newUserUid);
     }, []);
 
     useEffect(() => {
@@ -110,7 +134,9 @@ const MySelection = withUser(() => {
     return (
         <React.Fragment>
             <PageTitle>{t("title")}</PageTitle>
-            <MySelectionContent images={images}></MySelectionContent>
+            <UserSelection onChange={onUserChange} />
+            <VerticalSpacing factor={4}/>
+            <MySelectionContent images={images} uid={favoritesUserUid}></MySelectionContent>
             {
                 removedFavorites.length > 0 && 
                 <Snackbar
