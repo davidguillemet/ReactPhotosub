@@ -6,4 +6,5 @@ module.exports = function(admin, config) {
     require("./subgalleries")(admin, config);
     require("./images")(admin, config);
     require("./locations")(admin, config);
+    require("./users")(admin, config);
 };
