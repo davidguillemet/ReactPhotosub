@@ -74,7 +74,7 @@ const Form = ({
         }
 
         if (onChange) {
-            onChange();
+            onChange(field, fieldValue);
         }
 
         unstable_batchedUpdates(() => {
@@ -135,18 +135,21 @@ const Form = ({
                     />
                 )
             }
-            {   
+            {   (submitAction || onCancel) &&
                 <Stack spacing={2} direction="row" sx={{mt: 2}}>
-                    <LoadingButton
-                        onClick={onSubmit}
-                        variant="contained"
-                        disabled={readOnly || !isValid || !isDirty}
-                        startIcon={<SendIcon />}
-                        loadingPosition="start"
-                        loading={sending}
-                    >
-                        {submitCaption}
-                    </LoadingButton>
+                    {
+                        submitAction !== null &&
+                        <LoadingButton
+                            onClick={onSubmit}
+                            variant="contained"
+                            disabled={readOnly || !isValid || !isDirty}
+                            startIcon={<SendIcon />}
+                            loadingPosition="start"
+                            loading={sending}
+                        >
+                            {submitCaption}
+                        </LoadingButton>
+                    }
                     {
                         onCancel !== null &&
                         <Button variant="contained" onClick={onCancel}>
