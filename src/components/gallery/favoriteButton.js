@@ -48,7 +48,7 @@ const FavoriteButton = ({image, size = 'medium', style, color }) => {
         title = t("btn:deleteFavorite");
         buttonStyle.color = isDisabled ? 'grey' : 'red';
     } else if (color) {
-        buttonStyle.color = color;
+        buttonStyle.color = isDisabled ? 'grey' : color;
     }
 
     return (
