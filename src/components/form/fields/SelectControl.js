@@ -72,7 +72,7 @@ const SelectControl = ({ field, value, values, handleChange, sending, readOnly, 
                 fullWidth
                 disabled={sending || readOnly || field.readOnly || !hasOptions}
                 renderValue={(selected) => {
-                    return selected[captionProperty];
+                    return field.getCaption ? field.getCaption(selected) : selected[captionProperty];
                 }}
             >
                 {
@@ -87,6 +87,7 @@ const SelectControl = ({ field, value, values, handleChange, sending, readOnly, 
                                     withFavorite={false} /> :
                                 field.optionComponent ?
                                     <field.optionComponent option={option} /> :
+                                    field.getCaption ? field.getCaption(option) :
                                     option[captionProperty]}
                         </MenuItem>))
                 }
