@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
 import { useParams } from "react-router-dom";
 import {isMobile} from 'react-device-detect';
 import Stack from '@mui/material/Stack';
@@ -25,12 +24,11 @@ import NotFound from '../notFound';
 import { HelmetDestination } from 'template/seo';
 import { useReactQuery } from 'components/reactQuery';
 import { useAuthContext } from 'components/authentication';
-import useFormDialog from 'dialogs/FormDialog';
-import SubGalleryForm from './admin/SubGalleryForm';
 import GroupBuilderFactory from './groupBuilder';
-import { GalleryContextProvider } from './admin/GalleryContext';
+import { DestinationGalleryContextProvider } from './admin/DestinationGalleryContext';
 import { SubGalleryHeaderComponent } from './admin/SubGalleryHeaderComponent';
 import { PublicationAlert } from 'components/publication';
+import DestinationAdminTools from './admin/DestinationAdminTools';
 
 const RegionChip = ({region}) => {
     const { language } = useLanguage();
@@ -226,38 +224,6 @@ const getGroupDestinations = (destination, galleries) => {
         }));
 }
 
-const DestinationAdminTools = ({destination}) => {
-    const authContext = useAuthContext();
-    const history = useHistory();
-    const { dialogProps, openDialog, FormDialog } = useFormDialog();
-    const [ subGalleryToEdit, setSubGalleryToEdit ] = useState(null);
-
-    const onAddSubGallery = useCallback(() => {
-        setSubGalleryToEdit(null);
-        openDialog();
-    }, [openDialog]);
-
-    const onManageImages = useCallback(() => {
-        history.push(`/admin?tab=images&path=${encodeURIComponent(destination.path)}`)
-    }, [history, destination]);
-
-    if (!authContext.admin) {
-        return null;
-    }
-
-    return (
-        <React.Fragment>
-            <Stack direction="row" spacing={1}>
-                <Button variant="contained" onClick={onAddSubGallery}>Ajouter une sous-galerie</Button>
-                <Button variant="contained" onClick={onManageImages}>Gérer les images</Button>
-            </Stack>
-            <FormDialog title="Créer une sous-galerie" {...dialogProps}>
-                <SubGalleryForm subGallery={subGalleryToEdit} destination={destination}/>
-            </FormDialog>
-        </React.Fragment>
-    );
-};
-
 const DestinationDisplay = withLoading(({destination}) => {
 
     const { language } = useLanguage();
@@ -274,7 +240,7 @@ const DestinationDisplay = withLoading(({destination}) => {
     const destinations = useMemo(() => [destination], [destination]);
 
     return (
-        <GalleryContextProvider destination={destination} images={images} galleries={galleries}>
+        <DestinationGalleryContextProvider destination={destination} images={images} galleries={galleries}>
             <PublicationAlert destination={destination} sx={{width: "100%", mt: 2}} />
             <RegionPath regions={destination.regionpath}></RegionPath>
 
@@ -319,7 +285,7 @@ const DestinationDisplay = withLoading(({destination}) => {
                 <RelatedDestinations destination={destination} />
             }
 
-        </GalleryContextProvider>
+        </DestinationGalleryContextProvider>
     );
 }, [buildLoadingState("destination", [null, undefined])]);
 

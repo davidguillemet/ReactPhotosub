@@ -12,7 +12,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { ConfirmDialog } from 'dialogs';
 import { useToast } from 'components/notifications';
 import TransferList from 'components/transferList';
-import { useGalleryContext } from './GalleryContext';
+import { useDestinationGalleryContext } from './DestinationGalleryContext';
 import { sortImagesAscending } from 'utils';
 import { RenderTransferListImage } from './RenderTransferListImage';
 import { GroupContextProvider } from './GroupContext';
@@ -22,7 +22,7 @@ const _getAvailableImages = (images) => {
 }
 
 export const SubGalleryHeaderComponent = ({ group }) => {
-    const galleryContext = useGalleryContext();
+    const galleryContext = useDestinationGalleryContext();
     const queryContext = useQueryContext();
 
     const deleteGalleryMutation = queryContext.useDeleteSubGallery();

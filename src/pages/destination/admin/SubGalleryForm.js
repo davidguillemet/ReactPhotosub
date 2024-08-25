@@ -1,11 +1,11 @@
 import React from 'react';
 import Form, { FIELD_TYPE_TEXT, FIELD_TYPE_NUMBER, FIELD_TYPE_SELECT } from "components/form";
 import { useQueryContext } from 'components/queryContext';
-import { useGalleryContext } from './GalleryContext';
+import { useDestinationGalleryContext } from './DestinationGalleryContext';
 
 const SubGalleryForm = ({destination, subGallery, onCancel}) => {
 
-    const galleryContext = useGalleryContext();
+    const galleryContext = useDestinationGalleryContext();
     const queryContext = useQueryContext();
     const subGalleryAddMutation = queryContext.useAddSubGallery();
     const subGalleryUpdateMutation = queryContext.useUpdateSubGallery();
