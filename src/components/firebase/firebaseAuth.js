@@ -124,7 +124,7 @@ const SignedInButton = ({handleLogout}) => {
                     position: 'absolute',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    right: 20,
+                    right: isMobile ? 10 : 20,
                     borderColor: 'white',
                     '& .MuiChip-avatar, & .MuiChip-deleteIcon, & .MuiChip-deleteIcon:hover, & .MuiChip-label': {
                         color: 'white'
