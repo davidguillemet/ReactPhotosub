@@ -19,6 +19,22 @@ import { Body } from '../../template/pageTypography';
 import { sortImagesAscending, sortImagesDescending, getSubGalleryAnchorName } from 'utils';
 import { VerticalSpacing } from 'template/spacing';
 import { GalleryContextProvider } from './galleryContext';
+import { useGalleryContext } from './galleryContext';
+
+const _colWidth = {
+    "small": {
+        mobile: 100,
+        desktop: 200
+    },
+    "medium": {
+        mobile: 170,
+        desktop: 350
+    },
+    "large": {
+        mobile: 200,
+        desktop: 400
+    }
+}
 
 export const createGroup = (key) => {
     return {
@@ -62,14 +78,18 @@ const buildGroups = (images, groupBuilder, sortOrder) => {
 
 const GroupGallery = ({images, onReady, renderItem}) => {
 
+    const galleryContext = useGalleryContext();
+
     const heightProvider = useCallback((item, itemWidth) => {
         return itemWidth / item.sizeRatio;
     }, []);
 
+    const colWidth = _colWidth[galleryContext.colWidth][isMobile ? "mobile" : "desktop"];
+
     return (
         <MasonryGallery
             items={images}
-            colWidth={isMobile ? 170 : 350}
+            colWidth={colWidth}
             heightProvider={heightProvider}
             renderItem={renderItem}
             onReady={onReady}
@@ -173,7 +193,8 @@ const Gallery = ({
     // By default sort images by date, descending, i.e. from the most recent to the oldest
     sort = "desc",
     pushHistory = false,
-    withFavorite = true}) => {
+    withFavorite = true,
+    colWidth = "medium"}) => {
 
     const history = useHistory();
     const location = useLocation();
@@ -241,7 +262,12 @@ const Gallery = ({
     }
 
     return (
-        <GalleryContextProvider options={{ withFavorite }}>
+        <GalleryContextProvider
+            options={{
+                withFavorite,
+                colWidth
+            }
+        }>
             {
                 groups.map((group, groupIndex) => {
                     return (

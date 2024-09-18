@@ -29,6 +29,7 @@ import { DestinationGalleryContextProvider } from './admin/DestinationGalleryCon
 import { SubGalleryHeaderComponent } from './admin/SubGalleryHeaderComponent';
 import { PublicationAlert } from 'components/publication';
 import DestinationAdminTools from './admin/DestinationAdminTools';
+import { NoWrapAndEllipsis } from 'template/pageTypography';
 
 const RegionChip = ({region}) => {
     const { language } = useLanguage();
@@ -66,13 +67,6 @@ const NavigationItem = ({destination, type, caption}) => {
     const dateFormatter = isMobile ? formatDateShort : formatDate;
     const formattedDate = dateFormatter(destinationDate, language);
 
-    const noWrapAndEllipsis = {
-        whiteSpace: "nowrap",
-        width: "100%",
-        overflow: "hidden",
-        textOverflow: "ellipsis"
-    };
-
     return (
         <DestinationLink destination={destination}>
             <Paper
@@ -102,13 +96,13 @@ const NavigationItem = ({destination, type, caption}) => {
                             my: 0,
                             fontWeight: "300",
                             textAlign: type,
-                            ...noWrapAndEllipsis
+                            ...NoWrapAndEllipsis
                         }}
                         variant={isMobile ? "h6" : "h4"}
                     >
                         {destinationTitle(destination, language)}
                     </PageHeader>
-                    <Paragraph sx={{my: 0, fontWeight: "100", textAlign: type, ...noWrapAndEllipsis}}>
+                    <Paragraph sx={{my: 0, fontWeight: "100", textAlign: type, ...NoWrapAndEllipsis}}>
                         { formattedDate }
                     </Paragraph>
                 </Stack>

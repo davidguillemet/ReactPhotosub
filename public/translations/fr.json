@@ -186,8 +186,12 @@
         },
         "search": {
             "inputPlaceHolder": "Rechercher parmi {0} images...",
-            "exactSwitch": "Rechercher les termes exacts",
-            "resultsCount": "{0} Résultat(s)",
+            "exactSwitch": "Termes exacts",
+            "seeAllResults": "Voir tous les résultats",
+            "nextResults": "Résultats suivants",
+            "close": "Fermer",
+            "resultsCount": "{0} Résultat(s) pour la recherche « {1} »",
+            "noResults": "Aucun résultat trouvé pour la recherche « {0} ». Vérifiez l'orthographe ou utilisez une autre expression.",
             "helpTitle": "Rechercher des images"
         },
         "form": {

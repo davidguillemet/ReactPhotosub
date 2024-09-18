@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import Typography from '@mui/material/Typography';
-import { parseImageDescription, useLanguage, useTranslation } from '../../utils';
+import { parseImageDescription, useLanguage } from '../../utils';
 import { VerticalSpacing } from 'template/spacing';
 import { Box } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import { isMobile } from 'react-device-detect';
+import { NoWrapAndEllipsis } from 'template/pageTypography';
 
 const useStyles = makeStyles({
     navigationButton: {
@@ -26,7 +27,6 @@ const getDescriptionFromLanguage = (captions, requiredLanguage) => {
 
 const ImageDescription = ({ image, withNavigation = true}) => {
 
-    const t = useTranslation("components.imageDescription")
     const classes = useStyles();
     const { language } = useLanguage();
     const [ descriptionIndex, setDescriptionIndex ] = useState(0);
@@ -64,11 +64,7 @@ const ImageDescription = ({ image, withNavigation = true}) => {
      */
 
     if (!description) {
-        return (
-            <Typography variant="subtitle1" style={{ marginBottom: 0, color: 'white' }}>
-                {t("noDescription")}
-            </Typography>
-        )
+        return null;
     }
 
     return (
@@ -76,11 +72,24 @@ const ImageDescription = ({ image, withNavigation = true}) => {
             position: 'relative',
             display: "flex",
             flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
+            width: "100%",
             flex: 1,
             my: 0,
             mx: 0
         }}>
-            <Typography variant="subtitle1" sx={{ m: 0, lineHeight: 1.25, color: 'white'}}>
+            <Typography
+                variant="subtitle1"
+                sx={{
+                    m: 0,
+                    pl: "5px",
+                    pr: "5px",
+                    lineHeight: 1.25,
+                    color: 'white',
+                    ...NoWrapAndEllipsis
+                }}
+            >
                 { description[descriptionIndex].vernacular[vernacularIndex] }
             </Typography>
             {

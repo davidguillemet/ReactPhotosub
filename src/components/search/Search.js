@@ -1,32 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useHistory } from "react-router-dom";
-import { styled } from '@mui/material/styles';
-import { green, orange, red } from '@mui/material/colors';
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
 import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
-import SearchIcon from '@mui/icons-material/Search';
-import CircularProgress from '@mui/material/CircularProgress';
 
-import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import InputBase from '@mui/material/InputBase';
-import Divider from '@mui/material/Divider';
-import HelpIcon from '@mui/icons-material/Help';
-import WarningIcon from '@mui/icons-material/Warning';
-import ErrorIcon from '@mui/icons-material/Error';
-
+import SearchInput from './searchInput';
 import { uniqueID, useTranslation, useLanguage } from '../../utils';
 import { LazyDialog } from 'dialogs';
 import { useQueryContext } from '../queryContext';
-import { Paragraph } from '../../template/pageTypography';
-import { useStateWithDep } from '../hooks';
-import ErrorAlert from '../error';
 import { useFirebaseContext } from '../firebase';
 import { useDataProvider } from '../dataProvider';
-
-const _pageSize = 10;
+import SearchResult from './searchResult';
+import SearchSettings from './searchSettings';
 
 export function getInitialSearchResult() {
     return {
@@ -47,105 +30,32 @@ function getEmptySearchResult(query) {
     }
 }
 
-const SearchIconButton = styled(IconButton)(({theme}) => ({
-    padding: 10
-}));
-
-const StatusIcon = ({searchIsRunning}) => {
-    return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: 24,
-            height: 24
-        }}>
-            {
-                searchIsRunning === true ?
-                <CircularProgress size={20} /> :
-                <SearchIcon size={20}></SearchIcon>
-            }
-        </div>
-    );
-}
-
-const ResultStatus = ({searchResult}) => {
-    const totalCount = searchResult.totalCount;
-    if (searchResult.hasError === true) {
-        return <ErrorIcon sx={{ml: 1, color: red[400]}} />
-    } else if (totalCount === 0) {
-        return <WarningIcon sx={{ml: 1, color: orange[400]}} />
-    } else if (totalCount > 0) {
-        return <Chip color="success" sx={{ml: 1, bgcolor: totalCount > 0 ? green[600] : orange[700]}} label={totalCount}></Chip>
+function pushSearchConfigHistory(history, query, exact) {
+    const historyConfig = {
+        pathname: '/search'
+    };
+    if (query && query.length > 0) {
+        historyConfig.search = '?' + new URLSearchParams({query: query}).toString() + `&exact=${exact}`;
     }
-
-    return null;
-}
-
-const SearchInput = ({imageCount, searchResult, running, onChange, onOpenHelp, showResultCount, initialValue}) => {
-
-    const t = useTranslation("components.search");
-    const [value, setValue] = useStateWithDep(initialValue);
-
-    const onValueChange = useCallback((event) => {
-        setValue(event.target.value);
-        onChange(event)
-    }, [onChange, setValue])
-
-    return (
-        <Paper sx={{
-            display: 'flex',
-            alignItems: 'center',
-            width: '100%',
-            borderStyle: "solid",
-            borderWidth: "1px",
-            borderColor: theme => theme.palette.divider,
-            py: '2px',
-            px: '4px',
-            m: 0
-        }}>
-            <SearchIconButton disabled={true}>
-                <StatusIcon searchIsRunning={running}/>
-            </SearchIconButton>
-            <InputBase
-                sx={{
-                    flex: 1,
-                    ml: 1
-                }}
-                placeholder={imageCount !== undefined  ? t("inputPlaceHolder", imageCount) : ""}
-                autoFocus={true}
-                fullWidth
-                type="search"
-                onChange={onValueChange}
-                value={value}
-            />
-            <Divider
-                sx={{
-                    height: '28px',
-                    m: '4px'
-                }}
-                orientation="vertical"
-            />
-            {
-                showResultCount &&
-                <ResultStatus searchResult={searchResult} />
-            }
-            <SearchIconButton onClick={onOpenHelp}>
-                <HelpIcon />
-            </SearchIconButton>
-        </Paper>
-    );
+    history.push(historyConfig);
 }
 
 const Search = React.forwardRef(({
     showExactSwitch = true,
+    showHelp = true,
     onResult = null,
     galleryComponent = null,
     nextPageComponent = null,
     query = null,
     pushHistory = false,
-    pageIndex = 0}, ref) => {
+    pageIndex = 0,
+    expandable = false,
+    resultsOpen = false,
+    onCloseResults = null,
+    onExpandedChange = null,
+    pageSize = 10,
+    exact = false,
+    alignItems = 'center'}, ref) => {
 
     const t = useTranslation("components.search");
     const { language } = useLanguage();
@@ -157,7 +67,7 @@ const Search = React.forwardRef(({
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
     const [ searchResult, setSearchResult] = useState(getInitialSearchResult())
     const [ searchConfig, setSearchConfig ] = useState({
-        exact: false,
+        exact: exact ?? false,
         page: 0,
         query: query || ""
     });
@@ -175,6 +85,16 @@ const Search = React.forwardRef(({
             }
         })
     }, [query]);
+
+    useEffect(() => {
+        setSearchConfig(oldConfig => {
+            return {
+                ...oldConfig,
+                exact: exact,
+                page: 0
+            }
+        });
+    }, [exact]);
 
     useEffect(() => {
         setSearchConfig(oldConfig => {
@@ -207,7 +127,7 @@ const Search = React.forwardRef(({
 
         lastSearchProcessId.current = uniqueID();
 
-        dataProvider.searchImages(searchConfig.page, searchConfig.query, _pageSize, searchConfig.exact, lastSearchProcessId.current)
+        dataProvider.searchImages(searchConfig.page, searchConfig.query, pageSize, searchConfig.exact, lastSearchProcessId.current)
         .then(response => {
             if (response.processId !== lastSearchProcessId.current) {
                 console.log(`skip obsolete search results ${response.processId}`);
@@ -252,28 +172,35 @@ const Search = React.forwardRef(({
             setSearchIsRunning(false);
         })
 
-    }, [searchConfig, dataProvider, firebaseContext]);
+    }, [searchConfig, dataProvider, firebaseContext, pageSize]);
 
     const toggleSearchHelpOpen = useCallback(() => {
         setHelpOpen(open => !open);
     }, []);
 
+    const handleOnFocus = useCallback(() => {
+        if (onResult) {
+            onResult(searchResult);
+        }
+    }, [onResult, searchResult]);
+
     function handleChangeExact(event) {
-        setSearchConfig(oldConfig => {
-            return {
-                ...oldConfig,
-                exact: event.target.checked,
-                page: 0
-            }
-        });
+        if (pushHistory ===  true) {
+            pushSearchConfigHistory(history, searchConfig.query, event.target.checked);
+        } else {
+            setSearchConfig(oldConfig => {
+                return {
+                    ...oldConfig,
+                    exact: event.target.checked,
+                    page: 0
+                }
+            });
+        }
     }
 
     function setSearchQuery(newQuery) {
         if (pushHistory ===  true) {
-            history.push({
-                pathname: '/search',
-                search: '?' + new URLSearchParams({query: newQuery}).toString()
-            })
+            pushSearchConfigHistory(history, newQuery, searchConfig.exact);
         } else {
             setSearchConfig(oldConfig => {
                 return {
@@ -294,11 +221,26 @@ const Search = React.forwardRef(({
         })
     }, []);
 
-    function onQueryChange(event) {
+    const handleOnExpandedChange = useCallback((expanded) => {
+        if (onExpandedChange) {
+            onExpandedChange(expanded);
+        }
+        if (!expanded) {
+            // Clear search result
+            setSearchResult(getInitialSearchResult());
+            setSearchConfig(oldConfig => ({
+                ...oldConfig,
+                page: 0,
+                query: ""
+            }));
+        }
+    }, [onExpandedChange]);
+
+    function onQueryChange(newQuery) {
         if (searchTimer.current !== null) {
             clearTimeout(searchTimer.current);
         }
-        searchTimer.current = setTimeout(setSearchQuery, 500, event.target.value.trim());
+        searchTimer.current = setTimeout(setSearchQuery, 500, newQuery.trim());
     }
 
     const GalleryComponent = galleryComponent;
@@ -313,12 +255,13 @@ const Search = React.forwardRef(({
                     m: 0.5,
                 },
                 width: '100%',
-                maxWidth: '700px',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
+                justifyContent: 'flex-start',
+                alignItems: alignItems,
                 marginLeft: "auto",
-                marginRight: "auto"
+                marginRight: "auto",
+                ...(!expandable && {maxWidth: '700px' })
             }}
         >
             <SearchInput
@@ -329,34 +272,28 @@ const Search = React.forwardRef(({
                 onChange={onQueryChange}
                 onOpenHelp={toggleSearchHelpOpen}
                 showResultCount={GalleryComponent === null}
+                showHelp={showHelp}
                 initialValue={searchConfig.query}
+                expandable={expandable}
+                resultsOpen={resultsOpen}
+                onCloseResults={onCloseResults}
+                onExpandedChange={handleOnExpandedChange}
+                onFocus={handleOnFocus}
             />
             { 
-                showExactSwitch && 
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={searchConfig.exact}
-                            onChange={handleChangeExact}
-                            name="checkedExact"
-                            color="primary"
-                    />}
-                    label={t("exactSwitch")}
-                />
+                showExactSwitch && <SearchSettings config={searchConfig} onChangeExact={handleChangeExact} />
             }
         </Box>
         {
             GalleryComponent &&
             <React.Fragment>
-                {
-                    searchResult.hasError ? <ErrorAlert /> :
-                    searchResult.totalCount >= 0 && <Paragraph>{t("resultsCount", searchResult.totalCount)}</Paragraph>
-                }
+                <SearchResult result={searchResult} />
                 <GalleryComponent
                     images={searchResult.images}
                     count={searchResult.totalCount}
                     hasNext={searchResult.hasNext}
-                    onNextPage={handleNextPage} />
+                    onNextPage={handleNextPage}
+                />
             </React.Fragment>
         }
         {

@@ -13,7 +13,14 @@ const BodyTypography = ({children, ...other}) => (<Typography variant="body1" {.
 
 export const Anchor = ({index}) => (
     <span id={`anchor${index}`} />
-)
+);
+
+export const NoWrapAndEllipsis = {
+        whiteSpace: "nowrap",
+        width: "100%",
+        overflow: "hidden",
+        textOverflow: "ellipsis"
+};
 
 export const CustomDivider = () => <Divider variant="middle" sx={{ my: 3, mx: '20%', borderBottomWidth: 3, borderBottomColor: (theme) => theme.palette.primary.light}}/>
 

@@ -39,6 +39,7 @@ const Overlay = ({image, id}) => {
                 position: 'absolute',
                 top: '50%',
                 transform: 'translateY(-50%)',
+                width: "100%"
             }}>
                 <ImageDescription image={image} withNavigation={false}/>
             </Box>
