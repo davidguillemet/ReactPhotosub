@@ -195,12 +195,12 @@ DataProvider.prototype._getBucketContent = function(folder) {
     });
 }
 
-DataProvider.prototype.searchImages = function(pageIndex, query, pageSize, exact, processId) {
+DataProvider.prototype.searchImages = function(pageIndex, query, pageSize, settings, processId) {
     return this.axios.post('/search', {
         query: query,
         page: pageIndex,
         pageSize: pageSize,
-        exact: exact,
+        settings: settings,
         processId: processId
     }).then(response => {
         return response.data;

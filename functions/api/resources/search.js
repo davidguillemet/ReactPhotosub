@@ -163,8 +163,10 @@ module.exports = function(app, config) {
             const searchData = req.body;
             const page = searchData.page;
             const pageSize = searchData.pageSize;
-            const exact = searchData.exact;
+            const settings = searchData.settings;
             const processId = searchData.processId;
+
+            const exact = settings.exact;
 
             const searchQuery = searchData.query.trim().toLowerCase();
             const criteriaList = extractCriteriaList(searchQuery);

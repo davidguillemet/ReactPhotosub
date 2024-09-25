@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import Gallery from 'components/gallery';
-import Search from 'components/search';
+import Search, { getSettingsFromQueryParameters } from 'components/search';
 import { PageTitle } from 'template/pageTypography';
 import { useTranslation } from 'utils';
 import { useQueryParameter } from 'utils';
@@ -30,7 +30,7 @@ const SearchPage = () => {
     const t = useTranslation("pages.search");
     const getQueryParameter = useQueryParameter();
     const [query, setQuery] = React.useState(() => getQueryParameter("query"));
-    const [exact, setExact] = React.useState(() => getQueryParameter("exact"));
+    const [settings, setSettings] = React.useState(() => getSettingsFromQueryParameters(getQueryParameter));
 
     useEffect(() => {
         const locationQuery = getQueryParameter("query");
@@ -40,12 +40,9 @@ const SearchPage = () => {
     }, [getQueryParameter, query]);
 
     useEffect(() => {
-        const exactParameterString = getQueryParameter("exact");
-        const exactParameter = exactParameterString === 'true';
-        if (exactParameter !== exact) {
-            setExact(exactParameter)
-        }
-    }, [getQueryParameter, exact]);
+        const newSettings = getSettingsFromQueryParameters(getQueryParameter)
+        setSettings(newSettings);
+    }, [getQueryParameter]);
 
     return (
         <React.Fragment>
@@ -56,7 +53,7 @@ const SearchPage = () => {
                 nextPageComponent={NextPageButton}
                 pushHistory={true}
                 query={query}
-                exact={exact}
+                settings={settings}
             />
         </React.Fragment>
     );

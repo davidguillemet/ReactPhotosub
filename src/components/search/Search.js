@@ -10,17 +10,7 @@ import { useFirebaseContext } from '../firebase';
 import { useDataProvider } from '../dataProvider';
 import SearchResult from './searchResult';
 import SearchSettings from './searchSettings';
-
-export function getInitialSearchResult() {
-    return {
-        images: [],
-        hasNext: false,
-        hasError: false,
-        query: "",
-        page: 0,
-        totalCount: -1
-    }
-}
+import { getInitialSearchResult, pushSearchConfigHistory } from './searchUtils';
 
 function getEmptySearchResult(query) {
     return {
@@ -28,16 +18,6 @@ function getEmptySearchResult(query) {
         query: query,
         totalCount: 0
     }
-}
-
-function pushSearchConfigHistory(history, query, exact) {
-    const historyConfig = {
-        pathname: '/search'
-    };
-    if (query && query.length > 0) {
-        historyConfig.search = '?' + new URLSearchParams({query: query}).toString() + `&exact=${exact}`;
-    }
-    history.push(historyConfig);
 }
 
 const Search = React.forwardRef(({
@@ -54,7 +34,7 @@ const Search = React.forwardRef(({
     onCloseResults = null,
     onExpandedChange = null,
     pageSize = 10,
-    exact = false,
+    settings,
     alignItems = 'center'}, ref) => {
 
     const t = useTranslation("components.search");
@@ -67,7 +47,7 @@ const Search = React.forwardRef(({
     const [ searchIsRunning, setSearchIsRunning ] = useState(false);
     const [ searchResult, setSearchResult] = useState(getInitialSearchResult())
     const [ searchConfig, setSearchConfig ] = useState({
-        exact: exact ?? false,
+        settings: settings,
         page: 0,
         query: query || ""
     });
@@ -79,7 +59,7 @@ const Search = React.forwardRef(({
     useEffect(() => {
         setSearchConfig(prevConfig => {
             return {
-                exact: prevConfig.exact,
+                settings: prevConfig.settings,
                 page: 0,
                 query: query || ""
             }
@@ -90,11 +70,11 @@ const Search = React.forwardRef(({
         setSearchConfig(oldConfig => {
             return {
                 ...oldConfig,
-                exact: exact,
+                settings: { ...settings },
                 page: 0
             }
         });
-    }, [exact]);
+    }, [settings]);
 
     useEffect(() => {
         setSearchConfig(oldConfig => {
@@ -127,8 +107,13 @@ const Search = React.forwardRef(({
 
         lastSearchProcessId.current = uniqueID();
 
-        dataProvider.searchImages(searchConfig.page, searchConfig.query, pageSize, searchConfig.exact, lastSearchProcessId.current)
-        .then(response => {
+        dataProvider.searchImages(
+            searchConfig.page,
+            searchConfig.query,
+            pageSize,
+            searchConfig.settings,
+            lastSearchProcessId.current
+        ).then(response => {
             if (response.processId !== lastSearchProcessId.current) {
                 console.log(`skip obsolete search results ${response.processId}`);
                 return;
@@ -184,14 +169,14 @@ const Search = React.forwardRef(({
         }
     }, [onResult, searchResult]);
 
-    function handleChangeExact(event) {
+    function handleChangeSettings(settings) {
         if (pushHistory ===  true) {
-            pushSearchConfigHistory(history, searchConfig.query, event.target.checked);
+            pushSearchConfigHistory(history, searchConfig.query, settings);
         } else {
             setSearchConfig(oldConfig => {
                 return {
                     ...oldConfig,
-                    exact: event.target.checked,
+                    settings: { ...settings },
                     page: 0
                 }
             });
@@ -200,7 +185,7 @@ const Search = React.forwardRef(({
 
     function setSearchQuery(newQuery) {
         if (pushHistory ===  true) {
-            pushSearchConfigHistory(history, newQuery, searchConfig.exact);
+            pushSearchConfigHistory(history, newQuery, searchConfig.settings);
         } else {
             setSearchConfig(oldConfig => {
                 return {
@@ -281,7 +266,7 @@ const Search = React.forwardRef(({
                 onFocus={handleOnFocus}
             />
             { 
-                showExactSwitch && <SearchSettings config={searchConfig} onChangeExact={handleChangeExact} />
+                showExactSwitch && <SearchSettings settings={searchConfig.settings} onChange={handleChangeSettings} />
             }
         </Box>
         {

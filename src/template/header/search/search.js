@@ -9,7 +9,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 
-import Search, { SearchResult, SearchSettings, getInitialSearchResult } from 'components/search';
+import Search, { SearchResult, SearchSettings, defaultSettings, getInitialSearchResult, pushSearchConfigHistory } from 'components/search';
 import { HorizontalSpacing, VerticalSpacing } from 'template/spacing';
 import { useTranslation, useScrollBlock } from 'utils';
 import { useResizeObserver } from 'components/hooks';
@@ -42,7 +42,7 @@ const HeaderSearch = ({
     const [blockScroll, allowScroll] = useScrollBlock();
 
     const [ searchResult, setSearchResult ] = React.useState(getInitialSearchResult());
-    const [ exact, setExact ] = React.useState(false);
+    const [ settings, setSettings ] = React.useState(defaultSettings);
     const [ resultsOpen, setResultsOpen ] = React.useState(false);
     const [ loadingNextPage, setLoadingNextPage ] = React.useState(false);
     const [ pageIndex, setPageIndex ] = React.useState(0);
@@ -56,19 +56,19 @@ const HeaderSearch = ({
         setSearchResult(searchResult);
     }, []);
 
-    const handleChangeExact = React.useCallback((event) => {
-        setExact(event.target.checked);
+    const handleChangeSettings = React.useCallback((settings) => {
+        setSettings(settings);
     }, []);
 
-    const handleClose = React.useCallback(() => {
+    const handleClose = React.useCallback((param) => {
         setResultsOpen(false);
     }, []);
 
     const onSeeAllResults = React.useCallback(() => {
         handleClose();
         if (onExpandedChange) onExpandedChange(false);
-        history.push(`/search?query=${searchResult.query}&exact=${exact}`);
-    }, [history, searchResult, exact, handleClose, onExpandedChange]);
+        pushSearchConfigHistory(history, searchResult.query, settings);
+    }, [history, searchResult, settings, handleClose, onExpandedChange]);
 
     const handleNextSearchPage = React.useCallback(() => {
         setLoadingNextPage(true);
@@ -106,7 +106,7 @@ const HeaderSearch = ({
                     onExpandedChange={onExpandedChange}
                     pageSize={resultPageSize}
                     pageIndex={pageIndex}
-                    exact={exact}
+                    settings={settings}
                     alignItems='flex-start'
                 />
                 <Popper
@@ -139,7 +139,7 @@ const HeaderSearch = ({
                         <SearchResult result={searchResult} />
                         <Divider />
                         <VerticalSpacing factor={0.5} />
-                        <SearchSettings config={{ exact }} onChangeExact={handleChangeExact} />
+                        <SearchSettings settings={settings} onChange={handleChangeSettings} />
                         <VerticalSpacing factor={0.5} />
                         <ResultGallery
                             searchResult={searchResult}

@@ -14,7 +14,8 @@ const ResultGallery = ({
                 display: 'flex',
                 flexDirection: 'column',
                 flex: 1,
-                overflow: 'scroll'
+                overflowY: 'scroll',
+                overflowX: 'hidden'
             }}
         >
             <Gallery
