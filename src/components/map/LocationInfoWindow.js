@@ -27,7 +27,7 @@ const useStyles = makeStyles(() => ({
     },
     tripsGalery: {
         display: "flex",
-        overflowX: "scroll",
+        overflowX: "auto",
         overflowY: "hidden",
         maxWidth: 310,
         height: "auto",

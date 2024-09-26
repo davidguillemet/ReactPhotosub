@@ -65,7 +65,7 @@ const CustomMasonry = ({title, items, renderItem, type}) => {
                 height: 400,
                 p: 0.5,
                 overflowX: 'hidden',
-                overflowY: "scroll"
+                overflowY: "auto"
             }}>
                 <MasonryGallery
                     items={items.sort(transferContext.sortFunc)}
