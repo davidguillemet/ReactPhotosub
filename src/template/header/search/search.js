@@ -15,6 +15,7 @@ import { useTranslation, useScrollBlock } from 'utils';
 import { useResizeObserver } from 'components/hooks';
 import TooltipIconButton from 'components/tooltipIconButton';
 import ResultGallery from './resultGallery';
+import { useAppContext } from 'template/app/appContext';
 
 const popperSizeModifier = {
     name: "SizeModifier",
@@ -36,6 +37,7 @@ const HeaderSearch = ({
 }) => {
 
     const history = useHistory();
+    const { subscribeHistory, unsubscribeHistory } = useAppContext();
 
     const t = useTranslation("components.search");
 
@@ -60,7 +62,7 @@ const HeaderSearch = ({
         setSettings(settings);
     }, []);
 
-    const handleClose = React.useCallback((param) => {
+    const handleClose = React.useCallback(() => {
         setResultsOpen(false);
     }, []);
 
@@ -90,6 +92,12 @@ const HeaderSearch = ({
         if (resultsPaperRef.current === null) return;
         resultsPaperRef.current.width = searchInputBoxResizeObserver.width;
     }, [searchInputBoxResizeObserver.width]);
+
+    React.useEffect(() => {
+        const componentId = "headerSearch";
+        subscribeHistory(componentId, handleClose);
+        return () => unsubscribeHistory(componentId);
+    }, [subscribeHistory, unsubscribeHistory, handleClose]);
 
     return (
         <ClickAwayListener onClickAway={handleClose}>

@@ -15,15 +15,16 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import MuiDrawer from '@mui/material/Drawer';
 
-import { routes, NavigationLink, ROUTES_NAMESPACE } from '../navigation/routes';
-import Footer from './footer';
-import Header from './header';
-import PageContent from './pageContent';
-import { VerticalSpacing } from './spacing';
+import { routes, NavigationLink, ROUTES_NAMESPACE } from '../../navigation/routes';
+import Footer from '../footer';
+import Header from '../header';
+import PageContent from '../pageContent';
+import { VerticalSpacing } from '../spacing';
 import SocialIcons from 'components/socialIcons';
 import LanguageSelector from 'components/language';
 import { DarkModeSelector } from 'components/theme';
-import { useTranslation } from '../utils';
+import { useTranslation } from '../../utils';
+import { AppContextProvider, useAppContext } from './appContext';
 
 const drawerWidth = 240;
 const miniDrawerWidth = 56;
@@ -106,9 +107,18 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     }),
 );
 
-const DrawerContent = ({open, handleClose, handleDrawerOpen, variant = "temporary"}) => {
+const DrawerContent = ({variant = "temporary"}) => {
 
     const t = useTranslation(ROUTES_NAMESPACE);
+    const { drawerOpen: open, setDrawerOpen } = useAppContext();
+
+    const handleClose = React.useCallback(() => {
+        setDrawerOpen(false);
+    }, [setDrawerOpen]);
+
+    const handleOpen = React.useCallback(() => {
+        setDrawerOpen(true);
+    }, [setDrawerOpen]);
 
     return (
         <div>
@@ -130,7 +140,7 @@ const DrawerContent = ({open, handleClose, handleDrawerOpen, variant = "temporar
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
-                        onClick={handleDrawerOpen}
+                        onClick={handleOpen}
                         edge="start"
                         sx={{ ml: "-5px", ...(open && { display: 'none' }) }}
                         size="large">
@@ -203,41 +213,39 @@ const DrawerContent = ({open, handleClose, handleDrawerOpen, variant = "temporar
     )
 };
 
-const AppContent = React.forwardRef((props, ref) => {
+const isImageLocation = (locationSearch) => {
+    return locationSearch.startsWith("?image=");
+}
 
-    const drawerSubscriptions = React.useRef([]);
-    const subscribeDrawer = React.useCallback((func) => {
-        drawerSubscriptions.current.push(func);
-    }, []);
+const AppContentUI = React.forwardRef((props, ref) => {
+
+    const { drawerOpen, setDrawerOpen, subscribeHistory, unsubscribeHistory } = useAppContext();
     const location = useLocation();
     const isHomePage = location.pathname === '/';
 
-    const [open, setOpen] = React.useState(false);
+    const previousLocationSearch = React.useRef("");
 
-    const handleDrawerOpen = React.useCallback(() => {
-        setOpen(true);
-        drawerSubscriptions.current.forEach(func => func(true));
-    }, []);
+    const handleHistoryChanged = React.useCallback((location) => {
+        setDrawerOpen(false);
+        if (!isImageLocation(location.search) && !isImageLocation(previousLocationSearch.current)) {
+            // Scroll to the top of the new page, unless we display an image in the expanded view (new location)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+        previousLocationSearch.current = location.search;
+    }, [setDrawerOpen]);
 
-    const handleDrawerClose = React.useCallback(() => {
-        setOpen(false);
-        drawerSubscriptions.current.forEach(func => func(false));
-    }, []);
-
-    const handleHistoryChanged = React.useCallback(() => {
-        handleDrawerClose();
-    }, [handleDrawerClose]);
+    React.useEffect(() => {
+        const componentId = "appContent";
+        subscribeHistory(componentId, handleHistoryChanged);
+        return () => unsubscribeHistory(componentId);
+    }, [subscribeHistory, unsubscribeHistory, handleHistoryChanged]);
 
     const container = window !== undefined ? () => window.document.body : undefined;
 
     return (
         <React.Fragment>
 
-            <Header
-                open={open}
-                handleDrawerOpen={handleDrawerOpen}
-                handleDrawerClose={handleDrawerClose}
-            />
+            <Header />
 
             <Box
                 component="nav"
@@ -250,9 +258,9 @@ const AppContent = React.forwardRef((props, ref) => {
                     container={container}
                     variant="temporary"
                     anchor="left"
-                    open={open}
-                    onClose={handleDrawerClose}
-                    onOpen={handleDrawerOpen}
+                    open={drawerOpen}
+                    onClose={() => setDrawerOpen(false)}
+                    onOpen={() => setDrawerOpen(true)}
                     sx={{
                         /*display: { xs: 'block', lg: 'none' },*/
                         '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
@@ -264,7 +272,7 @@ const AppContent = React.forwardRef((props, ref) => {
                         keepMounted: true, // Better open performance on mobile.
                     }}
                 >
-                    <DrawerContent handleClose={handleDrawerClose} handleDrawerOpen={handleDrawerOpen} open={open} variant="temporary" />
+                    <DrawerContent variant="temporary" />
                 </SwipeableDrawer>
 
                 <Drawer
@@ -274,7 +282,7 @@ const AppContent = React.forwardRef((props, ref) => {
                         display: { xs: 'none', lg: (isHomePage ? 'none' : 'block') }
                     }}
                 >
-                    <DrawerContent handleClose={handleDrawerClose} handleDrawerOpen={handleDrawerOpen} open={open} variant="permanent" />
+                    <DrawerContent variant="permanent" />
                 </Drawer>
             </Box>
 
@@ -293,12 +301,20 @@ const AppContent = React.forwardRef((props, ref) => {
             >
                 <div id={scrollTopAnchor} />
                 <DrawerHeader />
-                <PageContent onHistoryChanged={handleHistoryChanged} subscribeDrawer={subscribeDrawer} />
+                <PageContent />
                 <Footer />
             </Box>
 
         </React.Fragment>
     );
 });
+
+const AppContent = (props) => {
+    return (
+        <AppContextProvider>
+            <AppContentUI {...props} />
+        </AppContextProvider>
+    )
+}
 
 export default AppContent;

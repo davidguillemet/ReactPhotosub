@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import { FirebaseSignin } from 'components/firebase';
 import { useDarkMode } from 'components/theme';
 import HeaderSearch from './search/search';
+import { useAppContext } from 'template/app/appContext';
 
 function HideOnScroll(props) {
     const { children } = props;
@@ -35,7 +36,9 @@ const AppBar = styled(MuiAppBar, {
     })
 }));
 
-const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
+const TopToolBar = () => {
+
+    const { drawerOpen: open, setDrawerOpen } = useAppContext();
 
     const scrollTrigger = useScrollTrigger({
         disableHysteresis: true,
@@ -78,7 +81,7 @@ const TopToolBar = ({ open, handleDrawerOpen, handleDrawerClose }) => {
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
-                        onClick={handleDrawerOpen}
+                        onClick={() => setDrawerOpen(true)}
                         sx={{ mr: 0, ...(open && { display: 'none' }) }}
                         size="large"
                     >
