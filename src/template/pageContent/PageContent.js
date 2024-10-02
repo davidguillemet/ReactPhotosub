@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { Switch, Route } from "react-router-dom";
 import { routes } from '../../navigation/routes';
-import { Loading } from '../../components/hoc';
+import { FullPageLoading } from 'components/loading';
 import NotFound from '../../pages/notFound';
 import { HelmetFull } from '../seo';
 import { ToastNotifications } from '../../components/notifications';
@@ -50,7 +50,7 @@ const PageContent = React.forwardRef((props, ref) => {
             maxWidth={false}
             {...props}
         >
-            <Suspense fallback={<Loading />}>
+            <Suspense fallback={<FullPageLoading />}>
                 <Switch>
                     {
                         routes.map((route, index) => {

@@ -3,8 +3,8 @@ import { EmailAuthProvider, onAuthStateChanged, reauthenticateWithCredential } f
 import AuthContext from './authContext';
 import { useFirebaseContext } from '../firebase';
 import { useToast } from '../notifications';
-import { Loading } from 'components/hoc';
 import { useQueryContext } from 'components/queryContext';
+import { FullPageLoading } from 'components/loading';
 
 const AuthProvider = ({ children }) => {
 
@@ -92,7 +92,7 @@ const AuthProvider = ({ children }) => {
 
     if (userContext.user === undefined) {
         return (
-            <Loading size={40} />
+            <FullPageLoading />
         );
     }
 

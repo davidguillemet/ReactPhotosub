@@ -28,7 +28,7 @@ const scrollTopAnchor = "back-to-top-anchor";
 const App = (props) => {
 
     return (
-        <Box sx={{ display: 'flex' }} id="AppContainer">
+        <Box sx={{ display: 'flex', minHeight: "100%"}} id="AppContainer">
             <StyledEngineProvider injectFirst>
                 <ChainedProviders
                     providers={[

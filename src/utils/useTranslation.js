@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { Loading } from 'components/hoc';
 import { useOverlay } from 'components/loading';
 import { useToast } from 'components/notifications';
-import { Box } from '@mui/material';
+import { FullPageLoading } from 'components/loading';
 
 const TranslationContext = React.createContext(null);
 
@@ -122,17 +121,7 @@ export const TranslationProvider = ({children}) => {
 
     if (resources.current === null) {
         return (
-            <Box
-                id="languageLoadingBox"
-                sx={{
-                    display: "flex",
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center"
-                }}
-            >
-                <Loading />
-            </Box>
+            <FullPageLoading />
         )
     }
 
