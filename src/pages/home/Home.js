@@ -57,8 +57,7 @@ const Home = ({images, currentIndex}) => {
         return () => {
             allowScroll();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [blockScroll, allowScroll]);
 
     useEffect(() => {
         // Just create a first timeout to display the first image a few seconds...
