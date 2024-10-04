@@ -76,7 +76,13 @@ export const QueryContextProvider = ({children}) => {
             ];
             await queryClient.invalidateQueries({
                 predicate: (query) => {
-                    const invalidate = mainKeyForDestinations.includes(query.queryKey[0]);
+                    let invalidate = mainKeyForDestinations.includes(query.queryKey[0]);
+                    if (invalidate && query.queryKey[0] === DESTINATION_QUERY_BASE_KEY) {
+                        const destinationPath = query.queryKey[1];
+                        if (!destinationPath) {
+                            invalidate = false;
+                        }
+                    }
                     return invalidate;
                 },
                 refetchType: 'all'

@@ -78,8 +78,8 @@ module.exports = function(app, config) {
                     } else {
                         const destination = destinations.rows[0];
                         if (destination.published === false && isAdmin === false) {
-                            // HTTP 404 : destination not published and not admin user
-                            res.sendStatus(404);
+                            // HTTP 401 : destination not published and not admin user
+                            res.sendStatus(401);
                         } else {
                             convertPath(destination, config);
                             res.json(destination);
