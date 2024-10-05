@@ -33,7 +33,8 @@ const popperSizeModifier = {
 
 const HeaderSearch = ({
     resultPageSize = 6,
-    onExpandedChange
+    onExpandedChange,
+    visible
 }) => {
 
     const history = useHistory();
@@ -101,7 +102,12 @@ const HeaderSearch = ({
 
     return (
         <ClickAwayListener onClickAway={handleClose}>
-            <Box sx={{width: "100%"}}>
+            <Box
+                sx={{
+                    width: "100%",
+                    display: visible ? "flex" : "none"
+                }}
+            >
                 <Search
                     ref={searchInputBoxResizeObserver.ref}
                     showExactSwitch={false}

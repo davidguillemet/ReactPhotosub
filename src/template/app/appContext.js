@@ -11,7 +11,7 @@ export const AppContextProvider = ({ children }) => {
         historySubscriptions.current.set(key, func);
     }, []);
     const unsubscribeHistory = React.useCallback((key) => {
-        historySubscriptions.current.delete(key)
+        historySubscriptions.current.delete(key);
     }, []);
     const callHistoryObservers = React.useCallback((location) => {
         historySubscriptions.current.values().forEach(fn => fn(location));

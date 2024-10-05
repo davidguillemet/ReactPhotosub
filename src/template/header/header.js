@@ -40,6 +40,8 @@ const TopToolBar = () => {
 
     const { drawerOpen: open, setDrawerOpen } = useAppContext();
 
+    const [ searchExpanded, setSearchExpanded ] = React.useState(false);
+
     const scrollTrigger = useScrollTrigger({
         disableHysteresis: true,
         threshold: 0
@@ -47,17 +49,9 @@ const TopToolBar = () => {
     const { darkMode } = useDarkMode();
     const location = useLocation();
 
-    const signInContainerRef = React.useRef(null);
-    const handleOnSearchExpandedChange = React.useCallback((searchExpanded) => {
-        if (searchExpanded) {
-            signInContainerRef.current.classList.add('hidden');
-        } else {
-            signInContainerRef.current.classList.remove('hidden');
-        }
-    }, []);
-
     const transparent = location.pathname === '/';
     const isSearchPage = location.pathname === '/search';
+    const loginVisible = !searchExpanded || isSearchPage;
 
     return (
         <HideOnScroll>
@@ -90,16 +84,15 @@ const TopToolBar = () => {
                 }
 
                 <Box
-                    ref={signInContainerRef}
                     sx={{
                         display: 'flex',
                         flexGrow: 0,
                         zIndex: 1,
                         transition: 'opacity 0.5s',
-                        '&.hidden': {
+                        ...(!loginVisible && {
                             opacity: 0,
                             zIndex: 0
-                        }
+                        })
                     }}
                 >
                     <FirebaseSignin />
@@ -107,9 +100,9 @@ const TopToolBar = () => {
 
                 { /* Search after FirebaseSignin to make sure zIndex is greater */ }
                 {   
-                    !isSearchPage &&
                     <HeaderSearch
-                        onExpandedChange={handleOnSearchExpandedChange}
+                        visible={!isSearchPage}
+                        onExpandedChange={setSearchExpanded}
                     />
                 }
 
