@@ -37,9 +37,9 @@ export const useScrollBlock = () => {
         if (!body || !body.style || !scrollBlocked.current) return;
 
         html.style.position = '';
-        html.style.overflow = 'auto';
+        html.style.overflow = '';
         body.style.position = '';
-        body.style.overflow = 'auto'
+        body.style.overflow = ''
         body.style.paddingRight = '';
 
         scrollBlocked.current = false;
