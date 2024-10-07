@@ -14,7 +14,8 @@ export const AppContextProvider = ({ children }) => {
         historySubscriptions.current.delete(key);
     }, []);
     const callHistoryObservers = React.useCallback((location) => {
-        historySubscriptions.current.values().forEach(fn => fn(location));
+        // [...xxx.values()] otherwise it does not work on mobile...
+        [...historySubscriptions.current.values()].forEach(fn => fn(location));
     }, []);
 
     React.useEffect(() => {
