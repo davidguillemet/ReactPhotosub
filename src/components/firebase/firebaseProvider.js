@@ -41,10 +41,10 @@ const firebaseAuth = getAuth(firebaseApp);
 const firebaseStorage = getStorage(firebaseApp);
 const firebaseAnalytics = isDev ? null : getAnalytics(firebaseApp);
 
-const storageHost = isDev ? "http://localhost:9199" : "https://storage.googleapis.com";
+const storageHost = isDev ? `http://${process.env.REACT_APP_DEV_HOST}:9199` : "https://storage.googleapis.com";
 if (isDev) {
-    connectAuthEmulator(firebaseAuth, "http://localhost:9099");
-    connectStorageEmulator(firebaseStorage, "localhost", 9199);
+    connectAuthEmulator(firebaseAuth, `http://${process.env.REACT_APP_DEV_HOST}:9099`);
+    connectStorageEmulator(firebaseStorage, process.env.REACT_APP_DEV_HOST, 9199);
 }
 
 const _ghostFileName = ".ghost";

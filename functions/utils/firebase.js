@@ -14,7 +14,10 @@ const bucket = admin.storage().bucket(process.env.FIREBASE_CONFIG.storageBucket)
 
 function convertPathToUrl(imagePath) {
     // TODO : maybe remove decodeURI once the download Uri strategy has been refined...
-    return decodeURIComponent(bucket.file(imagePath).publicUrl());
+    const imageUrl = decodeURIComponent(bucket.file(imagePath).publicUrl());
+    return process.env.FUNCTIONS_EMULATOR === "true" ?
+        imageUrl.replace("127.0.0.1", process.env.REACT_APP_DEV_HOST) :
+        imageUrl;
 }
 
 module.exports = {

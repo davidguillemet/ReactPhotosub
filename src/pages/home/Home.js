@@ -173,6 +173,9 @@ const HomeController = () => {
         setImages(shuffleArray(data).map(image => {
             return {
                 ...image,
+                ...(process.env.REACT_APP_USE_FUNCTIONS_EMULATOR === 'true' && {
+                    src: image.src.replace("127.0.0.1", process.env.REACT_APP_DEV_HOST)
+                }),
                 id: uniqueID()
             }
         }));

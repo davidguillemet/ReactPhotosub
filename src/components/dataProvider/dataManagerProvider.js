@@ -11,7 +11,7 @@ const isDev = () => {
 
 const apiBaseUrl =
     process.env.REACT_APP_USE_FUNCTIONS_EMULATOR === 'true' ?
-    'http://localhost:5003/photosub/us-central1/mainapi':
+    `http://${process.env.REACT_APP_DEV_HOST}:5003/photosub/us-central1/mainapi`:
     '';
 
 const createAxiosInstance = (firebaseContext) => {
