@@ -2,8 +2,11 @@ import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useHistory } from 'react-router-dom';
 import { Box, Paper } from '@mui/material';
-import Popper from '@mui/material/Popper';
-import ClickAwayListener from '@mui/base/ClickAwayListener';
+import { ClickAwayListener } from '@mui/base/ClickAwayListener';
+import { Unstable_Popup as Popup } from '@mui/base/Unstable_Popup';
+import { size } from '@floating-ui/dom';
+import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+
 import Divider from '@mui/material/Divider';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
@@ -11,25 +14,11 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 
 import Search, { SearchResult, SearchSettings, defaultSettings, getInitialSearchResult, pushSearchConfigHistory } from 'components/search';
 import { HorizontalSpacing, VerticalSpacing } from 'template/spacing';
-import { useTranslation, useScrollBlock } from 'utils';
-import { useResizeObserver } from 'components/hooks';
+import { useTranslation } from 'utils';
 import TooltipIconButton from 'components/tooltipIconButton';
 import ResultGallery from './resultGallery';
 import { useAppContext } from 'template/app/appContext';
-
-const popperSizeModifier = {
-    name: "SizeModifier",
-    enabled: true,
-    phase: 'read',
-    fn: ({state}) => {
-        const popperOffsets = state.modifiersData.popperOffsets;
-        const popperMaxHeight = window.innerHeight - popperOffsets.y - 10;
-        state.styles.popper = {
-            ...state.styles.popper,
-            maxHeight: `${popperMaxHeight}px`
-        };
-    }
-};
+import { useTheme } from '@mui/material';
 
 const HeaderSearch = ({
     resultPageSize = 6,
@@ -37,12 +26,11 @@ const HeaderSearch = ({
     visible
 }) => {
 
+    const theme = useTheme();
     const history = useHistory();
     const { subscribeHistory, unsubscribeHistory } = useAppContext();
 
     const t = useTranslation("components.search");
-
-    const [blockScroll, allowScroll] = useScrollBlock();
 
     const [ searchResult, setSearchResult ] = React.useState(getInitialSearchResult());
     const [ settings, setSettings ] = React.useState(defaultSettings);
@@ -50,8 +38,27 @@ const HeaderSearch = ({
     const [ loadingNextPage, setLoadingNextPage ] = React.useState(false);
     const [ pageIndex, setPageIndex ] = React.useState(0);
 
-    const searchInputBoxResizeObserver = useResizeObserver();
+    const searchInputBoxRef = React.useRef();
     const resultsPaperRef = React.useRef(null);
+    const resultsGalleryRef = React.useRef(null);
+
+    const setGalleryResultRef = React.useCallback(element => {
+        resultsGalleryRef.current = element;
+        if (resultsGalleryRef.current !== null) {
+            disableBodyScroll(resultsGalleryRef.current);
+        }
+    }, []);
+    React.useEffect(() => {
+        if (!resultsOpen) {
+            clearAllBodyScrollLocks();
+        }
+    }, [resultsOpen]);
+
+    React.useEffect(() => {
+        return () => {
+            clearAllBodyScrollLocks();
+        }
+    }, []);
 
     const onShowSearchResult = React.useCallback((searchResult) => {
         setLoadingNextPage(false);
@@ -69,9 +76,8 @@ const HeaderSearch = ({
 
     const onSeeAllResults = React.useCallback(() => {
         handleClose();
-        if (onExpandedChange) onExpandedChange(false);
         pushSearchConfigHistory(history, searchResult.query, settings);
-    }, [history, searchResult, settings, handleClose, onExpandedChange]);
+    }, [history, searchResult, settings, handleClose]);
 
     const handleNextSearchPage = React.useCallback(() => {
         setLoadingNextPage(true);
@@ -79,26 +85,38 @@ const HeaderSearch = ({
     }, []);
 
     React.useEffect(() => {
-        if (resultsOpen) {
-            blockScroll();
-        } else {
-            allowScroll();
-        }
-        return () => {
-            allowScroll();
-        }
-    }, [resultsOpen, blockScroll, allowScroll]);
-
-    React.useEffect(() => {
-        if (resultsPaperRef.current === null) return;
-        resultsPaperRef.current.width = searchInputBoxResizeObserver.width;
-    }, [searchInputBoxResizeObserver.width]);
-
-    React.useEffect(() => {
         const componentId = "headerSearch";
         subscribeHistory(componentId, handleClose);
         return () => unsubscribeHistory(componentId);
     }, [subscribeHistory, unsubscribeHistory, handleClose]);
+
+    const toolbarPadding = 10;
+
+    const popupMiddlewarePosition = React.useMemo(() => {
+        return {
+            name: "SearchResultsMiddlewarePosition",
+            fn: ({x, y, elements, rects}) => {
+                // Set zIndex between Drawer=1200 and Modal=1300 (ExpandedView)
+                elements.floating.style.setProperty("z-index", theme.zIndex.drawer + 10);
+                return {
+                    x: toolbarPadding,
+                    y: rects.reference.y + rects.reference.height,
+                };
+            }
+        }
+    }, [theme]);
+
+    const popupMiddlewareSizeOptions = React.useMemo(() => {
+        return {
+            apply: ({availableWidth, availableHeight, elements, rects}) => {
+                Object.assign(elements.floating.style, {
+                    width: `${window.innerWidth - 2*toolbarPadding}px`,
+                    maxHeight: `${Math.max(0, availableHeight - 10)}px`,
+                    display: 'flex'
+                });
+            }
+        };
+    }, []);
 
     return (
         <ClickAwayListener onClickAway={handleClose}>
@@ -109,7 +127,7 @@ const HeaderSearch = ({
                 }}
             >
                 <Search
-                    ref={searchInputBoxResizeObserver.ref}
+                    ref={searchInputBoxRef}
                     showExactSwitch={false}
                     pushHistory={false}
                     expandable={true}
@@ -123,13 +141,13 @@ const HeaderSearch = ({
                     settings={settings}
                     alignItems='flex-start'
                 />
-                <Popper
+                <Popup
                     open={resultsOpen}
-                    anchorEl={searchInputBoxResizeObserver.element}
+                    anchor={searchInputBoxRef.current}
                     placement="bottom-start"
-                    sx={{ zIndex: theme => theme.zIndex.modal, display: 'flex' }}
-                    modifiers={[
-                        popperSizeModifier
+                    middleware={[
+                        size(popupMiddlewareSizeOptions),
+                        popupMiddlewarePosition
                     ]}
                 >
                     <Paper
@@ -145,7 +163,7 @@ const HeaderSearch = ({
                             paddingTop: 0,
                             display: 'flex',
                             flexDirection: 'column',
-                            width: `${searchInputBoxResizeObserver.width}px`,
+                            width: '100%',
                             backgroundColor: (theme) => theme.palette.background
                         }}
                     >
@@ -156,6 +174,7 @@ const HeaderSearch = ({
                         <SearchSettings settings={settings} onChange={handleChangeSettings} />
                         <VerticalSpacing factor={0.5} />
                         <ResultGallery
+                            ref={setGalleryResultRef}
                             searchResult={searchResult}
                             handleNextSearchPage={handleNextSearchPage}
                             loadingNextPage={loadingNextPage}
@@ -198,7 +217,7 @@ const HeaderSearch = ({
                             </TooltipIconButton>
                         </Box>
                     </Paper>
-                </Popper>
+                </Popup>
             </Box>
         </ClickAwayListener>
     );

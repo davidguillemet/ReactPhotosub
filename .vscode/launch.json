@@ -8,13 +8,19 @@
             "type": "node",
             "request": "attach",
             "name": "Debug functions",
-            "port": 9229
+            "port": 9232
         },
         {
         "type": "chrome",
         "request": "launch",
         "name": "Debug React Photosub",
-        "url": "http://localhost:5002"
+        "url": "http://localhost:3000"
+        },
+        {
+        "type": "chrome",
+        "request": "launch",
+        "name": "Debug React Photosub Mobile",
+        "url": "http://192.168.1.11:3000"
         }
     ]
 }

@@ -3,13 +3,14 @@ import { Box } from '@mui/material';
 import Gallery from 'components/gallery';
 import NextPageButton from './nextPageButton';
 
-const ResultGallery = ({
+const ResultGallery = React.forwardRef(({
     searchResult,
     handleNextSearchPage,
     loadingNextPage
-}) => {
+}, ref) => {
     return (
         <Box
+            ref={ref}
             sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -31,6 +32,6 @@ const ResultGallery = ({
             }
         </Box>
     );
-};
+});
 
 export default ResultGallery;

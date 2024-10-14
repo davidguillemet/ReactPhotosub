@@ -1,6 +1,7 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
 import { green, orange, red } from '@mui/material/colors';
+import { isMobile } from 'react-device-detect';
 import Box from "@mui/material/Box";
 import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
@@ -15,14 +16,10 @@ import InputBase from '@mui/material/InputBase';
 import Chip from "@mui/material/Chip";
 
 import { gsap } from "gsap";
-import { Flip } from "gsap/Flip";
 import { useGSAP } from '@gsap/react';
 
-import { useTranslation } from '../../utils';
+import { useTranslation, debounce } from 'utils';
 import { useStateWithDep } from '../hooks';
-
-gsap.registerPlugin(useGSAP);
-gsap.registerPlugin(Flip);
 
 const SearchIconButton = styled(IconButton)(({theme}) => ({
     padding: 10,
@@ -43,7 +40,7 @@ const StatusIcon = ({searchIsRunning}) => {
             {
                 searchIsRunning === true ?
                 <CircularProgress size={20} color="inherit"/> :
-                <SearchIcon size={20} color="inherit"></SearchIcon>
+                <SearchIcon fontSize={isMobile ? "small" : "medium"} color="inherit"></SearchIcon>
             }
         </Box>
     );
@@ -90,16 +87,16 @@ const SearchInput = ({
     }, [onChange, setValue])
 
     const onClickSearchIcon = React.useCallback(() => {
-        setExpanded(true);
+        setExpanded(prevExpanded => !prevExpanded);
     }, []);
 
+    const debouncedOnClickSearchIcon = React.useMemo(() => {
+        return debounce(onClickSearchIcon, 500, true /* Immediate */);
+    }, [onClickSearchIcon]);
+
     const onClearSearch = React.useCallback(() => {
-        if (expandable) {
-            setExpanded(false);
-        } else {
-            onChange('');
-        }
-    }, [expandable, onChange]);
+        onChange('');
+    }, [onChange]);
 
     const handleOnFocus = React.useCallback(() => {
         if (expandable && expanded) {
@@ -122,9 +119,8 @@ const SearchInput = ({
                 const expandTween = gsap.to(containerRef.current, {
                     duration: animationDuration,
                     ease: animationEase,
-                    width: "100%",
-                    borderWidth: "1px",
-                    borderColor: "rgb(255,255,255,0.5)",
+                    width: `100%`,
+                    borderColor: "rgb(255,255,255,0.4)",
                     backgroundColor: 'rgb(255,255,255,0.1)',
                     onStart: () => {
                         if (onExpandedChange) onExpandedChange(true);
@@ -149,12 +145,8 @@ const SearchInput = ({
             });
         } else if (expandTimelineRef.current !== null) {
             if (onCloseResults) onCloseResults();
-            expandTimelineRef.current.reverse().then((timeline) => {
-                // Maybe we clicked again on the expanse button while
-                // the reversed animation was not completed
-                // -> in that case, we should not fire the expandChange event as false
-                if (timeline.reversed() && onExpandedChange) onExpandedChange(false);
-            });
+            if (onExpandedChange) onExpandedChange(false);
+            expandTimelineRef.current.reverse();
         }
     }, {
         dependencies: [expanded],
@@ -176,12 +168,13 @@ const SearchInput = ({
             ref={containerRef}
             elevation={!expandable || expanded ? 1 : 0}
             sx={{
+                position: 'relative',
                 display: 'flex',
                 alignItems: 'center',
                 width: expandable ? '56px' : '100%',
                 borderRadius: (theme) => theme.shape.borderRadius,
                 borderStyle: "solid",
-                borderWidth: expandable ? "0px" : "1px",
+                borderWidth: "1px",
                 borderColor: theme => expandable ? 'rgb(255,255,255,0)' : theme.palette.divider,
                 backgroundColor: 'rgb(255,255,255,0)',
                 py: '2px',
@@ -196,7 +189,7 @@ const SearchInput = ({
         >
             <SearchIconButton
                 disabled={!expandable}
-                onClick={expandable ? onClickSearchIcon : null}
+                onClick={expandable ? debouncedOnClickSearchIcon : null}
             >
                 <StatusIcon searchIsRunning={running} />
             </SearchIconButton>
@@ -207,7 +200,7 @@ const SearchInput = ({
                     ml: 1,
                     opacity: expandable ? 0 : 1,
                     display: expandable ? 'none' : 'flex',
-                    color: 'inherit',
+                    color: 'inherit'
                 }}
                 placeholder={imageCount !== undefined  ? t("inputPlaceHolder", imageCount) : ""}
                 autoFocus={true}
@@ -221,9 +214,6 @@ const SearchInput = ({
                         <CloseIcon size="small"/>
                     </IconButton>
                 }
-                inputProps={{
-                    disableClearable: true
-                }}
             />
             <Box
                 ref={inputAdornmentRef}
@@ -238,7 +228,8 @@ const SearchInput = ({
                     <Divider
                         sx={{
                             height: '28px',
-                            m: '4px'
+                            m: '4px',
+                            color: 'inherit' // TODO change divider color in header bar
                         }}
                         orientation="vertical"
                     />

@@ -21,7 +21,6 @@ import Paper from '@mui/material/Paper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import MenuList from '@mui/material/MenuList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { isMobile } from 'react-device-detect';
 
 import { useAuthContext } from '../authentication';
 import { routes, NavigationLink, ROUTES_NAMESPACE } from '../../navigation/routes';
@@ -57,11 +56,7 @@ const LoadingUserState = () => {
         <Box
             sx={{
                 display: 'flex',
-                position: 'absolute',
                 alignItems: 'center',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                right: isMobile ? 10 : 20
             }}
         >
             <Loading size={24} sx={{mt: 0, color: 'white'}}/>
@@ -121,10 +116,6 @@ const SignedInButton = ({handleLogout}) => {
                 deleteIcon={<MoreVertIcon />}
                 onDelete={handleToggle}
                 sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    right: isMobile ? 10 : 20,
                     borderColor: 'white',
                     '& .MuiChip-avatar, & .MuiChip-deleteIcon, & .MuiChip-deleteIcon:hover, & .MuiChip-label': {
                         color: 'white'

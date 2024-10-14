@@ -1,9 +1,9 @@
 import React  from 'react';
 import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
+import { IconButton } from '@mui/material';
 import Toolbar from '@mui/material/Toolbar';
 import MuiAppBar from '@mui/material/AppBar';
-import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Slide from '@mui/material/Slide';
@@ -12,6 +12,9 @@ import { FirebaseSignin } from 'components/firebase';
 import { useDarkMode } from 'components/theme';
 import HeaderSearch from './search/search';
 import { useAppContext } from 'template/app/appContext';
+
+import { gsap } from "gsap";
+import { useGSAP } from '@gsap/react';
 
 function HideOnScroll(props) {
     const { children } = props;
@@ -40,6 +43,9 @@ const TopToolBar = () => {
 
     const { drawerOpen: open, setDrawerOpen } = useAppContext();
 
+    const menuIconRef = React.useRef(null);
+    const loginRef = React.useRef(null);
+
     const [ searchExpanded, setSearchExpanded ] = React.useState(false);
 
     const scrollTrigger = useScrollTrigger({
@@ -49,9 +55,37 @@ const TopToolBar = () => {
     const { darkMode } = useDarkMode();
     const location = useLocation();
 
+    const expandTimelineRef = React.useRef(null);
+
+    const animationEase = "power1.inOut";
+    const animationDuration = 0.4;
     const transparent = location.pathname === '/';
     const isSearchPage = location.pathname === '/search';
-    const loginVisible = !searchExpanded || isSearchPage;
+    const displayToolbarButtons = !searchExpanded || isSearchPage;
+
+    useGSAP(() => {
+        if (!displayToolbarButtons) {
+            if (expandTimelineRef.current === null) {
+                const inputTargets = gsap.utils.toArray([
+                    menuIconRef.current,
+                    loginRef.current
+                ]);
+
+                const expandTween = gsap.to(inputTargets, {
+                    duration: animationDuration,
+                    ease: animationEase,
+                    width: `0px`
+                });
+                expandTimelineRef.current = gsap.timeline();
+                expandTimelineRef.current.add(expandTween);
+            }
+            expandTimelineRef.current.play();
+        } else if (expandTimelineRef.current !== null) {
+            expandTimelineRef.current.reverse();
+        }
+    }, {
+        dependencies: [displayToolbarButtons]
+    });
 
     return (
         <HideOnScroll>
@@ -61,51 +95,49 @@ const TopToolBar = () => {
             open={open}
             sx={{
                 ...(
-                    transparent ? 
-                    { backgroundColor: 'rgba(0,0,0,0.2)' } :
+                    transparent ?  { backgroundColor: 'rgba(0,0,0,0.2)' } :
                     darkMode === true ? { backgroundColor: 'rgba(0,0,0,0.9)'} :
                     { }
                 )
             }}
         >
-            <Toolbar sx={{ '&.MuiToolbar-root': { paddingRight: '10px', paddingLeft: 0}}}>
-
-                {
-                    !open &&
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={() => setDrawerOpen(true)}
-                        sx={{ mr: 0, ...(open && { display: 'none' }) }}
-                        size="large"
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                }
-
+            <Toolbar sx={{ '&.MuiToolbar-root': { padding: '10px' }}}>
                 <Box
                     sx={{
                         display: 'flex',
-                        flexGrow: 0,
-                        zIndex: 1,
-                        transition: 'opacity 0.5s',
-                        ...(!loginVisible && {
-                            opacity: 0,
-                            zIndex: 0
-                        })
+                        flexDirection: 'row',
+                        flexGrow: 1,
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
                     }}
                 >
-                    <FirebaseSignin />
+
+                    <Box ref={menuIconRef} sx={{ display: 'flex', overflow: 'hidden' }}>
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={() => setDrawerOpen(true)}
+                            sx={{
+                                mr: 0,
+                                transition: 'opacity 0.5s'
+                            }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                    </Box>
+
+                    <Box sx={{ display: "flex", flex: 1 }}>
+                        <HeaderSearch
+                            visible={!isSearchPage}
+                            onExpandedChange={setSearchExpanded}
+                        />
+                    </Box>
+
+                    <Box ref={loginRef} sx={{ display: 'flex', overflow: 'hidden' }}>
+                        <FirebaseSignin />
+                    </Box>
+
                 </Box>
-
-                { /* Search after FirebaseSignin to make sure zIndex is greater */ }
-                {   
-                    <HeaderSearch
-                        visible={!isSearchPage}
-                        onExpandedChange={setSearchExpanded}
-                    />
-                }
-
             </Toolbar>
         </AppBar>
         </HideOnScroll>
