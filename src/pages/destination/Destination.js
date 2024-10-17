@@ -35,7 +35,7 @@ const RegionChip = ({region}) => {
     const { language } = useLanguage();
 
     return (
-        <Chip label={regionTitle(region, language)} sx={{m: 0, mr: 0.5, mt: 0.5}} color="primary" variant="outlined"/>
+        <Chip label={regionTitle(region, language)} sx={{m: 0, mr: 0.5}} color="primary" variant="outlined"/>
     )
 }
 
@@ -235,7 +235,7 @@ const DestinationDisplay = withLoading(({destination}) => {
 
     return (
         <DestinationGalleryContextProvider destination={destination} images={images} galleries={galleries}>
-            <PublicationAlert destination={destination} sx={{width: "100%", mt: 2}} />
+            <PublicationAlert destination={destination} sx={{width: "100%", mt: 1}} />
             <RegionPath regions={destination.regionpath}></RegionPath>
 
             <Box sx={{ width: "100%", height: isMobile ? "300px" : "400px", position: "relative" }}>

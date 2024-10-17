@@ -210,8 +210,8 @@ const SearchInput = ({
                 onFocus={handleOnFocus}
                 value={value}
                 endAdornment={
-                    <IconButton color="inherit" onClick={onClearSearch}>
-                        <CloseIcon size="small"/>
+                    <IconButton color="inherit" onClick={onClearSearch} size='small'>
+                        <CloseIcon fontSize="small" />
                     </IconButton>
                 }
             />
@@ -226,10 +226,10 @@ const SearchInput = ({
                 {
                     (showHelp || (showResultCount && searchResult.totalCount !== -1)) &&
                     <Divider
+                        color={expandable ? 'lightgrey' : 'grey'}
                         sx={{
                             height: '28px',
-                            m: '4px',
-                            color: 'inherit' // TODO change divider color in header bar
+                            m: '4px'
                         }}
                         orientation="vertical"
                     />
@@ -240,8 +240,8 @@ const SearchInput = ({
                 }
                 {
                     showHelp &&
-                    <SearchIconButton onClick={onOpenHelp}>
-                        <HelpIcon />
+                    <SearchIconButton color="inherit" onClick={onOpenHelp} size='small'>
+                        <HelpIcon fontSize='small' sx={{color: "inherit" }}/>
                     </SearchIconButton>
                 }
             </Box>

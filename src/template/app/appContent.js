@@ -87,7 +87,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-start',
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
+    height: '70px',
 }));
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -131,7 +131,8 @@ const DrawerContent = ({variant = "temporary"}) => {
                         onClick={handleClose}
                         edge="start"
                         sx={{ ml: "-5px" }}
-                        size="large">
+                        size="large"
+                    >
                         <CloseIcon />
                     </IconButton>
                 }
@@ -143,7 +144,8 @@ const DrawerContent = ({variant = "temporary"}) => {
                         onClick={handleOpen}
                         edge="start"
                         sx={{ ml: "-5px", ...(open && { display: 'none' }) }}
-                        size="large">
+                        size="large"
+                    >
                         <MenuIcon />
                     </IconButton>
                 }

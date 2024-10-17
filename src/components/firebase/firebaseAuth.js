@@ -37,7 +37,7 @@ const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => (
             top: '50%',
             transform: 'translateY(-50%)',
             right: 10,
-            color: 'white'
+            color: 'lightgrey'
         }}
         size="large">
         <AccountCircleOutlinedIcon />
@@ -116,9 +116,9 @@ const SignedInButton = ({handleLogout}) => {
                 deleteIcon={<MoreVertIcon />}
                 onDelete={handleToggle}
                 sx={{
-                    borderColor: 'white',
+                    borderColor: 'lightgrey',
                     '& .MuiChip-avatar, & .MuiChip-deleteIcon, & .MuiChip-deleteIcon:hover, & .MuiChip-label': {
-                        color: 'white'
+                        color: 'lightgrey'
                     }
                 }}
             />

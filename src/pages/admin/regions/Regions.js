@@ -3,7 +3,7 @@ import { Box } from '@mui/system';
 import { Button } from '@mui/material';
 import { IconButton, Typography } from '@mui/material';
 import useRegions from 'components/hooks/useRegions';
-import TreeView from '@mui/lab/TreeView';
+import { SimpleTreeView } from '@mui/x-tree-view';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import FmdGoodIcon from '@mui/icons-material/FmdGood';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
@@ -21,6 +21,14 @@ import { useToast } from 'components/notifications';
 import useFormDialog from 'dialogs/FormDialog';
 import LocationForm from './LocationForm';
 
+function getRegionItemId(region) {
+    return `region_${region.id}`;
+}
+
+function getLocationItemId(location) {
+    return `location_${location.id}`;
+}
+
 const LocationItem = ({location, onEdit, onDelete}) => {
 
     const onClickEdit = React.useCallback((event) => {
@@ -33,21 +41,21 @@ const LocationItem = ({location, onEdit, onDelete}) => {
         onDelete(location);
     }, [location, onDelete]);
 
-    const nodeId = `location_${location.id}`;
+    const locationId = getLocationItemId(location);
     return (
         <StyledTreeItem
-            nodeId={nodeId} 
+            itemId={locationId}
             label={
-                <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', p: 0 }}>
                     <Box component={FmdGoodIcon} color="inherit" sx={{ mr: 1 }} />
                     <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
                         {location.title}
                     </Typography>
-                    <IconButton onClick={onClickEdit}>
-                        <EditLocationAltIcon />
+                    <IconButton onClick={onClickEdit} size='small'>
+                        <EditLocationAltIcon fontSize='inherit'/>
                     </IconButton>
-                    <IconButton onClick={onClickDelete}>
-                        <DeleteIcon />
+                    <IconButton onClick={onClickDelete} size='small'>
+                        <DeleteIcon fontSize='inherit'/>
                     </IconButton>
                 </Box>
             }
@@ -64,20 +72,21 @@ const RegionItem = ({region, children, onEdit}) => {
     }, [onEdit, region]);
 
     const isEmpty = React.useMemo(() => children === null || children.every(child => child.length === 0), [children]);
-    const regionId = `${region.id}`;
+    const regionId = getRegionItemId(region);
 
     return (
         <StyledTreeItem
-            nodeId={regionId} sx={{textAlign: 'left'}}
+            itemId={regionId}
+            sx={{textAlign: 'left'}}
             icon={isEmpty ? <EmptySquare /> : null}
             label={
-                <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', p: 0 }}>
                     <Box component={TravelExploreIcon} color="inherit" sx={{ mr: 1 }} />
                     <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
                         {regionTitle(region, language)}
                     </Typography>
-                    <IconButton onClick={onAddLocation}>
-                        <AddLocationAltIcon />
+                    <IconButton onClick={onAddLocation} size='small'>
+                        <AddLocationAltIcon fontSize='inherit' />
                     </IconButton>
                 </Box>
             }
@@ -95,7 +104,7 @@ function buildTreeView(hierarchy, parentId, locations, onEdit, onDelete, languag
                 { buildTreeView(hierarchy, node.id, locations, onEdit, onDelete, language) }
                 {
                     locations.filter(location => location.region === node.id).map((location, index) => {
-                        const nodeId = `location_${location.id}`;
+                        const nodeId = getLocationItemId(location);
                         return <LocationItem
                                     key={nodeId}
                                     location={location}
@@ -145,14 +154,14 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
     }, [openDialog]);
 
     const handleExpandAllClick = React.useCallback(() => {
-        setExpanded(regions.map(region => `${region.id}`));
+        setExpanded(regions.map(region => getRegionItemId(region)));
     }, [regions]);
 
     const handleCollapseAllClick = React.useCallback(() => {
         setExpanded([]);
     }, []);
 
-    const handleNodeToggle = React.useCallback((event, nodeIds) => {
+    const handleExpandedItemsChange = React.useCallback((event, nodeIds) => {
         setExpanded(nodeIds);
     }, []);
 
@@ -187,15 +196,18 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
                 <HorizontalSpacing factor={2} />
                 <Button variant="outlined" disabled={expanded.length === 0} onClick={handleCollapseAllClick}>{t("collapseAll")}</Button>
             </Box>
-            <TreeView
-                expanded={expanded}
-                onNodeToggle={handleNodeToggle}
-                defaultCollapseIcon={<MinusSquare />}
-                defaultExpandIcon={<PlusSquare />}
+            <SimpleTreeView
+                expandedItems={expanded}
+                onExpandedItemsChange={handleExpandedItemsChange}
+                slots={{
+                    expandIcon: PlusSquare,
+                    collapseIcon: MinusSquare,
+                    endIcon: EmptySquare,
+                }}
                 sx={{ flexGrow: 1, overflowY: 'auto' }}
             >
                 { buildTreeView(regions, null, locations, onEditLocation, setLocationToDelete, language) }
-            </TreeView>
+            </SimpleTreeView>
             <ConfirmDialog
                 open={locationToDelete !== null}
                 onOpenChanged={onConfirmDeleteOpenChanged}
