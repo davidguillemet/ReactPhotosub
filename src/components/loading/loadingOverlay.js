@@ -1,7 +1,7 @@
 import React from 'react';
 import Modal from '@mui/material/Modal';
 import CircularProgress from '@mui/material/CircularProgress';
-import { withTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 
 const OverlayContext = React.createContext(null);
 
@@ -9,8 +9,9 @@ const zIndexFromTheme = (theme) => {
     return theme.zIndex.tooltip + 1;
 };
 
-export const OverlayProvider = withTheme(({children, theme}) => {
+export const OverlayProvider = ({children}) => {
     const [ overlayActive, setOverlayActive ] = React.useState(false);
+    const theme = useTheme();
 
     return (
         <OverlayContext.Provider
@@ -24,7 +25,7 @@ export const OverlayProvider = withTheme(({children, theme}) => {
             <LoadingOverlay open={overlayActive}></LoadingOverlay>
         </OverlayContext.Provider>
     );
-});
+};
 
 export function useOverlay() {
     const context = React.useContext(OverlayContext);

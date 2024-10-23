@@ -14,9 +14,11 @@ const RegionItem = ({option}) => {
     return (
         <Box sx={{display: "flex", flexDirection: "row"}}>
             {
-                [...Array(option.level)].map(x => {
+                [...Array(option.level)].map((x, i) => {
                     return (
-                        <Box sx={{
+                        <Box
+                            key={i}
+                            sx={{
                                 width: "15px",
                                 marginLeft: "15px",
                                 paddingLeft: "18px",
@@ -26,7 +28,7 @@ const RegionItem = ({option}) => {
                     )
                 })
             }
-            <Box sx={{display: "flex", flexGrow: 1}}>
+            <Box sx={{display: "flex", flexGrow: 1, py: 0.5}}>
                 <ListItemText primary={option.title} />
             </Box>
         </Box>

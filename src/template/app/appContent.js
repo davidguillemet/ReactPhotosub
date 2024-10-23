@@ -9,7 +9,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
@@ -176,14 +176,14 @@ const DrawerContent = ({variant = "temporary"}) => {
                     routes.filter(route => route.sidebar).map((route, index) => {
                         return (
                             <NavigationLink key={index} to={route.path} isActive={isLinkActive}>
-                                <ListItem button>
+                                <ListItemButton>
                                     <MenuItemIcon variant={variant} route={route}>
                                         <ListItemIcon>
                                             {route.icon}
                                         </ListItemIcon>
                                     </MenuItemIcon>
                                     <ListItemText primary={t(route.label)} />
-                                </ListItem>
+                                </ListItemButton>
                             </NavigationLink>
                         );
                     })

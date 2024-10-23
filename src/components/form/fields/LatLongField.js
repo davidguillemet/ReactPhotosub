@@ -1,10 +1,11 @@
 import React from 'react';
 import { Box } from '@mui/system';
-import { LocationsMap } from '../../map';
+import { LocationsMapNative } from '../../map';
 import { FIELD_TYPE_NUMBER } from '../Form';
 import { useTranslation } from 'utils';
 import { validateValueRange } from './common';
 import GenericTextField from './GenericTextField';
+import { uniqueID } from 'utils';
 
 const getLatLongFieldTemplate = () => {
     return {
@@ -85,6 +86,7 @@ const LatLongField = ({ field, value, values, handleChange, sending, readOnly, v
     const onMapClick = React.useCallback((position) => {
         locationSource.current = "input";
         setLocation({
+            id: uniqueID(),
             latitude: position.lat,
             longitude: position.lng
         });
@@ -113,7 +115,7 @@ const LatLongField = ({ field, value, values, handleChange, sending, readOnly, v
                     max: longitudeField.current.range.max
                 }} />
             <Box sx={{ height: "200px", width: "100%" }}>
-                <LocationsMap locations={location} resetOnChange={false} onMapClick={onMapClick} />
+                <LocationsMapNative locations={location} resetOnChange={false} onMapClick={onMapClick} />
             </Box>
         </React.Fragment>
     );

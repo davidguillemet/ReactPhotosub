@@ -78,7 +78,7 @@ const SelectControl = ({ field, value, values, handleChange, sending, readOnly, 
                 {
                     options &&
                     options.map(option => (
-                        <MenuItem key={option[keyProperty]} value={option} sx={{ pv: 0 }}>
+                        <MenuItem key={option[keyProperty]} value={option} sx={{ py: 0 }}>
                             {option.src ?
                                 <LazyImage
                                     image={option}
