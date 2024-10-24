@@ -33,6 +33,9 @@ import { virtualize } from 'react-swipeable-views-utils';
 
 import {isMobile} from 'react-device-detect';
 
+import { gsap } from "gsap";
+import { useGSAP } from '@gsap/react';
+
 const VirtualizeSwipeableViews = virtualize(SwipeableViews);
 
 const useStyles = makeStyles({
@@ -256,6 +259,32 @@ const ExpandedView = React.forwardRef(({
                 break;
         }
     }
+
+    const animationEase = "power1.inOut";
+    const animationDuration = 0.4;
+    const collapseTimelineRef = React.useRef(null);
+    const sliderContainerRef = React.useRef(null);
+
+    useGSAP(() => {
+        if (!showThumbnails) {
+            if (collapseTimelineRef.current === null) {
+                const collapseTween = gsap.to(sliderContainerRef.current, {
+                    duration: animationDuration,
+                    ease: animationEase,
+                    height: 0,
+                    paddingTop: 0,
+                    paddingBottom: 0
+                });
+                collapseTimelineRef.current = gsap.timeline();
+                collapseTimelineRef.current.add(collapseTween);
+            }
+            collapseTimelineRef.current.play();
+        } else if (collapseTimelineRef.current !== null) {
+            collapseTimelineRef.current.reverse();
+        }
+    }, {
+        dependencies: [showThumbnails],
+    });
 
     const cancelHideHeaderBar = useCallback(() => {
         headerBarRef.current.classList.remove('hidden');
@@ -564,11 +593,13 @@ const ExpandedView = React.forwardRef(({
 
             </Box>
 
-            <Collapse in={showThumbnails}>
-                <Paper sx={{
-                        py: 1,
-                    }}
-                >
+            <Paper
+                ref={sliderContainerRef}
+                sx={{
+                    overflow: 'hidden',
+                    py: 1,
+                }}
+            >
                 <ImageSlider
                     images={images}
                     currentIndex={currentIndex}
@@ -576,8 +607,7 @@ const ExpandedView = React.forwardRef(({
                     hasNext={hasNext}
                     onNextPage={onNextPage}
                 />
-                </Paper>
-            </Collapse>
+            </Paper>
         </Box>
     );
 });
