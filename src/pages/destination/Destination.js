@@ -9,7 +9,7 @@ import Paper from '@mui/material/Paper';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Chip from '@mui/material/Chip';
-import { formatDate, formatDateShort, useLanguage, regionTitle, useTranslation, destinationTitle } from 'utils';
+import { formatDate, formatDateShort, useLanguage, regionTitle, useTranslation, destinationTitle, getPropFromLanguage } from 'utils';
 import Gallery from 'components/gallery';
 import { PageSubTitle, PageHeader, Paragraph } from 'template/pageTypography';
 import { LazyDialog } from 'dialogs';
@@ -204,14 +204,14 @@ const useFetchImagesAndSubGalleries = (destination) => {
     };
 }
 
-const getGroupDestinations = (destination, galleries) => {
+const getGroupDestinations = (destination, galleries, language) => {
     if (!galleries) {
         return [];
     }
     return galleries
         .filter((gallery) => gallery.location !== null) // Keep galleries with location
         .map((gallery) => ({
-            title: gallery.location_title,
+            [getPropFromLanguage("title", language)]: gallery.location_title,
             latitude: gallery.latitude,
             longitude: gallery.longitude,
             date: destination.date
@@ -230,7 +230,7 @@ const DestinationDisplay = withLoading(({destination}) => {
     }, []);
 
     const groupBuilder = React.useMemo(() => GroupBuilderFactory(destination, galleries, language), [destination, galleries, language]);
-    const groupDestinations = React.useMemo(() => getGroupDestinations(destination, galleries), [destination, galleries]);
+    const groupDestinations = React.useMemo(() => getGroupDestinations(destination, galleries, language), [destination, galleries, language]);
     const destinations = useMemo(() => [destination], [destination]);
 
     return (
