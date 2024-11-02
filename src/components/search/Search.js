@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { styled } from '@mui/material/styles';
 import { useHistory } from "react-router-dom";
 import Box from "@mui/material/Box";
 
@@ -21,6 +22,7 @@ function getEmptySearchResult(query) {
 }
 
 const Search = React.forwardRef(({
+    className,
     showExactSwitch = true,
     showHelp = true,
     onResult = null,
@@ -233,7 +235,7 @@ const Search = React.forwardRef(({
 
     return (
         <React.Fragment>
-        <Box 
+        <Box
             ref={ref}
             sx={{
                 '& > *': {
@@ -296,4 +298,4 @@ const Search = React.forwardRef(({
     );
 });
 
-export default Search;
+export default styled(Search)``;

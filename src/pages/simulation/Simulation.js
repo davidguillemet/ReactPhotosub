@@ -358,11 +358,13 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     listType === LIST_SEARCH &&
                     <React.Fragment>
                         <VerticalSpacing factor={2} />
-                        <Search
-                            showExactSwitch={false}
-                            onResult={handleSearchResult}
-                            pageIndex={searchResult.page}
-                        />
+                        <Box sx={{ width: "100%", px: 1}}>
+                            <Search
+                                showExactSwitch={false}
+                                onResult={handleSearchResult}
+                                pageIndex={searchResult.page}
+                            />
+                        </Box>
                     </React.Fragment>
                 }
 
