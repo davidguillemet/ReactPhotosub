@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import { FormLabel } from '@mui/material';
+import { Collapse, FormLabel, IconButton, Stack } from '@mui/material';
 import Select from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
 
@@ -14,6 +14,9 @@ import CollectionsIcon from '@mui/icons-material/Collections';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import SearchIcon from '@mui/icons-material/Search';
 import Tooltip from '@mui/material/Tooltip';
+
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import Alert from '@mui/material/Alert';
 
@@ -35,6 +38,7 @@ import { useFirebaseContext } from '../../components/firebase';
 import ErrorAlert from '../../components/error/error';
 import { QUERY_ERROR } from '../../components/reactQuery';
 import { useTranslation } from 'utils';
+import { useStateWithDep } from 'components/hooks';
 
 const borderColors = [
     "#FFFFFF",
@@ -42,6 +46,65 @@ const borderColors = [
     "#999999",
     "#8B4513",
 ];
+
+const SimulationFormControl = ({
+    label,
+    collapsible = false,
+    expanded = true,
+    children}) => {
+
+    const [isExpanded, setIsExpanded] = useStateWithDep(expanded);
+    const handleClickOnToggleExpanded = React.useCallback(() => {
+        setIsExpanded(prev => !prev);
+    }, [setIsExpanded]);
+
+    return (
+        <FormControl 
+            component="fieldset"
+            variant="outlined"
+            sx={{
+                width: "100%",
+                borderStyle: "solid",
+                borderWidth: 1,
+                borderColor: theme => theme.palette.divider,
+                borderRadius: "5px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                py: 1,
+                px: 0
+            }}
+        >
+            <FormLabel 
+                component="legend"
+                sx={{
+                    padding: "5px",
+                    color: theme => theme.palette.text.primary
+                }}
+            >
+                <Stack direction='row' alignItems={'center'}>
+                    <Typography variant="h4" style={{fontWeight: "100"}}>{label}</Typography>
+                    {
+                        collapsible &&
+                        <React.Fragment>
+                            <HorizontalSpacing factor={1} />
+                            <IconButton onClick={handleClickOnToggleExpanded}>
+                                { isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon /> }
+                            </IconButton>
+                        </React.Fragment>
+                    }
+                </Stack>
+            </FormLabel>
+
+            <Collapse in={isExpanded} sx={{ width: "100%" }}>
+                <Box sx={{ width: '100%'}}>
+                    {children}
+                </Box>
+            </Collapse>
+
+        </FormControl>
+    )
+};
 
 const EmptySimulationImages = ({type, images, searchResult}) => {
     const t = useTranslation("pages.composition");
@@ -238,122 +301,103 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     return (
         <Box sx={{ maxWidth: 1200, width: '100%'}}>
 
-            <Typography variant="h4" style={{fontWeight: "100"}}>{t("interiorSelection")}</Typography>
-            {
-                userUploadRef &&
-                <FileUploads
-                    caption={t("btn:addScenery")}
-                    uploadRef={userUploadRef}
-                    onFilesUploaded={onFilesUploaded}
+            <SimulationFormControl label={t("interiorSelection")}>
+                {
+                    userUploadRef &&
+                    <>
+                        <FileUploads
+                            caption={t("btn:addScenery")}
+                            uploadRef={userUploadRef}
+                            onFilesUploaded={onFilesUploaded}
+                        />
+                        <VerticalSpacing factor={1} />
+                    </>
+                }
+                <ImageSlider
+                    images={interiors}
+                    currentIndex={currentInteriorIndex}
+                    onThumbnailClick={onInteriorClick}
+                    style={{
+                        mx: {
+                            "xs": 0,
+                            "sm": 0
+                        }
+                    }}
+                    imageHeight={isMobile ? 100 : 120}
+                    disabled={simulation.isLocked}
+                    onDeleteUploaded={deleteUploadedInterior}
+                    emptyComponent={<EmptySimulationImages type={LIST_INTERIORS} images={interiors} />}
                 />
-            }
-            <VerticalSpacing factor={2} />
-            <ImageSlider
-                images={interiors}
-                currentIndex={currentInteriorIndex}
-                onThumbnailClick={onInteriorClick}
-                style={{
-                    mx: {
-                        "xs": -1,
-                        "sm": 0
-                    }
-                }}
-                imageHeight={isMobile ? 100 : 120}
-                disabled={simulation.isLocked}
-                onDeleteUploaded={deleteUploadedInterior}
-                emptyComponent={<EmptySimulationImages type={LIST_INTERIORS} images={interiors} />}
-            />
+            </SimulationFormControl>
 
             <VerticalSpacing factor={3} />
 
-            <Typography variant="h4" style={{fontWeight: "100"}}>{t("imageSelection")}</Typography>
-            <VerticalSpacing factor={1} />
-            <ToggleButtonGroup exclusive value={listType} onChange={handleListType} >
-                <ToggleButton value={LIST_HOME_SLIDESHOW} >
-                    <Tooltip title={t("imageType:preSelection")}>
-                        <CollectionsIcon />
-                    </Tooltip>
-                </ToggleButton>
-                {
-                    user &&
-                    <ToggleButton value={LIST_FAVORITES} >
-                        <Tooltip title={t("imageType:favorites")}>
-                            <FavoriteIcon />
+            <SimulationFormControl label={t("imageSelection")}>
+                <ToggleButtonGroup exclusive value={listType} onChange={handleListType} >
+                    <ToggleButton value={LIST_HOME_SLIDESHOW} >
+                        <Tooltip title={t("imageType:preSelection")}>
+                            <CollectionsIcon />
                         </Tooltip>
                     </ToggleButton>
-                }
-                <ToggleButton value={LIST_SEARCH} >
-                    <Tooltip title={t("imageType:search")}>
-                        <SearchIcon />
-                    </Tooltip>
-                </ToggleButton>
-            </ToggleButtonGroup>
-
-            {
-                listType === LIST_SEARCH &&
-                <React.Fragment>
-                    <VerticalSpacing factor={2} />
-                    <Search
-                        showExactSwitch={false}
-                        onResult={handleSearchResult}
-                        pageIndex={searchResult.page}
-                    />
-                </React.Fragment>
-            }
-
-            <VerticalSpacing factor={2} />
-            <ImageSlider
-                images={images}
-                resetScrollOnChangeImages={listType !== LIST_SEARCH}
-                currentIndex={-1}
-                onThumbnailClick={onSelectImage}
-                style={{
-                    mx: {
-                        "xs": -1,
-                        "sm": 0
+                    {
+                        user &&
+                        <ToggleButton value={LIST_FAVORITES} >
+                            <Tooltip title={t("imageType:favorites")}>
+                                <FavoriteIcon />
+                            </Tooltip>
+                        </ToggleButton>
                     }
-                }}
-                imageHeight={isMobile ? 100 : 120}
-                disabled={simulation.isLocked}
-                emptyComponent={<EmptySimulationImages type={listType} images={images} searchResult={searchResult} />}
-                onNextPage={handleNextSearchPage}
-                hasNext={searchResult.hasNext}
-            />
+                    <ToggleButton value={LIST_SEARCH} >
+                        <Tooltip title={t("imageType:search")}>
+                            <SearchIcon />
+                        </Tooltip>
+                    </ToggleButton>
+                </ToggleButtonGroup>
+
+                {
+                    listType === LIST_SEARCH &&
+                    <React.Fragment>
+                        <VerticalSpacing factor={2} />
+                        <Search
+                            showExactSwitch={false}
+                            onResult={handleSearchResult}
+                            pageIndex={searchResult.page}
+                        />
+                    </React.Fragment>
+                }
+
+                <VerticalSpacing factor={2} />
+                <ImageSlider
+                    images={images}
+                    resetScrollOnChangeImages={listType !== LIST_SEARCH}
+                    currentIndex={-1}
+                    onThumbnailClick={onSelectImage}
+                    style={{
+                        mx: {
+                            "xs": 0,
+                            "sm": 0
+                        }
+                    }}
+                    imageHeight={isMobile ? 100 : 120}
+                    disabled={simulation.isLocked}
+                    emptyComponent={<EmptySimulationImages type={listType} images={images} searchResult={searchResult} />}
+                    onNextPage={handleNextSearchPage}
+                    hasNext={searchResult.hasNext}
+                />
+
+            </SimulationFormControl>
 
             <VerticalSpacing factor={3} />
             
-            <FormControl 
-                component="fieldset" 
-                variant="outlined"
-                sx={{
-                    width: "100%",
-                    borderStyle: "solid",
-                    borderWidth: 1,
-                    borderColor: theme => theme.palette.divider,
-                    borderRadius: "5px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    py: 1,
-                    px: 2
-                }}
-            >
-                <FormLabel 
-                    component="legend"
-                    sx={{
-                        padding: "5px",
-                        color: theme => theme.palette.text.primary
-                    }}
-                >
-                    <Typography variant="h4" style={{fontWeight: "100"}}>{t("frameSelection")}</Typography>
-                </FormLabel>
+            <SimulationFormControl label={t("frameSelection")} collapsible={true} expanded={false}>
 
                 <Box style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: "center",
-                    width: "100%"}}>
-                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>{t("frameThickness")}</Typography>
+                    width: "100%"}}
+                >
+                    <Typography variant="h6" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>{t("frameThickness")}</Typography>
                     <HorizontalSpacing factor={isMobile ? 2 : 6} />
                     <BorderInput
                         value={simulation.border.width}
@@ -371,7 +415,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     justifyContent: "center",
                     width: "100%"}}
                 >
-                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>{t("frameColor")}</Typography>
+                    <Typography variant="h6" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>{t("frameColor")}</Typography>
                     <HorizontalSpacing factor={isMobile ? 2 : 6} />
                     <FormControl
                         variant="outlined"
@@ -387,6 +431,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                             onChange={handleBorderColorChange}
                             disabled={simulation.isLocked}
                             sx={{ width: 140}}
+                            size='small'
                         >
                             {
                                 borderColors.map((color, index) => {
@@ -421,9 +466,10 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     justifyContent: "center",
                     width: "100%"}}
                 >
-                    <Typography variant="h5" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>{t("frameShadow")}</Typography>
+                    <Typography variant="h6" sx={{fontWeight: "100", width: 100, textAlign: "left"}}>{t("frameShadow")}</Typography>
                     <HorizontalSpacing factor={isMobile ? 2 : 6} />
                     <Slider
+                        color='secondary'
                         value={simulation.shadow}
                         onChange={handleShadowChange}
                         step={1}
@@ -434,9 +480,9 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                         }}
                     />
                 </Box>
-            
-            </FormControl>
-            
+
+            </SimulationFormControl>
+
             <VerticalSpacing factor={3} />
 
             <SimulationDisplay

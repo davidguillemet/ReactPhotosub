@@ -192,9 +192,9 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
     return (
         <React.Fragment>
             <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', mb: 1}}>
-                <Button variant="outlined" disabled={expanded.length === regions.length} onClick={handleExpandAllClick}>{t("expandAll")}</Button>
+                <Button disabled={expanded.length === regions.length} onClick={handleExpandAllClick}>{t("expandAll")}</Button>
                 <HorizontalSpacing factor={2} />
-                <Button variant="outlined" disabled={expanded.length === 0} onClick={handleCollapseAllClick}>{t("collapseAll")}</Button>
+                <Button disabled={expanded.length === 0} onClick={handleCollapseAllClick}>{t("collapseAll")}</Button>
             </Box>
             <SimpleTreeView
                 expandedItems={expanded}

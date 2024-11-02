@@ -59,7 +59,7 @@ const TopToolBar = () => {
 
     const animationEase = "power1.inOut";
     const animationDuration = 0.4;
-    const transparent = location.pathname === '/';
+    const isHomePage = location.pathname === '/';
     const isSearchPage = location.pathname === '/search';
     const displayToolbarButtons = !searchExpanded || isSearchPage;
 
@@ -81,11 +81,24 @@ const TopToolBar = () => {
             }
             expandTimelineRef.current.play();
         } else if (expandTimelineRef.current !== null) {
-            expandTimelineRef.current.reverse();
+            expandTimelineRef.current.reverse().then(() => {
+                // clear expand timeline to manage login state change
+                // that has ean effect on loginRef width
+                expandTimelineRef.current = null;
+                unsetLoginContainerWidth();
+            });
         }
     }, {
         dependencies: [displayToolbarButtons]
     });
+
+    const unsetLoginContainerWidth = React.useCallback(() => {
+        if (loginRef.current === null) {
+            return;
+        }
+        // Remove width property that might have been fixed by the GSap animation...
+        loginRef.current.style.removeProperty('width');
+    }, []);
 
     return (
         <HideOnScroll>
@@ -94,8 +107,18 @@ const TopToolBar = () => {
             position="fixed"
             open={open}
             sx={{
+                borderBottomWidth: '1px',
+                borderBottomStyle: 'solid',
+                borderBottomColor: 'divider',
                 ...(
-                    transparent ?  { backgroundColor: 'rgba(0,0,0,0.2)' } :
+                    isHomePage ?  {
+                        transition: 'background-color 500ms linear',
+                        backgroundColor: 'transparent',
+                        '&:hover': {
+                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                            transition: 'background-color 500ms linear'
+                        }
+                    } :
                     darkMode === true ? { backgroundColor: 'rgba(0,0,0,0.9)'} :
                     { }
                 )
@@ -114,7 +137,6 @@ const TopToolBar = () => {
 
                     <Box ref={menuIconRef} sx={{ display: 'flex', overflow: 'hidden' }}>
                         <IconButton
-                            color="inherit"
                             aria-label="open drawer"
                             onClick={() => setDrawerOpen(true)}
                             sx={{
@@ -122,7 +144,7 @@ const TopToolBar = () => {
                                 transition: 'opacity 0.5s'
                             }}
                         >
-                            <MenuIcon />
+                            <MenuIcon sx={{ color: theme => theme.palette.text.primary }} />
                         </IconButton>
                     </Box>
 
@@ -134,7 +156,7 @@ const TopToolBar = () => {
                     </Box>
 
                     <Box ref={loginRef} sx={{ display: 'flex', overflow: 'hidden' }}>
-                        <FirebaseSignin />
+                        <FirebaseSignin onLoginStateChange={unsetLoginContainerWidth} />
                     </Box>
 
                 </Box>

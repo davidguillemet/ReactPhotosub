@@ -29,8 +29,8 @@ const DestinationAdminTools = ({destination}) => {
         <React.Fragment>
             <VerticalSpacing factor={2} />
             <Stack direction="row" spacing={1}>
-                <Button variant="contained" onClick={onAddSubGallery}>Ajouter une sous-galerie</Button>
-                <Button variant="contained" onClick={onManageImages}>Gérer les images</Button>
+                <Button onClick={onAddSubGallery}>Ajouter une sous-galerie</Button>
+                <Button onClick={onManageImages}>Gérer les images</Button>
             </Stack>
             <VerticalSpacing factor={2} />
             <FormDialog title="Créer une sous-galerie" {...dialogProps}>

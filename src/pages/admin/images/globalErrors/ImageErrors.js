@@ -108,9 +108,18 @@ const ImageErrorsUi = withLoading(({errors}) => {
 
     return (
         <React.Fragment>
-        <TableContainer component={Paper} sx={{display: 'flex', flexDirection: 'column', paddingBottom: 0}}>
+        <TableContainer
+            component={Paper}
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                paddingBottom: 0,
+                bgcolor: theme => expanded ? theme.palette.background.paper : "none"
+            }}
+        >
             <Alert
                 severity="error"
+                variant='filled'
                 action={
                     <IconButton color="inherit" size="small" onClick={onToggleExpand}>
                         {
@@ -122,8 +131,8 @@ const ImageErrorsUi = withLoading(({errors}) => {
                 }>
                     {`${errorCount} erreurs en base:`}
             </Alert>
-            <VerticalSpacing factor={1} />
             <Collapse in={expanded}>
+                <VerticalSpacing factor={1} />
                 <StyledToggleButtonGroup
                     size="small"
                     value={displayedErrors}

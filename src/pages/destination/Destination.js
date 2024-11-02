@@ -35,7 +35,7 @@ const RegionChip = ({region}) => {
     const { language } = useLanguage();
 
     return (
-        <Chip label={regionTitle(region, language)} sx={{m: 0, mr: 0.5}} color="primary" variant="outlined"/>
+        <Chip label={regionTitle(region, language)} sx={{m: 0, mr: 0.5}} color="secondary" variant="outlined"/>
     )
 }
 
@@ -160,7 +160,7 @@ const DestinationDetails = ({destination}) => {
                 bottom: 10,
                 py: 1,
                 px: isMobile ? 1 : 4,
-                backgroundColor: (theme) => theme.palette.primary.light,
+                backgroundColor: (theme) => theme.palette.primary.main,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start'
@@ -174,7 +174,7 @@ const DestinationDetails = ({destination}) => {
             }
             {
                 hasSummary &&
-                <Button sx={{m: 0, mt: 1, px: 1}} size={isMobile ? "small": "medium"} onClick={toggleOpenSummary} variant="contained">{t("btn:seeSummary")}</Button>
+                <Button sx={{m: 0, mt: 1, px: 1}} size={isMobile ? "small": "medium"} onClick={toggleOpenSummary}>{t("btn:seeSummary")}</Button>
             }
             <LazyDialog
                 open={summaryOpen}

@@ -59,7 +59,12 @@ const Admin = () => {
             <PageTitle>{t("title")}</PageTitle>
             <VerticalSpacing factor={2} />
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={tabIndex} onChange={handleChange} >
+                <Tabs
+                    value={tabIndex}
+                    onChange={handleChange}
+                    textColor="secondary"
+                    indicatorColor="secondary"
+                >
                 {
                     _tabs.map((tab, index) => {
                         return <Tab key={index} label={t(tab.label)} />

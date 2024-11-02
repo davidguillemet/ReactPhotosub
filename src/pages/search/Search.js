@@ -15,10 +15,8 @@ const NextPageButton = ({
     const t = useTranslation("pages.search");
     return (
         <LoadingButton
-            variant="outlined"
             loading={loading}
             sx={{ mt: 3, width: "100%"}}
-            color="primary"
             onClick={onClick}>
                 {t("button::nextResults")}
         </LoadingButton>

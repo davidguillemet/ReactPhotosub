@@ -29,17 +29,13 @@ import { useTranslation } from '../../utils';
 
 const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => (
     <IconButton
-        variant="contained"
         onClick={onClick}
         ref={ref}
         sx={{
-            position: 'absolute',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            right: 10,
-            color: 'lightgrey'
+            color: theme => theme.palette.text.primary
         }}
-        size="large">
+        size="large"
+    >
         <AccountCircleOutlinedIcon />
     </IconButton>
 ))
@@ -116,9 +112,9 @@ const SignedInButton = ({handleLogout}) => {
                 deleteIcon={<MoreVertIcon />}
                 onDelete={handleToggle}
                 sx={{
-                    borderColor: 'lightgrey',
+                    borderColor: theme => theme.palette.text.primary,
                     '& .MuiChip-avatar, & .MuiChip-deleteIcon, & .MuiChip-deleteIcon:hover, & .MuiChip-label': {
-                        color: 'lightgrey'
+                        color: theme => theme.palette.text.primary
                     }
                 }}
             />
@@ -162,7 +158,7 @@ const SignedInButton = ({handleLogout}) => {
     );
 }
 
-const FirebaseAuth = (props) => {
+const FirebaseAuth = ({onLoginStateChange}) => {
 
     const firebaseContext = useFirebaseContext();
     const authContext = useAuthContext();
@@ -175,6 +171,12 @@ const FirebaseAuth = (props) => {
             setIsLogin(false);
         }
     }, [authContext.user]);
+
+    useEffect(() => {
+        if (onLoginStateChange) {
+            onLoginStateChange(isLogin);
+        }
+    }, [isLogin, onLoginStateChange]);
 
     function handleSignIn(event) {
         setIsLogin(true);
@@ -211,7 +213,7 @@ const FirebaseAuth = (props) => {
                 <LoadingUserState /> :
                 authContext.user === null ?
                 <NotSignedInButton handleSignIn={handleSignIn} /> :
-                <SignedInButton  handleLogout={logout}/>
+                <SignedInButton handleLogout={logout}/>
             }
 
             <Modal

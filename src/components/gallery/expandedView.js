@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import InfoIcon from '@mui/icons-material/Info';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import StopIcon from '@mui/icons-material/Stop';
@@ -40,11 +40,9 @@ const VirtualizeSwipeableViews = virtualize(SwipeableViews);
 
 const useStyles = makeStyles({
     navigationButton: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
         position: 'absolute',
         top: '50%',
         transform: 'translateY(-50%)',
-        color: "#FFFFFF"
     },
     expandedHeader: {
         opacity: 1,
@@ -110,6 +108,7 @@ function StopButtonWithCircularProgress({ onClick, onCompletedRef, duration, siz
                 }}
                 size={height-4}
                 thickness={5}
+                color="secondary"
             />
         </TooltipIconButton>
     );
@@ -369,8 +368,7 @@ const ExpandedView = React.forwardRef(({
                 justifyContent: 'flex-start',
                 width: '100%',
                 height: '100%',
-                padding: 0,
-                backgroundColor: theme => theme.palette.grey['900']
+                padding: 0
             }}
         >
             { /* HEADER TOOLBAR */}
@@ -423,7 +421,7 @@ const ExpandedView = React.forwardRef(({
                                 disabled={playable === false}
                                 size={toolbarIconSize}
                             >
-                                <PlayArrowIcon fontSize="inherit"></PlayArrowIcon>
+                                <PlayCircleOutlineIcon fontSize="inherit" />
                             </TooltipIconButton>
                     }
 
@@ -497,6 +495,7 @@ const ExpandedView = React.forwardRef(({
             
             { /* IMAGE BOX WITH NAVIGATION BUTTONS */}
             <Box
+                id="imagecontainer"
                 ref={slideContainerResizeObserver.ref}
                 sx={{
                     position: 'relative',
@@ -596,8 +595,11 @@ const ExpandedView = React.forwardRef(({
             <Paper
                 ref={sliderContainerRef}
                 sx={{
+                    borderTopWidth: '1px',
+                    borderTopStyle: 'solid',
+                    borderTopColor: 'divider',
                     overflow: 'hidden',
-                    py: 1,
+                    paddingTop: 1, // Padding bottom = 0
                 }}
             >
                 <ImageSlider

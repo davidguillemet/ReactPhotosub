@@ -225,7 +225,7 @@ const SimulationManagerController = () => {
 
             <PageTitle>{t("title")}</PageTitle>
 
-            <Button variant="contained" startIcon={<HelpIcon />} onClick={toggleHelpOpen}>{t("button::help")}</Button>
+            <Button startIcon={<HelpIcon />} onClick={toggleHelpOpen}>{t("button::help")}</Button>
 
             <SimulationContext.Provider value={{ state, dispatch }}>
                 <SimulationManagerDispatcher user={authContext.user} />

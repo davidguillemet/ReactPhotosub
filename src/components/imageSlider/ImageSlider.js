@@ -3,18 +3,19 @@ import {isMobile} from 'react-device-detect';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
-import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
-import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 import { withLoading, buildLoadingState } from '../hoc';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+
+import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
+import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOutlined';
 
 import { useResizeObserver } from '../../components/hooks';
 
 import Thumbnail from './thumbnail';
 import './style.css';
 
-const _naxtPageButtonWidth = 60;
+const _nextPageButtonWidth = 60;
 
 const getThumbnailRectAt = (container, index) => {
     if (container === null || index > container.children.length - 1) {
@@ -28,7 +29,7 @@ const getThumbnailRectAt = (container, index) => {
 };
 
 const getLastThumbnailRightPosition = (images, height, spacing, hasNext) => {
-    const initialValue = hasNext ? (_naxtPageButtonWidth + spacing) : 0;
+    const initialValue = hasNext ? (_nextPageButtonWidth + spacing) : 0;
     return images.reduce((position, image) => position + Math.round(height*image.sizeRatio) + spacing, initialValue );
 }
 
@@ -47,7 +48,7 @@ const ImageSlider = ({
     renderOverlay = null,
     resetScrollOnChangeImages = false}) => {
     
-    const [thumnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
+    const [thumbnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
     const lastThumbRight = useMemo(() => getLastThumbnailRightPosition(images, imageHeight, spacing, hasNext), [images, imageHeight, spacing, hasNext]);
 
     const resizeObserver = useResizeObserver(true);
@@ -157,9 +158,9 @@ const ImageSlider = ({
                 !isMobile &&
                 <IconButton
                     onClick={handleThumbnailsScrollLeft}
-                    disabled={!thumnailScrollActivation.scrollLeft}
-                    size="large">
-                    <ArrowBackIosRoundedIcon fontSize="large"/>
+                    disabled={!thumbnailScrollActivation.scrollLeft}
+                    size="small">
+                    <ArrowCircleLeftOutlinedIcon fontSize="inherit"/>
                 </IconButton>
             }
 
@@ -173,7 +174,7 @@ const ImageSlider = ({
                     display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'flex-start',
-                    height: `${imageHeight}px`,
+                    height: `${imageHeight + 8}px`, // 8px for selection shadow
                     mx: 0
                 }}
             >
@@ -210,7 +211,7 @@ const ImageSlider = ({
                     }
                     </TransitionGroup>
                 }
-                {   
+                {
                     hasNext &&
                     <LoadingButton
                         loading={searchRunning}
@@ -220,7 +221,7 @@ const ImageSlider = ({
                         sx={{
                             height: `${imageHeight}px`,
                             mr: `${spacing}px`,
-                            minWidth: `${_naxtPageButtonWidth}px`,
+                            minWidth: `${_nextPageButtonWidth}px`,
                             px: 1,
                             '& .MuiButton-startIcon': {
                                 mr: 0
@@ -236,9 +237,9 @@ const ImageSlider = ({
                 !isMobile &&
                 <IconButton
                     onClick={handleThumbnailsScrollRight}
-                    disabled={!thumnailScrollActivation.scrollRight}
-                    size="large">
-                    <ArrowForwardIosRoundedIcon fontSize="large"/>
+                    disabled={!thumbnailScrollActivation.scrollRight}
+                    size="small">
+                    <ArrowCircleRightOutlinedIcon fontSize="inherit"/>
                 </IconButton>
             }
         </Box>

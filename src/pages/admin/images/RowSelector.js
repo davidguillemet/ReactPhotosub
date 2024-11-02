@@ -13,7 +13,6 @@ const RowSelector = ({row, selected}) => {
 
     return (
         <Checkbox
-            color="primary"
             checked={selected}
             onChange={onChange}
         />

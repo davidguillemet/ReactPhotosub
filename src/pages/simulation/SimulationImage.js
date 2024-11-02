@@ -82,7 +82,12 @@ const SimulationImage = ({image, selected, border, shadowFactor, dispatch, onCli
             />
 
             {
-                selected && <SelectionMarker imageBorderWidth={border.width} withCheck={true} />
+                selected &&
+                <SelectionMarker
+                    selected={true}
+                    imageBorderWidth={border.width}
+                    withCheck={true}
+                />
             }
             
         </StyledRnd>

@@ -99,12 +99,12 @@ const ActionToolbar = () => {
             >
                 <Stack direction="row" alignItems="center">
                     <IconButton onClick={handleOnClose}>
-                        <CloseIcon fontSize="small" sx={{color: theme => theme.palette.secondary.contrastText}}/>
+                        <CloseIcon fontSize="small" sx={{color: theme => theme.palette.primary.contrastText}}/>
                     </IconButton>
                     <HorizontalSpacing />
-                    <Paragraph sx={{color: theme => theme.palette.secondary.contrastText}}>{`${imageContext.selectionCount} item(s) sélectionné(s)`}</Paragraph>
+                    <Paragraph sx={{color: theme => theme.palette.primary.contrastText}}>{`${imageContext.selectionCount} item(s) sélectionné(s)`}</Paragraph>
                     <HorizontalSpacing factor={4} />
-                    <Button variant="contained" onClick={handleOnClickDelete}>{"Supprimer"}</Button>
+                    <Button onClick={handleOnClickDelete}>{"Supprimer"}</Button>
                 </Stack>
 
                 <ConfirmDialog

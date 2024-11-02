@@ -127,7 +127,7 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
                         image.tags ?
                         image.tags.map(tag => {
                             return (
-                            <Chip color="primary" key={tag} label={tag} size="small" sx={{marginRight: 0.5, marginTop: 0.5, color: 'white'}} />
+                            <Chip color="secondary" key={tag} label={tag} size="small" sx={{marginRight: 0.5, marginTop: 0.5 }} />
                             )
                         }) :
                         <Alert severity='warning'>{t("info:noTags")}</Alert>

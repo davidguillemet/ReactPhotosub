@@ -91,10 +91,10 @@ export function borderColor(borderColor, simulationIndex) {
     };
 }
 
-export function shadow(shadowfactor, simulationIndex) {
+export function shadow(shadowFactor, simulationIndex) {
     return {
         type: ACTION_SHADOW,
-        shadow: shadowfactor,
+        shadow: shadowFactor,
         simulationIndex: simulationIndex
     };
 }

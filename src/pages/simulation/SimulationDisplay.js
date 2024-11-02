@@ -18,7 +18,7 @@ const ImageTools = ({onDelete}) => {
             top: 1,
             right: 1
         }}>
-            <Fab sx={{color: "white", backgroundColor: theme => theme.palette.warning.light}} aria-label="edit" size="small" onClick={onDelete}>
+            <Fab color="secondary" aria-label="edit" size="small" onClick={onDelete}>
                 <DeleteIcon />
             </Fab>
         </Box>

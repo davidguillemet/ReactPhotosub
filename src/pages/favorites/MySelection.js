@@ -116,7 +116,6 @@ const MySelection = withUser(() => {
                 loading={undoRunning}
                 endIcon={<UndoIcon />}
                 loadingPosition="end"
-                variant="contained"
             >
                 {t("btn:cancelDeletion")}
             </LoadingButton>

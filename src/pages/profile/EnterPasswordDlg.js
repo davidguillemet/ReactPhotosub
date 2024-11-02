@@ -11,6 +11,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useTranslation } from 'utils';
+import { VerticalSpacing } from 'template/spacing';
 
 // action = "save" or "rename"
 export default function SimulationNameDialog({ open, onOpenChanged, onValidate, action }) {
@@ -71,10 +72,12 @@ export default function SimulationNameDialog({ open, onOpenChanged, onValidate, 
                 <DialogTitle id="form-dialog-title">{dialogDetails.title}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>{dialogDetails.desc}</DialogContentText>
+                    <VerticalSpacing factor={2} />
                     <TextField
                         value={password}
                         onChange={onPasswordChanged}
                         autoFocus
+                        variant="outlined"
                         margin="dense"
                         id="password"
                         label={t("field:authDialog")}
@@ -83,12 +86,11 @@ export default function SimulationNameDialog({ open, onOpenChanged, onValidate, 
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary" variant="contained">
+                    <Button onClick={handleClose}>
                         {t("btn:cancel")}
                     </Button>
                     <LoadingButton
                         onClick={handleValidate}
-                        variant="contained"
                         disabled={okDisabled}
                         loading={sending}
                     >

@@ -141,7 +141,6 @@ const Form = ({
                         submitAction !== null &&
                         <LoadingButton
                             onClick={onSubmit}
-                            variant="contained"
                             disabled={readOnly || !isValid || !isDirty}
                             startIcon={<SendIcon />}
                             loadingPosition="start"
@@ -152,7 +151,7 @@ const Form = ({
                     }
                     {
                         onCancel !== null &&
-                        <Button variant="contained" onClick={onCancel}>
+                        <Button onClick={onCancel}>
                             {t("btn:cancel")}
                         </Button>
                     }

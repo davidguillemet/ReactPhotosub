@@ -151,11 +151,9 @@ const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = fa
         <TableRow
             role="checkbox"
             tabIndex={-1}
-            sx={{bgcolor: theme => theme.palette.grey[100]}}
         >
             <TableCell padding="checkbox">
                 <Checkbox
-                    color="primary"
                     disabled={true}
                 />
             </TableCell>

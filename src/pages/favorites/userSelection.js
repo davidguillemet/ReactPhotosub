@@ -16,7 +16,7 @@ const UserSelection = withUser(({onChange}) => {
     const getCaption = React.useCallback((user) => {
         let caption = user.displayName;
         if (user.uid === authContext.user.uid) {
-            caption += " (vous)";
+            caption += " (moi)";
         };
         return caption;
     }, [authContext]);

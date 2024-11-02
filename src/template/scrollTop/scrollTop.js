@@ -54,11 +54,14 @@ const ScrollTop = ({anchorSelector}) => {
                     zIndex: (theme) => theme.zIndex.appBar
                 }}
             >
+                <Fab color="secondary" size="small" aria-label="scroll back to top" >
+                    <KeyboardArrowUpIcon />
+                </Fab>
                 <CircularProgress
                     variant="determinate"
-                    thickness={6}
+                    thickness={4.5}
                     value={scroll < 100 ? scroll : 100}
-                    size={58}
+                    size={50}
                     sx={{
                         color: green[500],
                         position: 'absolute',
@@ -67,9 +70,6 @@ const ScrollTop = ({anchorSelector}) => {
                         zIndex: 0,
                     }}
                 />
-                <Fab color="secondary" size="medium" aria-label="scroll back to top">
-                    <KeyboardArrowUpIcon />
-                </Fab>
             </Div>
         </Zoom>
     );

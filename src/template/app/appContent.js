@@ -87,7 +87,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-start',
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
-    height: '70px',
+    height: '70px'
 }));
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -107,6 +107,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     }),
 );
 
+const DrawerContainer = styled('div')(({ theme }) => ({ }));
+
 const DrawerContent = ({variant = "temporary"}) => {
 
     const t = useTranslation(ROUTES_NAMESPACE);
@@ -121,7 +123,7 @@ const DrawerContent = ({variant = "temporary"}) => {
     }, [setDrawerOpen]);
 
     return (
-        <div>
+        <DrawerContainer>
             <DrawerHeader>
                 {
                     variant === "temporary" && open &&
@@ -139,18 +141,17 @@ const DrawerContent = ({variant = "temporary"}) => {
                 {
                     variant === 'permanent' &&
                     <IconButton
-                        color="inherit"
                         aria-label="open drawer"
                         onClick={handleOpen}
                         edge="start"
                         sx={{ ml: "-5px", ...(open && { display: 'none' }) }}
                         size="large"
                     >
-                        <MenuIcon />
+                        <MenuIcon sx={{ color: theme => theme.palette.text.primary }}/>
                     </IconButton>
                 }
             </DrawerHeader>
-            <Divider variant="middle" />
+            { open &&  <Divider variant="middle" /> }
             { /* 
             <Box sx={{
                 display: 'flex',
@@ -171,7 +172,7 @@ const DrawerContent = ({variant = "temporary"}) => {
                     }}
                 />
             </Box> */ }
-            <List sx={{ width: '100%', myt: 3, mb: 1 }}>
+            <List sx={{ width: '100%', myt: 3, mb: 1, pt: 0}}>
                 {
                     routes.filter(route => route.sidebar).map((route, index) => {
                         return (
@@ -211,7 +212,7 @@ const DrawerContent = ({variant = "temporary"}) => {
                     <VerticalSpacing factor={2}/>
                 </React.Fragment>
             }
-        </div>
+        </DrawerContainer>
     )
 };
 
@@ -264,11 +265,14 @@ const AppContentUI = React.forwardRef((props, ref) => {
                     onClose={() => setDrawerOpen(false)}
                     onOpen={() => setDrawerOpen(true)}
                     sx={{
-                        /*display: { xs: 'block', lg: 'none' },*/
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                        '& .MuiDrawer-paper': {
+                            boxSizing: 'border-box',
+                            width: drawerWidth,
+                            backgroundColor: 'primary.main'
+                        },
                         '& .MuiPaper-root': {
                             width: drawerWidth
-                        }
+                        },
                     }}
                     ModalProps={{
                         keepMounted: true, // Better open performance on mobile.
@@ -281,7 +285,13 @@ const AppContentUI = React.forwardRef((props, ref) => {
                     open={false}
                     variant="permanent"
                     sx={{
-                        display: { xs: 'none', lg: (isHomePage ? 'none' : 'block') }
+                        '& .MuiDrawer-paper': {
+                            backgroundColor: 'primary.main'
+                        },
+                        display: {
+                            xs: 'none',
+                            lg: (isHomePage ? 'none' : 'block')
+                        }
                     }}
                 >
                     <DrawerContent variant="permanent" />

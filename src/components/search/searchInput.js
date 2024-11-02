@@ -20,6 +20,7 @@ import { useGSAP } from '@gsap/react';
 
 import { useTranslation, debounce } from 'utils';
 import { useStateWithDep } from '../hooks';
+import { useTheme } from '@mui/material/styles';
 
 const SearchIconButton = styled(IconButton)(({theme}) => ({
     padding: 10,
@@ -39,8 +40,8 @@ const StatusIcon = ({searchIsRunning}) => {
         }}>
             {
                 searchIsRunning === true ?
-                <CircularProgress size={20} color="inherit"/> :
-                <SearchIcon fontSize={isMobile ? "small" : "medium"} color="inherit"></SearchIcon>
+                <CircularProgress size={20} sx={{ color: theme => theme.palette.text.primary }} /> :
+                <SearchIcon fontSize={isMobile ? "small" : "medium"} sx={{ color: theme => theme.palette.text.primary }} ></SearchIcon>
             }
         </Box>
     );
@@ -53,7 +54,7 @@ const ResultStatus = ({searchResult}) => {
     } else if (totalCount === 0) {
         return <WarningIcon sx={{ml: 1, color: orange[400]}} />
     } else if (totalCount > 0) {
-        return <Chip color="success" sx={{ml: 1, bgcolor: totalCount > 0 ? green[600] : orange[700]}} label={totalCount}></Chip>
+        return <Chip color="secondary" sx={{ml: 1, bgcolor: totalCount > 0 ? green[400] : orange[700]}} label={totalCount}></Chip>
     }
 
     return null;
@@ -75,6 +76,7 @@ const SearchInput = ({
     showHelp = true}) => {
 
     const t = useTranslation("components.search");
+    const theme = useTheme();
     const [value, setValue] = useStateWithDep(initialValue);
     const [ expanded, setExpanded ] = React.useState(false);
     const containerRef = React.useRef(null);
@@ -120,8 +122,8 @@ const SearchInput = ({
                     duration: animationDuration,
                     ease: animationEase,
                     width: `100%`,
-                    borderColor: "rgb(255,255,255,0.4)",
-                    backgroundColor: 'rgb(255,255,255,0.1)',
+                    borderColor: theme.palette.divider,
+                    backgroundColor: theme.palette.primary.main,
                     onStart: () => {
                         if (onExpandedChange) onExpandedChange(true);
                     }
@@ -166,7 +168,7 @@ const SearchInput = ({
     return (
         <Paper
             ref={containerRef}
-            elevation={!expandable || expanded ? 1 : 0}
+            elevation={expandable ? 0 : 1}
             sx={{
                 position: 'relative',
                 display: 'flex',
@@ -210,7 +212,11 @@ const SearchInput = ({
                 onFocus={handleOnFocus}
                 value={value}
                 endAdornment={
-                    <IconButton color="inherit" onClick={onClearSearch} size='small'>
+                    <IconButton
+                        color="inherit"
+                        onClick={expandable ? debouncedOnClickSearchIcon : onClearSearch}
+                        size='small'
+                    >
                         <CloseIcon fontSize="small" />
                     </IconButton>
                 }

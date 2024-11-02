@@ -22,7 +22,6 @@ const UploadStorageItemRow = ({file}) => {
         >
             <TableCell padding="checkbox">
                 <Checkbox
-                    color="primary"
                     disabled={true}
                 />
             </TableCell>

@@ -204,7 +204,7 @@
         "gallery": {
             "btn:addFavorite": "Ajouter aux favoris",
             "btn:deleteFavorite": "Retirer des favoris",
-            "lbl:groupImageCount": "{0} images",
+            "lbl:groupImageCount": "{0} image(s)",
             "btn:stopSlideshow": "Arrêter le diaporama",
             "btn:startSlideshow": "Démarrer le diaporama",
             "btn:showDetails": "Afficher les détails",

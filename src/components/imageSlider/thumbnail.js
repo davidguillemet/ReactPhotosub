@@ -45,6 +45,7 @@ const Thumbnail = React.forwardRef(({
                 withFavorite={false}
                 disabled={disabled}
             />
+
             {
                 image.uploaded &&
                 <Fab
@@ -61,9 +62,14 @@ const Thumbnail = React.forwardRef(({
                     <DeleteOutlineOutlinedIcon />
                 </Fab>
             }
-            {
-                selected && <SelectionMarker imageBorderWidth={0} withCheck={false} />
-            }
+
+            <SelectionMarker
+                selected={selected}
+                markerWidth={1}
+                opacity={0}
+                imageBorderWidth={0}
+                withCheck={false}
+            />
 
         </Box>
     );

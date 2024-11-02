@@ -231,7 +231,6 @@ const UserProfile = (props) => {
                     <VerticalSpacing factor={2} />
                     <Button
                         onClick={onClickModify}
-                        variant="contained"
                         startIcon={<EditIcon/>}
                     >
                         {t("btn:modifyData")}
@@ -242,7 +241,6 @@ const UserProfile = (props) => {
             <Button
                 color="error"
                 onClick={onClickDeleteAccount}
-                variant="contained"
                 startIcon={<DeleteIcon/>}
                 disabled={authContext.admin === true}
             >

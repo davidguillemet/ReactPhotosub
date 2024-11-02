@@ -45,7 +45,6 @@ const Images = () => {
         <ImageErrors />
         <Paragraph>{t("imageCount", [imageContext.itemCount, folderName])}</Paragraph>
             <Button
-                variant="contained"
                 disabled={imageContext.folderType !== FOLDER_TYPE.destination}
                 onClick={onDisplayDestination}
             >
@@ -59,7 +58,6 @@ const Images = () => {
                     <TableRow>
                         <TableCell padding="checkbox">
                             <Checkbox
-                                color="primary"
                                 indeterminate={imageContext.manySelected}
                                 checked={imageContext.allSelected}
                                 onChange={imageContext.onSelectAll}

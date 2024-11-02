@@ -69,7 +69,6 @@ const PictureTypeSelector = ({destinationType, onChange}) => {
     return (
         <ToggleButtonGroup
             size={isMobile ? "small" : "medium"}
-            color="primary"
             value={destinationType}
             onChange={onChange}
             exclusive

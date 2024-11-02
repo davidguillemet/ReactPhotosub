@@ -4,6 +4,7 @@ import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SocialIcons from '../../components/socialIcons';
+import { useDarkMode } from 'components/theme';
 
 const Copyright = ({isHome}) => {
     return (
@@ -25,6 +26,7 @@ const StyledFooter = styled('footer')``;
 
 const Footer = () => {
 
+    const darkMode = useDarkMode();
     const location = useLocation();
     const isHome = location.pathname === '/';
 
@@ -35,7 +37,10 @@ const Footer = () => {
             alignItems: 'center',
             p: 1,
             mt: 'auto',
-            backgroundColor: (theme) => isHome ? 'rgba(0,0,0,0.3)' : theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
+            borderTopWidth: '1px',
+            borderTopStyle: 'solid',
+            borderTopColor: 'divider',
+            backgroundColor: (theme) => isHome ? 'rgba(0,0,0,0.3)' : darkMode ? theme.palette.primary.main : theme.palette.grey[200],
             zIndex: (theme) => theme.zIndex.appBar
         }}>
             <Box sx={{ display: "flex", width: "240px" }} >

@@ -152,9 +152,13 @@ const HeaderSearch = ({
                 >
                     <Paper
                         ref={resultsPaperRef}
-                        elevation={6}
+                        elevation={0}
                         sx={{
                             borderRadius: (theme) => theme.shape.borderRadius,
+                            borderColor: (theme) => theme.palette.divider,
+                            borderStyle: 'solid',
+                            borderWidth: '1px',
+                            borderTopWidth: 0,
                             borderTopLeftRadius: 0,
                             borderTopRightRadius: 0,
                             p: (theme) => {
@@ -164,7 +168,7 @@ const HeaderSearch = ({
                             display: 'flex',
                             flexDirection: 'column',
                             width: '100%',
-                            backgroundColor: (theme) => theme.palette.background
+                            backgroundColor: (theme) => theme.palette.primary.main
                         }}
                     >
                         <VerticalSpacing factor={0.5} />

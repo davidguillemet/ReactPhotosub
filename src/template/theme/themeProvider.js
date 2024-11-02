@@ -6,10 +6,10 @@ import { useDarkMode } from 'components/theme';
 const paletteDarkMode = {
     mode: 'dark',
     link: {
-        main: "#28a745"
+        main: "#236fc0"
     },
     primary: {
-      main: '#2b6c7d',
+      main: '#121212',
       contrastText: '#d0d8c6',
     },
     secondary: {
@@ -19,30 +19,48 @@ const paletteDarkMode = {
     error: {
       main: '#de6f64',
     },
+    warning: {
+      main: '#ffe0b2',
+    },
     success: {
       main: '#6dd072',
     },
+    text: {
+        primary: '#bcd1e6'
+    }
 };
 
 const paletteLightMode = {
     mode: 'light',
     link: {
-        main: "#28a745"
+        main: '#236fc0'
     },
     primary: {
-      main: '#00668C',
-      contrastText: '#cdd8c2',
+      main: '#fbf7f3',
+      contrastText: '#5f5f4c',
     },
     secondary: {
-      main: '#afc752',
-      contrastText: '#fdfde6',
+      main: '#8db4c3',
+      contrastText: '#eeeeee',
     },
     error: {
-      main: '#de6f64',
+      main: 'rgb(251, 219, 219)',
+    },
+    info: {
+      main: '#9dc7e5',
+    },
+    warning: {
+      main: '#ffe0b2',
     },
     success: {
-      main: '#6dd072',
-      contrastText: '#dbffdf'
+      main: 'rgb(237, 247, 237)',
+      contrastText: 'rgb(30, 70, 32)'
+    },
+    text: {
+        primary: '#5f5f4c'
+    },
+    background: {
+        paper: '#fefdfd'
     }
 }
 
@@ -59,6 +77,28 @@ const CustomThemeProvider = ({children}) => {
                     width: '98%'
                 },
                 components: {
+                    MuiCheckbox: {
+                        defaultProps: {
+                            color: "secondary"
+                        }
+                    },
+                    MuiSwitch: {
+                        defaultProps: {
+                            color: "secondary"
+                        }
+                    },
+                    MuiButton: {
+                        defaultProps: {
+                            variant: "contained",
+                            color: "secondary"
+                        }
+                    },
+                    MuiLoadingButton: {
+                        defaultProps: {
+                            variant: "contained",
+                            color: "secondary"
+                        }
+                    },
                     MuiTooltip: {
                         styleOverrides: {
                             tooltip: {
@@ -68,6 +108,33 @@ const CustomThemeProvider = ({children}) => {
                             arrow: {
                                 color: "black"
                             }
+                        }
+                    },
+                    MuiInputLabel: {
+                        styleOverrides: {
+                            root: ({theme}) => ({
+                                "&.Mui-focused": {
+                                    color: theme.palette.secondary.dark
+                                }
+                            })
+                        }
+                    },
+                    MuiOutlinedInput: {
+                        styleOverrides: {
+                            root: ({ theme }) => ({
+                                "&.Mui-focused": {
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        borderWidth: '1px',
+                                        borderColor: theme.palette.secondary.dark,
+                                        borderStyle: 'solid'
+                                    }
+                                }
+                            })
+                        }
+                    },
+                    MuiLink: {
+                        defaultProps: {
+                            color: "secondary"
                         }
                     }
                 }

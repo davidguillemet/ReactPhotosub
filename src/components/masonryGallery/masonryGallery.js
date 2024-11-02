@@ -7,7 +7,7 @@ import { useResizeObserver } from '../../components/hooks';
 import { withLoading, buildLoadingState, Loading } from '../../components/hoc';
 import MasonryLayout from './masonryLayout';
 
-const _margin = isMobile ? 2 : 5;
+const _margin = isMobile ? 5 : 15;
 
 const MasonryGallery = ({
     items,

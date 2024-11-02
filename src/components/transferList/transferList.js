@@ -164,8 +164,8 @@ const TransferListWithContext = ({renderItem, onCancel, onValidate}) => {
         <Stack direction={'column'} spacing={2} sx={{height: "100%"}}>
             <TransferListUI renderItem={renderItem} onCancel={onCancel} />
             <Stack direction={'row'} alignItems='center' spacing={2} justifyContent={"flex-end"}>
-                <Button variant="contained" onClick={handleValidate} disabled={!transferContext.isDirty}>Valider</Button>
-                <Button variant="contained" onClick={onCancel}>Annuler</Button>
+                <Button onClick={handleValidate} disabled={!transferContext.isDirty}>Valider</Button>
+                <Button onClick={onCancel}>Annuler</Button>
             </Stack>
         </Stack>
     )

@@ -204,7 +204,7 @@
         "gallery": {
             "btn:addFavorite": "Add to favorites",
             "btn:deleteFavorite": "Remove from favorites",
-            "lbl:groupImageCount": "{0} images",
+            "lbl:groupImageCount": "{0} image(s)",
             "btn:stopSlideshow": "Stop slideshow",
             "btn:startSlideshow": "Start slideshow",
             "btn:showDetails": "Show details",

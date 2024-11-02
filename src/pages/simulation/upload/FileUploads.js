@@ -210,7 +210,6 @@ const FileUploads = ({caption, uploadRef, onFilesUploaded}) => {
             />
             <label htmlFor="contained-button-file">
                 <Button
-                    variant="contained"
                     component="span"
                     startIcon={<CloudUploadIcon />}
                     disabled={filesToUpload.length > 0}

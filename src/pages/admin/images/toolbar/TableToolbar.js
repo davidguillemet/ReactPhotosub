@@ -11,7 +11,7 @@ const TableToolbar = () => {
                     position: "relative",
                     height: "60px",
                     width: "100%",
-                    bgcolor: theme => theme.palette.secondary.dark,
+                    bgcolor: theme => theme.palette.primary.main,
                 }}
             >   
                 <ActionToolbar />

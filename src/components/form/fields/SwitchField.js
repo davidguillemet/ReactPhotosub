@@ -20,7 +20,6 @@ const SwitchField = ({ field, value, handleChange, sending, readOnly, validators
                 control={<Switch
                     onChange={onChange}
                     id={field.id}
-                    color="primary"
                     checked={value ?? false}
                     disabled={sending || readOnly || field.readOnly} />}
                 label={field.label} />
