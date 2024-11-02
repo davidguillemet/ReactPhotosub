@@ -44,7 +44,7 @@ const InfoWindowContainer = styled('div')(({ theme }) => ({
         float: "left",
         marginRight: 10
     },
-    [`& .${classes.tripsGalery}`]: {
+    [`& .${classes.tripsGallery}`]: {
         display: "flex",
         overflowX: "auto",
         overflowY: "hidden",
@@ -130,7 +130,7 @@ const LocationInfoWindow = ({location, coverWidth, isDestinationPage}) => {
                         <a href={location.link} target="_blank" rel="noreferrer"><div className={classes.link}></div></a>
                     }
                 </div>
-                <div className={classes.tripsGalery}>
+                <div className={classes.tripsGallery}>
                 {
                     location.destinations.map(destination => {
                         return (
