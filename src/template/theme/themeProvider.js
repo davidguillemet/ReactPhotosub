@@ -77,6 +77,11 @@ const CustomThemeProvider = ({children}) => {
                     width: '98%'
                 },
                 components: {
+                    MuiCircularProgress: {
+                        defaultProps: {
+                            color: 'secondary'
+                        }
+                    },
                     MuiCheckbox: {
                         defaultProps: {
                             color: "secondary"
