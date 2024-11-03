@@ -599,7 +599,7 @@ const ExpandedView = React.forwardRef(({
                     borderTopStyle: 'solid',
                     borderTopColor: 'divider',
                     overflow: 'hidden',
-                    paddingTop: 1, // Padding bottom = 0
+                    py: 0,
                 }}
             >
                 <ImageSlider

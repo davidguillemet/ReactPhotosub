@@ -5,7 +5,6 @@ import lazyComponent from '../../components/lazyComponent';
 import { useQueryContext } from '../../components/queryContext';
 import LabeledDivider from '../../components/labeledDivider/labeledDivider';
 import ImageSlider from '../../components/imageSlider';
-import { VerticalSpacing } from '../../template/spacing';
 import {isMobile} from 'react-device-detect';
 import { formatDate, formatDateShort, useLanguage, useTranslation, destinationTitle } from '../../utils';
 import ImageDescription from 'components/imageDescription';
@@ -108,6 +107,7 @@ const RelatedDestinationsSlider = withLoading(({destination, related, imageHeigh
             imageHeight={imageHeight}
             emptyComponent={<EmptyRelatedDestinations/>}
             renderOverlay={renderOverlay}
+            selectable={false}
         />
     );
 }, [buildLoadingState("related", [undefined])]);
@@ -125,7 +125,6 @@ const RelatedDestinations = ({destination}) => {
     return (
         <Box sx={{ width: "100%"}} >
             <LabeledDivider label={t("relatedDestinations")}></LabeledDivider>
-            <VerticalSpacing factor={2} />
             <RelatedDestinationsSliderController destination={destination} />
         </Box>
     );

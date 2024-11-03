@@ -9,6 +9,7 @@ import SelectionMarker from '../selectionMarker';
 const Thumbnail = React.forwardRef(({
     image,
     index,
+    selectable = true,
     handleClick,
     selected,
     imageHeight,
@@ -33,6 +34,9 @@ const Thumbnail = React.forwardRef(({
                 ml: index === 0 ? `${spacing}px` : 0,
                 height: `${imageHeight}px`,
                 width: `${imageWidth}px`,
+                ...(selected && {
+                    transform: 'translateX(-2px) translateY(-2px)'
+                })
             }}
         >
             <LazyImage
@@ -66,7 +70,7 @@ const Thumbnail = React.forwardRef(({
             <SelectionMarker
                 selected={selected}
                 markerWidth={1}
-                opacity={0}
+                selectionMaskOpacity={selectable ? 0.3 : 0}
                 imageBorderWidth={0}
                 withCheck={false}
             />

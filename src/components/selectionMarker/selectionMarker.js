@@ -1,16 +1,14 @@
 import { Box } from '@mui/system';
-import { Paper } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 
 const SelectionMarker = ({
     imageBorderWidth,
     withCheck,
-    opacity = 0,
+    selectionMaskOpacity = 0,
     markerWidth = 5,
     selected = true}) => {
     return (
-        <Paper
-            elevation={selected ? 5 : 0}
+        <Box
             sx={{
                 pointerEvents: 'none',
                 position: "absolute",
@@ -19,6 +17,9 @@ const SelectionMarker = ({
                 right: `${imageBorderWidth}px`,
                 bottom: `${imageBorderWidth}px`,
                 borderRadius: '0px',
+                ...(selected && {
+                    boxShadow: '4px 4px 6px -2px rgba(0,0,0,0.92);'
+                }),
                 ...(selected && markerWidth > 0 ?
                     {
                         borderColor: theme => theme.palette.secondary.light,
@@ -28,7 +29,7 @@ const SelectionMarker = ({
                     }
                     : !selected ?
                     {
-                        backgroundColor: `rgba(255,255,255,${opacity})`,
+                        backgroundColor: `rgba(0,0,0,${selectionMaskOpacity})`,
                     }
                     : { /* empty */ }
                 )
@@ -56,7 +57,7 @@ const SelectionMarker = ({
                     />
                 </Box>
             }
-        </Paper>
+        </Box>
     )
 }
 

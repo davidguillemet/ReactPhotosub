@@ -368,7 +368,6 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     </React.Fragment>
                 }
 
-                <VerticalSpacing factor={2} />
                 <ImageSlider
                     images={images}
                     resetScrollOnChangeImages={listType !== LIST_SEARCH}
@@ -385,6 +384,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     emptyComponent={<EmptySimulationImages type={listType} images={images} searchResult={searchResult} />}
                     onNextPage={handleNextSearchPage}
                     hasNext={searchResult.hasNext}
+                    selectable={false}
                 />
 
             </SimulationFormControl>

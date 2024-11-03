@@ -35,6 +35,7 @@ const getLastThumbnailRightPosition = (images, height, spacing, hasNext) => {
 
 const ImageSlider = ({
     images,
+    selectable = true,
     currentIndex,
     onThumbnailClick,
     style,
@@ -174,7 +175,8 @@ const ImageSlider = ({
                     display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'flex-start',
-                    height: `${imageHeight + 8}px`, // 8px for selection shadow
+                    paddingTop: '8px',
+                    height: `${imageHeight + 8*2}px`, // 8px top & bottom for selection shadow and thumbnail translate
                     mx: 0
                 }}
             >
@@ -194,6 +196,7 @@ const ImageSlider = ({
                                 >                
                                     <Thumbnail
                                         key={image.id}
+                                        selectable={selectable}
                                         ref={thumbnailRef}
                                         image={image}
                                         index={index}
