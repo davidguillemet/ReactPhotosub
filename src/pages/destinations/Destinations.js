@@ -3,7 +3,7 @@ import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
 import AppsIcon from '@mui/icons-material/Apps';
 import PublicIcon from '@mui/icons-material/Public';
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -20,20 +20,11 @@ import { isMobile } from 'react-device-detect';
 import { useReactQuery } from '../../components/reactQuery';
 import { useTranslation } from '../../utils';
 
-const useStyles = makeStyles(() => ({
-    regionContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        flexWrap: 'wrap',
-        '& *': {
-            margin: 5,
-        }
-    },
-    tabPanel: {
+const DestinationTabPanel = styled(TabPanel)(({ theme }) => ({
+    '&.MuiTabPanel-root': {
         padding: 0,
         width: '100%'
-    }
+    },
 }));
 
 const VIEW_GRID = 'grid';
@@ -83,7 +74,6 @@ const PictureTypeSelector = ({destinationType, onChange}) => {
 const DestinationsComponent = withLoading(({destinations}) => {
 
     const t = useTranslation("pages.destinations");
-    const classes = useStyles();
 
     const [filteredDestinations, setFilteredDestinations] = useState(destinations);
     const [destinationType, setDestinationType] = useState(() => TYPE_ALL);
@@ -148,25 +138,19 @@ const DestinationsComponent = withLoading(({destinations}) => {
             <DisplayModeSelector listType={destinationsView} onChange={handleChangeDestinationView} />
             <VerticalSpacing factor={2} />
             <TabContext value={destinationsView}>
-                <TabPanel 
+                <DestinationTabPanel 
                     value={VIEW_GRID}
-                    classes={{
-                        root: classes.tabPanel
-                    }}
                 >
                     <DestinationGallery destinations={filteredDestinations} />
-                </TabPanel>
-                <TabPanel 
+                </DestinationTabPanel>
+                <DestinationTabPanel 
                     value={VIEW_MAP}
-                    classes={{
-                        root: classes.tabPanel
-                    }}
                     sx={{
                         height: '500px'
                     }}
                 >
                     <DestinationsMap destinations={filteredDestinations} />
-                </TabPanel>
+                </DestinationTabPanel>
             </TabContext>
         </React.Fragment>
     )

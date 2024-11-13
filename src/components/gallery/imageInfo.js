@@ -23,6 +23,9 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
     const effectFirstRoundTrip = React.useRef(true);
 
     React.useEffect(() => {
+        if (!container) {
+            return;
+        }
         if (effectFirstRoundTrip.current === true) {
             effectFirstRoundTrip.current = false;
             return;
@@ -101,7 +104,8 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
                 }}
             >
                 <Stack
-                    direction={'column'}
+                    direction='column'
+                    alignItems='center'
                     spacing={1}
                     sx={{m: 1, p: 0}}
                 >

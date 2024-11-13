@@ -77,6 +77,7 @@ const SimulationFormControl = ({
         >
             <FormLabel 
                 component="legend"
+                focused={false}
                 sx={{
                     padding: "5px",
                     color: theme => theme.palette.text.primary

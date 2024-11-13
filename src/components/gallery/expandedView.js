@@ -1,4 +1,3 @@
-import { makeStyles } from '@mui/styles';
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -38,20 +37,11 @@ import { useGSAP } from '@gsap/react';
 
 const VirtualizeSwipeableViews = virtualize(SwipeableViews);
 
-const useStyles = makeStyles({
-    navigationButton: {
-        position: 'absolute',
-        top: '50%',
-        transform: 'translateY(-50%)',
-    },
-    expandedHeader: {
-        opacity: 1,
-        transition: 'opacity 1s',
-        '&.hidden' : {
-            opacity: 0
-        }
-    }
-});
+const NavigationButton = styled(IconButton)(({ theme }) => ({
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+}));
 
 const StyleImage = styled('img')(({ theme }) => ({ }));
 
@@ -175,8 +165,6 @@ const ExpandedView = React.forwardRef(({
 
     const slideContainerResizeObserver = useResizeObserver();
     const [blockScroll, allowScroll] = useScrollBlock();
-
-    const classes = useStyles();
 
     useEventListener('keydown', handleKeyDown);
 
@@ -544,8 +532,7 @@ const ExpandedView = React.forwardRef(({
                 {
                     !isMobile && 
                     <Collapse in={!isPlaying}>
-                        <IconButton
-                            className={classes.navigationButton}
+                        <NavigationButton
                             disabled={currentIndex === 0}
                             onClick={handlePreviousImage}
                             style={{
@@ -554,15 +541,14 @@ const ExpandedView = React.forwardRef(({
                             size="large"
                         >
                             <ArrowBackIosRoundedIcon fontSize='large' />
-                        </IconButton>
+                        </NavigationButton>
                     </Collapse>
                 }
 
                 { /* if mobile, show the button if it's the last of the current page */
                     (!isMobile || (currentIndex === images.length - 1 && images.length < count)) &&
                     <Collapse in={!isPlaying}>
-                        <IconButton
-                            className={classes.navigationButton}
+                        <NavigationButton
                             disabled={currentIndex === count - 1}
                             onClick={handleNextImage}
                             style={{
@@ -571,7 +557,7 @@ const ExpandedView = React.forwardRef(({
                             size="large"
                         >
                             <ArrowForwardIosRoundedIcon fontSize='large' />
-                        </IconButton>
+                        </NavigationButton>
                     </Collapse>
                 }
 

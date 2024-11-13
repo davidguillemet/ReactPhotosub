@@ -1,7 +1,6 @@
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import StyledFirebaseAuth from './StyledFirebaseAuth';
 import useFirebaseContext from './firebaseContextHook';
 import { EmailAuthProvider } from "firebase/auth";
-import './firebaseui.css';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import Divider from '@mui/material/Divider';
@@ -228,8 +227,22 @@ const FirebaseAuth = ({onLoginStateChange}) => {
                 }}
             >
                 <Fade in={isLogin}>
-                    <div style={{display: 'flex', flex: 1}}>
-                        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseContext.auth} />
+                    <div
+                        style={{
+                            display: 'flex',
+                            flex: 1,
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translateX(-50%) translateY(-50%)',
+                            width: '95%',
+                            maxWidth: '360px'
+                        }}
+                    >
+                        <StyledFirebaseAuth
+                            uiConfig={uiConfig}
+                            firebaseAuth={firebaseContext.auth}
+                        />
                     </div>
                 </Fade>
             </Modal>

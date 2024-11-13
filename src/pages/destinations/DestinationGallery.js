@@ -65,14 +65,15 @@ const DestinationContent = ({item, index, width, params}) => {
     const { onEdit, onDelete } = params;
 
     const container = useRef();
-    const selector = gsap.utils.selector(container);
 
     const onMouseEnter = () => {
+        const selector = gsap.utils.selector(container);
         gsap.to(selector(".details"), { y: -30, ease: "bounce.out" });
         gsap.to(selector(".image"), { scale: 1.1, ease: "bounce.out" });
     };
 
     const onMouseLeave = () => {
+        const selector = gsap.utils.selector(container);
         gsap.to(selector(".details"), { y: 0, ease: "bounce.out" });
         gsap.to(selector(".image"), { scale: 1, ease: "bounce.out" });
     };
