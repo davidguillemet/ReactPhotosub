@@ -334,60 +334,62 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
             <VerticalSpacing factor={3} />
 
             <SimulationFormControl label={t("imageSelection")}>
-                <ToggleButtonGroup exclusive value={listType} onChange={handleListType} >
-                    <ToggleButton value={LIST_HOME_SLIDESHOW} >
-                        <Tooltip title={t("imageType:preSelection")}>
-                            <CollectionsIcon />
-                        </Tooltip>
-                    </ToggleButton>
-                    {
-                        user &&
-                        <ToggleButton value={LIST_FAVORITES} >
-                            <Tooltip title={t("imageType:favorites")}>
-                                <FavoriteIcon />
+                <Stack direction={'column'} alignItems={'center'}>
+                    <ToggleButtonGroup exclusive value={listType} onChange={handleListType} >
+                        <ToggleButton value={LIST_HOME_SLIDESHOW} >
+                            <Tooltip title={t("imageType:preSelection")}>
+                                <CollectionsIcon />
                             </Tooltip>
                         </ToggleButton>
-                    }
-                    <ToggleButton value={LIST_SEARCH} >
-                        <Tooltip title={t("imageType:search")}>
-                            <SearchIcon />
-                        </Tooltip>
-                    </ToggleButton>
-                </ToggleButtonGroup>
-
-                {
-                    listType === LIST_SEARCH &&
-                    <React.Fragment>
-                        <VerticalSpacing factor={2} />
-                        <Box sx={{ width: "100%", px: 1}}>
-                            <Search
-                                showExactSwitch={false}
-                                onResult={handleSearchResult}
-                                pageIndex={searchResult.page}
-                            />
-                        </Box>
-                    </React.Fragment>
-                }
-
-                <ImageSlider
-                    images={images}
-                    resetScrollOnChangeImages={listType !== LIST_SEARCH}
-                    currentIndex={-1}
-                    onThumbnailClick={onSelectImage}
-                    style={{
-                        mx: {
-                            "xs": 0,
-                            "sm": 0
+                        {
+                            user &&
+                            <ToggleButton value={LIST_FAVORITES} >
+                                <Tooltip title={t("imageType:favorites")}>
+                                    <FavoriteIcon />
+                                </Tooltip>
+                            </ToggleButton>
                         }
-                    }}
-                    imageHeight={isMobile ? 100 : 120}
-                    disabled={simulation.isLocked}
-                    emptyComponent={<EmptySimulationImages type={listType} images={images} searchResult={searchResult} />}
-                    onNextPage={handleNextSearchPage}
-                    hasNext={searchResult.hasNext}
-                    selectable={false}
-                />
+                        <ToggleButton value={LIST_SEARCH} >
+                            <Tooltip title={t("imageType:search")}>
+                                <SearchIcon />
+                            </Tooltip>
+                        </ToggleButton>
+                    </ToggleButtonGroup>
 
+                    {
+                        listType === LIST_SEARCH &&
+                        <React.Fragment>
+                            <VerticalSpacing factor={2} />
+                            <Box sx={{ width: "100%", px: 1}}>
+                                <Search
+                                    showExactSwitch={false}
+                                    onResult={handleSearchResult}
+                                    pageIndex={searchResult.page}
+                                />
+                            </Box>
+                        </React.Fragment>
+                    }
+
+                    <ImageSlider
+                        images={images}
+                        resetScrollOnChangeImages={listType !== LIST_SEARCH}
+                        currentIndex={-1}
+                        onThumbnailClick={onSelectImage}
+                        style={{
+                            mx: {
+                                "xs": 0,
+                                "sm": 0
+                            },
+                            width: '100%'
+                        }}
+                        imageHeight={isMobile ? 100 : 120}
+                        disabled={simulation.isLocked}
+                        emptyComponent={<EmptySimulationImages type={listType} images={images} searchResult={searchResult} />}
+                        onNextPage={handleNextSearchPage}
+                        hasNext={searchResult.hasNext}
+                        selectable={false}
+                    />
+                </Stack>
             </SimulationFormControl>
 
             <VerticalSpacing factor={3} />

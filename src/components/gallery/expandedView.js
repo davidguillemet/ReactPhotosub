@@ -21,21 +21,20 @@ import { useEventListener, getThumbnailSrc, useTranslation } from '../../utils';
 import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
 import ImageInfo from './imageInfo';
-import { useResizeObserver } from '../../components/hooks';
+import { useResizeObserver } from 'components/hooks';
 import { useScrollBlock, openFullscreen, closeFullscreen } from '../../utils';
 
-import TooltipIconButton from '../../components/tooltipIconButton';
-import { HorizontalSpacing } from '../../template/spacing';
-
-import SwipeableViews from 'react-swipeable-views';
-import { virtualize } from 'react-swipeable-views-utils';
+import TooltipIconButton from 'components/tooltipIconButton';
+import { HorizontalSpacing } from 'template/spacing';
 
 import {isMobile} from 'react-device-detect';
 
 import { gsap } from "gsap";
 import { useGSAP } from '@gsap/react';
 
-const VirtualizeSwipeableViews = virtualize(SwipeableViews);
+import useEmblaCarousel from 'embla-carousel-react';
+
+import './css/imageLoading.css';
 
 const NavigationButton = styled(IconButton)(({ theme }) => ({
     position: 'absolute',
@@ -44,6 +43,7 @@ const NavigationButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const StyleImage = styled('img')(({ theme }) => ({ }));
+const StyleDiv = styled('div')(({ theme }) => ({ }));
 
 function StopButtonWithCircularProgress({ onClick, onCompletedRef, duration, size, height}) {
 
@@ -104,42 +104,141 @@ function StopButtonWithCircularProgress({ onClick, onCompletedRef, duration, siz
     );
 }
 
-const getSlideSrc = (image, availableWidth, availableHeight) => {
+const PLACEHOLDER_SRC = `data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D`;
+
+const getSlideSrc = (image, visible, availableWidth, availableHeight) => {
+    if (!visible) {
+        return PLACEHOLDER_SRC;
+    }
     if (availableWidth === 0 || availableHeight === null) {
         return null;
     }
     return getThumbnailSrc(image, availableWidth, availableHeight);
 }
 
-const SlideRenderer = ({image, containerWidth, containerHeight}) => {
+const imageLoadingAnimationDuration = '500ms';
 
-    const slideSrc = useMemo(() => getSlideSrc(image, containerWidth, containerHeight), [image, containerWidth, containerHeight]);
+const SlideRenderer = ({image, visible, containerWidth, containerHeight}) => {
+
+    const slideSrc = useMemo(() => getSlideSrc(image, visible, containerWidth, containerHeight), [image, visible, containerWidth, containerHeight]);
 
     function onImageLoaded(event) {
-        event.target.classList.add('loaded');
+        if (slideSrc !== PLACEHOLDER_SRC) {
+            event.target.parentElement.classList.add('loadedSlide');
+        }
     }
 
     return (
-        <StyleImage
-            alt=""
-            onLoad={onImageLoaded}
-            src={slideSrc}
+        <StyleDiv
+            className="embla__slide"
             sx={{
-                display: 'block',
-                maxWidth: '100%',
-                maxHeight: '100%',
-                width: 'auto',
-                height: 'auto',
-                opacity: 0,
-                transition: 'opacity 1s',
-                '&.loaded': {
-                    opacity: 1
-                },
-                objectFit: 'contain' // Prevent portrait image being enlarged on chrome windows (at least)
+                flex: "0 0 100%",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative'
             }}
-        />
+        >
+            <StyleImage
+                alt=""
+                onLoad={onImageLoaded}
+                src={slideSrc}
+                className='slideImage'
+                sx={{
+                    display: 'block',
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    opacity: 0,
+                    transition: `opacity ${imageLoadingAnimationDuration}`,
+                    objectFit: 'contain' // Prevent portrait image being enlarged on chrome windows (at least)
+                }}
+            />
+            <CircularProgress
+                className={'slideLoader'}
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translateX(-50%) translateY(-50%)',
+                    opacity: 1,
+                    transition: `opacity ${imageLoadingAnimationDuration}`,
+                }}
+            />
+        </StyleDiv>
     );
 }
+
+const EmblaCarousel = React.forwardRef(({
+    images,
+    initialIndex,
+    onChangeIndex,
+    containerWidth,
+    containerHeight}, inRef) => {
+
+    const initialIndexRef = useRef(initialIndex);
+    const [visibleSlides, setVisibleSlides] = useState(new Set());
+
+
+    const [emblaRef, emblaApi] = useEmblaCarousel({
+        startIndex: initialIndexRef.current,
+        loop: false
+    });
+
+    const emblaRefCallback  = useCallback((localRef) => {
+        if (localRef) {
+            emblaRef(localRef);
+        }
+        inRef.current = emblaApi;
+    }, [inRef, emblaRef, emblaApi]);
+
+    const updateVisibleSlides = useCallback((emblaApi) => {
+        setVisibleSlides((prevSlidesInView) => {
+            if (prevSlidesInView.size === emblaApi.slideNodes().length) {
+                emblaApi.off('slidesInView', updateVisibleSlides);
+            }
+            const newSlidesInView = new Set(prevSlidesInView);
+            emblaApi.slidesInView().forEach(index => newSlidesInView.add(index));
+            return newSlidesInView;
+        });
+    }, []);
+
+    const onScroll = useCallback(() => {
+        const selectedSlide = emblaApi.selectedScrollSnap();
+        if (onChangeIndex) {
+            onChangeIndex(selectedSlide);
+        }
+    }, [emblaApi, onChangeIndex]);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+        updateVisibleSlides(emblaApi);
+        emblaApi.on('slidesInView', updateVisibleSlides)
+        emblaApi.on('reInit', updateVisibleSlides)
+        emblaApi.on('scroll', onScroll);
+    }, [emblaApi, updateVisibleSlides, onScroll]);
+
+    return (
+        <StyleDiv className="embla" sx={{ width: "100%", height: "100%"}} ref={emblaRefCallback}>
+            <StyleDiv className="embla__container" sx={{ display: 'flex', height: '100%' }}>
+                {
+                    images && images.map((image, index) => {
+                        return (
+                            <SlideRenderer
+                                key={image.id}
+                                image={image}
+                                containerWidth={containerWidth}
+                                containerHeight={containerHeight}
+                                visible={visibleSlides.has(index)}
+                            />
+                        );
+                    })
+                }
+            </StyleDiv>
+        </StyleDiv>
+    );
+});
 
 const ExpandedView = React.forwardRef(({
     images,
@@ -162,6 +261,8 @@ const ExpandedView = React.forwardRef(({
     const handleNextImageRef = useRef(null);
 
     const waitingForNextPage = useRef(false);
+
+    let sliderApiRef = useRef(null);
 
     const slideContainerResizeObserver = useResizeObserver();
     const [blockScroll, allowScroll] = useScrollBlock();
@@ -194,6 +295,12 @@ const ExpandedView = React.forwardRef(({
     useEffect(() => {
         setCurrentIndex(index);
     }, [index]);
+
+    useEffect(() => {
+        if (sliderApiRef.current) {
+            sliderApiRef.current.scrollTo(currentIndex);
+        }
+    }, [currentIndex]);
 
     const handleThumbnailClick = useCallback((index) => {
         setCurrentIndex(index);
@@ -319,7 +426,9 @@ const ExpandedView = React.forwardRef(({
     }
 
     const handleNextImage = () => {
-        if (currentIndex < images.length - 1) {
+        if (isPlaying && currentIndex >= count - 1) {
+            handleStopClick();
+        } else if (currentIndex < images.length - 1) {
             handleThumbnailClick(currentIndex + 1);
         } else if (currentIndex < count - 1 && hasNext && onNextPage) {
             waitingForNextPage.current = true;
@@ -329,20 +438,6 @@ const ExpandedView = React.forwardRef(({
 
     // To avoid useless StopButtonWithCircularProgress rerendering
     handleNextImageRef.current = handleNextImage;
-
-    const slideRenderer = (params) => {
-        const {index} = params;
-        const image = images[index];
-
-        return (
-            <SlideRenderer
-                key={image.id}
-                image={image}
-                containerWidth={slideContainerResizeObserver.width}
-                containerHeight={slideContainerResizeObserver.height}
-            />
-        );
-    };
 
     const floatingHeader = (isPlaying || fullScreen);
 
@@ -496,27 +591,14 @@ const ExpandedView = React.forwardRef(({
                     overflow: 'hidden',
                 }}
             >
-                <VirtualizeSwipeableViews
-                    style={{
-                        width: '100%',
-                        height: '100%'
-                    }}
-                    containerStyle={{
-                        height: '100%'
-                    }}
-                    slideStyle={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        width: '100%',
-                        height: '100%',
-                        padding: 0,
-                        overflow: 'hidden'
-                    }}
-                    index={currentIndex}
+
+                <EmblaCarousel
+                    ref={sliderApiRef}
+                    images={images}
+                    containerWidth={slideContainerResizeObserver.width}
+                    containerHeight={slideContainerResizeObserver.height}
+                    initialIndex={index}
                     onChangeIndex={handleThumbnailClick}
-                    slideRenderer={slideRenderer}
-                    slideCount={images.length}
                 />
 
                 <ImageInfo
@@ -561,7 +643,7 @@ const ExpandedView = React.forwardRef(({
                     </Collapse>
                 }
 
-                { /* OVerlay when waiting for the next page */ }
+                { /* Overlay when waiting for the next page */ }
                 <Dialog
                     open={waitingForNextPage.current}
                     PaperProps={{
@@ -596,6 +678,7 @@ const ExpandedView = React.forwardRef(({
                     onNextPage={onNextPage}
                 />
             </Paper>
+
         </Box>
     );
 });

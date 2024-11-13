@@ -1,0 +1,9 @@
+
+.loadedSlide > .slideLoader {
+    opacity: 0
+}
+
+.loadedSlide > .slideImage {
+    opacity: 1
+}
+  

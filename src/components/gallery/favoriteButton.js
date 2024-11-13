@@ -8,7 +8,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 import TooltipIconButton from '../tooltipIconButton';
 import { useAuthContext } from '../authentication';
-import './styles.css';
+import './css/favorites.css';
 import { useFavorites } from '../favorites';
 import { useTranslation } from 'utils';
 import { useGalleryContext } from './galleryContext';

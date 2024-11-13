@@ -40,7 +40,7 @@ const paletteLightMode = {
       contrastText: '#5f5f4c',
     },
     secondary: {
-      main: '#8db4c3',
+      main: '#79a2b2',
       contrastText: '#eeeeee',
     },
     error: {
@@ -94,13 +94,13 @@ const CustomThemeProvider = ({children}) => {
                     },
                     MuiButton: {
                         defaultProps: {
-                            variant: "contained",
+                            variant: "outlined",
                             color: "secondary"
                         }
                     },
                     MuiLoadingButton: {
                         defaultProps: {
-                            variant: "contained",
+                            variant: "outlined",
                             color: "secondary"
                         }
                     },
