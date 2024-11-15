@@ -159,9 +159,6 @@ const SlideRenderer = ({image, visible, containerWidth, containerHeight}) => {
                 className={'slideLoader'}
                 sx={{
                     position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translateX(-50%) translateY(-50%)',
                     opacity: 1,
                     transition: `opacity ${imageLoadingAnimationDuration}`,
                 }}
@@ -204,7 +201,7 @@ const EmblaCarousel = React.forwardRef(({
         });
     }, []);
 
-    const onScroll = useCallback(() => {
+    const onSelectedSlideChanged = useCallback(() => {
         const selectedSlide = emblaApi.selectedScrollSnap();
         if (onChangeIndex) {
             onChangeIndex(selectedSlide);
@@ -216,8 +213,8 @@ const EmblaCarousel = React.forwardRef(({
         updateVisibleSlides(emblaApi);
         emblaApi.on('slidesInView', updateVisibleSlides)
         emblaApi.on('reInit', updateVisibleSlides)
-        emblaApi.on('scroll', onScroll);
-    }, [emblaApi, updateVisibleSlides, onScroll]);
+        emblaApi.on('select', onSelectedSlideChanged);
+    }, [emblaApi, updateVisibleSlides, onSelectedSlideChanged]);
 
     return (
         <StyleDiv className="embla" sx={{ width: "100%", height: "100%"}} ref={emblaRefCallback}>
@@ -298,7 +295,10 @@ const ExpandedView = React.forwardRef(({
 
     useEffect(() => {
         if (sliderApiRef.current) {
-            sliderApiRef.current.scrollTo(currentIndex);
+            const currentSliderIndex = sliderApiRef.current.selectedScrollSnap();
+            // No animation if scroll more than 1 slide
+            const jump = Math.abs(currentIndex - currentSliderIndex) > 1;
+            sliderApiRef.current.scrollTo(currentIndex, jump);
         }
     }, [currentIndex]);
 
