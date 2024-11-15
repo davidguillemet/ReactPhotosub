@@ -45,7 +45,16 @@ const HeaderSearch = ({
     const setGalleryResultRef = React.useCallback(element => {
         resultsGalleryRef.current = element;
         if (resultsGalleryRef.current !== null) {
-            disableBodyScroll(resultsGalleryRef.current);
+            disableBodyScroll(resultsGalleryRef.current, {
+                allowTouchMove: el => {
+                    while (el && el !== document.body) {
+                        if (el.getAttribute('data-body-scroll-lock-ignore') !== null) {
+                            return true;
+                        }
+                        el = el.parentElement;
+                    }
+                    return false;
+                }});
         }
     }, []);
     React.useEffect(() => {

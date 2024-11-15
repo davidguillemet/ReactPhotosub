@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { styled } from '@mui/material/styles';
 import {isMobile} from 'react-device-detect';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -16,6 +17,8 @@ import Thumbnail from './thumbnail';
 import './style.css';
 
 const _nextPageButtonWidth = 60;
+
+const CustomBox = styled(Box)(({ theme }) => ({ }));
 
 const getThumbnailRectAt = (container, index) => {
     if (container === null || index > container.children.length - 1) {
@@ -165,7 +168,7 @@ const ImageSlider = ({
                 </IconButton>
             }
 
-            <Box
+            <CustomBox
                 ref={resizeObserver.ref}
                 className="hideScroll" 
                 sx={{
@@ -179,6 +182,7 @@ const ImageSlider = ({
                     height: `${imageHeight + 8*2}px`, // 8px top & bottom for selection shadow and thumbnail translate
                     mx: 0
                 }}
+                data-body-scroll-lock-ignore
             >
                 {
                     images.length === 0 && emptyComponent !== null ?
@@ -234,7 +238,7 @@ const ImageSlider = ({
                     >
                     </LoadingButton>
                 }
-            </Box>
+            </CustomBox>
 
             {
                 !isMobile &&
@@ -247,5 +251,6 @@ const ImageSlider = ({
             }
         </Box>
     );
-}
+};
+
 export default withLoading(ImageSlider, [buildLoadingState("images", [null, undefined])]);
