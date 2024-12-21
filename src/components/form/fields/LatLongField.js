@@ -5,7 +5,6 @@ import { FIELD_TYPE_NUMBER } from '../Form';
 import { useTranslation } from 'utils';
 import { validateValueRange } from './common';
 import GenericTextField from './GenericTextField';
-import { uniqueID } from 'utils';
 
 const getLatLongFieldTemplate = () => {
     return {
@@ -86,7 +85,6 @@ const LatLongField = ({ field, value, values, handleChange, sending, readOnly, v
     const onMapClick = React.useCallback((position) => {
         locationSource.current = "input";
         setLocation({
-            id: uniqueID(),
             latitude: position.lat,
             longitude: position.lng
         });

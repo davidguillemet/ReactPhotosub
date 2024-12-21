@@ -41,10 +41,10 @@ export default function ConfirmDialog({
                     }
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary" variant="outlined">
+                    <Button onClick={handleClose} >
                     {t("cancel")}
                     </Button>
-                    <Button onClick={handleValidate} color="primary" variant="outlined">
+                    <Button onClick={handleValidate} >
                     {t("validate")}
                     </Button>
                 </DialogActions>
