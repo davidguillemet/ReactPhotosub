@@ -20,6 +20,7 @@ import { sortImagesAscending, sortImagesDescending, getSubGalleryAnchorName } fr
 import { VerticalSpacing } from 'template/spacing';
 import { GalleryContextProvider } from './galleryContext';
 import { useGalleryContext } from './galleryContext';
+import { useAuthContext } from 'components/authentication';
 
 const _colWidth = {
     "small": {
@@ -112,6 +113,7 @@ const GroupGalleryWithHeader = ({
     renderItem,
     groupHeaderEndComponent}) => {
 
+    const authContext = useAuthContext();
     const t = useTranslation("components.gallery");
     const [isExpanded, setIsExpanded] = useState(true);
 
@@ -124,6 +126,10 @@ const GroupGalleryWithHeader = ({
         group.showCount ?
         `${group.key} - ${t("lbl:groupImageCount", group.images.length)}` :
         group.key;
+
+    if (!authContext.admin && (!group.images || group.images.length === 0)) {
+        return null;
+    }
 
     return (
         <Stack sx={{width: '100%'}}>
