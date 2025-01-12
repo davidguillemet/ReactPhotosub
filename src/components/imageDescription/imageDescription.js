@@ -87,6 +87,9 @@ const ImageDescription = ({ image, withNavigation = true}) => {
 
             <Stack
                 direction='column'
+                sx={{
+                    textAlign: 'center'
+                }}
             >
                 <Typography
                     variant="subtitle1"
