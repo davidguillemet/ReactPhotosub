@@ -334,7 +334,7 @@ export const compareRegions = (lang) => {
 }
 
 export const regionTitle = (region, lang) => {
-    return region[getPropFromLanguage("title", lang)];
+    return region ? region[getPropFromLanguage("title", lang)] : "";
 }
 
 export const destinationTitle = (destination, lang) => {

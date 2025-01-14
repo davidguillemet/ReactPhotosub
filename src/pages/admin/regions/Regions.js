@@ -20,6 +20,7 @@ import StyledTreeItem from './StyledTreeItem';
 import { useToast } from 'components/notifications';
 import useFormDialog from 'dialogs/FormDialog';
 import LocationForm from './LocationForm';
+import RegionForm from './RegionForm';
 
 function getRegionItemId(region) {
     return `region_${region.id}`;
@@ -63,16 +64,28 @@ const LocationItem = ({location, onEdit, onDelete}) => {
     )
 };
 
-const RegionItem = ({region, children, onEdit}) => {
+const RegionItem = ({region, children, onEditLocation, onEditRegion, onDeleteRegion}) => {
 
     const { language } = useLanguage();
-    const onAddLocation = React.useCallback((event) => {
+    const handleAddLocation = React.useCallback((event) => {
         event.stopPropagation();
-        onEdit({ region: region.id });
-    }, [onEdit, region]);
+        onEditLocation({ region: region.id });
+    }, [onEditLocation, region]);
+
+    const handleEditRegion = React.useCallback((event) => {
+        event.stopPropagation();
+        onEditRegion(region);
+    }, [onEditRegion, region]);
+
+    const handleDeleteRegion = React.useCallback((event) => {
+        event.stopPropagation();
+        onDeleteRegion(region);
+    }, [onDeleteRegion, region]);
 
     const isEmpty = React.useMemo(() => children === null || children.every(child => child.length === 0), [children]);
     const regionId = getRegionItemId(region);
+
+    const hasChildren = children?.length > 1 && (children[0]?.length > 0 || children[1]?.length);
 
     return (
         <StyledTreeItem
@@ -85,8 +98,14 @@ const RegionItem = ({region, children, onEdit}) => {
                     <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
                         {regionTitle(region, language)}
                     </Typography>
-                    <IconButton onClick={onAddLocation} size='small'>
+                    <IconButton onClick={handleAddLocation} size='small'>
                         <AddLocationAltIcon fontSize='inherit' />
+                    </IconButton>
+                    <IconButton onClick={handleEditRegion} size='small'>
+                        <EditLocationAltIcon fontSize='inherit' />
+                    </IconButton>
+                    <IconButton onClick={handleDeleteRegion} size='small' disabled={hasChildren}>
+                        <DeleteIcon fontSize='inherit'/>
                     </IconButton>
                 </Box>
             }
@@ -96,20 +115,26 @@ const RegionItem = ({region, children, onEdit}) => {
     );
 }
 
-function buildTreeView(hierarchy, parentId, locations, onEdit, onDelete, language) {
+function buildTreeView(hierarchy, parentId, locations, onEditLocation, onEditRegion, onDeleteLocation, onDeleteRegion, language) {
     const levelNodes = hierarchy.filter(region => region.parent === parentId).sort(compareRegions(language));
     return levelNodes.map((node, index) => {
         return (
-            <RegionItem key={node.id} region={node} onEdit={onEdit}>
-                { buildTreeView(hierarchy, node.id, locations, onEdit, onDelete, language) }
+            <RegionItem
+                key={node.id}
+                region={node}
+                onEditLocation={onEditLocation}
+                onEditRegion={onEditRegion}
+                onDeleteRegion={onDeleteRegion}
+            >
+                { buildTreeView(hierarchy, node.id, locations, onEditLocation, onEditRegion, onDeleteLocation, onDeleteRegion, language) }
                 {
                     locations.filter(location => location.region === node.id).map((location, index) => {
                         const nodeId = getLocationItemId(location);
                         return <LocationItem
                                     key={nodeId}
                                     location={location}
-                                    onEdit={onEdit}
-                                    onDelete={onDelete}
+                                    onEdit={onEditLocation}
+                                    onDelete={onDeleteLocation}
                                 />
                     })
                 }
@@ -124,21 +149,41 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
     const { toast } = useToast();
     const queryContext = useQueryContext();
     const deleteLocationMutation = queryContext.useDeleteLocation();
+    const deleteRegionMutation = queryContext.useDeleteRegion();
 
     const [locationToDelete, setLocationToDelete] = React.useState(null);
     const [locationToEdit, setLocationToEdit] = React.useState(null);
+    const [regionToDelete, setRegionToDelete] = React.useState(null);
+    const [regionToEdit, setRegionToEdit] = React.useState(null);
     const [expanded, setExpanded] = React.useState([]);
 
     const onDeleteLocation = React.useCallback(() => {
         return deleteLocationMutation.mutateAsync(locationToDelete)
             .then(() => {
                 toast.success("Le lieu a bien été supprimé.")
+            }).catch((e) => {
+                toast.error(`Une erreur est survenue lors de la suppression du lieu: ${e.message}`);
             });
     }, [deleteLocationMutation, locationToDelete, toast]);
 
-    const onConfirmDeleteOpenChanged = React.useCallback((open) => {
+    const onDeleteRegion = React.useCallback(() => {
+        return deleteRegionMutation.mutateAsync(regionToDelete)
+            .then(() => {
+                toast.success("La région a bien été supprimée.")
+            }).catch((e) => {
+                toast.error(`Une erreur est survenue lors de la suppression de la région: ${e.message}`);
+            });
+    }, [deleteRegionMutation, regionToDelete, toast]);
+
+    const onConfirmDeleteLocationOpenChanged = React.useCallback((open) => {
         if (open === false) {
             setLocationToDelete(null);
+        }
+    }, []);
+
+    const onConfirmDeleteRegionOpenChanged = React.useCallback((open) => {
+        if (open === false) {
+            setRegionToDelete(null);
         }
     }, []);
 
@@ -146,12 +191,35 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
         setLocationToEdit(null);
     }, []);
 
-    const { dialogProps, openDialog, FormDialog } = useFormDialog(onCloseEditLocation);
+    const onCloseEditRegion = React.useCallback(() => {
+        setRegionToEdit(null);
+    }, []);
+
+    const {
+        dialogProps: locationDialogProps,
+        openDialog: openLocationDialog,
+        FormDialog: LocationFormDialog
+    } = useFormDialog(onCloseEditLocation);
+
+    const {
+        dialogProps: regionDialogProps,
+        openDialog: openRegionDialog,
+        FormDialog: RegionFormDialog
+    } = useFormDialog(onCloseEditRegion);
 
     const onEditLocation = React.useCallback((location) => {
         setLocationToEdit(location);
-        openDialog();
-    }, [openDialog]);
+        openLocationDialog();
+    }, [openLocationDialog]);
+
+    const onEditRegion = React.useCallback((region) => {
+        setRegionToEdit(region);
+        openRegionDialog();
+    }, [openRegionDialog]);
+
+    const handleAddRegion = React.useCallback(() => {
+        onEditRegion(null);
+    }, [onEditRegion]);
 
     const handleExpandAllClick = React.useCallback(() => {
         setExpanded(regions.map(region => getRegionItemId(region)));
@@ -170,8 +238,8 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
         const parentHierarchy = [];
         let currentParentId = newLocation.region;
         do {
-            parentHierarchy.push(currentParentId)
             const parentRegion = regionMap.get(currentParentId);
+            parentHierarchy.push(getRegionItemId(parentRegion))
             currentParentId = parentRegion.parent;
         } while(currentParentId !== null);
         setExpanded(prevNodeIds => {
@@ -181,7 +249,22 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
         });
     }, [regionMap]);
 
-    const getEditDialogTitle = React.useCallback(() => {
+    const handleNewRegion = React.useCallback((newRegion) => {
+        const parentHierarchy = [];
+        let currentParentId = newRegion.parent;
+        while (currentParentId !== null) {
+            const parentRegion = regionMap.get(currentParentId);
+            parentHierarchy.push(getRegionItemId(parentRegion));
+            currentParentId = parentRegion.parent;
+        };
+        setExpanded(prevNodeIds => {
+            const regionSet = new Set(prevNodeIds);
+            parentHierarchy.forEach(parent => regionSet.add(`${parent}`));
+            return [...regionSet.values()];
+        });
+    }, [regionMap]);
+
+    const getEditLocationDialogTitle = React.useCallback(() => {
         if (locationToEdit === null || locationToEdit.id === undefined) {
             return "Nouveau lieu"
         } else {
@@ -189,9 +272,19 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
         }
     }, [locationToEdit]);
 
+    const getEditRegionDialogTitle = React.useCallback(() => {
+        if (regionToEdit === null || regionToEdit.id === undefined) {
+            return "Nouvelle région"
+        } else {
+            return "Modifier la région"
+        }
+    }, [regionToEdit]);
+
     return (
         <React.Fragment>
             <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', mb: 1}}>
+                <Button onClick={handleAddRegion}>Nouvelle Région</Button>
+                <HorizontalSpacing factor={2} />
                 <Button disabled={expanded.length === regions.length} onClick={handleExpandAllClick}>{t("expandAll")}</Button>
                 <HorizontalSpacing factor={2} />
                 <Button disabled={expanded.length === 0} onClick={handleCollapseAllClick}>{t("collapseAll")}</Button>
@@ -206,11 +299,11 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
                 }}
                 sx={{ flexGrow: 1, overflowY: 'auto' }}
             >
-                { buildTreeView(regions, null, locations, onEditLocation, setLocationToDelete, language) }
+                { buildTreeView(regions, null, locations, onEditLocation, onEditRegion, setLocationToDelete, setRegionToDelete, language) }
             </SimpleTreeView>
             <ConfirmDialog
                 open={locationToDelete !== null}
-                onOpenChanged={onConfirmDeleteOpenChanged}
+                onOpenChanged={onConfirmDeleteLocationOpenChanged}
                 onValidate={onDeleteLocation}
                 title={t("title:deleteLocation")}
                 dialogContent={[
@@ -218,14 +311,31 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
                     t("warningDeleteLocation")
                 ]}
             />
-            <FormDialog title={getEditDialogTitle()} {...dialogProps} >
+            <ConfirmDialog
+                open={regionToDelete !== null}
+                onOpenChanged={onConfirmDeleteRegionOpenChanged}
+                onValidate={onDeleteRegion}
+                title={t("title:deleteRegion")}
+                dialogContent={[
+                    t("confirmDeleteRegion", regionTitle(regionToDelete, language)),
+                    t("warningDeleteRegion")
+                ]}
+            />
+            <LocationFormDialog title={getEditLocationDialogTitle()} {...locationDialogProps} >
                 <LocationForm
                     location={locationToEdit}
                     locations={locations}
                     regions={regions}
                     onNewLocation={handleNewLocation}
                 />
-            </FormDialog>
+            </LocationFormDialog>
+            <RegionFormDialog title={getEditRegionDialogTitle()} {...regionDialogProps} >
+                <RegionForm
+                    region={regionToEdit}
+                    regions={regions}
+                    onNewRegion={handleNewRegion}
+                />
+            </RegionFormDialog>
         </React.Fragment>
     );
 }, [buildLoadingState("regions", [undefined]), buildLoadingState("locations", [undefined])]);

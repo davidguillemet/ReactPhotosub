@@ -142,6 +142,9 @@
             "regions": {
                 "expandAll": "Tout Déplier",
                 "collapseAll": "Tout Replier",
+                "title:deleteRegion": "Supprimer la région",
+                "confirmDeleteRegion": "Confirmez-vous la suppression de la région '{0}'?",
+                "warningDeleteRegion": "Cette action est irreversible!",
                 "title:deleteLocation": "Supprimer le lieu",
                 "confirmDeleteLocation": "Confirmez-vous la suppression du lieu '{0}'?",
                 "warningDeleteLocation": "Cette action est irreversible!"

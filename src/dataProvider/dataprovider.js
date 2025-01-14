@@ -246,6 +246,23 @@ DataProvider.prototype.deleteDestination = function(destinationId) {
     });
 }
 
+// Regions
+DataProvider.prototype.createRegion = function(region) {
+    return this.axios.post('/admin/regions', region)
+    .then(response => {
+        return response.data; // contains the new regions
+    });
+}
+DataProvider.prototype.updateRegion = function(region) {
+    return this.axios.put('/admin/regions', region);
+}
+DataProvider.prototype.deleteRegion = function(regionId) {
+    return this.axios.delete('/admin/regions', {data: { id: regionId } })
+    .then(response => {
+        return response.data; // contains the deleted region
+    });
+}
+
 // Locations
 DataProvider.prototype.createLocation = function(location) {
     return this.axios.post('/admin/locations', location)

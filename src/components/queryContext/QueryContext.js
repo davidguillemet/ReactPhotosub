@@ -131,6 +131,25 @@ export const QueryContextProvider = ({children}) => {
             }
         }),
 
+        // Regions
+        useAddRegion: () => useMutation((region) => dataProvider.createRegion(region), {
+            onSuccess: (data) => {
+                queryClient.setQueryData(['regions'], data)
+            }
+        }),
+        useDeleteRegion: () => useMutation((region) => dataProvider.deleteRegion(region.id), {
+            onSuccess: ({id}) => {
+                const prevRegions = queryClient.getQueryData(['regions']);
+                const newRegions = prevRegions.filter(l => l.id !== id);
+                queryClient.setQueryData(['regions'], newRegions);
+            }
+        }),
+        useUpdateRegion: () => useMutation((region) => dataProvider.updateRegion(region), {
+            onSuccess: ({data}) => {
+                queryClient.setQueryData(['regions'], data)
+            }
+        }),
+
         // Locations
         useAddLocation: () => useMutation((location) => dataProvider.createLocation(location), {
             onSuccess: (data) => {
