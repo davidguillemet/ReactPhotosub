@@ -9,20 +9,20 @@ const cors = require("cors");
 // const appCheckVerification = require("./middlewares/appCheckVerification");
 
 // Build express app
-const mainapi = express();
+const mainApi = express();
 
 // app.use(mw);
 
-mainapi.use(compression());
+mainApi.use(compression());
 
 // support parsing of application/json type post data
-mainapi.use(express.json());
+mainApi.use(express.json());
 
 // support parsing of application/x-www-form-urlencoded post data
-mainapi.use(express.urlencoded({extended: true}));
+mainApi.use(express.urlencoded({extended: true}));
 
 // Fix the CORS Error
-mainapi.use(cors({origin: true}));
+mainApi.use(cors({origin: true}));
 
 const getTableColumns = async (pool) => {
     const tableColumns = await pool().raw(`
@@ -85,7 +85,7 @@ module.exports = function(pool, firebaseConfig) {
     const admin = express();
     require("./admin/expressAdmin")(admin, configuration);
 
-    mainapi.get("/status", (req, res) => res.send("Working!"));
+    mainApi.get("/status", (req, res) => res.send("Working!"));
 
     // In case we would like to take advantage of this generic error handler
     // just add a try/catch in a route handler and call next in a promise catch statement:
@@ -93,17 +93,21 @@ module.exports = function(pool, firebaseConfig) {
     // -> https://www.robinwieruch.de/node-express-error-handling
     // be catch here and we will send an internal server error http 500
     // response with the error message as the response body
-    mainapi.use((error, req, res, next) => {
+    const errorHandler = (error, req, res, next) => {
         logger.error(res.locals.errorMessage, error);
         return res.status(500).json({
             error: {
                 message: res.locals.errorMessage,
+                detail: error.message,
             },
         });
-    });
+    };
+
+    mainApi.use(errorHandler);
+    admin.use(errorHandler);
 
     app.use("/admin", admin);
-    mainapi.use("/api", app);
+    mainApi.use("/api", app);
 
-    return mainapi;
+    return mainApi;
 };
