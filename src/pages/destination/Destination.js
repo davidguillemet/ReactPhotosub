@@ -249,8 +249,6 @@ const DestinationDisplay = withLoading(({destination}) => {
 
             <VerticalSpacing factor={2} />
 
-            <DestinationAdminTools destination={destination} />
-
             <Gallery
                 images={images}
                 onReady={onGalleryIsReady}
@@ -262,8 +260,6 @@ const DestinationDisplay = withLoading(({destination}) => {
             />
 
             <VerticalSpacing factor={2} />
-
-            <DestinationAdminTools destination={destination} />
 
             <VerticalSpacing factor={4} />
 
@@ -278,6 +274,8 @@ const DestinationDisplay = withLoading(({destination}) => {
                 galleryIsReady &&
                 <RelatedDestinations destination={destination} />
             }
+
+            <DestinationAdminTools destination={destination} />
 
         </DestinationGalleryContextProvider>
     );

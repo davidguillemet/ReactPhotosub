@@ -1,8 +1,8 @@
 import React from 'react';
+import { styled } from '@mui/material/styles';
 import { useHistory } from 'react-router-dom';
 import { Box } from '@mui/material';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
@@ -24,6 +24,8 @@ import { FOLDER_TYPE } from './common';
 import ImageErrors from './globalErrors/ImageErrors';
 import { useTranslation } from 'utils';
 import ItemFilter from './ItemFilter';
+import { Fab } from "@mui/material";
+import CollectionsOutlinedIcon from '@mui/icons-material/CollectionsOutlined';
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -32,24 +34,45 @@ const columns = [
   { id: 'tags', label: '...' }                     // Ok if the tags column is not null
 ];
 
+const Div = styled('div')(() => {});
+
 const Images = () => {
     const history = useHistory();
     const imageContext = useImageContext();
     const t = useTranslation("pages.admin.images");
     const folderName = imageContext.folderType === FOLDER_TYPE.root ? t("rootFolder") : imageContext.folderName;
+
     const onDisplayDestination = React.useCallback(() => {
         history.push(`/destinations/${imageContext.destinationPath}`)
     }, [history, imageContext.destinationPath]);
+
+    const AdminTools = () => {
+        return (
+            <Div
+                sx={{
+                    position: 'fixed',
+                    bottom: '20px',
+                    right: '100px',
+                    zIndex: (theme) => theme.zIndex.drawer
+                }}
+            >
+                <Fab
+                    variant="extended"
+                    disabled={imageContext.folderType !== FOLDER_TYPE.destination}
+                    onClick={onDisplayDestination}
+                >
+                    <CollectionsOutlinedIcon fontSize="large" sx={{ mr: 1 }} />
+                    Afficher la destination
+                </Fab>
+            </Div>
+        )
+    }
+
     return (
         <Stack direction="column" alignItems="flex-start" spacing={1}>
         <ImageErrors />
         <Paragraph>{t("imageCount", [imageContext.itemCount, folderName])}</Paragraph>
-            <Button
-                disabled={imageContext.folderType !== FOLDER_TYPE.destination}
-                onClick={onDisplayDestination}
-            >
-                Afficher la destination
-            </Button>
+        <AdminTools />
         <ItemFilter />
         <TableContainer component={Paper} sx={{display: 'flex', flexDirection: 'column'}}>
             <TableToolbar />

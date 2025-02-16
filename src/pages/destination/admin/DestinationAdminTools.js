@@ -1,10 +1,12 @@
 import React from 'react';
-import { Button, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { useAuthContext } from 'components/authentication';
 import { useHistory } from 'react-router-dom';
 import useFormDialog from 'dialogs/FormDialog';
 import SubGalleryForm from './SubGalleryForm';
-import { VerticalSpacing } from 'template/spacing';
+import { Fab } from "@mui/material";
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 
 const DestinationAdminTools = ({destination}) => {
     const authContext = useAuthContext();
@@ -27,12 +29,31 @@ const DestinationAdminTools = ({destination}) => {
 
     return (
         <React.Fragment>
-            <VerticalSpacing factor={2} />
-            <Stack direction="row" spacing={1}>
-                <Button onClick={onAddSubGallery}>Ajouter une sous-galerie</Button>
-                <Button onClick={onManageImages}>Gérer les images</Button>
+            <Stack
+                direction="row"
+                spacing={1}
+                sx={{
+                    position: 'fixed',
+                    bottom: '20px',
+                    right: '100px',
+                    zIndex: (theme) => theme.zIndex.drawer
+                }}
+            >
+                <Fab
+                    onClick={onAddSubGallery}
+                    variant="extended"
+                >
+                    <AddCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
+                    Ajouter une sous-galerie
+                </Fab>
+                <Fab
+                    onClick={onManageImages}
+                    variant="extended"
+                >
+                    <TuneOutlinedIcon fontSize="large" sx={{ mr: 1 }} />
+                    Gérer les images
+                </Fab>
             </Stack>
-            <VerticalSpacing factor={2} />
             <FormDialog title="Créer une sous-galerie" {...dialogProps}>
                 <SubGalleryForm subGallery={subGalleryToEdit} destination={destination}/>
             </FormDialog>

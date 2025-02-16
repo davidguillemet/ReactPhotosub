@@ -2,23 +2,18 @@ import React, { useRef } from 'react';
 import {isMobile} from 'react-device-detect';
 import { gsap } from "gsap";
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
+import Stack from '@mui/material/Stack';    
 import Chip from "@mui/material/Chip";
 import Typography from '@mui/material/Typography';
-import { formatDate, getThumbnailSrc, useLanguage, useTranslation, regionTitle, destinationTitle } from 'utils';
+import { formatDate, getThumbnailSrc, useLanguage, regionTitle, destinationTitle } from 'utils';
 import DestinationLink from '../../components/destinationLink';
 import MasonryGallery from '../../components/masonryGallery';
 import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useAuthContext } from '../../components/authentication';
-import {unstable_batchedUpdates} from 'react-dom';
-import { useQueryContext } from '../../components/queryContext';
-import ConfirmDialog from '../../dialogs/ConfirmDialog';
-import useFormDialog from 'dialogs/FormDialog';
-import DestinationForm from './DestinationForm';
 import { PublicationIndicator } from 'components/publication';
+import useAdminActions from './UseAdminActions';
 
 const DestinationDetails = ({destination}) => {
     const { language } = useLanguage();
@@ -148,62 +143,10 @@ const DestinationContent = ({item, index, width, params}) => {
 
 const DestinationGallery = ({destinations}) => {
 
-    const t = useTranslation("pages.destinations");
-    const queryContext = useQueryContext();
-    const authContext = useAuthContext();
-    const deleteDestinationMutation = queryContext.useDeleteDestination();
-
-    const { dialogProps, openDialog, FormDialog } = useFormDialog();
-    const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
-    const [destinationToEdit, setDestinationToEdit] = React.useState(null);
-
-    const onEditDestination = (destination) => {
-        unstable_batchedUpdates(() => {
-            setDestinationToEdit(destination);
-            openDialog();
-        });
-    }
-
-    const onNewDestination = () => {
-        unstable_batchedUpdates(() => {
-            setDestinationToEdit(null);
-            openDialog();
-        });
-    }
-
-    const onDeleteDestination = () => {
-        return deleteDestinationMutation.mutateAsync(destinationToEdit);
-    }
-
-    const onClickDeleteDestination = (destination) => {
-        unstable_batchedUpdates(() => {
-            setDestinationToEdit(destination);
-            setConfirmDeleteOpen(true);
-        })
-    }
-
-    const onCloseDestinationEditor = () => {
-        unstable_batchedUpdates(() => {
-            setDestinationToEdit(null);
-        });
-    };
-
-    const getDialogTitle = React.useCallback(() => {
-        if (destinationToEdit === null) {
-            return t("title:newDestination")
-        } else {
-            return t("title:editDestination")
-        }
-    }, [destinationToEdit, t]);
+    const { AdminActions, onEditDestination, onClickDeleteDestination } = useAdminActions();
 
     return (
         <React.Fragment>
-            {
-                authContext.admin === true &&
-                <IconButton aria-label="new" size="large" onClick={onNewDestination}>
-                    <AddCircleOutlineIcon fontSize="large" />
-                </IconButton>
-            }
 
             <MasonryGallery
                 items={destinations}
@@ -215,25 +158,9 @@ const DestinationGallery = ({destinations}) => {
                     onDelete: onClickDeleteDestination
                 }}
             />
-            <FormDialog title={getDialogTitle()} {...dialogProps}>
-                <DestinationForm
-                    destination={destinationToEdit}
-                    onCancel={onCloseDestinationEditor}
-                />
-            </FormDialog>
-            {
-                destinationToEdit &&
-                <ConfirmDialog
-                    open={confirmDeleteOpen}
-                    onOpenChanged={setConfirmDeleteOpen}
-                    onValidate={onDeleteDestination}
-                    title={t("title:confirmRemove")}
-                    dialogContent={[
-                        t("confirmRemove", destinationTitle(destinationToEdit, t.language)),
-                        t("warningConfirmRemove")
-                    ]}
-                />
-            }
+
+            <AdminActions />
+
         </React.Fragment>
     )
 }
