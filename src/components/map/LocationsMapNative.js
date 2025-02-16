@@ -11,7 +11,7 @@ import {
     MapControl,
     useMap
 } from '@vis.gl/react-google-maps';
-import { MarkerClusterer } from '@googlemaps/markerclusterer';
+import { MarkerClusterer, NoopAlgorithm } from '@googlemaps/markerclusterer';
 import {isIOS} from 'react-device-detect';
 import { withLoading, buildLoadingState } from 'components/hoc';
 
@@ -94,16 +94,41 @@ export const LocationsMapNativeUI = withLoading(({
     // Create a new Clusterer when toggling fullscreen
     React.useEffect(() => {
         if (!map) return;
-        clusterer.current = new MarkerClusterer({map});
-    }, [fullScreen, map]);
+        const clustererOptions = {
+            map: map,
+            ...(isDestinationPage && { algorithm: new NoopAlgorithm() })
+        };
+        clusterer.current = new MarkerClusterer(clustererOptions);
+    }, [fullScreen, map, isDestinationPage]);
+
+/*
+    React.useEffect(() => {
+        const itinerary = locations.map(location => {
+            return location.position;
+        });
+        const flightPath = new google.maps.Polyline({
+            path: itinerary,
+            geodesic: true,
+            strokeColor: "#FF0000",
+            strokeOpacity: 1.0,
+            strokeWeight: 2,
+        });
+        flightPath.setMap(map);
+    }, [locations, map]);
+*/
 
     const fitMapToMarkers = React.useCallback(() => {
         const bounds = new google.maps.LatLngBounds();
         if (clusterer.current.clusters.length === 0) {
-            // Do nothing
-            return;
-        }
-        if (clusterer.current.clusters.length === 1) {
+            if (isDestinationPage) {
+                // clustering has been disabled:
+                const markersArray = Object.values(markers);
+                markersArray.forEach(marker => {
+                    bounds.extend(marker.location.position);
+                });
+                map.fitBounds(bounds);
+            }
+        } else if (clusterer.current.clusters.length === 1) {
             // Just set the center as the single location
             map.setCenter(clusterer.current.clusters[0].position);
         } else {
@@ -112,7 +137,7 @@ export const LocationsMapNativeUI = withLoading(({
             });
             map.fitBounds(bounds);
         }
-    }, [map]);
+    }, [map, markers, isDestinationPage]);
 
     React.useEffect(() => {
         if (!map || !clusterer.current) return;
