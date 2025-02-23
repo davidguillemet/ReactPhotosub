@@ -24,9 +24,12 @@ import {
     GenericTextField,
     LatLongField
 } from './fields';
+import { useFormContext } from './FormContext';
 
 export const FormField = (props) => {
-    
+
+    const formContext = useFormContext();
+
     const FormFields = useRef({
         [FIELD_TYPE_SWITCH]: SwitchField,
         [FIELD_TYPE_CHECK_BOX]: CheckBoxField,
@@ -43,6 +46,9 @@ export const FormField = (props) => {
     });
 
     const { field } = props;
-    const FieldComponent = FormFields.current[field.type];
+    const [ FieldComponent, fieldValidator ] = FormFields.current[field.type];
+
+    formContext.registerValidator(field.id, fieldValidator);
+
     return <FieldComponent {...props} />
 };

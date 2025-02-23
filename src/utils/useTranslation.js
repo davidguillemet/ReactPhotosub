@@ -126,7 +126,8 @@ export const TranslationProvider = ({children}) => {
     }
 
     return (
-        <TranslationContext.Provider value={{
+        <TranslationContext.Provider
+            value={{
                 language: language,
                 setLanguage: loadLanguage,
                 supportedLanguages: [LANGUAGE_FR, LANGUAGE_EN],

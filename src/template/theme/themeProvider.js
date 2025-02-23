@@ -44,16 +44,16 @@ const paletteLightMode = {
       contrastText: '#eeeeee',
     },
     error: {
-      main: 'rgb(251, 219, 219)',
+      main: 'rgb(218, 112, 112)',
     },
     info: {
-      main: '#9dc7e5',
+      main: '#8ebdde',
     },
     warning: {
-      main: '#ffe0b2',
+      main: '#e4c18c',
     },
     success: {
-      main: 'rgb(237, 247, 237)',
+      main: 'rgb(153, 219, 153)',
       contrastText: 'rgb(30, 70, 32)'
     },
     text: {

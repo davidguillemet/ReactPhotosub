@@ -1,29 +1,25 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
 import { Chip, Autocomplete } from '@mui/material';
+import { useFormContext } from '../FormContext';
 
-const validateTagsFieldValue = (value) => {
+const validateTagsFieldValue = (_field, value) => {
     return Array.isArray(value) && value.length > 0;
 };
 
-const TagsField = ({ field, value, values, handleChange, sending, readOnly, inputProps = {}, validators }) => {
+const TagsFieldComp = ({ field, value, handleChange }) => {
+    const formContext = useFormContext();
 
     const [error, setError] = React.useState(false);
     const [inputValue, setInputValue] = React.useState("");
 
-    React.useEffect(() => {
-        if (validators !== undefined) {
-            validators[field.id] = validateTagsFieldValue;
-        }
-    }, [field, validators]);
-
-    const onChange = (event, newValue) => {
+    const onChange = React.useCallback((event, newValue) => {
+        const valid = validateTagsFieldValue(field, newValue);
         handleChange(field, newValue);
-        const isError = !validateTagsFieldValue(newValue);
-        setError(isError);
-    };
+        setError(!valid);
+    }, [field, handleChange]);
 
-    const isReadOnly = sending || readOnly || field.readOnly;
+    const isReadOnly = formContext.sending || formContext.readOnly || field.readOnly;
 
     return (
         <Autocomplete
@@ -68,4 +64,5 @@ const TagsField = ({ field, value, values, handleChange, sending, readOnly, inpu
     );
 };
 
+const TagsField = [ TagsFieldComp, validateTagsFieldValue ];
 export default TagsField;

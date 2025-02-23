@@ -4,7 +4,9 @@ import { LocationsMapNative } from '../../map';
 import { FIELD_TYPE_NUMBER } from '../Form';
 import { useTranslation } from 'utils';
 import { validateValueRange } from './common';
-import GenericTextField from './GenericTextField';
+import GenericTextFieldProps from './GenericTextField';
+
+const [ GenericTextField ] = GenericTextFieldProps;
 
 const getLatLongFieldTemplate = () => {
     return {
@@ -24,7 +26,14 @@ const initializeLocation = (value) => {
     }
 };
 
-const LatLongField = ({ field, value, values, handleChange, sending, readOnly, validators }) => {
+const validateLatLong = (_field, latLongValue) => {
+    return latLongValue !== null && latLongValue !== undefined &&
+        validateValueRange(latLongValue.latitude, _latitudeRange) &&
+        validateValueRange(latLongValue.longitude, _longitudeRange);
+};
+
+const LatLongFieldComp = ({ field, value, handleChange }) => {
+
     const t = useTranslation("components.form");
     const [location, setLocation] = React.useState(null);
     const locationSource = React.useRef(null);
@@ -74,14 +83,6 @@ const LatLongField = ({ field, value, values, handleChange, sending, readOnly, v
         });
     }, []);
 
-    React.useEffect(() => {
-        validators[field.id] = (value) => {
-            return value !== null && value !== undefined &&
-                validateValueRange(value.latitude, _latitudeRange) &&
-                validateValueRange(value.longitude, _longitudeRange);
-        };
-    }, [field, validators]);
-
     const onMapClick = React.useCallback((position) => {
         locationSource.current = "input";
         setLocation({
@@ -95,23 +96,21 @@ const LatLongField = ({ field, value, values, handleChange, sending, readOnly, v
             <GenericTextField
                 field={latitudeField.current}
                 value={location?.latitude}
-                sending={sending}
-                readOnly={readOnly}
                 handleChange={onInputChange}
                 inputProps={{
                     min: latitudeField.current.range.min,
                     max: latitudeField.current.range.max
-                }} />
+                }}
+            />
             <GenericTextField
                 field={longitudeField.current}
                 value={location?.longitude}
-                sending={sending}
-                readOnly={readOnly}
                 handleChange={onInputChange}
                 inputProps={{
                     min: longitudeField.current.range.min,
                     max: longitudeField.current.range.max
-                }} />
+                }}
+            />
             <Box sx={{ height: "200px", width: "100%" }}>
                 <LocationsMapNative locations={location} resetOnChange={false} onMapClick={onMapClick} />
             </Box>
@@ -119,4 +118,5 @@ const LatLongField = ({ field, value, values, handleChange, sending, readOnly, v
     );
 };
 
+const LatLongField = [ LatLongFieldComp, validateLatLong];
 export default LatLongField;

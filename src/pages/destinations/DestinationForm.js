@@ -46,21 +46,13 @@ const DestinationForm = ({destination, onCancel}) => {
         setFields([
             {
                 id: "title",
-                label: t("form:titleField_fr"),
+                label: t("form:titleField"),
                 required: true,
-                errorText: t("form:titleError_fr"),
+                errorText: t("form:titleError"),
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
-                default: ""
-            },
-            {
-                id: "title_en",
-                label: t("form:titleField_en"),
-                required: true,
-                errorText: t("form:titleError_en"),
-                type: FIELD_TYPE_TEXT,
-                multiline: false,
-                default: ""
+                default: "",
+                multiLingual: true
             },
             {
                 id: "date",

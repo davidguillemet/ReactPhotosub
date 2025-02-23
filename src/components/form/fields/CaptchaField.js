@@ -2,19 +2,16 @@ import React from 'react';
 import { useDarkMode } from 'components/theme';
 import ReCAPTCHA from "react-google-recaptcha";
 
-const validateCaptcha = (value) => {
+const validateCaptcha = (_field, value) => {
     return value !== null;
 };
-const CaptchaField = ({ field, value, values, handleChange, sending, validators }) => {
+
+const CaptchaFieldComp = ({ field, handleChange }) => {
 
     const { darkMode } = useDarkMode();
     const onCaptchaChange = React.useCallback((value) => {
         handleChange(field, value);
     }, [handleChange, field]);
-
-    React.useEffect(() => {
-        validators[field.id] = validateCaptcha;
-    }, [field, validators]);
 
     return (
         <ReCAPTCHA
@@ -25,4 +22,5 @@ const CaptchaField = ({ field, value, values, handleChange, sending, validators 
     );
 };
 
+const CaptchaField = [ CaptchaFieldComp, validateCaptcha ];
 export default CaptchaField;

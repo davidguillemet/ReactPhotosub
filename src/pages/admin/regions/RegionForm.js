@@ -67,21 +67,13 @@ const RegionForm = ({region, regions, onChange, onCancel, onNewRegion}) => {
         setRegionFields([
             {
                 id: "title",
-                label: "Titre en français",
+                label: "Titre",
                 required: true,
-                errorText: "Merci d'indiquer le titre de la région en français.",
+                errorText: "Merci d'indiquer le titre de la région.",
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
-                default: ""
-            },
-            {
-                id: "title_en",
-                label: "Titre en anglais",
-                required: true,
-                errorText: "Merci d'indiquer le titre de la région en anglais.",
-                type: FIELD_TYPE_TEXT,
-                multiline: false,
-                default: ""
+                default: "",
+                multiLingual: true
             },
             {
                 id: "parent",

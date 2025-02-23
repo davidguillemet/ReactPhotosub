@@ -2,15 +2,16 @@ import React from 'react';
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
+import { useFormContext } from '../FormContext';
 
-const CheckBoxField = ({ field, value, handleChange, sending, readOnly, validators }) => {
+const validateCheckBox = (_field, _value) => true;
+
+const CheckBoxFieldComp = ({ field, value, handleChange }) => {
+    const formContext = useFormContext();
+
     const onChange = React.useCallback((event) => {
         handleChange(field, event.target.checked);
     }, [field, handleChange]);
-
-    React.useEffect(() => {
-        validators[field.id] = (value) => true;
-    }, [field, validators]);
 
     return (
         <FormControl fullWidth>
@@ -18,11 +19,12 @@ const CheckBoxField = ({ field, value, handleChange, sending, readOnly, validato
                 control={<Checkbox
                     id={field.id}
                     checked={value ?? false}
-                    disabled={sending || readOnly || field.readOnly}
+                    disabled={formContext.sending || formContext.readOnly || field.readOnly}
                     onChange={onChange} />}
                 label={field.label} />
         </FormControl>
     );
 };
 
+const CheckBoxField = [ CheckBoxFieldComp, validateCheckBox ];
 export default CheckBoxField;

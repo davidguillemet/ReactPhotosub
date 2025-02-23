@@ -2,8 +2,16 @@ import React from 'react';
 import TextField from '@mui/material/TextField';
 import { FIELD_TYPE_NUMBER } from '../Form';
 import { validateFieldValue } from './common';
+import { useFormContext } from '../FormContext';
 
-const GenericTextField = ({ field, value, values, handleChange, sending, readOnly, inputProps = {}, validators }) => {
+const GenericTextFieldComp = ({
+    field,
+    value,
+    handleChange,
+    inputProps = {},
+    group = false}) => {
+
+    const formContext = useFormContext();
 
     const [error, setError] = React.useState(false);
 
@@ -11,22 +19,16 @@ const GenericTextField = ({ field, value, values, handleChange, sending, readOnl
         const fieldValue = field.type === FIELD_TYPE_NUMBER ?
             event.target.valueAsNumber :
             event.target.value;
-        handleChange(field, fieldValue);
         const valid = validateFieldValue(field, fieldValue);
         setError(!valid);
+        handleChange(field, fieldValue);
     }, [field, handleChange]);
-
-    React.useEffect(() => {
-        if (validators !== undefined) {
-            validators[field.id] = (value) => validateFieldValue(field, value);
-        }
-    }, [field, validators]);
 
     return (
         <TextField
             key={field.id}
             id={field.id}
-            label={field.label}
+            label={group === true ? "" : field.label}
             value={value ?? ''}
             autoFocus={field.focus}
             variant="outlined"
@@ -34,22 +36,32 @@ const GenericTextField = ({ field, value, values, handleChange, sending, readOnl
             margin="normal"
             required={field.required}
             type={field.type}
-            inputProps={{
-                step: field.step,
-                min: field.min,
-                max: field.max,
-                ...inputProps
+            slotProps={{
+                htmlInput: {
+                    step: field.step,
+                    min: field.min,
+                    max: field.max,
+                    ...inputProps
+                },
+                inputLabel: {
+                    shrink: true
+                }
             }}
             multiline={field.multiline}
             minRows={field.minRows || 10 }
             onChange={onChange}
             error={error}
             helperText={error ? field.errorText : ''}
-            disabled={sending || readOnly || field.readOnly}
-            InputLabelProps={{
-                shrink: true
-            }} />
+            disabled={formContext.sending || formContext.readOnly || field.readOnly}
+            sx={{
+                ...(group === true && {
+                '&.MuiFormControl-root': {
+                    marginTop: 0
+                }})
+            }}
+        />
     );
 };
 
+const GenericTextField = [ GenericTextFieldComp, validateFieldValue ];
 export default GenericTextField;

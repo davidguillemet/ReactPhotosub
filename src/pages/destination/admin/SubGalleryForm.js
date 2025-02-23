@@ -57,21 +57,13 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
         setFields([
             {
                 id: "title",
-                label: "Titre en français",
+                label: "Titre",
                 required: true,
-                errorText: "Merci d'indiquer un titre en français.",
+                errorText: "Merci d'indiquer un titre.",
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
-                default: ""
-            },
-            {
-                id: "title_en",
-                label: "Titre en anglais",
-                required: true,
-                errorText: "Merci d'indiquer un titre en anglais.",
-                type: FIELD_TYPE_TEXT,
-                multiline: false,
-                default: ""
+                default: "",
+                multiLingual: true
             },
             {
                 id: "desc",
@@ -80,16 +72,8 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
                 type: FIELD_TYPE_TEXT,
                 multiline: true,
                 minRows: 2,
-                default: ""
-            },
-            {
-                id: "desc_en",
-                label: "Description en anglais",
-                required: false,
-                type: FIELD_TYPE_TEXT,
-                multiline: true,
-                minRows: 2,
-                default: ""
+                default: "",
+                multiLingual: true
             },
             {
                 id: "location",

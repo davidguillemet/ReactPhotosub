@@ -85,7 +85,7 @@ const RegionItem = ({region, children, onEditLocation, onEditRegion, onDeleteReg
     const isEmpty = React.useMemo(() => children === null || children.every(child => child.length === 0), [children]);
     const regionId = getRegionItemId(region);
 
-    const hasChildren = children?.length > 1 && (children[0]?.length > 0 || children[1]?.length);
+    const hasChildren = children?.length > 1 && (children[0]?.length > 0 || children[1]?.length > 0);
 
     return (
         <StyledTreeItem

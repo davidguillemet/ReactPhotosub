@@ -6,6 +6,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import LazyImage from "../../lazyImage";
 import { validateFieldValue } from './common';
+import { useFormContext } from '../FormContext';
 
 const useOptions = (field, values) => {
     //const { options, error } = React.useMemo(() => {
@@ -27,23 +28,21 @@ const useOptions = (field, values) => {
     };*/
 };
 
-const SelectControl = ({ field, value, values, handleChange, sending, readOnly, validators }) => {
+const SelectControlComp = ({ field, value, handleChange }) => {
 
+    const formContext = useFormContext();
     const valueProperty = React.useMemo(() => field.mapping ? field.mapping["value"] : "id", [field]);
     const captionProperty = React.useMemo(() => field.mapping ? field.mapping["caption"] : "title", [field]);
     const keyProperty = React.useMemo(() => field.mapping ? field.mapping["key"] : "id", [field]);
 
     const onChange = React.useCallback((event) => {
         const fieldValue = event.target.value;
-        handleChange(field, fieldValue[valueProperty]);
+        const value = fieldValue[valueProperty];
+        handleChange(field, value);
         setSelectedValue(fieldValue);
     }, [field, handleChange, valueProperty]);
 
-    React.useEffect(() => {
-        validators[field.id] = (value) => validateFieldValue(field, value);;
-    }, [field, validators]);
-
-    const { options, error } = useOptions(field, values);
+    const { options, error } = useOptions(field, formContext.values);
 
     const [selectedValue, setSelectedValue] = React.useState("");
 
@@ -70,7 +69,7 @@ const SelectControl = ({ field, value, values, handleChange, sending, readOnly, 
                 required={field.required}
                 onChange={onChange}
                 fullWidth
-                disabled={sending || readOnly || field.readOnly || !hasOptions}
+                disabled={formContext.sending || formContext.readOnly || field.readOnly || !hasOptions}
                 renderValue={(selected) => {
                     return field.getCaption ? field.getCaption(selected) : selected[captionProperty];
                 }}
@@ -97,4 +96,5 @@ const SelectControl = ({ field, value, values, handleChange, sending, readOnly, 
     );
 };
 
+const SelectControl = [ SelectControlComp, validateFieldValue ];
 export default SelectControl;
