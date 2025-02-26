@@ -14,16 +14,16 @@
 firebase functions:secrets:set SECRET_NAME
 
 # View the value of a secret
-functions:secrets:access SECRET_NAME
+firebase functions:secrets:access SECRET_NAME
 
 # Destroy a secret
-functions:secrets:destroy SECRET_NAME
+firebase functions:secrets:destroy SECRET_NAME
 
 # View all secret versions and their state
-functions:secrets:get SECRET_NAME
+firebase functions:secrets:get SECRET_NAME
 
 # Automatically clean up all secrets that aren't referenced by any of your functions
-functions:secrets:prune
+firebase functions:secrets:prune
 
 ##########################################
 

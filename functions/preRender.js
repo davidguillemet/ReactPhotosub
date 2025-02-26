@@ -1,4 +1,5 @@
-const functions = require("firebase-functions");
+const {onRequest} = require("firebase-functions/v2/https");
+const {defineSecret} = require("firebase-functions/params");
 const express = require("express");
 const preRender = require("prerender-node");
 const fs = require("fs");
@@ -90,11 +91,10 @@ module.exports = function(pool, firebaseConfig) {
         });
     });
 
-    const preRender = functions
-        .runWith({secrets: [
-            "PRERENDER_TOKEN",
-        ]})
-        .https.onRequest(preRenderApp);
+    const preRenderToken = defineSecret("PRERENDER_TOKEN");
+    const preRender = onRequest({secrets: [
+        preRenderToken,
+    ]}, preRenderApp);
 
     return preRender;
 };

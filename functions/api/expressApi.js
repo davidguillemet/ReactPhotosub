@@ -9,20 +9,20 @@ const cors = require("cors");
 // const appCheckVerification = require("./middlewares/appCheckVerification");
 
 // Build express app
-const mainApi = express();
+const mainapi = express();
 
 // app.use(mw);
 
-mainApi.use(compression());
+mainapi.use(compression());
 
 // support parsing of application/json type post data
-mainApi.use(express.json());
+mainapi.use(express.json());
 
 // support parsing of application/x-www-form-urlencoded post data
-mainApi.use(express.urlencoded({extended: true}));
+mainapi.use(express.urlencoded({extended: true}));
 
 // Fix the CORS Error
-mainApi.use(cors({origin: true}));
+mainapi.use(cors({origin: true}));
 
 const getTableColumns = async (pool) => {
     const tableColumns = await pool().raw(`
@@ -85,7 +85,7 @@ module.exports = function(pool, firebaseConfig) {
     const admin = express();
     require("./admin/expressAdmin")(admin, configuration);
 
-    mainApi.get("/status", (req, res) => res.send("Working!"));
+    mainapi.get("/status", (req, res) => res.send("Working!"));
 
     // In case we would like to take advantage of this generic error handler
     // just add a try/catch in a route handler and call next in a promise catch statement:
@@ -103,11 +103,11 @@ module.exports = function(pool, firebaseConfig) {
         });
     };
 
-    mainApi.use(errorHandler);
+    mainapi.use(errorHandler);
     admin.use(errorHandler);
 
     app.use("/admin", admin);
-    mainApi.use("/api", app);
+    mainapi.use("/api", app);
 
-    return mainApi;
+    return mainapi;
 };
