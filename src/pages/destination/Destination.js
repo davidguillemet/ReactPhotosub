@@ -198,6 +198,12 @@ const useFetchImagesAndSubGalleries = (destination) => {
         }
     }
 
+    // check if galleries contain images
+    galleries.forEach((gallery) => {
+        const hasImages = images.find(image => image.sub_gallery_id === gallery.id);
+        gallery.hasImages = hasImages ? true : false;
+    })
+
     return {
         images,
         galleries
@@ -214,7 +220,8 @@ const getGroupDestinations = (destination, galleries, language) => {
             [getPropFromLanguage("title", language)]: gallery.location_title,
             latitude: gallery.latitude,
             longitude: gallery.longitude,
-            date: destination.date
+            date: destination.date,
+            hasImages: gallery.hasImages
         }));
 }
 

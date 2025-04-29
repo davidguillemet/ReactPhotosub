@@ -3,6 +3,7 @@ import { Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import DestinationLink from '../destinationLink';
 import { useLanguage, destinationTitle, getSubGalleryAnchorName } from 'utils';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 const PREFIX = 'MapInfoWindow';
 const makeClassName = (name) => `${PREFIX}-${name}`
@@ -89,15 +90,15 @@ const InfoWindowContainer = styled('div')(({ theme }) => ({
     },
 }));
 
-const LocationTitleLink = ({isDestinationPage, title, children}) => {
+const LocationTitleLink = ({isDestinationPage, isSubGallery, title, children}) => {
 
     const onClickGallery = React.useCallback(() => {
         window.location.hash = getSubGalleryAnchorName(title);
     }, [title]);
 
-    if (isDestinationPage) {
+    if (isDestinationPage && isSubGallery) {
         return (
-            <Button onClick={onClickGallery}>
+            <Button onClick={onClickGallery} endIcon={<OpenInNewIcon />}>
                 {children}
             </Button>
         )
@@ -115,7 +116,7 @@ const LocationInfoWindow = ({location, coverWidth, isDestinationPage}) => {
         <InfoWindowContainer className={classes.root} id="content">
             <div className={classes.locationTitle}>
                 <h2>
-                    <LocationTitleLink isDestinationPage={isDestinationPage} title={infoTitle}>
+                    <LocationTitleLink isDestinationPage={isDestinationPage} isSubGallery={location.hasImages === true} title={infoTitle}>
                         {infoTitle}
                     </LocationTitleLink>
                 </h2>

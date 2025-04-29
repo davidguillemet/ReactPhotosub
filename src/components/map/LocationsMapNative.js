@@ -229,12 +229,13 @@ export const LocationsMapNativeUI = withLoading(({
                 </MapControl>
 
                 {
-                    locations.map(location => (
+                    locations.map((location, index) => (
                         <LocationMarker
                             key={location[_locationKey]}
                             location={location}
                             ref={setMarkerRef}
                             isDestinationPage={isDestinationPage}
+                            index={index}
                         />
                     ))
                 }

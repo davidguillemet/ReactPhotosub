@@ -3,12 +3,13 @@ import LocationInfoWindow from './LocationInfoWindow';
 import {
     AdvancedMarker,
     InfoWindow,
+    //Pin,
     useMap
 } from '@vis.gl/react-google-maps';
 
 const _infoCoverWidth = 150;
 
-const LocationMarker = React.forwardRef(({location, isDestinationPage}, ref) => {
+const LocationMarker = React.forwardRef(({location, isDestinationPage, index}, ref) => {
 
     const map = useMap();
     const [infoWindowShown, setInfoWindowShown] = React.useState(false);
@@ -32,7 +33,15 @@ const LocationMarker = React.forwardRef(({location, isDestinationPage}, ref) => 
                 clickable={true}
                 onClick={location.destinations ? handleLocationClick : null}
             >
-                <img alt="location" src="/diver.png" />
+                {
+                    /*index === 0 ?
+                    <Pin
+                        background={'#0f9d58'}
+                        borderColor={'#006425'}
+                        glyphColor={'#60d98f'}
+                    /> :*/
+                    <img alt="location" src="/diver.png" />
+                }
             </AdvancedMarker>
 
             {

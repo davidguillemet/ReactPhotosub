@@ -24,6 +24,7 @@ const DestinationsMapUi = withLoading(({destinations, locations, onClose, isDest
                 title: destination.title,
                 latitude: destination.latitude,
                 longitude: destination.longitude,
+                hasImages: destination.hasImages,
                 destinations: [
                     {
                         ...destination,
