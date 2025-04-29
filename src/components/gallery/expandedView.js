@@ -17,7 +17,7 @@ import CloseIcon from '@mui/icons-material/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 import AppsIcon from '@mui/icons-material/Apps';
-import { useEventListener, getThumbnailSrc, useTranslation } from '../../utils';
+import { useEventListener, getThumbnailSrc, useTranslation, useLanguage, parseImageDescription } from '../../utils';
 import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
 import ImageInfo from './imageInfo';
@@ -248,6 +248,7 @@ const ExpandedView = React.forwardRef(({
     onNextPage = null}, ref) => {
 
     const t = useTranslation("components.gallery");
+    const { language } = useLanguage();
     const [currentIndex, setCurrentIndex] = useState(index);
     const [infoVisible, setInfoVisible] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -267,6 +268,7 @@ const ExpandedView = React.forwardRef(({
     useEventListener('keydown', handleKeyDown);
 
     const currentImage = useMemo(() => images[currentIndex], [images, currentIndex]);
+    const currentImageDesc = useMemo(() => parseImageDescription(currentImage)[language], [currentImage, language]);
 
     // Deactivate scroll on expanded view
     useEffect(() => {
@@ -601,15 +603,20 @@ const ExpandedView = React.forwardRef(({
                     onChangeIndex={handleThumbnailClick}
                 />
 
-                <ImageInfo
-                    container={slideContainerResizeObserver.element}
-                    style={{
-                        mb: fullScreen ? 1 : 0
-                    }}
-                    image={currentImage}
-                    displayDestination={displayDestination}
-                    visible={infoVisible}
-                />
+                {
+                    currentImageDesc &&
+                    <ImageInfo
+                        container={slideContainerResizeObserver.element}
+                        style={{
+                            mb: fullScreen ? 1 : 0
+                        }}
+                        image={currentImage}
+                        displayDestination={displayDestination}
+                        visible={infoVisible}
+                        displayTags={false}
+                        onClose={handleInfoClick}
+                    />
+                }
 
                 {
                     !isMobile && 

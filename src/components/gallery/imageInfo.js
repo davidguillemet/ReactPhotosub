@@ -6,13 +6,14 @@ import Chip from '@mui/material/Chip';
 import {isMobile} from 'react-device-detect';
 import ImageDescription from '../imageDescription';
 import ImageDestinationLink from './imageDestinationLink';
-import { Alert, Stack } from '@mui/material';
+import { Alert, IconButton, Stack } from '@mui/material';
 import { useTranslation } from 'utils';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 const imageInfoId = "imageInfoId";
 const imageInfoAnimationDuration = 0.5;
 
-const ImageInfo = ({image, displayDestination, style, container, visible}) => {
+const ImageInfo = ({image, displayDestination, style, container, visible, displayTags = true, onClose}) => {
 
     const t = useTranslation("components.gallery");
     const overlayRef = React.useRef(null);
@@ -75,7 +76,6 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
                 flexDirection: 'column',
                 py: 0.5,
                 textAlign: 'center',
-                bgcolor: 'rgb(0,0,0,0.4)',
                 opacity: 0,
                 '&.visible' : {
                     display: 'flex'
@@ -92,22 +92,32 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
                     bgcolor: 'rgb(0,0,0,0.5)',
                     position: 'absolute',
                     overflowY: 'auto',
-                    top: '50%',
+                    bottom: 10,
                     left: '50%',
                     maxHeight: '100%',
-                    transform: 'translateY(-50%) translateX(-50%)',
+                    transform: 'translateX(-50%)',
                     ...(isMobile ? {
                         width: '100%'
                     } : {
                         minWidth: '70%'
-                    })
+                    }),
+                    borderColor: '#ffffff58',
+                    borderWidth: 1,
+                    borderStyle: 'solid'
                 }}
             >
+                <IconButton
+                    size='small'
+                    sx={{position: 'absolute', top: 0, right: 0, color: '#ffffff58'}}
+                    onClick={onClose}
+                >
+                    <HighlightOffIcon />
+                </IconButton>
                 <Stack
                     direction='column'
                     alignItems='center'
                     spacing={1}
-                    sx={{m: 1, p: 0}}
+                    sx={{m: 1.5, p: 0}}
                 >
                     <ImageDescription image={image} />
                     {
@@ -126,17 +136,22 @@ const ImageInfo = ({image, displayDestination, style, container, visible}) => {
                             <ImageDestinationLink image={image} />
                         </Box>
                     }
-                    <Box>
+
                     {
-                        image.tags ?
-                        image.tags.map(tag => {
-                            return (
-                            <Chip color="secondary" key={tag} label={tag} size="small" sx={{marginRight: 0.5, marginTop: 0.5 }} />
-                            )
-                        }) :
-                        <Alert severity='warning'>{t("info:noTags")}</Alert>
+                        displayTags === false ? null : (
+                            <Box>
+                            {
+                                image.tags ?
+                                image.tags.map(tag => {
+                                    return (
+                                    <Chip color="secondary" key={tag} label={tag} size="small" sx={{marginRight: 0.5, marginTop: 0.5 }} />
+                                    )
+                                }) :
+                                <Alert severity='warning'>{t("info:noTags")}</Alert>
+                            }
+                            </Box>
+                        )
                     }
-                    </Box>
                 </Stack>
             </Paper>
         </Box>
