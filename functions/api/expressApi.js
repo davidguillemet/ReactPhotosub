@@ -80,6 +80,7 @@ module.exports = function(pool, firebaseConfig) {
     require("./resources/search")(app, configuration);
     require("./resources/message")(app, configuration);
     require("./resources/user")(app, configuration);
+    require("./resources/users")(app, configuration);
 
     // Admin API
     const admin = express();
