@@ -19,6 +19,7 @@ import Form, {
 } from '../../components/form';
 import { useDataProvider } from '../../components/dataProvider';
 import { useTranslation } from 'utils';
+import { useFirebaseContext } from 'components/firebase';
 
 const getFormValues = (user) => {
     return {
@@ -81,6 +82,7 @@ const UserProfile = (props) => {
 
     const t = useTranslation("pages.profile");
     const authContext = useAuthContext();
+    const firebaseContext = useFirebaseContext();
     const dataProvider = useDataProvider();
     const { toast } = useToast();
 
@@ -189,8 +191,8 @@ const UserProfile = (props) => {
     }, []);
 
     const onDeleteAccount = useCallback(() => {
-        return authContext.user.delete();
-    }, [authContext.user]);
+        return firebaseContext.deleteUser();
+    }, [firebaseContext]);
 
     const onOpenPasswordDlgChanged = useCallback((open) => {
         setOpenPasswordDlg({

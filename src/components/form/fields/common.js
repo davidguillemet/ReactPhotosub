@@ -1,4 +1,7 @@
-import { FIELD_TYPE_EMAIL } from '../Form';
+import {
+    FIELD_TYPE_EMAIL,
+    FIELD_TYPE_PASSWORD
+} from '../Form';
 
 function validateEmail(email) {
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -27,7 +30,10 @@ export function validateValueRange(value, range) {
 export function validateFieldValue(field, fieldValue) {
     let isError = false;
     if (typeof fieldValue === "string") {
-        const isEmpty = fieldValue.trim().length === 0;
+        const isEmpty = 
+            field.type === FIELD_TYPE_PASSWORD ?
+            fieldValue.length === 0 :
+            fieldValue.trim().length === 0;
         if (field.type === FIELD_TYPE_EMAIL) {
             isError = (isEmpty === false && !validateEmail(fieldValue)) || (field.required && isEmpty === true);
         } else {

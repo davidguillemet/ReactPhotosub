@@ -1,12 +1,7 @@
-import StyledFirebaseAuth from './StyledFirebaseAuth';
 import useFirebaseContext from './firebaseContextHook';
-import { EmailAuthProvider } from "firebase/auth";
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import Divider from '@mui/material/Divider';
-import Backdrop from '@mui/material/Backdrop';
-import Modal from '@mui/material/Modal';
-import Fade from '@mui/material/Fade';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
@@ -25,6 +20,8 @@ import { useAuthContext } from '../authentication';
 import { routes, NavigationLink, ROUTES_NAMESPACE } from '../../navigation/routes';
 import { Loading } from '../hoc';
 import { useTranslation } from '../../utils';
+import useFormDialog from 'dialogs/FormDialog';
+import AuthenticationForm from './authenticationForm';
 
 const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => (
     <IconButton
@@ -117,7 +114,27 @@ const SignedInButton = ({handleLogout}) => {
                     }
                 }}
             />
-            <Popper open={menuOpen} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+            <Popper
+                open={menuOpen}
+                anchorEl={anchorRef.current}
+                role={undefined}
+                transition
+                disablePortal
+                placement={'bottom'}
+                modifiers={[
+                    {
+                        name: 'preventOverflow',
+                        enabled: true,
+                        options: {
+                            altAxis: false,
+                            altBoundary: false,
+                            tether: false,
+                            rootBoundary: 'document',
+                            padding: 8,
+                        },
+                    }
+                ]}
+            >
             {({ TransitionProps, placement }) => (
                 <Grow
                     {...TransitionProps}
@@ -159,10 +176,12 @@ const SignedInButton = ({handleLogout}) => {
 
 const FirebaseAuth = ({onLoginStateChange}) => {
 
+    const t = useTranslation("components.form::authentication");
     const firebaseContext = useFirebaseContext();
     const authContext = useAuthContext();
 
     const [isLogin, setIsLogin] = useState(false);
+    const { dialogProps, openDialog, FormDialog } = useFormDialog();
 
     // Listen to the Firebase Auth state and set the local state.
     useEffect(() => {
@@ -177,33 +196,15 @@ const FirebaseAuth = ({onLoginStateChange}) => {
         }
     }, [isLogin, onLoginStateChange]);
 
+    const onCancelLogin = () => {};
+
     function handleSignIn(event) {
-        setIsLogin(true);
+        openDialog();
     }
 
     function logout() {
         firebaseContext.signOut();
     }
-
-    function onCloseModal() {
-        setIsLogin(false);
-    }
-
-    // Configure FirebaseUI.
-    const uiConfig = {
-        // Popup signin flow rather than redirect flow.
-        signInFlow: 'popup',
-        // We will display Google and Facebook as auth providers.
-        signInOptions: [
-            EmailAuthProvider.PROVIDER_ID
-        ],
-        callbacks: {
-            signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-                // No redirect after login
-                return false;
-            }
-        },
-    };
 
     return (
         <React.Fragment>
@@ -215,37 +216,9 @@ const FirebaseAuth = ({onLoginStateChange}) => {
                 <SignedInButton handleLogout={logout}/>
             }
 
-            <Modal
-                open={isLogin}
-                onClose={onCloseModal}
-                BackdropComponent={Backdrop}
-                BackdropProps={{
-                    transitionDuration: 500,
-                    style: {
-                        backgroundColor: 'rgba(0,0,0,0.7)'
-                    }
-                }}
-            >
-                <Fade in={isLogin}>
-                    <div
-                        style={{
-                            display: 'flex',
-                            flex: 1,
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translateX(-50%) translateY(-50%)',
-                            width: '95%',
-                            maxWidth: '360px'
-                        }}
-                    >
-                        <StyledFirebaseAuth
-                            uiConfig={uiConfig}
-                            firebaseAuth={firebaseContext.auth}
-                        />
-                    </div>
-                </Fade>
-            </Modal>
+            <FormDialog title={t("title")} maxWidth='sm' {...dialogProps}>
+                <AuthenticationForm onCancel={onCancelLogin} />
+            </FormDialog>
 
         </React.Fragment>
     );

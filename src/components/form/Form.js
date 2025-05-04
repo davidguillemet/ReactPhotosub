@@ -1,7 +1,6 @@
 import React from 'react';
 import Stack from '@mui/material/Stack';
 import { FormField }from './FormField';
-import { LoadingButton } from '@mui/lab';
 import SendIcon from '@mui/icons-material/Send';
 import { Button } from '@mui/material';
 import { useTranslation, useLanguage } from 'utils';
@@ -14,6 +13,7 @@ import TabList from '@mui/lab/TabList';
 
 import { styled } from '@mui/material/styles';
 const Div = styled('div')(() => {});
+const HtmlForm = styled('form')(() => {})
 
 export const FIELD_TYPE_TEXT = 'text';
 export const FIELD_TYPE_TAGS_FIELD = 'tagsField';
@@ -145,7 +145,11 @@ const GroupedFormField = ({fields}) => {
 const Form = ({
     submitAction,
     onCancel = null,
-    submitCaption = "Envoyer"}) => {
+    submitCaption = "Envoyer",
+    submitIcon = <SendIcon />,
+    submitIconPosition = "start",
+    startCustomComponent = null,
+    endCustomComponent = null}) => {
 
     const formContext = useFormContext();
     const t = useTranslation("components.form");
@@ -154,6 +158,7 @@ const Form = ({
 
     return (
         <React.Fragment>
+            <HtmlForm sx={{width: "100%"}}>
             <Stack spacing={2} alignItems="center" sx={{width: '100%', paddingTop: 1}}>
             {
                 fieldGroups.map(group => {
@@ -178,29 +183,34 @@ const Form = ({
                 })
             }
             {   (submitAction || onCancel) &&
-                <Stack spacing={2} direction="row" sx={{mt: 2}}>
-                    {
-                        submitAction !== null &&
-                        <LoadingButton
-                            onClick={formContext.onSubmit}
-                            disabled={formContext.readOnly || !formContext.isValid || !formContext.isDirty}
-                            startIcon={<SendIcon />}
-                            loadingPosition="start"
-                            loading={formContext.sending}
-                        >
-                            {submitCaption}
-                        </LoadingButton>
-                    }
+                <Stack spacing={1} direction="row" sx={{mt: 2}}>
+                    { startCustomComponent !== null &&  startCustomComponent }
                     {
                         onCancel !== null &&
                         <Button onClick={onCancel}>
                             {t("btn:cancel")}
                         </Button>
                     }
+                    {
+                        submitAction !== null &&
+                        <Button
+                            onClick={formContext.onSubmit}
+                            disabled={formContext.readOnly || !formContext.isValid || !formContext.isDirty}
+                            startIcon={submitIconPosition === "start" && submitIcon}
+                            endIcon={submitIconPosition === "end" && submitIcon}
+                            loadingPosition={submitIconPosition}
+                            loading={formContext.sending}
+                            type="submit"
+                            variant="contained"
+                        >
+                            {submitCaption}
+                        </Button>
+                    }
+                    { endCustomComponent !== null &&  endCustomComponent }
                 </Stack>
             }
-
             </Stack>
+            </HtmlForm>
         </React.Fragment>
     )
 };

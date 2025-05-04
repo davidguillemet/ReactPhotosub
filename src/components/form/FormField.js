@@ -48,7 +48,9 @@ export const FormField = (props) => {
     const { field } = props;
     const [ FieldComponent, fieldValidator ] = FormFields.current[field.type];
 
-    formContext.registerValidator(field.id, fieldValidator);
+    // Validator might be overridden at field level, for example for password
+    // validation depending on specific rules (see authenticationForm)
+    formContext.registerValidator(field.id, field.validator || fieldValidator);
 
     return <FieldComponent {...props} />
 };

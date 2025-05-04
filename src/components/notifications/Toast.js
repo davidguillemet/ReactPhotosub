@@ -7,7 +7,14 @@ const Toast = React.forwardRef(({toast}, ref) => {
     const {type = 'error', message} = toast
 
     return (
-        <Alert ref={ref} severity={type} onClose={()=>removeToast(toast)} elevation={6} variant="filled">
+        <Alert
+            ref={ref}
+            severity={type}
+            onClose={()=>removeToast(toast)}
+            elevation={6}
+            variant="filled"
+            sx={{"white-space": "pre-wrap"}}
+        >
             {message}
         </Alert>
     )

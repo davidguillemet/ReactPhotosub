@@ -381,4 +381,14 @@ DataProvider.prototype.getUsers = function() {
     .then(response => response.data.users);
 }
 
+DataProvider.prototype.getUserByMail = function(email) {
+    return this.axios.post('/users/bymail', { email })
+    .then(response => response.data);
+}
+
+DataProvider.prototype.createUser = function(newUser) {
+    return this.axios.post('/users/create', newUser)
+    .then(response => response.data);
+}
+
 export default DataProvider;

@@ -7,7 +7,7 @@ import {
 import {unstable_batchedUpdates} from 'react-dom';
 import {isMobile} from 'react-device-detect';
 
-const FormDialog = ({title, open, onClose, children}) => {
+const FormDialog = ({title, open, onClose, children, maxWidth = 'lg'}) => {
 
     const [isOpen, setIsOpen] = React.useState(open);
 
@@ -25,7 +25,7 @@ const FormDialog = ({title, open, onClose, children}) => {
     return (
         <Dialog
             fullScreen={isMobile}
-            maxWidth='lg'
+            maxWidth={maxWidth}
             fullWidth={true}
             open={isOpen}
             onClose={handleClose}

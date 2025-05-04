@@ -1,7 +1,14 @@
 import React from 'react';
 import { initializeApp } from "firebase/app"
 // import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "firebase/app-check";
-import { getAuth, connectAuthEmulator, signOut } from "firebase/auth";
+import {
+    getAuth,
+    connectAuthEmulator,
+    signInWithEmailAndPassword,
+    sendEmailVerification,
+    deleteUser,
+    signOut
+} from "firebase/auth";
 import {
     getStorage,
     connectStorageEmulator,
@@ -67,6 +74,15 @@ const FirebaseProvider = ({children}) => {
         //getAppCheckToken,
         signOut: () => {
             signOut(firebaseAuth);
+        },
+        signIn: (email, password) => {
+            return signInWithEmailAndPassword(firebaseAuth, email, password);
+        },
+        sendEmailVerification: () => {
+            return sendEmailVerification(firebaseAuth.currentUser);
+        },
+        deleteUser: () => {
+            return deleteUser(firebaseAuth.currentUser);
         },
         storage: firebaseStorage,
         rootPublicUrl: `${storageHost}/${firebaseStorage.app.options.storageBucket}`,

@@ -1,6 +1,9 @@
 import React from 'react';
 import { useToast } from '../notifications';
 import { useOverlay } from '../loading/loadingOverlay';
+import {
+    FIELD_TYPE_PASSWORD
+} from './Form';
 
 const FormContext = React.createContext(null);
 
@@ -39,6 +42,11 @@ export const FormContextProvider = (props) => {
     React.useEffect(() => {
         setValues(getValuesFromFields(fields, initialValues));
     }, [fields, initialValues]);
+
+    // Clear validators when fields have changed (for example authentication wizard)
+    React.useEffect(() => {
+        validators.current = new Map();
+    }, [fields]);
 
     const setFieldError = React.useCallback((field, error) => {
         if (error) {
@@ -87,7 +95,7 @@ export const FormContextProvider = (props) => {
         fields.forEach(f => {
             if (!f.readOnly) {
                 let fieldValue = values[f.id];
-                if (typeof fieldValue === "string") {
+                if (typeof fieldValue === "string" && f.type !== FIELD_TYPE_PASSWORD) {
                     fieldValue = fieldValue.trim();
                 }
                 formValues[f.id] = fieldValue;
@@ -99,7 +107,9 @@ export const FormContextProvider = (props) => {
             if (onCancel) {
                 onCancel();
             }
-            toast.success(validationMessage);
+            if (validationMessage) {
+                toast.success(validationMessage);
+            }
         }).catch((error) => {
             toast.error(error.message);
         }).finally(() => {

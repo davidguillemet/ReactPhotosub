@@ -2,6 +2,7 @@ import React from 'react';
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 import { ThemeProvider } from '@mui/material/styles';
 import { useDarkMode } from 'components/theme';
+import { isMobile } from 'react-device-detect';
 
 const paletteDarkMode = {
     mode: 'dark',
@@ -95,7 +96,8 @@ const CustomThemeProvider = ({children}) => {
                     MuiButton: {
                         defaultProps: {
                             variant: "outlined",
-                            color: "secondary"
+                            color: "secondary",
+                            size: isMobile ? "small" : "medium"
                         }
                     },
                     MuiLoadingButton: {
@@ -115,7 +117,15 @@ const CustomThemeProvider = ({children}) => {
                             }
                         }
                     },
+                    MuiInputBase: {
+                        defaultProps: {
+                            size: isMobile ? "small" : "medium"
+                        }
+                    },
                     MuiInputLabel: {
+                        defaultProps: {
+                            size: isMobile ? "small" : "medium"
+                        },
                         styleOverrides: {
                             root: ({theme}) => ({
                                 "&.Mui-focused": {
@@ -141,7 +151,12 @@ const CustomThemeProvider = ({children}) => {
                         defaultProps: {
                             color: "secondary"
                         }
-                    }
+                    },
+                    // MuiStack: {
+                    //     defaultProps: {
+                    //         useFlexGap: true
+                    //     }
+                    // },
                 }
             }),
             { factor: 3 }
