@@ -67,6 +67,7 @@ const Images = () => {
                     variant="extended"
                     disabled={imageContext.folderType !== FOLDER_TYPE.destination}
                     onClick={onClickUpload}
+                    sx={{mr: 1}}
                 >
                     <CloudUploadOutlinedIcon fontSize="large" sx={{ mr: 1 }} />
                     Ajouter une image
