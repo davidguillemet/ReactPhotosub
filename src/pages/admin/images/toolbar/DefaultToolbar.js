@@ -18,7 +18,9 @@ const DefaultToolbar = () => {
     const { dialogProps, openDialog, FormDialog } = useFormDialog();      
     const uploadButtonRef = React.useRef(null);
 
-    const openUploadSelection = () => uploadButtonRef.current.click()
+    const openUploadSelection = () => {
+        uploadButtonRef.current.click();
+    };
     uploadContext.onClickUpload = openUploadSelection;
 
     const isUploadAvailable = canUpload(imageContext.folderType);

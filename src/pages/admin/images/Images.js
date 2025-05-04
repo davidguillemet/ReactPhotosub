@@ -14,7 +14,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { useQueryContext } from 'components/queryContext';
 import MissingStorageFolders from './MissingStorageFolders';
 import { ImageContextProvider, useImageContext } from './ImageContext';
-import { UploadContextProvider } from './upload/UploadContext';
+import { UploadContextProvider, useUploadContext } from './upload/UploadContext';
 import TableFolders from './TableFolders';
 import TableFiles from './TableFiles';
 import TableToolbar from './toolbar/TableToolbar';
@@ -26,6 +26,7 @@ import { useTranslation } from 'utils';
 import ItemFilter from './ItemFilter';
 import { Fab } from "@mui/material";
 import CollectionsOutlinedIcon from '@mui/icons-material/CollectionsOutlined';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -39,12 +40,18 @@ const Div = styled('div')(() => {});
 const Images = () => {
     const history = useHistory();
     const imageContext = useImageContext();
+    const uploadContext = useUploadContext();
     const t = useTranslation("pages.admin.images");
     const folderName = imageContext.folderType === FOLDER_TYPE.root ? t("rootFolder") : imageContext.folderName;
 
     const onDisplayDestination = React.useCallback(() => {
         history.push(`/destinations/${imageContext.destinationPath}`)
     }, [history, imageContext.destinationPath]);
+
+    const onClickUpload = React.useCallback(() => {
+        const uploadImage = uploadContext.onClickUpload;
+        uploadImage();
+    }, [uploadContext.onClickUpload]);
 
     const AdminTools = () => {
         return (
@@ -56,6 +63,14 @@ const Images = () => {
                     zIndex: (theme) => theme.zIndex.drawer
                 }}
             >
+                <Fab
+                    variant="extended"
+                    disabled={imageContext.folderType !== FOLDER_TYPE.destination}
+                    onClick={onClickUpload}
+                >
+                    <CloudUploadOutlinedIcon fontSize="large" sx={{ mr: 1 }} />
+                    Ajouter une image
+                </Fab>
                 <Fab
                     variant="extended"
                     disabled={imageContext.folderType !== FOLDER_TYPE.destination}

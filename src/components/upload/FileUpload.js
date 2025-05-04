@@ -7,29 +7,19 @@ const FileUpload = ({file, fileFullPath, start, onFileUploaded}) => {
     const firebaseContext = useFirebaseContext();
     const [progress, setProgress] = React.useState(0);
     const [error, setError] = React.useState(null);
-    const uploadTaskRef = React.useRef(null);
-    const unsubscribe = React.useRef(null);
 
     React.useEffect(() => {
-        return () => {
-            if (unsubscribe.current !== null) {
-                unsubscribe.current();
-            }
-            if (uploadTaskRef.current !== null && uploadTaskRef.current.snapshot.state === 'running') {
-                uploadTaskRef.current.cancel();
-            }
-        }
     }, []);
 
     React.useEffect(() => {
-        if (start === true && uploadTaskRef.current === null)
+        if (start === true)
         {
             // launch firebase upload
             // see documentation at https://firebase.google.com/docs/storage/web/upload-files
             const fileStorageRef = firebaseContext.storageRef(fileFullPath);
-            uploadTaskRef.current = firebaseContext.upload(fileStorageRef, file, { contentType: file.type });
+            const uploadTaskRef = firebaseContext.upload(fileStorageRef, file, { contentType: file.type });
 
-            unsubscribe.current = uploadTaskRef.current.on('state_changed', 
+            const unsubscribe = uploadTaskRef.on('state_changed', 
                 (snapshot) => {
                     // Observe state change events such as progress, pause, and resume
                     // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -46,6 +36,13 @@ const FileUpload = ({file, fileFullPath, start, onFileUploaded}) => {
                     onFileUploaded(fileFullPath);
                 }
             );
+
+            return () => {
+                unsubscribe();
+                if (uploadTaskRef.snapshot.state === 'running') {
+                    uploadTaskRef.cancel();
+                }
+            }
         }
     }, [file, fileFullPath, start, firebaseContext, onFileUploaded]);
 
