@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import {unstable_batchedUpdates} from 'react-dom'
 import {isMobile} from 'react-device-detect';
 
 import Button from '@mui/material/Button';
@@ -26,25 +25,21 @@ export default function SimulationNameDialog({ open, onOpenChanged, onValidate, 
     }, [open])
 
     const onPasswordChanged = useCallback((event) => {
-        unstable_batchedUpdates(() => {
-            const newPassword = event.target.value;
-            if (!newPassword || newPassword.lengh === 0) {
-                setOkDisabled(true);
-            } else {
-                setOkDisabled(false);
-            }
-            setPassword(newPassword);
-        });
+        const newPassword = event.target.value;
+        if (!newPassword || newPassword.lengh === 0) {
+            setOkDisabled(true);
+        } else {
+            setOkDisabled(false);
+        }
+        setPassword(newPassword);
     }, []);
 
     const handleClose = () => {
-        unstable_batchedUpdates(() => {
-            setPassword("");
-            setOkDisabled(true);
-            setIsOpen(false);
-            onOpenChanged(false);
-            setSending(false);
-        });
+        setPassword("");
+        setOkDisabled(true);
+        setIsOpen(false);
+        onOpenChanged(false);
+        setSending(false);
     };
 
     const handleValidate = () => {

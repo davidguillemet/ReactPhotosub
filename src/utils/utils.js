@@ -368,3 +368,14 @@ export const isDestinationPath = (path) => {
 export const getSubGalleryAnchorName = (subGalleryTitle) => {
     return subGalleryTitle.replace(/ /g, "_");
 }
+
+export function validateEmail(email) {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
+
+export function validatePassword(pwd) {
+    // Customized password rules:
+    // https://console.firebase.google.com/u/0/project/photosub/authentication/settings
+    return pwd !== null && pwd !== undefined && pwd.length >= 6;
+}

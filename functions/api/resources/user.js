@@ -12,6 +12,8 @@ module.exports = function(app, config) {
             return admin.auth().updateUser(uid, newUserProperties)
                 .then((userRecord) => {
                     res.status(200).send({user: userRecord});
-                }).catch(next);
+                }).catch((error) => {
+                    res.status(500).send({error});
+                });
         });
 };

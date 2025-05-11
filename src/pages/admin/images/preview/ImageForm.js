@@ -3,7 +3,7 @@ import { useQueryContext } from 'components/queryContext';
 import Form, {
     FIELD_TYPE_TAGS_FIELD,
     FIELD_TYPE_TEXT,
-} from 'components/form/Form';
+} from 'components/form';
 
 const imageFields = [
     {

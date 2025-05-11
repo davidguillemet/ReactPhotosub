@@ -2,6 +2,7 @@
     "menu": {
         "home": "Accueil",
         "destinations" : "Destinations",
+        "destination": "Destination",
         "search": "Recherche",
         "finning": "Le Finning",
         "composition": "Composition",
@@ -10,7 +11,8 @@
         "favorites": "Ma Sélection",
         "profile": "Mon Profil",
         "admin": "Administration",
-        "logout": "Déconnexion"
+        "logout": "Déconnexion",
+        "acctMgmt": "Gestion des comptes"
     },
     "pages" : {
         "404": {
@@ -19,6 +21,23 @@
         },
         "about": {
             "title": "A Propos"
+        },
+        "accountManagement": {
+            "title:verifyMailAddress": "Vérification de l'adresse de messagerie",
+            "title:resetPassword": "Nouveau mot de passe",
+            "verifyResetPasswordCode": "Validation de la requête...",
+            "verifyMailAddress": "Votre adresse de messagerie est en cours de validation...",
+            "invalidActionLink": "Le lien n'est pas valide.",
+            "mailAddressVerified": "Votre adresse de messagerie a bien été validée.\nMerci.",
+            "invalidVerifyMailLink": "Le lien de vérification ne semble plus valide.\nVous pouvez en demander un nouveau de puis la page de votre profil.",
+            "field:password": "Mot de passe",
+            "error:passwordCreate": "Veuillez saisir un mot de passe d'au moins 6 caractères.",
+            "field:passwordConfirm": "Confirmation du mot de passe",
+            "error:passwordConfirm": "Veuillez confirmer votre mot de passe.",
+            "error:passwordConfirmFailure": "La confirmation du mot de passe n'est pas correcte.",
+            "invalidResetPasswordLink": "Le lien de réinitialisation du mot de passe ne semble pas valide.\nVous pouvez en demander un nouveau en ouvrant le formulaire de connexion.",
+            "enterNewPassword": "Saisissez votre nouveau mot de passe:",
+            "resetPasswordSuccess": "Votre mot de passe a été changé avec succès.\nVous êtes maintenant connecté."
         },
         "home": {
 
@@ -165,6 +184,7 @@
             "password": "Mot de passe",
             "passwordConfirm": "Confirmation du mot de passe",
             "passwordConfirmError": "La confirmation du mot de passe n'est pas correcte.",
+            "passwordPolicyError": "Veuillez saisir un mot de passe d'au moins 6 caractères.",
             "emailVerified": "eMail vérifié",
             "title:removeProfile": "Suppression du compte",
             "btn:removeProfile": "Supprimer le compte",
@@ -173,12 +193,18 @@
             "removeProfileContent3": "Vos éventuels favoris et compositions seront effacés.",
             "removeProfileContent4": "Vous pourrez à tout moment créer un nouveau compte avec la même adresse mail.",
             "btn:modifyData": "Modifier les informations",
+            "btn:sendMailVerification": "Vérifier l'eMail",
             "title:authDialog": "Authentification",
             "desc:authDialog" : "Veuillez vous ré-authentifier pour modifier vos informations personnelles",
             "field:authDialog": "Veuillez saisir votre mot de passe",
             "btn:cancel": "Annuler",
             "btn:validate": "Valider",
-            "validationMessage": "Les modifications ont été enregistrées avec succès."
+            "validationMessage": "Les modifications ont été enregistrées avec succès.",
+            "emailVerificationLinkSent": "Un mail vous a été envoyé qui contient un lien vous permettant de valider votre adresse de messagerie.",
+            "emailVerificationLinkError": "Une erreur s'est produite lors de l'envoi du message de vérification.\nVeuillez essayer à nouveau.",
+            "invalidEmail": "L'adresse eMail est déjà utilisée par un autre compte utilisateur.",
+            "invalidDisplayName": "Le nom d'utilisateur n'est pas valide",
+            "invalidPassword": "Le mot de passe n'est pas valide."
         }
     },
     "components": {
@@ -224,7 +250,11 @@
             "createAccount": "Suivant",
             "authenticationFailed": "La connexion a échoué.",
             "accountCreated": "Votre compte a été créé.\nUn mail vous a été envoyé qui contient un lien vous permettant de valider votre adresse de messagerie.",
-            "userConnected": "Bonjour {0}!"
+            "userConnected": "Bonjour {0}!",
+            "linkResetPassword": "J'ai oublié mon mot de passe",
+            "resetPasswordLinkSent": "Un message a été envoyé à l'adresse indiquée qui contient un lien permettant de réinitialiser votre mot de passe.",
+            "resetPasswordLinkError": "Une erreur s'est produite lors de l'envoi du message de réinitialisation du mot de passe.\nVeuillez essayer à nouveau.",
+            "resetPasswordUserNotFound": "L'adresse ne correspond à aucun utilisateur enregistré.\nVeuillez vérifier l'adresse saisie avant de réessayer."
         },
         "gallery": {
             "btn:addFavorite": "Ajouter aux favoris",

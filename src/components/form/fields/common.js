@@ -1,12 +1,9 @@
 import {
     FIELD_TYPE_EMAIL,
-    FIELD_TYPE_PASSWORD
-} from '../Form';
-
-function validateEmail(email) {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-}
+    FIELD_TYPE_PASSWORD,
+    FIELD_TYPE_PASSWORD_CONFIRM
+} from '../FormContext';
+import { validateEmail } from 'utils';
 
 function isInvalidValue(field, value) {
     if (!field.invalidValues) {
@@ -27,11 +24,11 @@ export function validateValueRange(value, range) {
     return true;
 }
 
-export function validateFieldValue(field, fieldValue) {
+export function validateFieldValue(field, fieldValue, values) {
     let isError = false;
     if (typeof fieldValue === "string") {
         const isEmpty = 
-            field.type === FIELD_TYPE_PASSWORD ?
+            (field.type === FIELD_TYPE_PASSWORD || field.type === FIELD_TYPE_PASSWORD_CONFIRM) ?
             fieldValue.length === 0 :
             fieldValue.trim().length === 0;
         if (field.type === FIELD_TYPE_EMAIL) {
@@ -43,6 +40,11 @@ export function validateFieldValue(field, fieldValue) {
         isError = field.required;
     } else if (field.range) {
         isError = validateValueRange(fieldValue, field.range) === false;
+    }
+
+    if (isError === false && field.type === FIELD_TYPE_PASSWORD_CONFIRM) {
+        const passwordValue = values[field.passwordId];
+        isError = passwordValue !== fieldValue;
     }
 
     isError = isError || isInvalidValue(field, fieldValue);

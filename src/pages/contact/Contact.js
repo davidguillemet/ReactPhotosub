@@ -63,7 +63,6 @@ const getFields = (t) => {
             default: null
         }
     ]
-    fields.language = t.language;
     return fields;
 }
 
@@ -73,15 +72,10 @@ const Contact = () => {
     const dataProvider = useDataProvider();
     const authContext = useAuthContext();
     const [initialValues, setInitialValues] = useState(null);
-    const [ fields, setFields ] = useState(() => getFields(t));
+    const [ fields, setFields ] = useState(null);
 
     useEffect(() => {
-        setFields(prevFields => {
-            if (prevFields.language !== t.language) {
-                return getFields(t);
-            }
-            return prevFields;
-        });
+        setFields(getFields(t));
     }, [t]);
 
     useEffect(() => {

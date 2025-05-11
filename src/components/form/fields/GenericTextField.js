@@ -1,37 +1,35 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
-import { FIELD_TYPE_NUMBER } from '../Form';
+import { FIELD_TYPE_NUMBER, FIELD_TYPE_PASSWORD, FIELD_TYPE_PASSWORD_CONFIRM } from '../FormContext';
 import { validateFieldValue } from './common';
 import { useFormContext } from '../FormContext';
 import InputAdornment from '@mui/material/InputAdornment';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 
 const GenericTextFieldComp = ({
-    field,
+    fieldSpec,
     value,
     handleChange,
     inputProps = {},
-    group = false}) => {
+    group = false,
+    hasError}) => {
 
     const formContext = useFormContext();
 
-    const [error, setError] = React.useState(false);
-    const changed = React.useRef(false);
-
-    const checkFieldValue = React.useCallback((event) => {
+    const onChange = React.useCallback((event) => {
+        const field = fieldSpec.field;
         const fieldValue = field.type === FIELD_TYPE_NUMBER ?
             event.target.valueAsNumber :
             event.target.value;
-        const valid = field.validator ? field.validator(field, fieldValue) : validateFieldValue(field, fieldValue);
-        setError(!valid);
-        return fieldValue;
-    }, [field])
+        handleChange(fieldSpec, fieldValue);
+    }, [fieldSpec, handleChange]);
 
-    const onChange = React.useCallback((event) => {
-        changed.current = true;
-        const fieldValue = checkFieldValue(event);
-        handleChange(field, fieldValue);
-    }, [field, checkFieldValue, handleChange]);
+    const field = fieldSpec.field;
+    const fieldType =
+        field.type === FIELD_TYPE_PASSWORD_CONFIRM ? FIELD_TYPE_PASSWORD :
+        field.type;
+
+    const error = hasError !== undefined ? hasError : formContext.hasError(fieldSpec.id);
 
     return (
         <TextField
@@ -44,7 +42,7 @@ const GenericTextFieldComp = ({
             fullWidth
             margin="normal"
             required={field.required}
-            type={field.type}
+            type={fieldType}
             slotProps={{
                 htmlInput: {
                     step: field.step,

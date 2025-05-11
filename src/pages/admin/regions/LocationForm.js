@@ -7,7 +7,7 @@ import Form, {
     FIELD_TYPE_URL,
     FIELD_TYPE_LATLONG,
     FIELD_TYPE_SELECT
-} from 'components/form/Form';
+} from 'components/form';
 import { alpha } from '@mui/material/styles';
 
 const RegionItem = ({option}) => {
@@ -38,7 +38,7 @@ const RegionItem = ({option}) => {
 const LocationForm = ({location, locations, regions, onChange, onCancel, onNewLocation}) => {
 
     const queryContext = useQueryContext();
-    const [locationFields, setLocationFields] = React.useState([]);
+    const [locationFields, setLocationFields] = React.useState(null);
 
     const addLocationMutation = queryContext.useAddLocation();
     const updateLocationMutation = queryContext.useUpdateLocation();

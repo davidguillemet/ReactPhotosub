@@ -42,7 +42,9 @@ const getPageProperties = async (req, pool, firebaseConfig) => {
     let pageName = "Home";
 
     const path = req.path;
-    if (path === "/destinations") {
+    if (path === "/auth/action") {
+        pageName = "Account Management";
+    } else if (path === "/destinations") {
         pageName = "Destinations";
     } else if (path.startsWith("/destinations")) {
         // /destinations/2020/romblon

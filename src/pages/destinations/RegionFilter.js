@@ -2,7 +2,6 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import FormHelperText from '@mui/material/FormHelperText';
 import Chip from '@mui/material/Chip';
-import {unstable_batchedUpdates} from 'react-dom';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -23,11 +22,9 @@ const RegionFilterUI = ({hierarchy, onChange}) => {
     }, [hierarchy]);
 
     const handleChange = (event, newValue) => {
-        unstable_batchedUpdates(() => {
-            setFilter(newValue);
-            const parentId = newValue.length > 0 ? newValue[newValue.length - 1].id : null;
-            setOptions(hierarchy.filter(region => region.parent === parentId))
-        });
+        setFilter(newValue);
+        const parentId = newValue.length > 0 ? newValue[newValue.length - 1].id : null;
+        setOptions(hierarchy.filter(region => region.parent === parentId))
         if (onChange) {
             const regionSet = new Set();
             // Add the last element only

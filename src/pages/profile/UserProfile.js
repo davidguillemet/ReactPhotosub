@@ -1,8 +1,8 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import {unstable_batchedUpdates} from 'react-dom';
 import Button from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import { PageTitle } from '../../template/pageTypography';
 import { useAuthContext } from '../../components/authentication';
 import { VerticalSpacing } from '../../template/spacing';
@@ -10,12 +10,14 @@ import { withUser } from '../../components/hoc';
 import { ConfirmDialog } from '../../dialogs';
 import EnterPasswordDlg from './EnterPasswordDlg';
 import { useToast } from '../../components/notifications';
+import { validatePassword } from 'utils';
 
 import Form, {
     FIELD_TYPE_TEXT,
     FIELD_TYPE_EMAIL,
     FIELD_TYPE_CHECK_BOX,
-    FIELD_TYPE_PASSWORD
+    FIELD_TYPE_PASSWORD,
+    FIELD_TYPE_PASSWORD_CONFIRM
 } from '../../components/form';
 import { useDataProvider } from '../../components/dataProvider';
 import { useTranslation } from 'utils';
@@ -54,15 +56,19 @@ const getFields = (t) => {
             id: "password",
             label: t("password"),
             required: false,
+            errorText: t("passwordPolicyError"),
             type: FIELD_TYPE_PASSWORD,
             multiline: false,
-            default: ""
+            default: "",
+            // Password is optional, then no error if empty
+            validator: (_field, value) => validatePassword(value) || !value
         },
         {
             id: "password_confirm",
             label: t("passwordConfirm"),
             required: false,
-            type: FIELD_TYPE_PASSWORD,
+            type: FIELD_TYPE_PASSWORD_CONFIRM,
+            passwordId: "password", // The field id of the password to confirm (for validation)
             multiline: false,
             default: ""
         },
@@ -119,11 +125,19 @@ const UserProfile = (props) => {
         });
     }, []);
 
+    const onClickVerifyEmail = useCallback(() => {
+        const sendMailVerification = firebaseContext.sendEmailVerification;
+        sendMailVerification().then(() => {
+            toast.success(t("emailVerificationLinkSent"));
+        }).catch((error) => {
+            toast.error(t("emailVerificationLinkError"));
+        });
+    }, [firebaseContext.sendEmailVerification, toast, t]);
+
     const onSubmitUserForm = useCallback((values) => {
         // Check possible password + confirmation
         if (values.password.length > 0 || values.password_confirm.length > 0) {
             if (values.password !== values.password_confirm) {
-                fields.filter(field => field.id.startsWith("password")).forEach(field => field.error = true);
                 return Promise.reject(new Error(t("passwordConfirmError")))
             }
         } else {
@@ -142,15 +156,13 @@ const UserProfile = (props) => {
         })
         .then(() => authContext.reloadUser())
         .then(() => {
-            unstable_batchedUpdates(() => {
-                setReadOnly(true);
-                setValues(oldValues => {
-                    return {
-                        ...oldValues,
-                        ...values
-                    }
-                })
-            });
+            setReadOnly(true);
+            setValues(oldValues => {
+                return {
+                    ...oldValues,
+                    ...values
+                }
+            })
         })
         .catch(err => {
             if (err.code === "auth/user-token-expired") {
@@ -160,23 +172,21 @@ const UserProfile = (props) => {
                 return onIdTokenRevocation(values.email, values.password);
             }
             else if (err.cause?.code === "auth/invalid-password") {
-                fields.filter(field => field.id.startsWith("password")).forEach(field => field.error = true);
+                throw new Error(t("invalidPassword"));
             } else if (err.cause?.code === "auth/invalid-email" || err.cause?.code === "auth/email-already-exists") {
-                fields.find(field => field.id === "email").error = true;
+                throw new Error(t("invalidEmail"));
             } else if (err.cause?.code === "auth/invalid-display-name") {
-                fields.find(field => field.id === "displayName").error = true;
+                throw new Error(t("invalidDisplayName"));
             }
+            // Generic error...
             throw err;
         });
-    }, [authContext, dataProvider, onIdTokenRevocation, fields, t]);
+    }, [authContext, dataProvider, onIdTokenRevocation, t]);
 
     const onCancelChanges = useCallback(() => {
-        fields.forEach(field => field.error = false);
-        unstable_batchedUpdates(() => {
-            setReadOnly(true);
-            setValues(getFormValues(authContext.user));
-        });
-    }, [authContext.user, fields]);
+        setReadOnly(true);
+        setValues(getFormValues(authContext.user));
+    }, [authContext.user]);
 
     const onClickDeleteAccount = useCallback(() => {
         setOpenDeleteConfirmation(true);
@@ -227,18 +237,28 @@ const UserProfile = (props) => {
                 onCancel={onCancelChanges}
                 validationMessage={t("validationMessage")}
             />
-            {
-                readOnly &&
-                <React.Fragment>
-                    <VerticalSpacing factor={2} />
-                    <Button
-                        onClick={onClickModify}
-                        startIcon={<EditIcon/>}
-                    >
-                        {t("btn:modifyData")}
-                    </Button>
-                </React.Fragment>
-            }
+            <React.Fragment>
+                <VerticalSpacing factor={4} />
+                <Button
+                    onClick={onClickModify}
+                    startIcon={<EditIcon/>}
+                    disabled={!readOnly}
+                >
+                    {t("btn:modifyData")}
+                </Button>
+            </React.Fragment>
+
+            <React.Fragment>
+                <VerticalSpacing factor={2} />
+                <Button
+                    onClick={onClickVerifyEmail}
+                    startIcon={<MarkEmailReadIcon/>}
+                    disabled={authContext.user.emailVerified}
+                >
+                    {t("btn:sendMailVerification")}
+                </Button>
+            </React.Fragment>
+
             <VerticalSpacing factor={4} />
             <Button
                 color="error"

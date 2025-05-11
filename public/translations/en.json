@@ -2,6 +2,7 @@
     "menu": {
         "home": "Home",
         "destinations" : "Destinations",
+        "destination": "Destination",
         "search": "Search",
         "finning": "Finning",
         "composition": "Composition",
@@ -10,7 +11,8 @@
         "favorites": "My favorites",
         "profile": "My Profile",
         "admin": "Administration",
-        "logout": "Logout"
+        "logout": "Logout",
+        "acctMgmt": "Account Management"
     },
     "pages" : {
         "404": {
@@ -19,6 +21,23 @@
         },
         "about": {
             "title": "About me"
+        },
+        "accountManagement": {
+            "title:verifyMailAddress": "Mail address validation",
+            "title:resetPassword": "Password Reset",
+            "verifyResetPasswordCode": "Verifying request validity...",
+            "verifyMailAddress": "Your email address is being validated...",
+            "invalidActionLink": "The link is not valid.",
+            "mailAddressVerified": "Your email address has been validated.\nThank you.",
+            "invalidVerifyMailLink": "The verification link does not seem valid anymore.\nYou can ask for a new one from your profile page.",
+            "field:password": "Password",
+            "error:passwordCreate": "Please enter a password of at least 6 characters.",
+            "field:passwordConfirm": "Password confirmation",
+            "error:passwordConfirm": "Please confirm your password",
+            "error:passwordConfirmFailure": "The Password confirmation is not correct.",
+            "invalidResetPasswordLink": "The link to reset your password does not seem valid anymore.\nYou can ask for a new one by opening the login form.",
+            "enterNewPassword": "Enter your new password:",
+            "resetPasswordSuccess": "Your password has been changed successfully.\nYou are now signed-in."
         },
         "home": {
 
@@ -165,6 +184,7 @@
             "password": "Password",
             "passwordConfirm": "Password confirmation",
             "passwordConfirmError": "The Password confirmation is not correct.",
+            "passwordPolicyError": "Veuillez saisir un mot de passe d'au moins 6 caractères.",
             "emailVerified": "Verified email",
             "title:removeProfile": "Profile removal",
             "btn:removeProfile": "Remove Profile",
@@ -173,12 +193,18 @@
             "removeProfileContent3": "Your favorites and compositions will be removed.",
             "removeProfileContent4": "You will be able to create a new profile with the same email address.",
             "btn:modifyData": "Edit information",
+            "btn:sendMailVerification": "Verify email",
             "title:authDialog": "Authentication",
             "desc:authDialog" : "You must re-authenticate to modify your personal data.",
             "field:authDialog": "Enter your password",
             "btn:cancel": "Cancel",
             "btn:validate": "Validate",
-            "validationMessage": "The changes have been saved successfully."
+            "validationMessage": "The changes have been saved successfully.",
+            "emailVerificationLinkSent": "A message has been sent that contains a link to verify your email address.",
+            "emailVerificationLinkError": "En error occurred while trying to send the verification message.\nPlease try again.",
+            "invalidEmail": "The email address is already in use by another account.",
+            "invalidDisplayName": "The entered display name is not valid.",
+            "invalidPassword": "The entered password is not valid."
         }
     },
     "components": {
@@ -224,7 +250,11 @@
             "createAccount": "Next",
             "authenticationFailed": "Login failed.",
             "accountCreated": "Your account has been created.\nA message has been sent that contains a link to verify your email address.",
-            "userConnected": "Hello {0}!"
+            "userConnected": "Hello {0}!",
+            "linkResetPassword": "I forgot my password",
+            "resetPasswordLinkSent": "A message has been sent to the provided address that contains a link to reset your password.",
+            "resetPasswordLinkError": "An error occurred while trying to send the password reset link.\nPlease try again.",
+            "resetPasswordUserNotFound": "No user has been found.\nPlease verify the email you provided and try again."
         },
         "gallery": {
             "btn:addFavorite": "Add to favorites",

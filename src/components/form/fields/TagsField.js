@@ -3,23 +3,23 @@ import TextField from '@mui/material/TextField';
 import { Chip, Autocomplete } from '@mui/material';
 import { useFormContext } from '../FormContext';
 
-const validateTagsFieldValue = (_field, value) => {
+const validateTagsFieldValue = (_fieldSpec, value) => {
     return Array.isArray(value) && value.length > 0;
 };
 
-const TagsFieldComp = ({ field, value, handleChange }) => {
+const TagsFieldComp = ({ fieldSpec, value, handleChange }) => {
     const formContext = useFormContext();
 
-    const [error, setError] = React.useState(false);
     const [inputValue, setInputValue] = React.useState("");
 
     const onChange = React.useCallback((event, newValue) => {
-        const valid = validateTagsFieldValue(field, newValue);
-        handleChange(field, newValue);
-        setError(!valid);
-    }, [field, handleChange]);
+        handleChange(fieldSpec, newValue);
+    }, [fieldSpec, handleChange]);
 
+    const field = fieldSpec.field;
     const isReadOnly = formContext.sending || formContext.readOnly || field.readOnly;
+
+    const error = formContext.hasError(field.id);
 
     return (
         <Autocomplete

@@ -30,31 +30,31 @@ const App = (props) => {
     return (
         <Box sx={{ display: 'flex', minHeight: "100%"}} id="AppContainer">
             <StyledEngineProvider injectFirst>
-                <ChainedProviders
-                    providers={[
-                        HelmetProvider,
-                        ToastContextProvider,
-                        DarkModeProvider,
-                        CustomThemeProvider,
-                        OverlayProvider,
-                        TranslationProvider,
-                        ReactQueryClientProvider,
-                        FirebaseProvider,
-                        DataManagerProvider,
-                        QueryContextProvider,
-                        AuthProvider,
-                        FavoritesProvider
-                    ]}
-                >
-                    <CssBaseline />
-                    <Router>
-                        <AppContent {...props} />
-                    </Router>
-                    <ScrollTop
-                        {...props}
-                        anchorSelector={`#${scrollTopAnchor}`}
-                    />
-                </ChainedProviders>
+                <Router>
+                    <ChainedProviders
+                        providers={[
+                            HelmetProvider,
+                            ToastContextProvider,
+                            DarkModeProvider,
+                            CustomThemeProvider,
+                            OverlayProvider,
+                            TranslationProvider,
+                            ReactQueryClientProvider,
+                            FirebaseProvider,
+                            DataManagerProvider,
+                            QueryContextProvider,
+                            AuthProvider,
+                            FavoritesProvider
+                        ]}
+                    >
+                        <CssBaseline />
+                            <AppContent {...props} />
+                        <ScrollTop
+                            {...props}
+                            anchorSelector={`#${scrollTopAnchor}`}
+                        />
+                    </ChainedProviders>
+                </Router>
             </StyledEngineProvider>
         </Box>
     )

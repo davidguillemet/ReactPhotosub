@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useOverlay } from 'components/loading';
 import { useToast } from 'components/notifications';
 import { FullPageLoading } from 'components/loading';
+import { useQueryParameter } from './useQueryParameter';
 
 const TranslationContext = React.createContext(null);
 
@@ -37,8 +38,11 @@ const loadLanguageResources = (language) => {
     });
 }
 
+const SUPPORTED_LANGUAGES = [LANGUAGE_FR, LANGUAGE_EN];
+
 export const TranslationProvider = ({children}) => {
 
+    const getQueryParameter = useQueryParameter();
     const { toast } = useToast();
     const [language, setLanguage] = useState(null);
     const resources = useRef(null);
@@ -73,8 +77,9 @@ export const TranslationProvider = ({children}) => {
     }, [setOverlay, toast]);
 
     useEffect(() => {
-        loadLanguage(getNavigatorLanguage());
-    }, [loadLanguage]);
+        const languageParameter = getQueryParameter("lang");
+        loadLanguage(languageParameter || getNavigatorLanguage());
+    }, [loadLanguage, getQueryParameter]);
 
     const getTranslation = useCallback(({resourceMap, fallbackMap}, id, args) => {
         let caption = null;
@@ -130,7 +135,7 @@ export const TranslationProvider = ({children}) => {
             value={{
                 language: language,
                 setLanguage: loadLanguage,
-                supportedLanguages: [LANGUAGE_FR, LANGUAGE_EN],
+                supportedLanguages: SUPPORTED_LANGUAGES,
                 fromNamespace: translatorFromNamespace 
             }}
         >

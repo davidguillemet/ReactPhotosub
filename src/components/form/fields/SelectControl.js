@@ -28,8 +28,9 @@ const useOptions = (field, values) => {
     };*/
 };
 
-const SelectControlComp = ({ field, value, handleChange }) => {
+const SelectControlComp = ({ fieldSpec, value, handleChange }) => {
 
+    const field = fieldSpec.field;
     const formContext = useFormContext();
     const valueProperty = React.useMemo(() => field.mapping ? field.mapping["value"] : "id", [field]);
     const captionProperty = React.useMemo(() => field.mapping ? field.mapping["caption"] : "title", [field]);
@@ -38,9 +39,9 @@ const SelectControlComp = ({ field, value, handleChange }) => {
     const onChange = React.useCallback((event) => {
         const fieldValue = event.target.value;
         const value = fieldValue[valueProperty];
-        handleChange(field, value);
+        handleChange(fieldSpec, value);
         setSelectedValue(fieldValue);
-    }, [field, handleChange, valueProperty]);
+    }, [fieldSpec, handleChange, valueProperty]);
 
     const { options, error } = useOptions(field, formContext.values);
 

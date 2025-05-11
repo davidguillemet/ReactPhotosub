@@ -4,16 +4,18 @@ import Switch from "@mui/material/Switch";
 import FormControl from '@mui/material/FormControl';
 import { useFormContext } from '../FormContext';
 
-const validateSwitchField = (_field, _value) => true;
+const validateSwitchField = (_fieldSpec, _value) => true;
 
-const SwitchFieldComp = ({ field, value, handleChange }) => {
+const SwitchFieldComp = ({ fieldSpec, value, handleChange }) => {
     const formContext = useFormContext();
 
     const onChange = React.useCallback((event) => {
         const value = event.target.checked;
-        handleChange(field, value);
-    }, [field, handleChange]);
+        handleChange(fieldSpec, value);
+    }, [fieldSpec, handleChange]);
 
+    const field = fieldSpec.field;
+ 
     return (
         <FormControl fullWidth>
             <FormControlLabel

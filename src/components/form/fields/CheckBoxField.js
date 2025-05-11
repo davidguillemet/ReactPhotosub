@@ -6,12 +6,14 @@ import { useFormContext } from '../FormContext';
 
 const validateCheckBox = (_field, _value) => true;
 
-const CheckBoxFieldComp = ({ field, value, handleChange }) => {
+const CheckBoxFieldComp = ({ fieldSpec, value, handleChange }) => {
     const formContext = useFormContext();
 
     const onChange = React.useCallback((event) => {
-        handleChange(field, event.target.checked);
-    }, [field, handleChange]);
+        handleChange(fieldSpec, event.target.checked);
+    }, [fieldSpec, handleChange]);
+
+    const field = fieldSpec.field;
 
     return (
         <FormControl fullWidth>

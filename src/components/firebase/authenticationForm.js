@@ -4,13 +4,17 @@ import { Stack } from '@mui/material';
 import Form, {
     FIELD_TYPE_EMAIL,
     FIELD_TYPE_TEXT,
-    FIELD_TYPE_PASSWORD
+    FIELD_TYPE_PASSWORD,
+    FIELD_TYPE_PASSWORD_CONFIRM
 } from 'components/form';
 import { useTranslation } from 'utils';
 import { useDataProvider } from 'components/dataProvider';
 import useFirebaseContext from './firebaseContextHook';
 import { Button } from '@mui/material';
 import { Body } from 'template/pageTypography';
+import { useToast } from 'components/notifications';
+
+import { validateEmail, validatePassword } from 'utils';
 
 import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOutlined';
 import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
@@ -48,11 +52,49 @@ const CustomButtons = ({onCancel, onPrev, step}) => {
     )
 }
 
+const ResetPasswordLink = ({values}) => {
+    const { toast } = useToast();
+    const t = useTranslation("components.form::authentication");
+    const firebaseContext = useFirebaseContext();
+
+    const handleResetPasswordClick = React.useCallback(() => {
+        const sendPasswordResetEmail = firebaseContext.sendPasswordResetEmail;
+        sendPasswordResetEmail(values.email)
+        .then(() => {
+            toast.success(t("resetPasswordLinkSent"));
+        }).catch((error) => {
+            if (error.code === "auth/user-not-found") {
+                // Unknown eMail
+                toast.error(t("resetPasswordUserNotFound"));
+            } else {
+                // Generic error
+                toast.error(t("resetPasswordLinkError"));
+            }
+        });
+    }, [firebaseContext.sendPasswordResetEmail, values.email, t, toast]);
+
+    if (values === null) {
+        return null;
+    }
+
+    return (
+        <Button
+            variant='text'
+            size="small"
+            disabled={!validateEmail(values.email)}
+            onClick={handleResetPasswordClick}
+            sx={{textTransform: 'none'}}
+        >
+            {t("linkResetPassword")}
+        </Button>
+    );
+}
+
 const AuthenticationForm = ({onCancel}) => {
     const t = useTranslation("components.form::authentication");
     const firebaseContext = useFirebaseContext();
     const dataProvider = useDataProvider();
-    const [ fields, setFields ] = React.useState([]);
+    const [ fields, setFields ] = React.useState(null);
     const [ step, setStep ] = React.useState(INITIAL_STEP);
 
     // Submit action depending on wizard step
@@ -108,8 +150,10 @@ const AuthenticationForm = ({onCancel}) => {
                     }
                 };
                 if (values.password !== values.password_confirm) {
-                    fields.filter(field => field.id.startsWith("password")).forEach(field => field.error = true);
-                    setStep(newStep);
+                    setStep({
+                        id: step.id, // Keep the same step
+                        ...newStep
+                    });
                     return Promise.reject(new Error(t("error:passwordConfirmToast")))
                 }
                 return dataProvider.createUser({
@@ -130,14 +174,17 @@ const AuthenticationForm = ({onCancel}) => {
                         }
                     }));
                 }).catch(error => {
-                    setStep(newStep);
+                    setStep({
+                        id: step.id, // Keep the same step
+                        ...newStep
+                    });
                     throw error;
                 });
 
             default:
                 return Promise.reject(new Error(`Unexpected step ${step.id}`));
         }
-    }, [fields, step, dataProvider, firebaseContext, t]);
+    }, [step, dataProvider, firebaseContext, t]);
 
     // CLose Wizard after login
     React.useEffect(() => {
@@ -193,9 +240,7 @@ const AuthenticationForm = ({onCancel}) => {
                 focus: step.id === STEP.LOGIN_ENTER_PASSWORD,
                 // Validator for CREATE_ACCOUNT only
                 validator: step.id === STEP.LOGIN_ENTER_PASSWORD ? null : (_field, value) => {
-                    // Customized password rules:
-                    // https://console.firebase.google.com/u/0/project/photosub/authentication/settings
-                    return value !== null && value !== undefined && value.length >= 6;
+                    return validatePassword(value);
                 }
             });
         }
@@ -206,7 +251,8 @@ const AuthenticationForm = ({onCancel}) => {
                 label: t("field:passwordConfirm"),
                 required: step.id === STEP.CREATE_ACCOUNT || step.id === STEP.LOGIN_ENTER_PASSWORD,
                 errorText: t("error:passwordConfirm"),
-                type: FIELD_TYPE_PASSWORD,
+                type: FIELD_TYPE_PASSWORD_CONFIRM,
+                passwordId: "password",
                 multiline: false,
                 default: ""
             });
@@ -268,6 +314,7 @@ const AuthenticationForm = ({onCancel}) => {
                 submitCaption={submitButtonCaption}
                 validationMessage={validationMessage}
                 startCustomComponent={<CustomButtons onCancel={handleCancel} onPrev={handleOnPrevious} step={step} />}
+                endCustomComponent={ResetPasswordLink}
                 submitIcon={<ArrowCircleRightOutlinedIcon/>}
                 submitIconPosition="end"
             />

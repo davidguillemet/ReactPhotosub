@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { useIntersectionObserver } from '../hooks';
-import {unstable_batchedUpdates} from 'react-dom';
 import { styled } from '@mui/material/styles';
 
 const Frame = styled('iframe')(({ theme }) => ({ }));
@@ -42,10 +41,8 @@ const Player = ({src}) => {
     const [videoSrc, setVideoSrc] = useState("");
     const [loaded, setLoaded] = useState(false);
     const setVideoSrcCallback = useCallback(() => {
-        unstable_batchedUpdates(() => {
-            setVideoSrc(src);
-            setLoaded(true);
-        });
+        setVideoSrc(src);
+        setLoaded(true);
     }, [src]);
     const { ref: frameRef } = useIntersectionObserver(setVideoSrcCallback);
 

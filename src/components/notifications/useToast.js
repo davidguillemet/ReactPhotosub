@@ -1,34 +1,21 @@
 
 import React from 'react';
-import { useContext } from 'react';
 import { ToastContext } from './ToastContextProvider';
 
-const withTimeout = (addToast, timeout, removeToast) => (toast) => {
-    const toastObj = addToast(toast);
-    let appliedTimeout = toast.timeout ?? timeout
-    if (appliedTimeout > 0)
-        setTimeout(() => removeToast(toastObj), appliedTimeout)
-} 
-
-const useToast = (timeout = 10000) => {
-    const {removeToast, toast: originalToast} = useContext(ToastContext);
-
-    const toast = React.useRef({
-       error: withTimeout(originalToast.error, timeout, removeToast),
-       success: withTimeout(originalToast.success, timeout, removeToast),
-       info: withTimeout(originalToast.info, timeout, removeToast),
-       warning: withTimeout(originalToast.warning, timeout, removeToast),
-    });
-
-    return {
-        removeToast,
-        toast: toast.current
-    };
+const useToast = () => {
+    const context = React.useContext(ToastContext);
+    if (context === undefined || context === null) {
+        throw new Error("useToast must be used within a ToastContextProvider");
+    }
+    return context;
 }
 
 export const useToasts = () => {
-    const { toasts } = useContext(ToastContext);
-
+    const context = React.useContext(ToastContext);
+    if (context === undefined || context === null) {
+        throw new Error("useToasts must be used within a ToastContextProvider");
+    }
+    const { toasts } = context;
     return toasts;
 }
 

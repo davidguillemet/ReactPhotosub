@@ -9,8 +9,6 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import Divider from '@mui/material/Divider';
 
-import {unstable_batchedUpdates} from 'react-dom';
-
 import SimulationSplitButton from './SimulationSplitButton';
 import SimulationNameDialog from './dialogs/SimulationNameDlg';
 import SimulationDeletionDialog from './dialogs/SimulationDeletionDlg';
@@ -51,10 +49,8 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
 
     const handleSave = () => {
         if (!simulationHasName(simulations[currentIndex])) {
-            unstable_batchedUpdates(() => {
-                setAction(NAME_DIALOG_ACTION_SAVE);
-                setNameDlgOpen(true);
-            });
+            setAction(NAME_DIALOG_ACTION_SAVE);
+            setNameDlgOpen(true);
         } else {
             onSave();
         }
@@ -68,10 +64,8 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
 
     const handleAdd = () => {
         // Open dialog to enter a name
-        unstable_batchedUpdates(() => {
-            setAction(NAME_DIALOG_ACTION_NEW);
-            setNameDlgOpen(true);
-        });
+        setAction(NAME_DIALOG_ACTION_NEW);
+        setNameDlgOpen(true);
     }
 
     const onSelectionChange = (index) => {
@@ -80,10 +74,8 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
 
     const onRenameCurrent = useCallback(() => {
         // Open dialog to enter a name
-        unstable_batchedUpdates(() => {
-            setAction(NAME_DIALOG_ACTION_RENAME);
-            setNameDlgOpen(true);
-        });
+        setAction(NAME_DIALOG_ACTION_RENAME);
+        setNameDlgOpen(true);
     }, []);
 
     const handleToggleLock = () => {

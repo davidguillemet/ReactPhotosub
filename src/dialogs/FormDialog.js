@@ -4,7 +4,6 @@ import {
     DialogTitle,
     DialogContent
 } from '@mui/material';
-import {unstable_batchedUpdates} from 'react-dom';
 import {isMobile} from 'react-device-detect';
 
 const FormDialog = ({title, open, onClose, children, maxWidth = 'lg'}) => {
@@ -16,10 +15,8 @@ const FormDialog = ({title, open, onClose, children, maxWidth = 'lg'}) => {
     }, [open]);
 
     const handleClose = React.useCallback(() => {
-        unstable_batchedUpdates(() => {
-            setIsOpen(false);
-            onClose();
-        });
+        setIsOpen(false);
+        onClose();
     }, [onClose]);
 
     return (

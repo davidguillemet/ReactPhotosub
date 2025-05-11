@@ -24,6 +24,7 @@ const Contact = lazy(() => import("../pages/contact"));
 const MySelection = lazy(() => import("../pages/favorites"));
 const MyProfile = lazy(() => import("../pages/profile"));
 const Admin = lazy(() => import("../pages/admin"));
+const AccountManagement = lazy(() => import("../pages/accountmgmt"));
 
 export const HomePath = "/";
 export const DestinationsPath = "/destinations";
@@ -36,6 +37,7 @@ export const FavoritesPath = "/favorites";
 export const ProfilPath = "/profil";
 export const DestinationPath = "/destinations/:year/:title";
 export const AdminPath = "/admin";
+export const AccountManagementPath = "/auth/action";
 
 export const ROUTES_NAMESPACE = "menu";
 
@@ -132,11 +134,18 @@ export const routes = [
     },
     // Sub-pages, not directly accessible (for Router Switch) (private and sidebar are undefined)
     {
-        label: null,
+        label: "destination", // Will be overridden by HelmetDestination
         path: DestinationPath,
         component: Destination,
         fullWidth: true
     },
+    // Accessible through a link from account management eMail (reset password, verify eMail, ...)
+    {
+        label: "acctMgmt",
+        path: AccountManagementPath,
+        component: AccountManagement,
+        fullWidth: false
+    }
 ];
 
 export const NavigationLink = styled(NavLink)(

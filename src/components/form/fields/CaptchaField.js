@@ -6,12 +6,12 @@ const validateCaptcha = (_field, value) => {
     return value !== null;
 };
 
-const CaptchaFieldComp = ({ field, handleChange }) => {
+const CaptchaFieldComp = ({ fieldSpec, handleChange }) => {
 
     const { darkMode } = useDarkMode();
     const onCaptchaChange = React.useCallback((value) => {
-        handleChange(field, value);
-    }, [handleChange, field]);
+        handleChange(fieldSpec, value);
+    }, [handleChange, fieldSpec]);
 
     return (
         <ReCAPTCHA

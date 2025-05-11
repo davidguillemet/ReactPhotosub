@@ -2,10 +2,14 @@ import React from 'react';
 import { initializeApp } from "firebase/app"
 // import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "firebase/app-check";
 import {
+    applyActionCode,
     getAuth,
     connectAuthEmulator,
     signInWithEmailAndPassword,
     sendEmailVerification,
+    sendPasswordResetEmail,
+    verifyPasswordResetCode,
+    confirmPasswordReset,
     deleteUser,
     signOut
 } from "firebase/auth";
@@ -22,6 +26,8 @@ import {
 import { getAnalytics, logEvent } from "firebase/analytics";
 
 import FirebaseContext from './firebaseContext';
+import { useLanguage } from 'utils';
+
 // import { useToast } from '../notifications';
 
 const firebaseApp = initializeApp({
@@ -57,6 +63,7 @@ if (isDev) {
 const _ghostFileName = ".ghost";
 
 const FirebaseProvider = ({children}) => {
+    const { language } = useLanguage();
     // const { toast } = useToast();
 
     // const getAppCheckToken = React.useCallback(async () => {
@@ -69,6 +76,10 @@ const FirebaseProvider = ({children}) => {
     //     }
     // }, [toast]);
 
+    React.useEffect(() => {
+        firebaseAuth.languageCode = language;
+    }, [language])
+
     const firebaseContext = React.useRef({
         auth: firebaseAuth,
         //getAppCheckToken,
@@ -80,6 +91,18 @@ const FirebaseProvider = ({children}) => {
         },
         sendEmailVerification: () => {
             return sendEmailVerification(firebaseAuth.currentUser);
+        },
+        sendPasswordResetEmail: (email) => {
+            return sendPasswordResetEmail(firebaseAuth, email);
+        },
+        verifyPasswordResetCode: (actionCode) => {
+            return verifyPasswordResetCode(firebaseAuth, actionCode);
+        },
+        confirmPasswordReset: (actionCode, newPassword) => {
+            return confirmPasswordReset(firebaseAuth, actionCode, newPassword);
+        },
+        applyActionCode: (actionCode) => {
+            return applyActionCode(firebaseAuth, actionCode);
         },
         deleteUser: () => {
             return deleteUser(firebaseAuth.currentUser);

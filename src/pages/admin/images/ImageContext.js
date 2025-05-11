@@ -1,6 +1,5 @@
 import React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { unstable_batchedUpdates } from 'react-dom';
 import { buildLoadingState, withLoading } from 'components/hoc';
 import { getFileNameFromFullPath, getThumbnailsFromImageName } from 'utils';
 import { useFirebaseContext } from 'components/firebase';
@@ -255,14 +254,12 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
 
     React.useLayoutEffect(() => {
         const pathParameter = getQueryParameter("path") || "";
-        unstable_batchedUpdates(() => {
-            initialFetchCompleted.current = false;
-            destinationPath.current = extractDestinationPath(pathParameter);
-            setRows({});
-            setThumbs(null);
-            setStorageRef(firebaseContext.storageRef(pathParameter));
-            setSelectedItems(new Set());
-        });
+        initialFetchCompleted.current = false;
+        destinationPath.current = extractDestinationPath(pathParameter);
+        setRows({});
+        setThumbs(null);
+        setStorageRef(firebaseContext.storageRef(pathParameter));
+        setSelectedItems(new Set());
     }, [getQueryParameter, firebaseContext]);
 
     const onSelectAllClick = React.useCallback((event) => {

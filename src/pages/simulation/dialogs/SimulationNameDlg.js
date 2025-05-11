@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import {unstable_batchedUpdates} from 'react-dom'
 import {isMobile} from 'react-device-detect';
 
 import Button from '@mui/material/Button';
@@ -27,27 +26,23 @@ export default function SimulationNameDialog({ open, action = "save", validation
     }, [action]);
 
     const onNameChanged = useCallback((event) => {
-        unstable_batchedUpdates(() => {
-            const newName = event.target.value;
-            if (!validation(newName, actionName)) {
-                setHasError(true);
-                setOkDisabled(true);
-            } else {
-                setHasError(false);
-                setOkDisabled(false);
-            }
-            setName(newName);
-        });
+        const newName = event.target.value;
+        if (!validation(newName, actionName)) {
+            setHasError(true);
+            setOkDisabled(true);
+        } else {
+            setHasError(false);
+            setOkDisabled(false);
+        }
+        setName(newName);
     }, [actionName, validation]);
 
     const handleClose = () => {
-        unstable_batchedUpdates(() => {
-            setName("");
-            setHasError(false);
-            setOkDisabled(true);
-            setIsOpen(false);
-            onOpenChanged(false);
-        });
+        setName("");
+        setHasError(false);
+        setOkDisabled(true);
+        setIsOpen(false);
+        onOpenChanged(false);
     };
 
     const handleValidate = () => {

@@ -9,7 +9,7 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
     const queryContext = useQueryContext();
     const subGalleryAddMutation = queryContext.useAddSubGallery();
     const subGalleryUpdateMutation = queryContext.useUpdateSubGallery();
-    const [ fields, setFields ] = React.useState([]);
+    const [ fields, setFields ] = React.useState(null);
 
     const [values, setValues] = React.useState(null);
 

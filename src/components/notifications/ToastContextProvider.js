@@ -13,6 +13,15 @@ export const ToastContext = React.createContext({
 
 const id = (toast) => toast.__id;
 
+const _timeout = 10000;
+
+const withTimeout = (addToast, removeToast) => (toast) => {
+    const toastObj = addToast(toast);
+    let appliedTimeout = toast.timeout ?? _timeout
+    if (appliedTimeout > 0)
+        setTimeout(() => removeToast(toastObj), appliedTimeout)
+};
+
 const ToastContextProvider = ({children}) => {
     const [toasts, setToasts] = useState([]);
 
@@ -31,10 +40,10 @@ const ToastContextProvider = ({children}) => {
     }, []);
 
     const toast = React.useRef({
-        error: (msg) => addToast({message: msg, type: 'error'}),
-        success: (msg) => addToast({message: msg, type: 'success'}),
-        warning: (msg) => addToast({message: msg, type: 'warning'}),
-        info: (msg) => addToast({message: msg, type: 'info'})
+        error: withTimeout((msg) => addToast({message: msg, type: 'error'}), removeToast),
+        success: withTimeout((msg) => addToast({message: msg, type: 'success'}), removeToast),
+        warning: withTimeout((msg) => addToast({message: msg, type: 'warning'}), removeToast),
+        info: withTimeout((msg) => addToast({message: msg, type: 'info'}), removeToast)
     });
 
     const contextValue = {

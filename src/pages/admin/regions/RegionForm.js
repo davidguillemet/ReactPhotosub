@@ -5,7 +5,7 @@ import { useQueryContext } from 'components/queryContext';
 import Form, {
     FIELD_TYPE_TEXT,
     FIELD_TYPE_SELECT
-} from 'components/form/Form';
+} from 'components/form';
 import { alpha } from '@mui/material/styles';
 
 const RegionItem = ({option}) => {
@@ -36,7 +36,7 @@ const RegionItem = ({option}) => {
 const RegionForm = ({region, regions, onChange, onCancel, onNewRegion}) => {
 
     const queryContext = useQueryContext();
-    const [regionFields, setRegionFields] = React.useState([]);
+    const [regionFields, setRegionFields] = React.useState(null);
 
     const addRegionMutation = queryContext.useAddRegion();
     const updateRegionMutation = queryContext.useUpdateRegion();

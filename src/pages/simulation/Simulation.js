@@ -20,8 +20,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import Alert from '@mui/material/Alert';
 
-import {unstable_batchedUpdates} from 'react-dom';
-
 import BorderInput from './BorderInput';
 import { VerticalSpacing, HorizontalSpacing } from '../../template/spacing';
 import ImageSlider from '../../components/imageSlider';
@@ -206,12 +204,10 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
             }
         }
 
-        unstable_batchedUpdates(() => {
-            setCurrentInteriorIndex(interiorIndex);
-            if (initBackground) {
-                dispatch(setBackground(interiors[interiorIndex].src, simulationIndex));
-            }
-        });
+        setCurrentInteriorIndex(interiorIndex);
+        if (initBackground) {
+            dispatch(setBackground(interiors[interiorIndex].src, simulationIndex));
+        }
     }, [simulation, simulationIndex, interiors, dispatch])
 
     const handleBorderWidthChange = useCallback((newBorderWidth) => {
@@ -234,10 +230,8 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
     }, [])
 
     const onInteriorClick = useCallback((interiorIndex) => {
-        unstable_batchedUpdates(() => {
-            setCurrentInteriorIndex(interiorIndex);
-            dispatch(setBackground(interiors[interiorIndex].src, simulationIndex));
-        });
+        setCurrentInteriorIndex(interiorIndex);
+        dispatch(setBackground(interiors[interiorIndex].src, simulationIndex));
     }, [interiors, dispatch, simulationIndex]);
 
     const onSelectImage = useCallback((index) => {
@@ -274,20 +268,16 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         if (newListType === null) {
             return;
         }
-        unstable_batchedUpdates(() => {
-            if (newListType !== LIST_SEARCH)
-            {
-                setSearchResult(getInitialSearchResult());
-            }
-            setListType(newListType);
-        });
+        if (newListType !== LIST_SEARCH)
+        {
+            setSearchResult(getInitialSearchResult());
+        }
+        setListType(newListType);
     }
 
     const handleSearchResult = useCallback((searchResults) => {
-        unstable_batchedUpdates(() => {
-            setSearchImages(searchResults.images)
-            setSearchResult(searchResults);
-        });
+        setSearchImages(searchResults.images)
+        setSearchResult(searchResults);
     }, [setSearchImages]);
 
     const handleNextSearchPage = useCallback(() => {

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Helmet } from "react-helmet-async";
 import { useLocation } from "react-router-dom";
-import { getThumbnailSrc, formatDate, useLanguage, destinationTitle } from 'utils';
+import { getThumbnailSrc, formatDate, useLanguage, useTranslation, destinationTitle } from 'utils';
 
 const _pageNamePlaceHolder = '{title}';
 const _descriptionTemplate = `${_pageNamePlaceHolder} | David Guillemet - Underwater Photography`;
@@ -23,7 +23,8 @@ const buildDescription = (description, title) => {
 }
 
 export const HelmetFull = ({ route }) => {
-    const pageName = route.label;
+    const t = useTranslation("menu");
+    const pageName = route.label !== null ? t(route.label) : null;
     const description = route.description;
     return (
         <React.Fragment>
