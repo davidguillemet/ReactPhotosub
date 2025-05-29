@@ -144,7 +144,8 @@ const SignedInButton = ({handleLogout}) => {
                         <ClickAwayListener onClickAway={handleClose}>
                             <MenuList autoFocusItem={menuOpen} id="menu-list-grow" onKeyDown={handleListKeyDown}>
                                 {
-                                    routes.filter(route => route.private).map((route, index) => {
+                                    routes.filter(route => route.private && (!route.admin || authContext.admin))
+                                    .map((route, index) => {
                                         return (
                                             <NavigationLink key={index} to={route.path}>
                                                 <MenuItem onClick={handleClose}>

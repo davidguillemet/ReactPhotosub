@@ -130,6 +130,7 @@ export const routes = [
         component: Admin,
         icon: <AdminPanelSettingsIcon fontSize="small" />,
         private: true,
+        admin: true,
         fullWidth: false
     },
     // Sub-pages, not directly accessible (for Router Switch) (private and sidebar are undefined)
