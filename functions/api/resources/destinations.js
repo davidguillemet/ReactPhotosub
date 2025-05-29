@@ -7,7 +7,7 @@ module.exports = function(app, config) {
     app.route("/destinations").get(config.checkAuthentication, fetchAllDestinations);
 
     app.route("/destinations/related")
-        // Add checkAuthentication middleware
+        // Add checkAuthentication middleware in case the destination is not published
         .get(config.checkAuthentication, function(req, res, next) {
             const region = req.query.region;
             // If only one region, region parameter is not an array...

@@ -1,6 +1,5 @@
 import React from 'react';
 import { initializeApp } from "firebase/app"
-// import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "firebase/app-check";
 import {
     applyActionCode,
     getAuth,
@@ -28,8 +27,6 @@ import { getAnalytics, logEvent } from "firebase/analytics";
 import FirebaseContext from './firebaseContext';
 import { useLanguage } from 'utils';
 
-// import { useToast } from '../notifications';
-
 const firebaseApp = initializeApp({
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
     authDomain: "photosub.firebaseapp.com",
@@ -41,14 +38,6 @@ const firebaseApp = initializeApp({
 });
 
 const isDev = process.env.NODE_ENV === "development";
-// if (isDev) {
-//     window.self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-// }
-
-// const appCheck = initializeAppCheck(firebaseApp, {
-//     provider: new ReCaptchaV3Provider(process.env.REACT_APP_RECAPTCHA_V3_SITE_KEY),
-//     isTokenAutoRefreshEnabled: true
-// });
 
 const firebaseAuth = getAuth(firebaseApp);
 const firebaseStorage = getStorage(firebaseApp);
@@ -64,17 +53,6 @@ const _ghostFileName = ".ghost";
 
 const FirebaseProvider = ({children}) => {
     const { language } = useLanguage();
-    // const { toast } = useToast();
-
-    // const getAppCheckToken = React.useCallback(async () => {
-    //     try {
-    //         const appCheckTokenResponse = await getToken(appCheck, /* forceRefresh= */ false);
-    //         return appCheckTokenResponse.token;
-    //     } catch (err) {
-    //         toast.error(err.message);
-    //         return "";
-    //     }
-    // }, [toast]);
 
     React.useEffect(() => {
         firebaseAuth.languageCode = language;

@@ -1,5 +1,4 @@
 const sharp = require("sharp");
-const imageSize = require("buffer-image-size");
 const path = require("path");
 const {unlink} = require("fs/promises");
 const os = require("os");
@@ -29,8 +28,6 @@ const _sizes = [
         width: 1200,
     },
 ];
-
-exports.thumbnailSizes = _sizes;
 
 function createThumbnail(fileContent, bucket, width, tempResizedFilePath, resizedFilePathInBucket) {
     const resizeOptions = {
@@ -101,15 +98,4 @@ exports.createThumbnails = function(bucket, file, fileContent, thumbsFolder) {
 
 exports.deleteThumbnails = function(bucket, file, thumbsFolder) {
     return processThumbnails(ACTION_DELETE, bucket, file, thumbsFolder);
-};
-
-exports.addSizeRatio = function(bucket, file, filecontent) {
-    const dimensions = imageSize(filecontent);
-
-    const bucketFile = bucket.file(file.name);
-    return bucketFile.setMetadata({
-        metadata: {
-            sizeRatio: dimensions.width / dimensions.height,
-        },
-    });
 };

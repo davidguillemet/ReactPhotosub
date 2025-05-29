@@ -22,18 +22,19 @@ import { CircularProgress } from '@mui/material';
 import { Paragraph } from 'template/pageTypography';
 import { FOLDER_TYPE } from './common';
 import ImageErrors from './globalErrors/ImageErrors';
-import { useTranslation } from 'utils';
+import { useTranslation, useImageKit } from 'utils';
 import ItemFilter from './ItemFilter';
 import { Fab } from "@mui/material";
 import CollectionsOutlinedIcon from '@mui/icons-material/CollectionsOutlined';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 
-const columns = [
-  { id: 'name', label: 'Name' },
-  { id: 'thumbStatus', label: 'Thumbnail Status' }, // Ok if all thumbnails have been created
-  { id: 'dbStatus', label: 'Database Status' },     // Ok if the image exists in database
-  { id: 'tags', label: '...' }                     // Ok if the tags column is not null
-];
+const columns = []
+columns.push({ id: 'name', label: 'Name' });
+if (!useImageKit) {
+    columns.push({ id: 'thumbStatus', label: 'Thumbnail Status' }); // Ok if all thumbnails have been created
+}
+columns.push({ id: 'dbStatus', label: 'Database Status' });         // Ok if the image exists in database
+columns.push({ id: 'tags', label: '...' });                         // Ok if the tags column is not null
 
 const Div = styled('div')(() => {});
 
@@ -100,9 +101,6 @@ const Images = () => {
                                 indeterminate={imageContext.manySelected}
                                 checked={imageContext.allSelected}
                                 onChange={imageContext.onSelectAll}
-                                inputProps={{
-                                    'aria-label': 'select all items',
-                                }}
                             />
                         </TableCell>
                         {

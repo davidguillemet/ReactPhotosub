@@ -1,3 +1,5 @@
+import { useImageKit } from "utils";
+
 export const ITEM_TYPE_FILE = 'item::file';
 export const ITEM_TYPE_FOLDER = 'item::folder';
 
@@ -30,6 +32,9 @@ const _foldersWithUpload = [
 ];
 
 export const requireThumbnails = (folderType) => {
+    if (useImageKit) {
+        return false;
+    }
     return _foldersWithThumbnails.includes(folderType);
 }
 

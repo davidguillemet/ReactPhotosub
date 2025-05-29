@@ -3,6 +3,7 @@ import { TableRow, TableCell, Checkbox, Chip } from "@mui/material";
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import FileUpload from 'components/upload';
 import { useUploadContext } from "./UploadContext";
+import { useImageKit } from 'utils';
 
 const UploadStorageItemRow = ({file}) => {
 
@@ -13,6 +14,13 @@ const UploadStorageItemRow = ({file}) => {
         const postProcessUploadedFile = uploadContext.postProcessUploadedFile;
         postProcessUploadedFile(file.fullPath);
     }, [file, uploadContext.postProcessUploadedFile]);
+
+    const onFileUploadError = React.useCallback((_fileFullPath, error) => {
+        const onUploadFileError = uploadContext.onUploadFileError;
+        onUploadFileError(file.fullPath, error);
+    }, [file, uploadContext.onUploadFileError]);
+
+    const uploadColspan = useImageKit ? 2 /* No thumbnails */: 3;
 
     return (
         <TableRow
@@ -33,12 +41,14 @@ const UploadStorageItemRow = ({file}) => {
             >
                 <Chip icon={<InsertPhotoIcon />} label={file.name} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
             </TableCell>
-            <TableCell colSpan={3} align="left" sx={{paddingTop: 0, paddingBottom: 0}} >
+            <TableCell colSpan={uploadColspan} align="left" sx={{paddingTop: 0, paddingBottom: 0}} >
                 <FileUpload
                     file={file.nativeFile}
                     fileFullPath={file.fullPath}
+                    folderPath={file.folderPath}
                     start={uploadContext.canStartUpload(file.fullPath)}
                     onFileUploaded={onFileUploaded}
+                    onFileUploadError={onFileUploadError}
                 />
             </TableCell>
         </TableRow>

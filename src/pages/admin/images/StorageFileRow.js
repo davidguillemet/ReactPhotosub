@@ -13,6 +13,7 @@ import DataBasePropStatus from './itemStatus/DataBasePropStatus';
 import { useImageContext } from './ImageContext';
 import { containsImage } from './common';
 import ImagePreview from './preview/ImagePreview';
+import { useImageKit } from 'utils';
 
 const FileDetails = ({image, file, expanded}) => {
     const imageContext = useImageContext();
@@ -21,9 +22,11 @@ const FileDetails = ({image, file, expanded}) => {
         return null;
     }
 
+    const colspan = useImageKit ? 4 /* No thumbnails */ : 5;
+
     return (
         <TableRow>
-            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
+            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={colspan}>
                 <Collapse in={expanded} timeout="auto" unmountOnExit>
                     <ImagePreview image={image} file={file} />
                 </Collapse>
@@ -37,7 +40,7 @@ const StorageFileRow = ({row, selected}) => {
     const imageContext = useImageContext();
 
     const [ dbStatus, setDbStatus ] = React.useState("default");
-    const [ thumbStatus, setThumbStatus ] = React.useState("default");
+    const [ thumbStatus, setThumbStatus ] = React.useState(useImageKit ? "success" : "default");
     const [ dbPropStatus, setDbPropStatus ] = React.useState("default");
     const [ itemStatus, setItemStatus ] = React.useState("default")
 
@@ -90,9 +93,12 @@ const StorageFileRow = ({row, selected}) => {
                     </IconButton>
                 }
             </TableCell>
-            <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
-                <ThumbnailStatus row={row} onSetStatus={setThumbStatus} />
-            </TableCell>
+            {
+                !useImageKit &&
+                <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
+                    <ThumbnailStatus row={row} onSetStatus={setThumbStatus} />
+                </TableCell>
+            }
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
                 <DatabaseStatus row={row} onSetStatus={setDbStatus} />
             </TableCell>

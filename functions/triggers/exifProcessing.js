@@ -1,8 +1,7 @@
 const exifr = require("exifr");
 const imageSize = require("buffer-image-size");
-const axios = require("axios");
 const {parse} = require("path");
-const {apiBaseUrl, logger} = require("./config");
+const {logger} = require("./config");
 
 const generateTagsFromDescription = (imageTitle, imageDescription) => {
     let imageCaption = null;
@@ -78,20 +77,6 @@ exports.extractExif = async function(file, fileContent) {
     };
 
     return newImageItem;
-};
-
-exports.insertNewImage = async function(file, fileContent) {
-    const newImageItem = await module.exports.extractExif(file, fileContent);
-
-    // Send post request api-photosub/image to insert a new image item
-    // Axios post request is blocked when return axios.post(...) !!??
-    axios.post(apiBaseUrl + "/api/images", newImageItem)
-        .then(() => {
-            logger.info(`${file.name} has been inserted.`);
-        })
-        .catch((error) => {
-            logger.error(`Failed to insert new image ${file.name}.`, error);
-        });
 };
 
 function getObjectProperty(object, propertyName, defaultValue) {

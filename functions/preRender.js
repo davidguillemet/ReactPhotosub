@@ -5,7 +5,7 @@ const preRender = require("prerender-node");
 const fs = require("fs");
 
 if (process.env.FUNCTIONS_EMULATOR === "true") {
-    preRender.set("prerenderServiceUrl", "http://localhost:3000/");
+    preRender.set("prerenderServiceUrl", "http://localhost:3001/");
 } else {
     preRender.set("prerenderToken", process.env.PRERENDER_TOKEN);
 }
@@ -16,7 +16,9 @@ preRenderApp.use(preRender);
 const _pageNamePlaceHolder = "{title}";
 const _descriptionTemplate = `${_pageNamePlaceHolder} | David Guillemet - Underwater Photography`;
 const _shortTitleTemplate = `${_pageNamePlaceHolder} | David Guillemet`;
-const _defaultImage = process.env.OPEN_GRAPH_DEFAULT_IMAGE;
+const _defaultImagePath = process.env.OPEN_GRAPH_DEFAULT_IMAGE;
+const _imageKitEmulator = process.env.FUNCTIONS_EMULATOR === "true" ? "/emulator" : "";
+const _imageKitEndpoint = `https://ik.imagekit.io/lmpvkcer3${_imageKitEmulator}`;
 
 const _destinationRegexp = /\/destinations\/(?<year>[0-9]{4})\/(?<location>[a-z]+)/;
 const _imageNameRegexp = /^(?<baseUrl>.+)\/(?<name>[^./]+)\.jpg$/;
@@ -29,16 +31,21 @@ const getDestinationProperties = async (year, title, pool) => {
     return null;
 };
 
-const toMediumThumbnail = (imageName) => {
-    const match = imageName.match(_imageNameRegexp);
-    const imageNameWithoutExt = match.groups["name"];
-    const baseUrl = match.groups["baseUrl"];
-    const thumbSrc = `${baseUrl}/thumbs/${imageNameWithoutExt}_m.jpg`;
-    return thumbSrc;
+const toMediumThumbnailUrl = (imagePath, firebaseConfig) => {
+    if (process.env.USE_IMAGEKIT === "true") {
+        return `${_imageKitEndpoint}/tr:n-medium/${imagePath}`;
+    } else {
+        const imageFullUrl = firebaseConfig.convertPathToUrl(imagePath);
+        const match = imageFullUrl.match(_imageNameRegexp);
+        const imageNameWithoutExt = match.groups["name"];
+        const baseUrl = match.groups["baseUrl"];
+        const thumbSrc = `${baseUrl}/thumbs/${imageNameWithoutExt}_m.jpg`;
+        return thumbSrc;
+    }
 };
 
 const getPageProperties = async (req, pool, firebaseConfig) => {
-    let image = _defaultImage;
+    let imagePath = _defaultImagePath;
     let pageName = "Home";
 
     const path = req.path;
@@ -56,7 +63,7 @@ const getPageProperties = async (req, pool, firebaseConfig) => {
             const destination = await getDestinationProperties(year, locationCode, pool);
             if (destination !== null) {
                 const locationName = destination.title_en || destination.title;
-                image = `${destination.path}/${destination.cover}`;
+                imagePath = `${destination.path}/${destination.cover}`;
                 pageName = `${locationName} - ${year}`;
             }
         }
@@ -74,21 +81,21 @@ const getPageProperties = async (req, pool, firebaseConfig) => {
 
     return {
         pageName,
-        image: toMediumThumbnail(firebaseConfig.convertPathToUrl(image)),
+        imageUrl: toMediumThumbnailUrl(imagePath, firebaseConfig),
     };
 };
 
 module.exports = function(pool, firebaseConfig) {
     preRenderApp.get("*", (req, res) => {
         return fs.readFile("./web/index.html", "utf8", async (err, htmlData) => {
-            const {pageName, image} = await getPageProperties(req, pool, firebaseConfig);
+            const {pageName, imageUrl} = await getPageProperties(req, pool, firebaseConfig);
             const title = _shortTitleTemplate.replace(_pageNamePlaceHolder, pageName);
             const description = _descriptionTemplate.replace(_pageNamePlaceHolder, pageName);
             htmlData = htmlData
                 .replace(/__HTML_TITLE__/g, title)
                 .replace(/__META_TITLE__/g, description)
                 .replace(/__META_DESCRIPTION__/g, description)
-                .replace(/__META_IMAGE__/g, image);
+                .replace(/__META_IMAGE__/g, imageUrl);
             return res.send(htmlData);
         });
     });

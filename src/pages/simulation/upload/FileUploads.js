@@ -16,7 +16,7 @@ import { useToast } from 'components/notifications';
 import './fileUploadStyles.css';
 import { useDataProvider } from 'components/dataProvider';
 import FileUpload from 'components/upload/FileUpload';
-import { useTranslation } from 'utils';
+import { useTranslation, useImageKit } from 'utils';
 
 const STEP_UPLOAD = "step::upload";
 const STEP_THUMBNAILS = "step::thumbnail";
@@ -113,20 +113,23 @@ const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUpload
         }
     }, [step, handleCancel, toast]);
 
-    const onFileUploadCompleted = React.useCallback(() => {
-        setStep({ name: STEP_THUMBNAILS, error: null });
-        dataProvider.createInteriorThumbnails(fileFullPath.current).then((fileProps) => {
-            const { sizeRatio } = fileProps;
+    const onFileUploadCompleted = React.useCallback((fileFullPath, sizeRatio) => {
+        if (useImageKit) {
             onFileUploaded(file.name, sizeRatio);
-        }).then(() => {
             setStep({ name: STEP_SUCCESS, error: null });
-        }).catch(error => {
-            setStep({ name: STEP_ERROR, error: error });
-        });
+        } else {
+            setStep({ name: STEP_THUMBNAILS, error: null });
+            dataProvider.createInteriorThumbnails(fileFullPath).then((fileProps) => {
+                onFileUploaded(file.name, sizeRatio);
+                setStep({ name: STEP_SUCCESS, error: null });
+            }).catch(error => {
+                setStep({ name: STEP_ERROR, error: error });
+            });
+        }
     }, [dataProvider, file, onFileUploaded]);
 
     return (
-        <Box ref={ref}>
+        <Box ref={ref} sx={{marginX: 2}}>
             <VerticalSpacing factor={1} />
             <Paper
                 style={{
@@ -149,7 +152,13 @@ const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUpload
                 <Box sx={{display: "flex", flexDirection: "row", flexGrow: 1}}>
                 {
                     step.name === STEP_UPLOAD ?
-                    <FileUpload file={file} fileFullPath={fileFullPath.current} start={true} onFileUploaded={onFileUploadCompleted} /> :
+                    <FileUpload
+                        file={file}
+                        folderPath={storageRef.fullPath}
+                        fileFullPath={fileFullPath.current}
+                        start={true}
+                        onFileUploaded={onFileUploadCompleted}
+                    /> :
                     step.name === STEP_THUMBNAILS ?
                     <ThumbnailGeneration /> :
                     step.name === STEP_ERROR ?

@@ -4,11 +4,11 @@ import Box from '@mui/material/Box';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 
-import { uniqueID, shuffleArray } from 'utils';
+import { uniqueID, shuffleArray, getThumbnailSrc, useImageKit } from 'utils';
 import { useQueryContext } from 'components/queryContext';
 import { useScrollBlock } from 'utils';
 import { useAppContext } from 'template/app/appContext';
-import { useFocusManager } from 'components/hooks';
+import { useFocusManager, useResizeObserver } from 'components/hooks';
 
 const _diaporamaInterval = 15000;
 const _transitionDuration = 2000;
@@ -22,14 +22,39 @@ const MainImageStyled = styled('img')({
     objectFit: 'cover' // prevent image from shrinking when window width is too small
 });
 
-const MainImage = ({images, currentImageIndex, handleImageLoaded}) => {
+const _imageSizeRatio = 600 / 400; // always landscape
 
-    let currentImageSrc = "/home_initial.jpg";
+const MainImage = ({images, currentImageIndex, handleImageLoaded, width, height}) => {
+
+    let defaultImageSrc = useImageKit ?
+        "photosub.appspot.com/home/DSC_0706-Modifier.jpg" :
+        "/home_initial.jpg";
+
+    // If the height is less than the image height which width is the available width, all is ok
+    // -> get the thumbnail with the same width as the available width
+    const availableWidth = width;
+    const availableHeight = height;
+
+    let thumbnailWidth = availableWidth;
+    const thumbnailHeight = thumbnailWidth / _imageSizeRatio;
+    if (thumbnailHeight < availableHeight) {
+        // Consider the image height and calculate the new thumbnail width
+        thumbnailWidth = availableHeight * _imageSizeRatio;
+    }
+
+    let originalImageSrc;
 
     if (images !== null && currentImageIndex >= 0) {
         const currentImage = images[currentImageIndex % images.length];
-        currentImageSrc = currentImage.src;
+        originalImageSrc = currentImage.src;
+    } else {
+        originalImageSrc = defaultImageSrc;
     }
+
+    const currentImageSrc = React.useMemo(() => getThumbnailSrc({
+        src: originalImageSrc,
+        sizeRatio: _imageSizeRatio
+    }, thumbnailWidth), [originalImageSrc, thumbnailWidth]);
 
     return (
         <MainImageStyled 
@@ -47,6 +72,8 @@ const Home = ({images, currentIndex}) => {
     const diaporamaTimeoutRef = useRef(null);
     const initialTimeoutRef = useRef(null);
     const { drawerOpen } = useAppContext();
+    const resizeObserver = useResizeObserver();
+    const boxRef = React.createRef(null);
 
     const { focus: onFocus } = useFocusManager();
 
@@ -125,9 +152,19 @@ const Home = ({images, currentIndex}) => {
         }
     }, [isPlaying, stopSlideshow, resumeSlideshow]);
 
-    const boxRef = React.createRef(null);
     return (
-        <React.Fragment>
+        <Box
+            ref={resizeObserver.ref}
+            sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                padding: 0,
+                overflow: 'hidden'
+            }}
+        >
             <TransitionGroup component={null}>
                 <CSSTransition
                     key={currentImageIndex}
@@ -154,11 +191,13 @@ const Home = ({images, currentIndex}) => {
                             images={images}
                             currentImageIndex={currentImageIndex}
                             handleImageLoaded={handleImageLoaded}
+                            width={resizeObserver.width}
+                            height={resizeObserver.height}
                         />
                     </Box>
                 </CSSTransition>
             </TransitionGroup>
-        </React.Fragment>
+        </Box>
     )
 };
 

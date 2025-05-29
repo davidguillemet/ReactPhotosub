@@ -35,9 +35,6 @@ export const UploadContextProvider = ({children}) => {
     const queryContext = useQueryContext();
     const imageContext = useImageContext();
     const [ filesToUpload, setFilesToUpload ] = React.useState([]);
-    const [ uploadingCursor, setUploadingCursor ] = React.useState(-1);
-    const fileIndices = React.useRef(null);
-    const lastCursor = React.useRef(-1);
     const [ processingStatus, setProcessingStatus ] = React.useState({
         dbProcessing: new Set(),
         thumbProcessing: new Set(),
@@ -48,27 +45,25 @@ export const UploadContextProvider = ({children}) => {
     })
 
     const setUploadSelection = React.useCallback((files) => {
-        fileIndices.current = new Map();
-        lastCursor.current = files.length - 1;
         const getItemFullPath = imageContext.getItemFullPath;
         const fileWrappers = files.map((file, index) => {
             const fullPath = getItemFullPath(file.name);
-            fileIndices.current.set(fullPath, index);
             const fileWrapper = {
                 name: file.name,
+                folderPath: imageContext.folderPath,
                 fullPath: fullPath,
                 size: file.size,
                 nativeFile: file
             };
             return fileWrapper;
         });
-        setUploadingCursor(Math.min(fileWrappers.length - 1, _maxParallelUpload - 1));
         setFilesToUpload(fileWrappers);
         const addStorageItems = imageContext.addStorageItems
         addStorageItems(fileWrappers, ITEM_TYPE_FILE);
     }, [
         imageContext.addStorageItems,
-        imageContext.getItemFullPath
+        imageContext.getItemFullPath,
+        imageContext.folderPath
     ]);
 
     const insertInDatabase = React.useCallback((fileFullPath) => {
@@ -155,37 +150,23 @@ export const UploadContextProvider = ({children}) => {
     ]);
 
     const postProcessUploadedFile = React.useCallback((fileFullPath) => {
-        setFilesToUpload(files => files.filter(f => f.fullPath !== fileFullPath));
         const thumbPromise = generateThumbnails(fileFullPath);
         const dataBasePromise = insertInDatabase(fileFullPath);
         Promise.all([thumbPromise, dataBasePromise]).then((results) => {
-            setUploadingCursor(cursor => cursor + 1);
+            setFilesToUpload(files => files.filter(f => f.fullPath !== fileFullPath));
         }); // catch is managed in generateThumbnails & insertInDatabase
     }, [generateThumbnails, insertInDatabase]);
 
-    const _onAllFilesProcessed = React.useCallback(() => {
-        // Clear upload state
-        setFilesToUpload(files => {
-            if (files.length > 0) {
-                throw new Error('Remaining files to upload while onAllFilesProcessed is called...');
-            }
-            return [];
-        });
-        setUploadingCursor(-1);
-        fileIndices.current = null;
-        lastCursor.current = -1;
-    }, [])
-
-    React.useEffect(() => {
-        if (uploadingCursor > lastCursor.current) {
-            _onAllFilesProcessed();
-        }
-    }, [uploadingCursor, _onAllFilesProcessed])
+    const onUploadFileError = React.useCallback((fileFullPath) => {
+        // Remove error files from the queue
+        // -> If we do that, the upload error is not displayed and the item is considered as uploaded...
+        // setFilesToUpload(files => files.filter(f => f.fullPath !== fileFullPath));
+    }, []);
 
     const canStartUpload = React.useCallback((fileFullPath) => {
-        const fileIndex = fileIndices.current.get(fileFullPath);
-        return (fileIndex <= uploadingCursor);
-    }, [uploadingCursor]);
+        const fileIndex = filesToUpload.findIndex(fileToUpload => fileToUpload.fullPath === fileFullPath);
+        return (fileIndex < _maxParallelUpload);
+    }, [filesToUpload]);
 
     const isUploading = React.useCallback((fullPath) => {
         return filesToUpload.some(fileToUpload => fileToUpload.fullPath === fullPath)
@@ -225,6 +206,7 @@ export const UploadContextProvider = ({children}) => {
         setUploadSelection,
         canStartUpload,
         postProcessUploadedFile,
+        onUploadFileError,
         generateThumbnails,
         insertInDatabase,
         isUploading,

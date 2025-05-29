@@ -5,6 +5,7 @@ import {
     getDbIndex
 } from './common';
 import qs from 'qs';
+import { HOME_IMAGE_FOLDER } from 'utils';
 
 function _addSimulationDbIndex(simulations) {
     simulations.forEach((simulation, index) => {
@@ -185,7 +186,7 @@ DataProvider.prototype.removeUploadedInterior = function(fileName) {
 }
 
 DataProvider.prototype.getImageDefaultSelection = function() {
-    return this._getBucketContent('homeslideshow');
+    return this._getBucketContent(HOME_IMAGE_FOLDER);
 }
 
 DataProvider.prototype._getBucketContent = function(folder) {
@@ -322,7 +323,7 @@ DataProvider.prototype.insertImageInDatabase = function(fullPath) {
         //     "path": "2026/essai1",
         //     "title": "",
         //     "description": "",
-        //     "tags": <string arrray>,
+        //     "tags": <string array>,
         //     "caption": null,
         //     "captionTags": null,
         //     "width": 1328,
@@ -352,7 +353,7 @@ DataProvider.prototype.refreshThumbnails = function(fullPath) {
     });
 }
 DataProvider.prototype.createInteriorThumbnails = function(fullPath) {
-    return this.axios.patch('/admin/interiors', {
+    return this.axios.patch('/interiors', {
         fullPath,
     }).then(response => {
         return response.data; // Contains the size ratio of the original interior
@@ -389,6 +390,19 @@ DataProvider.prototype.getUserByMail = function(email) {
 DataProvider.prototype.createUser = function(newUser) {
     return this.axios.post('/users/create', newUser)
     .then(response => response.data);
+}
+
+// Upload files
+DataProvider.prototype.uploadFile = function(file, folderPath, onUploadProgress) {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    formData.append('bucket', folderPath);
+    return this.axios.post('/bucket/file', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        onUploadProgress: onUploadProgress
+    }).then(response => response.data);
 }
 
 export default DataProvider;

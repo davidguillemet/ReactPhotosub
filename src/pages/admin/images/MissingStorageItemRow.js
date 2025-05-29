@@ -10,6 +10,7 @@ import { STATUS_ERROR, STATUS_NOT_AVAILABLE, STATUS_PENDING, StorageItemStatus }
 import { useImageContext } from './ImageContext';
 import { useUploadContext } from './upload/UploadContext';
 import DataBasePropStatus from './itemStatus/DataBasePropStatus';
+import { useImageKit } from 'utils';
 
 const ThumbIssueStatus = ({itemName, error}) => {
 
@@ -165,9 +166,12 @@ const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = fa
             >
                 <Chip color="error" icon={<InsertPhotoIcon />} label={itemName} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
             </TableCell>
-            <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
-                <ThumbIssueStatus itemName={itemName} error={thumbIssue} />
-            </TableCell>
+            {
+                !useImageKit && // No thumbnails
+                <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
+                    <ThumbIssueStatus itemName={itemName} error={thumbIssue} />
+                </TableCell>
+            }
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
                 <DatabaseIssueStatus itemName={itemName} type={type} error={dbIssue} />
             </TableCell>

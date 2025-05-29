@@ -1,10 +1,10 @@
 import React from 'react';
-import { useFirebaseContext } from 'components/firebase';
+import { useDataProvider } from 'components/dataProvider';
 import BorderLinearProgress from 'components/borderLinearProgress';
 
-const FileUpload = ({file, fileFullPath, start, onFileUploaded}) => {
+const FileUpload = ({file, folderPath, fileFullPath, start, onFileUploaded, onFileUploadError}) => {
 
-    const firebaseContext = useFirebaseContext();
+    const dataProvider = useDataProvider();
     const [progress, setProgress] = React.useState(0);
     const [error, setError] = React.useState(null);
 
@@ -14,37 +14,26 @@ const FileUpload = ({file, fileFullPath, start, onFileUploaded}) => {
     React.useEffect(() => {
         if (start === true)
         {
-            // launch firebase upload
-            // see documentation at https://firebase.google.com/docs/storage/web/upload-files
-            const fileStorageRef = firebaseContext.storageRef(fileFullPath);
-            const uploadTaskRef = firebaseContext.upload(fileStorageRef, file, { contentType: file.type });
-
-            const unsubscribe = uploadTaskRef.on('state_changed', 
-                (snapshot) => {
-                    // Observe state change events such as progress, pause, and resume
-                    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    setProgress(progress);
-                }, 
-                (error) => {
-                    // Handle unsuccessful uploads
-                    setError(error);
-                }, 
-                () => {
-                    // Handle successful uploads on complete
-                    // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-                    onFileUploaded(fileFullPath);
+            const onFileProgress = (progressEvent) => {
+                const { loaded, total } = progressEvent;
+                const progress = (loaded / total) * 100;
+                setProgress(progress);
+            };
+            dataProvider.uploadFile(file, folderPath, onFileProgress)
+            .then((data) => {
+                const fileInfo = data.find(info => info.file === file.name);
+                if (!fileInfo) {
+                    throw new Error(`Missing sizeRatio for ${file.name}`);
                 }
-            );
-
-            return () => {
-                unsubscribe();
-                if (uploadTaskRef.snapshot.state === 'running') {
-                    uploadTaskRef.cancel();
+                onFileUploaded(fileFullPath, fileInfo.sizeRatio);
+            }).catch((error) => {
+                setError(error)
+                if (onFileUploadError) {
+                    onFileUploadError(fileFullPath, error);
                 }
-            }
+            });
         }
-    }, [file, fileFullPath, start, firebaseContext, onFileUploaded]);
+    }, [dataProvider, file, fileFullPath, folderPath, start, onFileUploaded, onFileUploadError]);
 
     if (error) {
         return error.message

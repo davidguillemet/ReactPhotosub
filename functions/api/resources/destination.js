@@ -49,6 +49,7 @@ module.exports = function(app, config) {
 
     // Get a specific destination head from identifier, including region path
     app.route("/destination/:year/:title/head")
+        // Add checkAuthentication middleware in case the destination is not published
         .get(config.checkAuthentication, function(req, res, next) {
             res.locals.errorMessage = `Failed to load information for destination '${getDestinationPath(req)}'`;
             const isAdmin = config.isAdmin(res);

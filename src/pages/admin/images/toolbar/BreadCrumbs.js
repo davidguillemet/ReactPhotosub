@@ -69,7 +69,7 @@ const StorageBreadcrumbs = () => {
             {
                 refHierarchy.map((ref, index) => {
                     return (
-                        index < refHierarchy.length - 1 ? <Link underline="hover" key={ref.fullPath} id={ref.fullPath} onClick={handleClick} sx={{color: theme => theme.palette.primary.contrastText}}>{ref.name}</Link> :
+                        index < refHierarchy.length - 1 ? <Link underline="hover" key={ref.fullPath} id={ref.fullPath} onClick={handleClick} sx={{cursor: 'pointer', color: theme => theme.palette.primary.contrastText}}>{ref.name}</Link> :
                         editMode === true ? <TextField key={ref.fullPath} value={newFolderName} multiline={false} size="small" onChange={onFolderNameChange}/> :
                         <Box key={ref.fullPath} sx={{color: theme => theme.palette.primary.contrastText}}>{ref.name}</Box>
                     )

@@ -1,10 +1,17 @@
 import React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { buildLoadingState, withLoading } from 'components/hoc';
-import { getFileNameFromFullPath, getThumbnailsFromImageName } from 'utils';
+import {
+    extractDestinationPath,
+    getFileNameFromFullPath,
+    getThumbnailsFromImageName,
+    getImageNameFromThumbnail,
+    useImageKit,
+    useQueryParameter,
+    HOME_IMAGE_FOLDER
+} from 'utils';
 import { useFirebaseContext } from 'components/firebase';
 import { useQueryContext } from 'components/queryContext';
-import { getImageNameFromThumbnail, extractDestinationPath, useQueryParameter } from 'utils';
 import { useDataProvider } from 'components/dataProvider';
 import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER, FOLDER_TYPE} from './common';
 
@@ -63,6 +70,9 @@ const getMissingImagesVersusDatabase = (files, imagesFromDatabase) => {
 };
 
 const getMissingImagesVersusThumbnails = (files, thumbs) => {
+    if (useImageKit) {
+        return [];
+    }
     const imagesFromThumbs = new Set();
     // browse thumbs and check the original image exists
     for (const thumbName of thumbs) {
@@ -103,7 +113,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const dbImages = useDestinationImages(destinationPath.current);
 
     const setThumbsFromRef = React.useCallback(() => {
-        if (thumbsRef.current !== null && thumbsRef.current !== undefined) {
+        if (!useImageKit && thumbsRef.current !== null && thumbsRef.current !== undefined) {
             return firebaseContext.list(thumbsRef.current, { })
                 .then(result => {
                     // Not interested with prefixes in thumbs folder
@@ -332,6 +342,9 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     }, [dbImages]);
 
     const deleteThumbnails = React.useCallback((itemFullPath) => {
+        if (useImageKit) {
+            return Promise.resolve();
+        }
         const itemThumbnails = getThumbnailsFromImageName(itemFullPath);
         const thumbnailsToRemove = itemThumbnails.filter(thumbFullPath => thumbs.has(getFileNameFromFullPath(thumbFullPath)));
         const firebaseContext_deleteItems = firebaseContext.deleteItems;
@@ -364,7 +377,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
             return FOLDER_TYPE.root;
         } else if (destinationPath.current !== null) {
             return FOLDER_TYPE.destination;
-        } else if (storageRef.fullPath === "homeslideshow") {
+        } else if (storageRef.fullPath === HOME_IMAGE_FOLDER) {
             return FOLDER_TYPE.homeSlideshow;
         } else if (storageRef.fullPath.startsWith("legacy")) {
             return FOLDER_TYPE.legacy;

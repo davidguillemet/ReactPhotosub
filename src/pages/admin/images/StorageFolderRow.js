@@ -6,6 +6,7 @@ import TableCell from '@mui/material/TableCell';
 import RowSelector from './RowSelector';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { useImageContext } from './ImageContext';
+import { useImageKit } from 'utils';
 
 const StorageFolderRow = ({folder, selected}) => {
 
@@ -38,7 +39,10 @@ const StorageFolderRow = ({folder, selected}) => {
                     <Link component="button" onClick={handleOnRowClick}>{`${folder.name}/`}</Link>
                 </Box>
             </TableCell>
-            <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>{" - "}</TableCell>
+            { 
+                !useImageKit && // No thumbnails
+                <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>{" - "}</TableCell>
+            }
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>{" - "}</TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>{" - "}</TableCell>
         </TableRow>

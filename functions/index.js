@@ -10,7 +10,6 @@ const {pool} = require("./utils/pool-postgresql");
 
 const firebaseConfig = require("./utils/firebase");
 
-// const {newFile, deleteFile} = require("./triggers/storageTriggers");
 const {deleteUser} = require("./triggers/authenticationTriggers");
 const mainapi = require("./api/expressApi")(pool, firebaseConfig);
 const preRender = require("./preRender")(pool, firebaseConfig);
