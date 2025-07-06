@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation, useQueryParameter } from 'utils';
+import { useTranslation, useQueryParameter, useLanguage } from 'utils';
 import { Loading } from 'components/hoc';
 import { useFirebaseContext } from 'components/firebase';
 import { PageTitle, Paragraph } from 'template/pageTypography';
@@ -41,6 +41,7 @@ const AccountManagement = () => {
     const t = useTranslation("pages.accountManagement");
     const firebaseContext = useFirebaseContext();
     const getQueryParameter = useQueryParameter();
+    useLanguage(getQueryParameter("lang"));
 
     // Get the action to complete.
     const mode = getQueryParameter("mode");

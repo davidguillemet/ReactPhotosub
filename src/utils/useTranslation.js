@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useOverlay } from 'components/loading';
 import { useToast } from 'components/notifications';
 import { FullPageLoading } from 'components/loading';
-import { useQueryParameter } from './useQueryParameter';
 
 const TranslationContext = React.createContext(null);
 
@@ -42,7 +41,6 @@ const SUPPORTED_LANGUAGES = [LANGUAGE_FR, LANGUAGE_EN];
 
 export const TranslationProvider = ({children}) => {
 
-    const getQueryParameter = useQueryParameter();
     const { toast } = useToast();
     const [language, setLanguage] = useState(null);
     const resources = useRef(null);
@@ -77,9 +75,8 @@ export const TranslationProvider = ({children}) => {
     }, [setOverlay, toast]);
 
     useEffect(() => {
-        const languageParameter = getQueryParameter("lang");
-        loadLanguage(languageParameter || getNavigatorLanguage());
-    }, [loadLanguage, getQueryParameter]);
+        loadLanguage(getNavigatorLanguage());
+    }, [loadLanguage]);
 
     const getTranslation = useCallback(({resourceMap, fallbackMap}, id, args) => {
         let caption = null;
@@ -154,10 +151,16 @@ export function useTranslation(namespace) {
     return translator;
 }
 
-export function useLanguage() {
+export function useLanguage(lang = null) {
     const context = React.useContext(TranslationContext);
     if (context === undefined || context === null) {
         throw new Error("useTranslation must be used within a TranslationProvider");
+    }
+    if (lang !== null) {
+        const navigatorLanguage = getNavigatorLanguage();
+        if (lang !== navigatorLanguage) {
+            context.setLanguage(lang);
+        }
     }
     return context;
 }
