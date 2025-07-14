@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';    
 import Chip from "@mui/material/Chip";
 import Typography from '@mui/material/Typography';
-import { formatDate, getThumbnailSrc, useLanguage, regionTitle, destinationTitle } from 'utils';
+import { formatDate, useLanguage, regionTitle, destinationTitle } from 'utils';
 import DestinationLink from '../../components/destinationLink';
 import MasonryGallery from '../../components/masonryGallery';
 import { IconButton } from '@mui/material';
@@ -14,6 +14,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useAuthContext } from '../../components/authentication';
 import { PublicationIndicator } from 'components/publication';
 import useAdminActions from './UseAdminActions';
+import LazyImage from '../../components/lazyImage';
 
 const DestinationDetails = ({destination}) => {
     const { language } = useLanguage();
@@ -54,8 +55,12 @@ const DestinationDetails = ({destination}) => {
 
 const DestinationContent = ({item, index, width, params}) => {
 
-    const { language } = useLanguage();
     const destination = item;
+    const destinationImage = React.useMemo(() => ({
+        src: destination.cover,
+        description: destinationTitle(destination, "en") // force English for the cover image description
+    }), [destination]);
+
     const authContext = useAuthContext();
     const { onEdit, onDelete } = params;
 
@@ -64,13 +69,11 @@ const DestinationContent = ({item, index, width, params}) => {
     const onMouseEnter = () => {
         const selector = gsap.utils.selector(container);
         gsap.to(selector(".details"), { y: -30, ease: "bounce.out" });
-        gsap.to(selector(".image"), { scale: 1.1, ease: "bounce.out" });
     };
 
     const onMouseLeave = () => {
         const selector = gsap.utils.selector(container);
         gsap.to(selector(".details"), { y: 0, ease: "bounce.out" });
-        gsap.to(selector(".image"), { scale: 1, ease: "bounce.out" });
     };
 
     const onEditDestination = () => {
@@ -80,6 +83,12 @@ const DestinationContent = ({item, index, width, params}) => {
     const onDeleteDestination = () => {
         onDelete(destination);
     }
+
+    const onImageLoaded = React.useCallback(() => {
+        const selector = gsap.utils.selector(container);
+        gsap.to(selector(".details"), { opacity: 1, ease: "bounce.out" });
+        //gsap.to(selector(".imageLoader"), { opacity: 0, ease: "bounce.out" });
+    }, [container]);
 
     return (
         <Box
@@ -95,14 +104,12 @@ const DestinationContent = ({item, index, width, params}) => {
             onMouseLeave={isMobile ? null : onMouseLeave}
         >
             <DestinationLink destination={destination}>
-                <img
-                    className="image"
-                    src={getThumbnailSrc(destination.cover, width)}
-                    alt={destinationTitle(destination, language)}
-                    style={{
-                        height: '100%',
-                        width: '100%',
-                    }}
+                <LazyImage
+                    index={index}  
+                    image={destinationImage}
+                    width={width}
+                    renderOverlay={false}
+                    onImageLoaded={onImageLoaded}
                 />
                 <Box
                     sx={{
@@ -114,7 +121,8 @@ const DestinationContent = ({item, index, width, params}) => {
                         height: 'auto',
                         paddingBottom: '5px',
                         bottom: isMobile ? '0px' : '-30px',
-                        color: 'white'
+                        color: 'white',
+                        opacity: 0
                     }}
                     className="details"
                 >

@@ -54,6 +54,7 @@ const LazyImage = ({
     width,
     withOverlay = true,
     renderOverlay = null,
+    onImageLoaded = null,
     withFavorite = true,
     disabled = false
 }) => {
@@ -75,6 +76,9 @@ const LazyImage = ({
             // add class loaded and modify ref value to prevent one additional render
             event.target.classList.add('loaded');
             loaded.current = true;
+            if (onImageLoaded) {
+                onImageLoaded(index);
+            }
         }
     }
 
@@ -90,12 +94,12 @@ const LazyImage = ({
 
     const onMouseEnter = () => {
         gsap.to(selector(`#${imageOverlayId}`), { duration: 0.4, opacity: 1 });
-        gsap.to(selector(`#${imageId}`), { duration: 2.5, scale: 1.1, ease: "power4.out" });
+        gsap.to(selector(`#${imageId}`), { scale: 1.1, ease: "bounce.out" });
     };
 
     const onMouseLeave = () => {
         gsap.to(selector(`#${imageOverlayId}`), { duration: 0.4, opacity: 0 });
-        gsap.to(selector(`#${imageId}`), { duration: 2.5, scale: 1, ease: "power4.out"});
+        gsap.to(selector(`#${imageId}`), { scale: 1, ease: "bounce.out" });
     }
 
     return (
