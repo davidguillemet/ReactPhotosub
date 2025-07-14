@@ -128,7 +128,11 @@ function _getThumbSrc(image, thumbSpec) {
                 // Black Skipjack (Euthynnus lineatus) => Black-Skipjack_Euthynnus-lineatus
                 // captionItem.vernacular is an array
                 // captionItem.scientific is a string
-                const seoFriendlyFileName = `${captionItem.vernacular[0]}_${captionItem.scientific}`.replace(/ /g, '-');
+                let seoFriendlyFileName = captionItem.vernacular[0];
+                if (captionItem.scientific) {
+                    seoFriendlyFileName += `_${captionItem.scientific}`;
+                }
+                seoFriendlyFileName = seoFriendlyFileName.replace(/ /g, '-');
 
                 const dotPosition = imagePath.lastIndexOf(".");
                 const fileExtension = imagePath.substring(dotPosition + 1);
