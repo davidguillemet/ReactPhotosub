@@ -110,6 +110,7 @@ const DestinationContent = ({item, index, width, params}) => {
                     width={width}
                     renderOverlay={false}
                     onImageLoaded={onImageLoaded}
+                    withFavorite={false}
                 />
                 <Box
                     sx={{

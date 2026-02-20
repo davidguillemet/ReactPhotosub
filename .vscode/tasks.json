@@ -1,0 +1,35 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Firebase Emulators",
+			"type": "shell",
+			"command": "clear && firebase emulators:start --import ./firebase-snapshot --inspect-functions",
+			"args": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+			"isBackground": true
+		},
+		{
+			"label": "Build 4 Deploy",
+			"type": "shell",
+			"command": "npm run-script build4deploy",
+			"args": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+			"isBackground": true
+		},
+        {
+            "label": "Deploy to Firebase",
+            "type": "shell",
+            "command": "firebase deploy",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true
+        }
+	]
+}
