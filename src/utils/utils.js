@@ -178,13 +178,6 @@ export function closeFullscreen() {
     }
 }
 
-export const isPrerenderUserAgent = () => {
-    if (getUA.toLowerCase().indexOf('prerender') !== -1) {
-        return true;
-    }
-    return false;
-}
-
 export const getPropFromLanguage = (prop, language) => { 
     switch (language) {
         case 'fr':

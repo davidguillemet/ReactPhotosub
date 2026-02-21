@@ -3,6 +3,5 @@ export {
     HelmetTitle,
     HelmetDescription,
     HelmetImage,
-    HelmetDestination,
-    Helmet404
+    HelmetDestination
 } from './Helmet';

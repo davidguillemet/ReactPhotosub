@@ -1,17 +1,7 @@
-const {onRequest} = require("firebase-functions/v2/https");
-const {defineSecret} = require("firebase-functions/params");
 const express = require("express");
-const preRender = require("prerender-node");
 const fs = require("fs");
 
-if (process.env.FUNCTIONS_EMULATOR === "true") {
-    preRender.set("prerenderServiceUrl", "http://localhost:3001/");
-} else {
-    preRender.set("prerenderToken", process.env.PRERENDER_TOKEN);
-}
-
 const preRenderApp = express();
-preRenderApp.use(preRender);
 
 const _pageNamePlaceHolder = "{title}";
 const _descriptionTemplate = `${_pageNamePlaceHolder} | David Guillemet - Underwater Photography`;
@@ -100,10 +90,5 @@ module.exports = function(pool, firebaseConfig) {
         });
     });
 
-    const preRenderToken = defineSecret("PRERENDER_TOKEN");
-    const preRender = onRequest({secrets: [
-        preRenderToken,
-    ]}, preRenderApp);
-
-    return preRender;
+    return preRenderApp;
 };

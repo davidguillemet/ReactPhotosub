@@ -27,7 +27,6 @@
     "knex": "^0.21.18",
     "nodemailer": "^6.6.3",
     "pg": "^8.5.1",
-    "prerender-node": "^3.5.0",
     "sharp": "^0.32.4"
   },
   "devDependencies": {

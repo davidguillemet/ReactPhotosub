@@ -34,9 +34,4 @@ exports.mainapi = onRequest({secrets: [
     reCaptchaV3SecretKey,
 ]}, mainapi);
 
-const prerenderTokenSecretKey = defineSecret("PRERENDER_TOKEN");
-
-exports.preRender = onRequest({secrets: [
-    postgreSqlPassword,
-    prerenderTokenSecretKey,
-]}, preRender);
+exports.preRender = onRequest({secrets: [postgreSqlPassword]}, preRender);
