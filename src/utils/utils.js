@@ -1,4 +1,3 @@
-import {getUA} from 'react-device-detect';
 
 export const sortImagesDescending = (img1, img2) => {
     return img2.create > img1.create ? 1 : -1;
