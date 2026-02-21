@@ -288,6 +288,7 @@ const Search = React.forwardRef(({
             <NextPageComponent
                 onClick={handleNextPage}
                 count={searchResult.images.length}
+                totalCount={searchResult.totalCount}
                 loading={searchIsRunning}
             />
         }

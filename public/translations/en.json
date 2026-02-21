@@ -115,8 +115,7 @@
             "menuItem6": "Some videos"
         },
         "search": {
-            "title": "Search",
-            "button::nextResults": "Next Results"
+            "title": "Search"
         },
         "composition": {
             "title": "Composition",
@@ -218,6 +217,7 @@
             "nextResults": "Next results",
             "close": "Close",
             "resultsCount": "{0} Result(s)",
+            "resultsCountWithTotal": "{0} images / {1}",
             "noResults": "No result found for the search « {0} ». Check the spelling or use another search criteria.",
             "helpTitle": "Search for images"
         },

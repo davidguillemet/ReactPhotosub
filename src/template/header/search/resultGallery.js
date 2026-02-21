@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import Gallery from 'components/gallery';
-import NextPageButton from './nextPageButton';
+import NextPageButton from 'components/search/NextPageButton';
 
 const ResultGallery = React.forwardRef(({
     searchResult,
@@ -28,7 +28,12 @@ const ResultGallery = React.forwardRef(({
             />
             {
                 searchResult.hasNext &&
-                <NextPageButton onClick={handleNextSearchPage} loading={loadingNextPage} />
+                <NextPageButton
+                    onClick={handleNextSearchPage}
+                    loading={loadingNextPage}
+                    count={searchResult.images.length}
+                    totalCount={searchResult.totalCount}
+                />
             }
         </Box>
     );

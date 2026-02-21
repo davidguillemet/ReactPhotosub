@@ -1,27 +1,11 @@
 import React, { useEffect } from 'react';
-import LoadingButton from "@mui/lab/LoadingButton";
 
 import Gallery from 'components/gallery';
 import Search, { getSettingsFromQueryParameters } from 'components/search';
 import { PageTitle } from 'template/pageTypography';
 import { useTranslation } from 'utils';
 import { useQueryParameter } from 'utils';
-
-const NextPageButton = ({
-    onClick,
-    loading,
-    count       // The number of images currently displayed
-}) => {
-    const t = useTranslation("pages.search");
-    return (
-        <LoadingButton
-            loading={loading}
-            sx={{ mt: 3, width: "100%"}}
-            onClick={onClick}>
-                {t("button::nextResults")}
-        </LoadingButton>
-    );
-};
+import NextPageButton from 'components/search/NextPageButton';
 
 const SearchPage = () => {
 
