@@ -5,6 +5,7 @@ import { Button } from '@mui/material';
 import { useTranslation, useLanguage } from 'utils';
 import { useFormContext, FormContextProvider } from './FormContext';
 import { useDarkMode } from 'components/theme';
+import { useFormDialogContext } from 'dialogs/FormDialog';
 
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
@@ -143,11 +144,20 @@ const Form = ({
     endCustomComponent = null}) => {
 
     const formContext = useFormContext();
+    const [ isFormDialog ] = useFormDialogContext();
     const t = useTranslation("components.form");
 
     const fieldGroups = React.useMemo(() => getFieldGroups(formContext.fieldSpecs), [formContext.fieldSpecs]);
 
     const EndCustomComponent = endCustomComponent;
+
+    const handleCancelClick = React.useCallback(() => {
+        if (onCancel) {
+            onCancel();
+            const setIsDirty = formContext.setIsDirty;
+            setIsDirty(false); // Clear Dirty state on cancel
+        }
+    }, [onCancel, formContext.setIsDirty]);
 
     return (
         <React.Fragment>
@@ -182,7 +192,10 @@ const Form = ({
                     { startCustomComponent !== null &&  startCustomComponent }
                     {
                         onCancel !== null &&
-                        <Button onClick={onCancel}>
+                        <Button
+                            onClick={handleCancelClick}
+                            disabled={!isFormDialog && formContext.readOnly}
+                        >
                             {t("btn:cancel")}
                         </Button>
                     }

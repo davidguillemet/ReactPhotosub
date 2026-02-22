@@ -193,6 +193,7 @@ export const FormContextProvider = (props) => {
         hasError,
         sending,
         isDirty,
+        setIsDirty,
         isValid: checkValidity(),
         readOnly,
         fieldSpecs,

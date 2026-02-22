@@ -6,6 +6,22 @@ import {
 } from '@mui/material';
 import {isMobile} from 'react-device-detect';
 
+
+const FormDialogContext = React.createContext(null);
+
+const FormDialogContextProvider = ({children}) => {
+
+    const formDialogContext = React.useRef({
+        // Empty for now, but can be used in the future to pass form related data to the dialog content
+    });
+
+    return (
+        <FormDialogContext.Provider value={formDialogContext.current}>
+          { children }
+        </FormDialogContext.Provider>
+    )
+};
+
 const FormDialog = ({title, open, onClose, children, maxWidth = 'lg'}) => {
 
     const [isOpen, setIsOpen] = React.useState(open);
@@ -30,6 +46,7 @@ const FormDialog = ({title, open, onClose, children, maxWidth = 'lg'}) => {
             <DialogTitle id="form-dialog-title">{title}</DialogTitle>
 
             <DialogContent>
+                <FormDialogContextProvider>
                 {
                     // Inject onCancel property for each child
                     React.Children.map(children, child => {
@@ -39,10 +56,17 @@ const FormDialog = ({title, open, onClose, children, maxWidth = 'lg'}) => {
                         return child;
                     })
                 }
+                </FormDialogContextProvider>
             </DialogContent>
 
         </Dialog>
     )
+}
+
+export function useFormDialogContext() {
+    const context = React.useContext(FormDialogContext);
+    const hasContext = context !== undefined && context !== null;
+    return [hasContext, context];
 }
 
 export default function useFormDialog(onClose = null) {
