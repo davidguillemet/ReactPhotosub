@@ -19,7 +19,7 @@ const Unauthorized = ({admin}) => {
     );
 }
 
-const withUser = (Component, /* options */{ alert = true, admin = false }) => (props) => {
+const withUser = (Component, { alert = true, admin = false } = { alert: true, admin: false}) => (props) => {
 
     const authContext = useAuthContext();
 
