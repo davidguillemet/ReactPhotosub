@@ -63,7 +63,8 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
                 default: "",
-                multiLingual: true
+                multiLingual: true,
+                focus: true
             },
             {
                 id: "desc",

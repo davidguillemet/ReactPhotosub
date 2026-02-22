@@ -73,7 +73,8 @@ const RegionForm = ({region, regions, onChange, onCancel, onNewRegion}) => {
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
                 default: "",
-                multiLingual: true
+                multiLingual: true,
+                focus: true
             },
             {
                 id: "parent",

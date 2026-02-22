@@ -82,7 +82,8 @@ const LocationForm = ({location, locations, regions, onChange, onCancel, onNewLo
                 errorText: "Merci d'indiquer le titre du lieu.",
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
-                default: ""
+                default: "",
+                focus: true,
             },
             {
                 id: "region",
