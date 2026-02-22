@@ -30,7 +30,7 @@ const NextPageButton = ({
                 >
                     <Box sx={{
                             height: "100%",
-                            backgroundColor: "black",
+                            backgroundColor: theme => theme.palette.secondary.dark,
                             borderWidth: 0,
                             borderRadius: 3,
                             width: `${(count / totalCount) * 100}%`

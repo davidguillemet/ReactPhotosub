@@ -7,11 +7,11 @@ import MuiAppBar from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Slide from '@mui/material/Slide';
-import { useLocation } from "react-router-dom";
 import { FirebaseSignin } from 'components/firebase';
 import { useDarkMode } from 'components/theme';
 import HeaderSearch from './search/search';
 import { useAppContext } from 'template/app/appContext';
+import { useCurrentPage } from 'components/hooks';
 
 import { gsap } from "gsap";
 import { useGSAP } from '@gsap/react';
@@ -53,14 +53,12 @@ const TopToolBar = () => {
         threshold: 0
     });
     const { darkMode } = useDarkMode();
-    const location = useLocation();
+    const { isHomePage, isSearchPage } = useCurrentPage();
 
     const expandTimelineRef = React.useRef(null);
 
     const animationEase = "power1.inOut";
     const animationDuration = 0.4;
-    const isHomePage = location.pathname === '/';
-    const isSearchPage = location.pathname === '/search';
     const displayToolbarButtons = !searchExpanded || isSearchPage;
 
     useGSAP(() => {
@@ -107,17 +105,13 @@ const TopToolBar = () => {
             position="fixed"
             open={open}
             sx={{
-                borderBottomWidth: '1px',
+                borderBottomWidth: isHomePage === true ? 0 : '1px',
                 borderBottomStyle: 'solid',
-                borderBottomColor: 'divider',
+                borderBottomColor: theme => theme.palette.divider,
                 ...(
                     isHomePage ?  {
                         transition: 'background-color 500ms linear',
-                        backgroundColor: 'transparent',
-                        '&:hover': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                            transition: 'background-color 500ms linear'
-                        }
+                        backgroundColor: 'rgba(0,0,0,0.3)'
                     } :
                     darkMode === true ? { backgroundColor: 'rgba(0,0,0,0.9)'} :
                     { }
@@ -144,7 +138,11 @@ const TopToolBar = () => {
                                 transition: 'opacity 0.5s'
                             }}
                         >
-                            <MenuIcon sx={{ color: theme => theme.palette.text.primary }} />
+                            <MenuIcon
+                                sx={{
+                                    color: theme => isHomePage === true ? theme.palette.common.white : theme.palette.text.primary
+                                }}
+                            />
                         </IconButton>
                     </Box>
 

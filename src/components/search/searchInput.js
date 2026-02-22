@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { green, orange, red } from '@mui/material/colors';
 import { isMobile } from 'react-device-detect';
@@ -19,8 +19,11 @@ import { gsap } from "gsap";
 import { useGSAP } from '@gsap/react';
 
 import { useTranslation, debounce } from 'utils';
-import { useStateWithDep } from '../hooks';
+import { useStateWithDep, useCurrentPage } from '../hooks';
 import { useTheme } from '@mui/material/styles';
+
+
+gsap.registerPlugin(useGSAP);
 
 const SearchIconButton = styled(IconButton)(({theme}) => ({
     padding: 10,
@@ -28,6 +31,7 @@ const SearchIconButton = styled(IconButton)(({theme}) => ({
 }));
 
 const StatusIcon = ({searchIsRunning}) => {
+    const { isHomePage } = useCurrentPage();
     return (
         <Box sx={{
             display: 'flex',
@@ -41,7 +45,12 @@ const StatusIcon = ({searchIsRunning}) => {
             {
                 searchIsRunning === true ?
                 <CircularProgress size={20} sx={{ color: theme => theme.palette.text.primary }} /> :
-                <SearchIcon fontSize={isMobile ? "small" : "medium"} sx={{ color: theme => theme.palette.text.primary }} ></SearchIcon>
+                <SearchIcon
+                    fontSize={isMobile ? "small" : "medium"}
+                    sx={{
+                        color: theme => isHomePage === true ? theme.palette.common.white : theme.palette.text.primary
+                    }}
+                />
             }
         </Box>
     );
@@ -82,6 +91,7 @@ const SearchInput = ({
     const containerRef = React.useRef(null);
     const inputRef = React.useRef(null);
     const inputAdornmentRef = React.useRef(null);
+    const { isHomePage } = useCurrentPage();
 
     const onValueChange = React.useCallback((event) => {
         setValue(event.target.value);
@@ -115,6 +125,15 @@ const SearchInput = ({
     const animationDuration = 0.4;
     const expandTimelineRef = React.useRef(null);
 
+    useEffect(() => {
+        // If we navigated to the home page or leave it, clear the animation
+        // that depends from the isHomePage state
+        if (expandTimelineRef.current !== null) {
+            expandTimelineRef.current.kill();
+            expandTimelineRef.current = null;
+        }
+    }, [isHomePage]);
+
     useGSAP(() => {
         if (expanded) {
             if (expandTimelineRef.current === null) {
@@ -122,8 +141,8 @@ const SearchInput = ({
                     duration: animationDuration,
                     ease: animationEase,
                     width: `100%`,
-                    borderColor: theme.palette.divider,
-                    backgroundColor: theme.palette.primary.main,
+                    borderColor: isHomePage ? theme.palette.common.white : theme.palette.divider,
+                    backgroundColor: isHomePage ? 'rgb(0,0,0,0.3)' : theme.palette.background.default,
                     onStart: () => {
                         if (onExpandedChange) onExpandedChange(true);
                     }
@@ -151,8 +170,8 @@ const SearchInput = ({
             expandTimelineRef.current.reverse();
         }
     }, {
-        dependencies: [expanded],
-        scope: containerRef
+        dependencies: [expanded, isHomePage],
+        scope: containerRef,
     });
 
     React.useEffect(() => {
@@ -182,7 +201,7 @@ const SearchInput = ({
                 py: '2px',
                 px: '4px',
                 m: 0,
-                color: 'inherit',
+                color: isHomePage ? theme.palette.common.white :'inherit',
                 '&.withResults': {
                     borderBottomLeftRadius: 0,
                     borderBottomRightRadius: 0

@@ -15,6 +15,7 @@ import Paper from '@mui/material/Paper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import MenuList from '@mui/material/MenuList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useCurrentPage } from 'components/hooks';
 
 import { useAuthContext } from '../authentication';
 import { routes, NavigationLink, ROUTES_NAMESPACE } from '../../navigation/routes';
@@ -23,18 +24,23 @@ import { useTranslation } from '../../utils';
 import useFormDialog from 'dialogs/FormDialog';
 import AuthenticationForm from './authenticationForm';
 
-const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => (
-    <IconButton
-        onClick={onClick}
-        ref={ref}
-        sx={{
-            color: theme => theme.palette.text.primary
-        }}
-        size="large"
-    >
-        <AccountCircleOutlinedIcon />
-    </IconButton>
-))
+const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => {
+
+    const { isHomePage } = useCurrentPage();
+
+    return (
+        <IconButton
+            onClick={onClick}
+            ref={ref}
+            sx={{
+                color: theme => theme.palette.text.primary
+            }}
+            size="large"
+        >
+            <AccountCircleOutlinedIcon sx={{ color: theme => isHomePage === true ? theme.palette.common.white : theme.palette.text.primary }} />
+        </IconButton>
+    )
+});
 
 const NotSignedInButton = ({handleSignIn}) => {
 
@@ -63,6 +69,8 @@ const SignedInButton = ({handleLogout}) => {
     const [userDisplayName, setUserDisplayName] = React.useState(authContext.user.displayName);
     const [menuOpen, setMenuOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
+
+    const { isHomePage } = useCurrentPage();
 
     const onUserUpdated = useCallback(() => {
         setUserDisplayName(authContext.user.displayName);
@@ -108,9 +116,9 @@ const SignedInButton = ({handleLogout}) => {
                 deleteIcon={<MoreVertIcon />}
                 onDelete={handleToggle}
                 sx={{
-                    borderColor: theme => theme.palette.text.primary,
+                    borderColor: theme => isHomePage === true ? theme.palette.common.white : theme.palette.text.primary,
                     '& .MuiChip-avatar, & .MuiChip-deleteIcon, & .MuiChip-deleteIcon:hover, & .MuiChip-label': {
-                        color: theme => theme.palette.text.primary
+                        color: theme => isHomePage === true ? theme.palette.common.white : theme.palette.text.primary
                     }
                 }}
             />
