@@ -21,8 +21,7 @@ const NextPageButton = ({
                         flexGrow: 1,
                         height: 6,
                         backgroundColor: "grey.200",
-                        borderColor: "grey.200",
-                        borderStyle: "solid",
+                        borderWidth: 0,
                         borderRadius: 3,
                         width: "100%",
                         maxWidth: 300,
@@ -31,7 +30,9 @@ const NextPageButton = ({
                 >
                     <Box sx={{
                             height: "100%",
-                            backgroundColor: "grey.500",
+                            backgroundColor: "black",
+                            borderWidth: 0,
+                            borderRadius: 3,
                             width: `${(count / totalCount) * 100}%`
                         }}
                     />
