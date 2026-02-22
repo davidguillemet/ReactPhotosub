@@ -3,7 +3,6 @@ import {isMobile} from 'react-device-detect';
 
 import Button from '@mui/material/Button';
 import LoadingButton from '@mui/lab/LoadingButton';
-import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -11,9 +10,10 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useTranslation } from 'utils';
 import { VerticalSpacing } from 'template/spacing';
+import AutoFocusTextField from 'components/textField';
 
 // action = "save" or "rename"
-export default function SimulationNameDialog({ open, onOpenChanged, onValidate, action }) {
+export default function EnterPasswordDlg({ open, onOpenChanged, onValidate, action }) {
     const t = useTranslation("pages.profile");
     const [isOpen, setIsOpen] = useState(open);
     const [okDisabled, setOkDisabled] = useState(true);
@@ -68,10 +68,10 @@ export default function SimulationNameDialog({ open, onOpenChanged, onValidate, 
                 <DialogContent>
                     <DialogContentText>{dialogDetails.desc}</DialogContentText>
                     <VerticalSpacing factor={2} />
-                    <TextField
+                    <AutoFocusTextField
                         value={password}
-                        onChange={onPasswordChanged}
                         autoFocus
+                        onChange={onPasswordChanged}
                         variant="outlined"
                         margin="dense"
                         id="password"

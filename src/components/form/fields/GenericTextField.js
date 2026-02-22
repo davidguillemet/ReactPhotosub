@@ -1,10 +1,10 @@
 import React from 'react';
-import TextField from '@mui/material/TextField';
 import { FIELD_TYPE_NUMBER, FIELD_TYPE_PASSWORD, FIELD_TYPE_PASSWORD_CONFIRM } from '../FormContext';
 import { validateFieldValue } from './common';
 import { useFormContext } from '../FormContext';
 import InputAdornment from '@mui/material/InputAdornment';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
+import AutoFocusTextField from 'components/textField';
 
 const GenericTextFieldComp = ({
     fieldSpec,
@@ -32,7 +32,7 @@ const GenericTextFieldComp = ({
     const error = hasError !== undefined ? hasError : formContext.hasError(fieldSpec.id);
 
     return (
-        <TextField
+        <AutoFocusTextField
             key={field.id}
             id={field.id}
             label={group === true ? "" : field.label}

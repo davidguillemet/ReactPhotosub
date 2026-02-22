@@ -2,12 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import {isMobile} from 'react-device-detect';
 
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import AutoFocusTextField from 'components/textField';
 
 // action = "save" or "rename"
 export default function SimulationNameDialog({ open, action = "save", validation, onOpenChanged, onValidate }) {
@@ -88,7 +88,7 @@ export default function SimulationNameDialog({ open, action = "save", validation
                 <DialogTitle id="form-dialog-title">{dialogDetails.title}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>{dialogDetails.desc}</DialogContentText>
-                    <TextField
+                    <AutoFocusTextField
                         value={name}
                         onChange={onNameChanged}
                         autoFocus
