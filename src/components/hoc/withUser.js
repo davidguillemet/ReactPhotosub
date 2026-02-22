@@ -19,14 +19,14 @@ const Unauthorized = ({admin}) => {
     );
 }
 
-const withUser = (Component, options = { alert: true, admin: false }) => (props) => {
+const withUser = (Component, /* options */{ alert = true, admin = false }) => (props) => {
 
     const authContext = useAuthContext();
 
     return (
         authContext.user === undefined ? <Loading size={40} /> : // User not yet loaded
-        authContext.user !== null && (options.admin === false || authContext.admin === true) ? <Component {...props} /> :
-        options.alert === true ? <Unauthorized admin={options.admin}/> : // Connected user required (maybe admin)
+        authContext.user !== null && (admin === false || authContext.admin === true) ? <Component {...props} /> :
+        alert === true ? <Unauthorized admin={admin}/> : // Connected user required (maybe admin)
         null    // the component is just not displayed
     );
 }
