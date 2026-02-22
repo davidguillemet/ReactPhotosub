@@ -141,7 +141,7 @@ const SearchInput = ({
                     duration: animationDuration,
                     ease: animationEase,
                     width: `100%`,
-                    borderColor: isHomePage ? theme.palette.common.white : theme.palette.divider,
+                    borderColor: isHomePage ? theme.palette.grey[400] : theme.palette.divider,
                     backgroundColor: isHomePage ? 'rgb(0,0,0,0.3)' : theme.palette.background.default,
                     onStart: () => {
                         if (onExpandedChange) onExpandedChange(true);
