@@ -68,6 +68,7 @@ const ImageInfo = ({image, displayDestination, style, container, visible, displa
             id={imageInfoId}
             sx={{
                 ...style,
+                pointerEvents: 'none',
                 position: 'absolute',
                 width: '100%',
                 height: '100%',
@@ -89,7 +90,8 @@ const ImageInfo = ({image, displayDestination, style, container, visible, displa
                     display: 'flex',
                     justifyContent: 'center',
                     padding: 0,
-                    bgcolor: 'rgb(0,0,0,0.5)',
+                    bgcolor: 'rgb(0,0,0,0.9)',
+                    pointerEvents: 'auto',
                     position: 'absolute',
                     overflowY: 'auto',
                     bottom: 10,
@@ -108,7 +110,7 @@ const ImageInfo = ({image, displayDestination, style, container, visible, displa
             >
                 <IconButton
                     size='small'
-                    sx={{position: 'absolute', top: 0, right: 0, color: '#ffffff58'}}
+                    sx={{position: 'absolute', top: 0, right: 0, color: theme => theme.palette.grey[400]}}
                     onClick={onClose}
                 >
                     <HighlightOffIcon />
