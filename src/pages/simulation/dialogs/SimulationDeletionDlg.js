@@ -1,6 +1,7 @@
 import {isMobile} from 'react-device-detect';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
+import DeleteIcon from '@mui/icons-material/Delete';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
@@ -36,10 +37,10 @@ export default function SimulationDeletionDialog({ open, name, onOpenChanged, on
                     <DialogContentText>{t("dlg:confirm2", name)}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary" variant="outlined">
+                    <Button onClick={handleClose}>
                         {t("dlg:cancelDeletion")}
                     </Button>
-                    <Button onClick={handleValidate} color="primary" variant="outlined">
+                    <Button onClick={handleValidate} color="error" variant="contained" startIcon={<DeleteIcon />} >
                         {t("dlg:validateDeletion")}
                     </Button>
                 </DialogActions>

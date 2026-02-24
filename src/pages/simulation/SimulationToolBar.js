@@ -29,6 +29,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
     const t = useTranslation("pages.composition");
     const [action, setAction] = useState(NAME_DIALOG_ACTION_SAVE);
     const [nameDlgOpen, setNameDlgOpen] = useState(false);
+    const [nameDlgVersion, setNameDlgVersion] = useState(0); // Used to reset the dialog internal state when reopening it for a different simulation
     const [deletionDlgOpen, setDeletionDlgOpen] = useState(false);
 
     const simulation = useMemo(() => simulations[currentIndex], [simulations, currentIndex]);
@@ -50,6 +51,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
     const handleSave = () => {
         if (!simulationHasName(simulations[currentIndex])) {
             setAction(NAME_DIALOG_ACTION_SAVE);
+            setNameDlgVersion(version => version + 1);
             setNameDlgOpen(true);
         } else {
             onSave();
@@ -65,6 +67,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
     const handleAdd = () => {
         // Open dialog to enter a name
         setAction(NAME_DIALOG_ACTION_NEW);
+        setNameDlgVersion(version => version + 1);
         setNameDlgOpen(true);
     }
 
@@ -75,6 +78,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
     const onRenameCurrent = useCallback(() => {
         // Open dialog to enter a name
         setAction(NAME_DIALOG_ACTION_RENAME);
+        setNameDlgVersion(version => version + 1);
         setNameDlgOpen(true);
     }, []);
 
@@ -120,9 +124,11 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
             <SimulationNameDialog
                 open={nameDlgOpen}
                 action={action}
+                initialName={action === NAME_DIALOG_ACTION_RENAME ? simulation.name : undefined}
                 validation={validateSimulationName}
                 onOpenChanged={setNameDlgOpen}
                 onValidate={getDialogCallback(action)}
+                key={nameDlgVersion /* Reset internal state when version changes */}
             />
 
             <SimulationDeletionDialog

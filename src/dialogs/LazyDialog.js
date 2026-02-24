@@ -31,7 +31,7 @@ const LazyDialog = ({path, title, open, handleClose}) => {
             { open && <LazyContent path={path} /> }
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose} variant="outlined" size={ isMobile ? "small" : "large"}>{t("button::close")}</Button>
+                <Button onClick={handleClose} size={ isMobile ? "small" : "large"}>{t("button::close")}</Button>
             </DialogActions>
         </Dialog>
     )

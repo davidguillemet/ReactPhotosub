@@ -10,12 +10,12 @@ import DialogTitle from '@mui/material/DialogTitle';
 import AutoFocusTextField from 'components/textField';
 
 // action = "save" or "rename"
-export default function SimulationNameDialog({ open, action = "save", validation, onOpenChanged, onValidate }) {
+export default function SimulationNameDialog({ open, initialName, action = "save", validation, onOpenChanged, onValidate }) {
     const [isOpen, setIsOpen] = useState(open);
     const [actionName, setActionName] = useState(action);
     const [hasError, setHasError] = useState(false);
     const [okDisabled, setOkDisabled] = useState(true);
-    const [name, setName] = useState("");
+    const [name, setName] = useState(initialName || "");
 
     useEffect(() => {
         setIsOpen(open);
@@ -38,9 +38,6 @@ export default function SimulationNameDialog({ open, action = "save", validation
     }, [actionName, validation]);
 
     const handleClose = () => {
-        setName("");
-        setHasError(false);
-        setOkDisabled(true);
         setIsOpen(false);
         onOpenChanged(false);
     };
@@ -102,10 +99,10 @@ export default function SimulationNameDialog({ open, action = "save", validation
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary" variant="outlined">
+                    <Button onClick={handleClose}>
                         Annuler
                     </Button>
-                    <Button onClick={handleValidate} color="primary" disabled={okDisabled} variant="outlined">
+                    <Button onClick={handleValidate} disabled={okDisabled}>
                         Valider
                     </Button>
                 </DialogActions>
