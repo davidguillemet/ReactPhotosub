@@ -24,6 +24,13 @@ const GenericTextFieldComp = ({
         handleChange(fieldSpec, fieldValue);
     }, [fieldSpec, handleChange]);
 
+    const onBlur = React.useCallback((event) => {
+        // Remove autofocus
+        if (fieldSpec.field.focus) {
+            fieldSpec.field.focus = false;
+        }   
+    }, [fieldSpec]);
+
     const field = fieldSpec.field;
     const fieldType =
         field.type === FIELD_TYPE_PASSWORD_CONFIRM ? FIELD_TYPE_PASSWORD :
@@ -65,6 +72,7 @@ const GenericTextFieldComp = ({
             multiline={field.multiline}
             minRows={field.minRows || 10 }
             onChange={onChange}
+            onBlur={onBlur}
             error={error}
             helperText={error ? field.errorText : ''}
             disabled={formContext.sending || formContext.readOnly || field.readOnly}
