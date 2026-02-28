@@ -92,7 +92,8 @@
             "form:hasMacro": "Contient des images macro",
             "form:hasWideAngle": "Contient des images grand-angle",
             "form:published": "Published",
-            "validationMessage": "Les modifications ont été enregistrées avec succès."
+            "validationMessage": "Les modifications ont été enregistrées avec succès.",
+            "noDestinationsFound": "Aucune destination ne correspond aux filtres sélectionnés."
         },
         "favorites": {
             "title": "Ma Sélection",

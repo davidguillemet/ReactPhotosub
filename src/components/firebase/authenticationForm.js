@@ -306,7 +306,7 @@ const AuthenticationForm = ({onCancel}) => {
 
     return (
         <React.Fragment>
-            <Body sx={{mt: 0, mb: 2, "white-space": "pre-wrap"}}>{pageSubtitle}</Body>
+            <Body sx={{mt: 0, mb: 2, whiteSpace: "pre-wrap"}}>{pageSubtitle}</Body>
             <Form
                 fields={fields}
                 initialValues={step.data}

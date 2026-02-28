@@ -1,7 +1,7 @@
 import React, { useLayoutEffect } from 'react';
 import { Box } from '@mui/system';
 import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab'; 
+import Tab from '@mui/material/Tab';
 import { useTranslation, useQueryParameter } from 'utils';
 import { PageTitle } from 'template/pageTypography';
 import { VerticalSpacing } from 'template/spacing';

@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
+
+import Box from '@mui/material/Box';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
+
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab'; 
+import Fade from '@mui/material/Fade';
+
 import AppsIcon from '@mui/icons-material/Apps';
 import PublicIcon from '@mui/icons-material/Public';
 import { styled } from '@mui/material/styles';
@@ -12,6 +19,8 @@ import { PageTitle, Paragraph } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import { DestinationsMap } from '../../components/map';
 import RegionFilter from './RegionFilter';
+import KeyWordFilter from './KeyWordFilter';
+import DateFilter from './DateFilter';
 import { useQueryContext } from '../../components/queryContext';
 import DestinationGallery from './DestinationGallery';
 import { buildLoadingState, withLoading } from '../../components/hoc';
@@ -19,6 +28,7 @@ import { isMobile } from 'react-device-detect';
 
 import { useReactQuery } from '../../components/reactQuery';
 import { useTranslation } from '../../utils';
+import { Alert } from '@mui/material';
 
 const DestinationTabPanel = styled(TabPanel)(({ theme }) => ({
     '&.MuiTabPanel-root': {
@@ -33,6 +43,10 @@ const VIEW_MAP = 'map';
 const TYPE_MACRO = 'macro';
 const TYPE_WIDE_ANGLE = 'wide';
 const TYPE_ALL = 'all';
+
+const FILTER_REGION = 0;
+const FILTER_KEYWORD = 1;
+const FILTER_DATE = 2;
 
 const DisplayModeSelector = ({listType, onChange}) => {
 
@@ -78,7 +92,12 @@ const DestinationsComponent = withLoading(({destinations}) => {
     const [filteredDestinations, setFilteredDestinations] = useState(destinations);
     const [destinationType, setDestinationType] = useState(() => TYPE_ALL);
     const [destinationsView, setDestinationsView] = useState(VIEW_GRID);
+
     const [regionFilterSet, setRegionFilterSet] = useState(null);
+    const [keywordFilterSet, setKeywordFilterSet] = useState(null);
+    const [dateFilterSet, setDateFilterSet] = useState(null);
+
+    const [filterTab, setFilterTab] = useState(FILTER_REGION);
 
     useEffect(() => {
 
@@ -90,24 +109,62 @@ const DestinationsComponent = withLoading(({destinations}) => {
             return destinations.filter(destination => destination.regionpath.find(region => regionFilterSet.has(region.id)))
         }
 
-        const filterDestinationsByKeyword = (destinations) => {
-            return destinations;
-        }
-
         const filterDestinationsByType = (destinations) => {
             if (!destinations) return null;
             return destinations.filter(destination => destinationType === TYPE_ALL || destination[destinationType]);
         }
 
+        const filterDestinationsByKeyword = (destinations) => {
+            if (!keywordFilterSet || keywordFilterSet.size === 0) {
+                return destinations;
+            }
+            // {
+            //     title: "BASSE Californie",
+            //     title_en: "BAJA California",
+            //     regionpath: [
+            //         {
+            //              id: 21,
+            //              title: "Mexique",
+            //              title_en: "Mexico",
+            //              parent: 1,
+            //         },
+            //         {
+            //              id: 1,
+            //              title: "Pacifique Nord",
+            //              title_en: "North Pacific",
+            //              parent: null,
+            //         },
+            //     ],
+            //     ....
+            // }
+            return destinations.filter(destination => {
+                // Build a string that contains the title, title_en, and all title/title_en from the region path
+                const destinationString = `${destination.title} ${destination.title_en} ${destination.regionpath.map(region => `${region.title} ${region.title_en}`).join(' ')}`;
+                // Check if all keywords are included in this string
+                return Array.from(keywordFilterSet).every(keyword => destinationString.toLowerCase().includes(keyword.toLowerCase()));
+            });
+        }
+
+        const filterDestinationsByDate = (destinations) => {
+            if (!dateFilterSet || dateFilterSet.size === 0) {
+                return destinations;
+            }
+            return destinations.filter(destination => {
+                // destination.date = '2022-11-18T00:00:00.000Z'
+                return dateFilterSet.has(new Date(destination.date).getFullYear().toString());
+            });
+        }
+
         const filters = [
             filterDestinationsByRegion,
             filterDestinationsByKeyword,
-            filterDestinationsByType
+            filterDestinationsByType,
+            filterDestinationsByDate
         ];
 
         setFilteredDestinations(filters.reduce((currentDestinations, filter) => filter(currentDestinations), destinations));
 
-    }, [regionFilterSet, destinationType, destinations]);
+    }, [regionFilterSet, keywordFilterSet, dateFilterSet, destinationType, destinations]);
 
     const handleChangeDestinationTypes = (event, newType) => {
         if (newType !== null) {
@@ -122,17 +179,75 @@ const DestinationsComponent = withLoading(({destinations}) => {
     };
 
     const handleRegionFilterChange = (regionSet) => {
+        if (regionSet === null || regionSet.size === 0) {
+            setRegionFilterSet(null);
+        } else {
+            setRegionFilterSet(regionSet);
+        }
         setRegionFilterSet(regionSet);
     };
+
+    const handleKeywordFilterChange = (keywordSet) => {
+        setKeywordFilterSet(keywordSet);
+    };
+
+    const handleDateFilterChange = (dateSet) => {
+        setDateFilterSet(dateSet);
+    };
+
+    const onChangeSearchTabIndex = React.useCallback((event, newValue) => {
+        setFilterTab(newValue);
+    }, []);
+
+    const hasRegionFilter = regionFilterSet && regionFilterSet.size > 0;
+    const hasKeywordFilter = keywordFilterSet && keywordFilterSet.size > 0;
+    const hasDateFilter = dateFilterSet && dateFilterSet.size > 0;
 
     return (
         <React.Fragment>
             <PictureTypeSelector destinationType={destinationType} onChange={handleChangeDestinationTypes} /> 
             <VerticalSpacing factor={2} />
-            <RegionFilter destinations={destinations} onChange={handleRegionFilterChange} />
+
+            <Tabs
+                value={filterTab}
+                onChange={onChangeSearchTabIndex}
+                textColor="secondary"
+                indicatorColor="secondary"
+            >
+                <Tab key={FILTER_REGION} sx={{ fontWeight: hasRegionFilter ? "bold" : "normal" }} label={`Par régions ${hasRegionFilter ? ' *' : ''}`} />
+                <Tab key={FILTER_KEYWORD} sx={{ fontWeight: hasKeywordFilter ? "bold" : "normal" }} label={`Par mots-clés ${hasKeywordFilter ? ' *' : ''}`} />
+                <Tab key={FILTER_DATE} sx={{ fontWeight: hasDateFilter ? "bold" : "normal" }} label={`Par année ${hasDateFilter ? ' *' : ''}`} />
+            </Tabs>
+            <Box
+                sx={{
+                    width: '95%',
+                    maxWidth: 700,
+                    mt: 2
+                }}
+            >
+                <Fade in={filterTab === FILTER_REGION} >
+                    <Box sx={{ mb: 2, display: filterTab === FILTER_REGION ? 'block' : 'none' }} >
+                        <RegionFilter destinations={destinations} onChange={handleRegionFilterChange} />
+                    </Box>
+                </Fade>
+                <Fade in={filterTab === FILTER_KEYWORD} >
+                    <Box sx={{ mb: 2, display: filterTab === FILTER_KEYWORD ? 'block' : 'none' }} >
+                        <KeyWordFilter onChange={handleKeywordFilterChange} />
+                    </Box>
+                </Fade>
+                <Fade in={filterTab === FILTER_DATE} >
+                    <Box sx={{ mb: 2, display: filterTab === FILTER_DATE ? 'block' : 'none' }} >
+                        <DateFilter destinations={destinations} onChange={handleDateFilterChange} />
+                    </Box>
+                </Fade>
+            </Box>
             {
-                filteredDestinations &&
+                filteredDestinations && filteredDestinations.length > 0 &&
                 <Paragraph>{t("count", filteredDestinations.length)}</Paragraph>
+            }
+            {
+                filteredDestinations && filteredDestinations.length === 0 &&
+                <Alert severity="warning">{t("noDestinationsFound")}</Alert>
             }
             <VerticalSpacing factor={2} />
             <DisplayModeSelector listType={destinationsView} onChange={handleChangeDestinationView} />
