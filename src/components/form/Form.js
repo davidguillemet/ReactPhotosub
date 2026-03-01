@@ -137,7 +137,7 @@ const GroupedFormField = ({fieldSpecs}) => {
 const Form = ({
     submitAction,
     onCancel = null,
-    submitCaption = "Envoyer",
+    submitCaption,
     submitIcon = <SendIcon />,
     submitIconPosition = "start",
     startCustomComponent = null,
@@ -146,6 +146,7 @@ const Form = ({
     const formContext = useFormContext();
     const [ isFormDialog ] = useFormDialogContext();
     const t = useTranslation("components.form");
+    const finalSubmitCaption = submitCaption || t("submit:default");
 
     const fieldGroups = React.useMemo(() => getFieldGroups(formContext.fieldSpecs), [formContext.fieldSpecs]);
 
@@ -211,7 +212,7 @@ const Form = ({
                             type="submit"
                             variant="contained"
                         >
-                            {submitCaption}
+                            {finalSubmitCaption}
                         </Button>
                     }
                 </Stack>

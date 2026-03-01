@@ -7,6 +7,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { TextField } from '@mui/material';
 import { useToast } from 'components/notifications';
+import { useTranslation } from 'utils';
 import { useImageContext } from '../ImageContext';
 import GlobalStatus from './GlobalStatus';
 import { useDataProvider } from 'components/dataProvider';
@@ -16,6 +17,7 @@ const StorageBreadcrumbs = () => {
     const dataProvider = useDataProvider();
     const imageContext = useImageContext();
     const { toast } = useToast();
+    const t = useTranslation("pages.admin.images.breadcrumbs");
     const [ refHierarchy, setRefHierarchy ] = React.useState([]);
     const [ editMode, setEditMode ] = React.useState(false);
     const [ newFolderName, setNewFolderName ] = React.useState("");
@@ -47,7 +49,7 @@ const StorageBreadcrumbs = () => {
     const handleOnClickSaveName = React.useCallback(() => {
         dataProvider.renameFolder(imageContext.storageRef.fullPath, `${imageContext.storageRef.parent.fullPath}/${newFolderName}`)
         .then(() => {
-            toast.success("Le répertoire a été renommé.");
+            toast.success(t("success:renamed"));
         })
         .catch(error => {
             setNewFolderName(imageContext.storageRef.name);
@@ -55,7 +57,7 @@ const StorageBreadcrumbs = () => {
         }).finally(() => {
             setEditMode(editMode => !editMode);
         })
-    }, [dataProvider, imageContext.storageRef, newFolderName, toast])
+    }, [dataProvider, imageContext.storageRef, newFolderName, toast, t])
 
     const onFolderNameChange = React.useCallback((event) => {
         setNewFolderName(event.target.value);

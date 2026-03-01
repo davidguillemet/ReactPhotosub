@@ -14,6 +14,7 @@ import {isMobile} from 'react-device-detect';
 import { Button, IconButton, Stack } from '@mui/material';
 import { useTransferContext, TransferContextProvider } from './transferContext';
 import { useToast } from 'components/notifications';
+import { useTranslation } from 'utils';
 
 const SOURCE_LIST = 'src';
 const TARGET_LIST = 'target';
@@ -32,6 +33,7 @@ export function union(a, b) {
 
 const CustomMasonry = ({title, items, renderItem, type}) => {
 
+    const t = useTranslation("components.transferList");
     const transferContext = useTransferContext();
 
     const onToggleAll = React.useCallback(() => {
@@ -58,7 +60,7 @@ const CustomMasonry = ({title, items, renderItem, type}) => {
                     />
                 }
                 title={title}
-                subheader={`${numberOfChecked}/${items.length} selected`}
+                subheader={t("selected", [numberOfChecked, items.length])}
             />
             <Divider />
             <Box sx={{
@@ -144,6 +146,7 @@ const TransferListUI = ({renderItem, onCancel}) => {
 }
 
 const TransferListWithContext = ({renderItem, onCancel, onValidate}) => {
+    const t = useTranslation("components.transferList");
     const transferContext = useTransferContext();
     const { toast } = useToast();
 
@@ -155,17 +158,17 @@ const TransferListWithContext = ({renderItem, onCancel, onValidate}) => {
                     onCancel();
                 }
             }).catch((error) => {
-                toast.error("Une erreur est survenue...")
+                toast.error(t("toast:error"))
             })
         }
-    }, [onValidate, transferContext, toast, onCancel]);
+    }, [onValidate, transferContext, toast, onCancel, t]);
 
     return (
         <Stack direction={'column'} spacing={2} sx={{height: "100%"}}>
             <TransferListUI renderItem={renderItem} onCancel={onCancel} />
             <Stack direction={'row'} alignItems='center' spacing={2} justifyContent={"flex-end"}>
-                <Button onClick={handleValidate} disabled={!transferContext.isDirty}>Valider</Button>
-                <Button onClick={onCancel}>Annuler</Button>
+                <Button onClick={handleValidate} disabled={!transferContext.isDirty}>{t("btn:validate")}</Button>
+                <Button onClick={onCancel}>{t("btn:cancel")}</Button>
             </Stack>
         </Stack>
     )

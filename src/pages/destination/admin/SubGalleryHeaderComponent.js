@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'utils';
 import Box from '@mui/material/Box';
 import { useQueryContext } from 'components/queryContext';
 import useFormDialog from 'dialogs/FormDialog';
@@ -22,6 +23,7 @@ const _getAvailableImages = (images) => {
 }
 
 export const SubGalleryHeaderComponent = ({ group }) => {
+    const t = useTranslation("pages.destinationAdmin.subGalleryHeader");
     const galleryContext = useDestinationGalleryContext();
     const queryContext = useQueryContext();
 
@@ -55,9 +57,9 @@ export const SubGalleryHeaderComponent = ({ group }) => {
     const onDeleteGallery = React.useCallback(() => {
         return deleteGalleryMutation.mutateAsync(group)
             .then(() => {
-                toast.success("La galerie a été supprimée.");
+                toast.success(t("success:deleted"));
             });
-    }, [group, deleteGalleryMutation, toast]);
+    }, [group, deleteGalleryMutation, toast, t]);
 
     const onSelectImages = React.useCallback(() => {
         openImageDialog();
@@ -79,14 +81,15 @@ export const SubGalleryHeaderComponent = ({ group }) => {
         }
         return updateGalleryImagesMutation.mutateAsync(updatePayload)
             .then(() => {
-                toast.success("La galerie a été mise à jour.");
+                toast.success(t("success:updated"));
             });
     }, [
         toast,
         group.gallery.id,
         group.images,
         updateGalleryImagesMutation,
-        galleryContext.destination
+        galleryContext.destination,
+        t
     ]);
 
     const canDecreaseIndex = React.useCallback(() => {
@@ -161,7 +164,7 @@ export const SubGalleryHeaderComponent = ({ group }) => {
                 <ArrowUpwardIcon />
             </IconButton>
 
-            <ImageFormDialog title="Gérer les images de la sous-galerie" {...ImageDialogProps}>
+            <ImageFormDialog title={t("dlg:manageImages")} {...ImageDialogProps}>
                 <TransferList
                     allItems={initialDestinationImages.current}
                     rightList={initialGroupImages.current}
@@ -169,17 +172,17 @@ export const SubGalleryHeaderComponent = ({ group }) => {
                     sortFunc={sortImagesAscending}
                     onValidate={onValidateImages} />
             </ImageFormDialog>
-            <EditFormDialog title="Modifier la sous-galerie" {...EditDialogProps}>
+            <EditFormDialog title={t("dlg:edit")} {...EditDialogProps}>
                 <SubGalleryForm subGallery={group.gallery} destination={group.destination} />
             </EditFormDialog>
             <ConfirmDialog
                 open={confirmDeleteOpen}
                 onOpenChanged={setConfirmDeleteOpen}
                 onValidate={onDeleteGallery}
-                title={"Supprimer la galerie"}
+                title={t("dlg:deleteTitle")}
                 dialogContent={[
-                    `Confirmez-vous la suppression de la galerie '${group.gallery.title}'?`,
-                    "Cette action est irreversible!"
+                    t("dlg:deleteConfirmation", [group.gallery.title]),
+                    t("dlg:deleteWarning")
                 ]} />
         </Box>
         </GroupContextProvider>

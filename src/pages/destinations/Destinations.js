@@ -199,6 +199,10 @@ const DestinationsComponent = withLoading(({destinations}) => {
         setFilterTab(newValue);
     }, []);
 
+    const tabCaption = React.useCallback((captionKey, isModified) => {
+        return `${t(captionKey)}${isModified ? ' *' : ''}`;
+    }, [t]);
+
     const hasRegionFilter = regionFilterSet && regionFilterSet.size > 0;
     const hasKeywordFilter = keywordFilterSet && keywordFilterSet.size > 0;
     const hasDateFilter = dateFilterSet && dateFilterSet.size > 0;
@@ -214,9 +218,9 @@ const DestinationsComponent = withLoading(({destinations}) => {
                 textColor="secondary"
                 indicatorColor="secondary"
             >
-                <Tab key={FILTER_REGION} sx={{ fontWeight: hasRegionFilter ? "bold" : "normal" }} label={`Par régions ${hasRegionFilter ? ' *' : ''}`} />
-                <Tab key={FILTER_KEYWORD} sx={{ fontWeight: hasKeywordFilter ? "bold" : "normal" }} label={`Par mots-clés ${hasKeywordFilter ? ' *' : ''}`} />
-                <Tab key={FILTER_DATE} sx={{ fontWeight: hasDateFilter ? "bold" : "normal" }} label={`Par année ${hasDateFilter ? ' *' : ''}`} />
+                <Tab key={FILTER_REGION} sx={{ fontWeight: hasRegionFilter ? "bold" : "normal" }} label={tabCaption("filterTab:byRegions", hasRegionFilter)} />
+                <Tab key={FILTER_KEYWORD} sx={{ fontWeight: hasKeywordFilter ? "bold" : "normal" }} label={tabCaption("filterTab:byKeywords", hasKeywordFilter)} />
+                <Tab key={FILTER_DATE} sx={{ fontWeight: hasDateFilter ? "bold" : "normal" }} label={tabCaption("filterTab:byYear", hasDateFilter)} />
             </Tabs>
             <Box
                 sx={{

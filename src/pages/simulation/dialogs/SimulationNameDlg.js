@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'utils';
 import {isMobile} from 'react-device-detect';
 
 import Button from '@mui/material/Button';
@@ -9,8 +10,11 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import AutoFocusTextField from 'components/textField';
 
+import { VerticalSpacing } from 'template/spacing';
+
 // action = "save" or "rename"
 export default function SimulationNameDialog({ open, initialName, action = "save", validation, onOpenChanged, onValidate }) {
+    const t = useTranslation("pages.composition.simulationNameDialog");
     const [isOpen, setIsOpen] = useState(open);
     const [actionName, setActionName] = useState(action);
     const [hasError, setHasError] = useState(false);
@@ -52,25 +56,25 @@ export default function SimulationNameDialog({ open, initialName, action = "save
     const getDialogDetails = useCallback(() => {
         if (actionName === "save") {
             return {
-                title: "Sauvegarder",
-                desc: "Donnez un nom à votre simulation pour la sauvegarder."
+                title: t("save:title"),
+                desc: t("save:description")
             };
         } else if (actionName === "rename") {
             return {
-                title: "Renommer",
-                desc: "Renommez votre simulation."
+                title: t("rename:title"),
+                desc: t("rename:description")
             };
         } else if (actionName === "new") {
             return {
-                title: "Nouvelle simulation",
-                desc: "Saisissez un nom pour votre nouvelle simulation."
+                title: t("new:title"),
+                desc: t("new:description")
             };
         }
         return {
-            title: "Unknown action",
-            desc: "Unknown action"
+            title: t("unknownAction:title"),
+            desc: t("unknownAction:description")
         };
-    }, [actionName]);
+    }, [actionName, t]);
 
     const dialogDetails = getDialogDetails();
 
@@ -85,25 +89,26 @@ export default function SimulationNameDialog({ open, initialName, action = "save
                 <DialogTitle id="form-dialog-title">{dialogDetails.title}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>{dialogDetails.desc}</DialogContentText>
+                    <VerticalSpacing factor={1} />
                     <AutoFocusTextField
                         value={name}
                         onChange={onNameChanged}
                         autoFocus
                         margin="dense"
                         id="name"
-                        label="Nom de la simulation"
+                        label={t("field:simulationName")}
                         type="text"
                         fullWidth
                         error={hasError}
-                        helperText={hasError ? (name.trim().length > 0 ? "Ce nom existe déjà" : "") : ""}
+                        helperText={hasError ? (name.trim().length > 0 ? t("error:nameExists") : "") : ""}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>
-                        Annuler
+                        {t("btn:cancel")}
                     </Button>
                     <Button onClick={handleValidate} disabled={okDisabled}>
-                        Valider
+                        {t("btn:validate")}
                     </Button>
                 </DialogActions>
             </Dialog>

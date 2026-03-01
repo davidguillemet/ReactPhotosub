@@ -93,7 +93,20 @@
             "form:hasWideAngle": "Contains wide-angle images",
             "form:published": "Publiée",
             "validationMessage": "The changes have been saved successfully.",
-            "noDestinationsFound": "No destination matches the selected filters."
+            "noDestinationsFound": "No destination matches the selected filters.",
+            "filterTab:byRegions": "By regions",
+            "filterTab:byKeywords": "By keywords",
+            "filterTab:byYear": "By year",
+            "dateFilter": {
+                "label": "Filter by years",
+                "noAvailableYears": "No years available",
+                "helperText": "Select one or more years to filter destinations."
+            },
+            "keywordFilter": {
+                "label": "Filter by keywords",
+                "errorTooShort": "Please enter at least 3 characters",
+                "helperText": "Enter keywords to refine your search."
+            }
         },
         "favorites": {
             "title": "My Selection",
@@ -101,7 +114,13 @@
             "info:favoritesDeleted": "{0} favorite(s) deleted",
             "btn:cancelDeletion": "Cancel",
             "info:noFavorites": "Your favorites list is empty.",
-            "info:userHasNoFavorites": "The user has no favorites."
+            "info:userHasNoFavorites": "The user has no favorites.",
+            "userSelection": {
+                "suffix:me": " (me)",
+                "field:label": "User selection",
+                "field:error": "Please select a user.",
+                "text:intro": "To view another user's selection:"
+            }
         },
         "finning": {
             "title": "Finning, Késako ?",
@@ -150,7 +169,21 @@
             "dlg:confirm1": "Do you confirm the deletion of '{0}' ?",
             "dlg:confirm2": "Attention, this action is irreversible.",
             "dlg:validateDeletion": "OK",
-            "dlg:cancelDeletion": "Cancel"
+            "dlg:cancelDeletion": "Cancel",
+            "simulationNameDialog": {
+                "save:title": "Save",
+                "save:description": "Give your simulation a name to save it.",
+                "rename:title": "Rename",
+                "rename:description": "Rename your simulation.",
+                "new:title": "New simulation",
+                "new:description": "Enter a name for your new simulation.",
+                "unknownAction:title": "Unknown action",
+                "unknownAction:description": "Unknown action",
+                "field:simulationName": "Simulation name",
+                "error:nameExists": "This name already exists",
+                "btn:cancel": "Cancel",
+                "btn:validate": "Validate"
+            }
         },
         "admin": {
             "title": "Administration",
@@ -164,15 +197,100 @@
                 "warningDeleteRegion": "This action is irreversible.",
                 "title:deleteLocation": "Delete Location",
                 "confirmDeleteLocation": "Are your sure you want to delete the location '{0}'?",
-                "warningDeleteLocation": "This action is irreversible."
+                "warningDeleteLocation": "This action is irreversible.",
+                "toolbar": {
+                    "btn:newRegion": "New Region"
+                },
+                "dialogs": {
+                    "newLocation:title": "New Location",
+                    "editLocation:title": "Edit Location",
+                    "newRegion:title": "New Region",
+                    "editRegion:title": "Edit Region"
+                },
+                "messages": {
+                    "success:locationDeleted": "The location has been deleted.",
+                    "error:locationDelete": "An error occurred while deleting the location: {0}",
+                    "success:regionDeleted": "The region has been deleted.",
+                    "error:regionDelete": "An error occurred while deleting the region: {0}"
+                },
+                "locationForm": {
+                    "field:title": "Title",
+                    "error:title": "Please indicate the title of the location.",
+                    "field:region": "Region",
+                    "error:region": "Please select a region.",
+                    "field:website": "Website",
+                    "btn:validate": "Validate",
+                    "success:saved": "The location has been saved."
+                },
+                "regionForm": {
+                    "field:title": "Title",
+                    "error:title": "Please indicate the title of the region.",
+                    "field:parentRegion": "Parent Region",
+                    "btn:validate": "Validate",
+                    "success:saved": "The region has been saved."
+                }
             },
             "images" : {
+                "ImageFormDialogTitle": "Edit image properties",
+                "folderDialogTitle": "Create folder",
                 "title:deleteItems": "Delete pictures",
                 "confirmDeleteItems": "Are your sure you want to delete theses pictures?",
                 "warningDeleteItems": "This action is irreversible.",
                 "imageCount": "{0} item(s) in the folder {1}",
                 "filter": "Filter files:",
-                "rootFolder": "root"
+                "rootFolder": "root",
+                "toolbar": {
+                    "btn:addImage": "Add an image",
+                    "btn:showDestination": "Show destination"
+                },
+                "form": {
+                    "field:titleFr": "Title in French",
+                    "field:titleEn": "Title in English",
+                    "field:tags": "Tags",
+                    "error:tags": "Please add tags that describe the image (location, species, color, etc).",
+                    "btn:validate": "Validate",
+                    "success:saved": "The image properties have been saved."
+                },
+                "folderForm": {
+                    "field:name": "Folder Name",
+                    "error:name": "Please indicate the folder name.",
+                    "btn:validate": "Validate",
+                    "success:created": "The folder has been created successfully."
+                },
+                "breadcrumbs": {
+                    "success:renamed": "The folder has been renamed."
+                }
+            }
+        },
+        "destinationAdmin": {
+            "subGalleryForm": {
+                "field:noLocation": "No location",
+                "field:title": "Title",
+                "error:title": "Please indicate a title.",
+                "field:description": "Description",
+                "field:location": "Location",
+                "error:location": "Please select a location.",
+                "field:position": "Position",
+                "error:position": "Please indicate an unused position.",
+                "btn:validate": "Validate",
+                "success:saved": "The sub-gallery has been saved."
+            },
+            "subGalleryHeader": {
+                "success:deleted": "The gallery has been deleted.",
+                "success:updated": "The gallery has been updated.",
+                "dlg:manageImages": "Manage sub-gallery images",
+                "dlg:edit": "Edit sub-gallery",
+                "dlg:deleteTitle": "Delete gallery",
+                "dlg:deleteConfirmation": "Do you confirm the deletion of the gallery '{0}'?",
+                "dlg:deleteWarning": "This action is irreversible!"
+            },
+            "tools": {
+                "btn:addSubGallery": "Add a sub-gallery",
+                "btn:manageImages": "Manage images",
+                "dlg:createSubGallery": "Create a sub-gallery"
+            },
+            "admin": {
+                "btn:addDestination": "Add a destination"
             }
         },
         "profile": {
@@ -227,7 +345,15 @@
             "field:latitude": "Latitude",
             "field:longitude": "Longitude",
             "field:latitudeError": "Please specify a valid latitude between {0} and {1}.",
-            "field:longitudeError": "Please specify a valid longitude between {0} and {1}."
+            "field:longitudeError": "Please specify a valid longitude between {0} and {1}.",
+            "groupTab:label": "{0} ({1}) {2}",
+            "submit:default": "Send"
+        },
+        "transferList": {
+            "selected": "{0}/{1} selected",
+            "btn:validate": "Validate",
+            "btn:cancel": "Cancel",
+            "toast:error": "An error occurred during the operation."
         },
         "form::authentication": {
             "title": "Sign in with email",

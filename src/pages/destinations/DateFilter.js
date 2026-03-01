@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'utils';
 import AutoCompleteTagInput from 'components/input';
 
 const DateFilter = ({destinations, onChange}) => {
+    const t = useTranslation("pages.destinations.dateFilter");
 
     const options = React.useMemo(() => {
         // destination.date = '2022-11-18T00:00:00.000Z'
@@ -22,9 +24,9 @@ const DateFilter = ({destinations, onChange}) => {
         <AutoCompleteTagInput
             options={options}
             onChange={handleChange}
-            noOptionsText={"No years available"}
-            placeholder={"Filtrer par années"}
-            helperText={"Sélectionnez une ou plusieurs années pour filtrer les destinations."}
+            noOptionsText={t("noAvailableYears")}
+            placeholder={t("label")}
+            helperText={t("helperText")}
             enableLastSelected={false}
         />
     )

@@ -7,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import useFormDialog from 'dialogs/FormDialog';
 import ImageForm from './ImageForm';
+import { useTranslation } from 'utils';
 
 const ImageProperties = ({image}) => {
     if (!image) {
@@ -75,6 +76,7 @@ const ImagePreview = ({image, file}) => {
 
 const ImagePreviewWrapper = ({image, children}) => {
     const { dialogProps, openDialog, FormDialog } = useFormDialog();
+    const t = useTranslation("pages.admin.images");
 
     const onCopyTags = React.useCallback(() => {
         navigator.clipboard.writeText(image.tags.join());
@@ -91,7 +93,7 @@ const ImagePreviewWrapper = ({image, children}) => {
                         <Button startIcon={<EditIcon/>} variant="outlined" size="small" onClick={openDialog}>Modifier</Button>
                     </Stack>
                 </Stack>
-                <FormDialog title="Modifier les propriétés de l'image" {...dialogProps}>
+                <FormDialog title={t("ImageFormDialogTitle")} {...dialogProps}>
                     <ImageForm image={image} />
                 </FormDialog>
             </React.Fragment>

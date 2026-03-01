@@ -93,7 +93,20 @@
             "form:hasWideAngle": "Contient des images grand-angle",
             "form:published": "Published",
             "validationMessage": "Les modifications ont été enregistrées avec succès.",
-            "noDestinationsFound": "Aucune destination ne correspond aux filtres sélectionnés."
+            "noDestinationsFound": "Aucune destination ne correspond aux filtres sélectionnés.",
+            "filterTab:byRegions": "Par régions",
+            "filterTab:byKeywords": "Par mots-clés",
+            "filterTab:byYear": "Par année",
+            "dateFilter": {
+                "label": "Filtrer par années",
+                "noAvailableYears": "No years available",
+                "helperText": "Sélectionnez une ou plusieurs années pour filtrer les destinations."
+            },
+            "keywordFilter": {
+                "label": "Filtrer par mots clés",
+                "errorTooShort": "Veuillez saisir au moins 3 caractères",
+                "helperText": "Saisissez des mots clés pour affiner votre recherche."
+            }
         },
         "favorites": {
             "title": "Ma Sélection",
@@ -101,7 +114,13 @@
             "info:favoritesDeleted": "{0} favori(s) supprimé(s)",
             "btn:cancelDeletion": "Annuler",
             "info:noFavorites": "Votre liste de favoris est vide.",
-            "info:userHasNoFavorites": "La liste de favoris de l'utilisateur est vide."
+            "info:userHasNoFavorites": "La liste de favoris de l'utilisateur est vide.",
+            "userSelection": {
+                "suffix:me": " (moi)",
+                "field:label": "Sélection d'un utilisateur",
+                "field:error": "Merci de sélectionner un utilisateur.",
+                "text:intro": "Pour voir la sélection d'un autre utilisateur:"
+            }
         },
         "finning": {
             "title": "Le Finning, Késako ?",
@@ -150,7 +169,21 @@
             "dlg:confirm1": "Confirmez-vous la suppression de la simulation '{0}' ?",
             "dlg:confirm2": "Attention, cette action est irreversible.",
             "dlg:validateDeletion": "Valider",
-            "dlg:cancelDeletion": "Annuler"
+            "dlg:cancelDeletion": "Annuler",
+            "simulationNameDialog": {
+                "save:title": "Sauvegarder",
+                "save:description": "Donnez un nom à votre simulation pour la sauvegarder.",
+                "rename:title": "Renommer",
+                "rename:description": "Renommez votre simulation.",
+                "new:title": "Nouvelle simulation",
+                "new:description": "Saisissez un nom pour votre nouvelle simulation.",
+                "unknownAction:title": "Unknown action",
+                "unknownAction:description": "Unknown action",
+                "field:simulationName": "Nom de la simulation",
+                "error:nameExists": "Ce nom existe déjà",
+                "btn:cancel": "Annuler",
+                "btn:validate": "Valider"
+            }
         },
         "admin": {
             "title": "Administration",
@@ -164,15 +197,100 @@
                 "warningDeleteRegion": "Cette action est irreversible!",
                 "title:deleteLocation": "Supprimer le lieu",
                 "confirmDeleteLocation": "Confirmez-vous la suppression du lieu '{0}'?",
-                "warningDeleteLocation": "Cette action est irreversible!"
+                "warningDeleteLocation": "Cette action est irreversible!",
+                "toolbar": {
+                    "btn:newRegion": "Nouvelle Région"
+                },
+                "dialogs": {
+                    "newLocation:title": "Nouveau lieu",
+                    "editLocation:title": "Modifier le lieu",
+                    "newRegion:title": "Nouvelle région",
+                    "editRegion:title": "Modifier la région"
+                },
+                "messages": {
+                    "success:locationDeleted": "Le lieu a bien été supprimé.",
+                    "error:locationDelete": "Une erreur est survenue lors de la suppression du lieu: {0}",
+                    "success:regionDeleted": "La région a bien été supprimée.",
+                    "error:regionDelete": "Une erreur est survenue lors de la suppression de la région: {0}"
+                },
+                "locationForm": {
+                    "field:title": "Titre",
+                    "error:title": "Merci d'indiquer le titre du lieu.",
+                    "field:region": "Region",
+                    "error:region": "Merci de sélectionner une région.",
+                    "field:website": "Site internet",
+                    "btn:validate": "Valider",
+                    "success:saved": "Le lieu a bien été enregistré."
+                },
+                "regionForm": {
+                    "field:title": "Titre",
+                    "error:title": "Merci d'indiquer le titre de la région.",
+                    "field:parentRegion": "Region parent",
+                    "btn:validate": "Valider",
+                    "success:saved": "La région a bien été enregistrée."
+                }
             },
             "images" : {
+                "ImageFormDialogTitle": "Modifier les propriétés de l'image",
+                "folderDialogTitle": "Création d'un répertoire",
                 "title:deleteItems": "Supprimer des images",
                 "confirmDeleteItems": "Confirmez-vous la suppression de ces images?",
                 "warningDeleteItems": "Cette action est irreversible!",
                 "imageCount": "{0} item(s) dans le répertoire {1}",
                 "filter": "Filtrer les fichiers:",
-                "rootFolder": "racine"
+                "rootFolder": "racine",
+                "toolbar": {
+                    "btn:addImage": "Ajouter une image",
+                    "btn:showDestination": "Afficher la destination"
+                },
+                "form": {
+                    "field:titleFr": "Titre en français",
+                    "field:titleEn": "Titre en anglais",
+                    "field:tags": "Tags",
+                    "error:tags": "Merci d'ajouter des tags qui caractérisent l'image (lieu, espèce, couleur, etc).",
+                    "btn:validate": "Valider",
+                    "success:saved": "Les nouvelles propriétés de l'image ont été sauvegardées."
+                },
+                "folderForm": {
+                    "field:name": "Nom du Répertoire",
+                    "error:name": "Merci d'indiquer le nom du répertoire.",
+                    "btn:validate": "Valider",
+                    "success:created": "Le répertoire a été créé avec succès."
+                },
+                "breadcrumbs": {
+                    "success:renamed": "Le répertoire a été renommé."
+                }
+            }
+        },
+        "destinationAdmin": {
+            "subGalleryForm": {
+                "field:noLocation": "Pas de lieu",
+                "field:title": "Titre",
+                "error:title": "Merci d'indiquer un titre.",
+                "field:description": "Description",
+                "field:location": "Lieu",
+                "error:location": "Merci de renseigner un lieu.",
+                "field:position": "Position",
+                "error:position": "Merci d'indiquer une position non utilisée.",
+                "btn:validate": "Valider",
+                "success:saved": "La sous-galerie a été sauvegardée."
+            },
+            "subGalleryHeader": {
+                "success:deleted": "La galerie a été supprimée.",
+                "success:updated": "La galerie a été mise à jour.",
+                "dlg:manageImages": "Gérer les images de la sous-galerie",
+                "dlg:edit": "Modifier la sous-galerie",
+                "dlg:deleteTitle": "Supprimer la galerie",
+                "dlg:deleteConfirmation": "Confirmez-vous la suppression de la galerie '{0}'?",
+                "dlg:deleteWarning": "Cette action est irreversible!"
+            },
+            "tools": {
+                "btn:addSubGallery": "Ajouter une sous-galerie",
+                "btn:manageImages": "Gérer les images",
+                "dlg:createSubGallery": "Créer une sous-galerie"
+            },
+            "admin": {
+                "btn:addDestination": "Ajouter une destination"
             }
         },
         "profile": {
@@ -227,7 +345,15 @@
             "field:latitude": "Latitude",
             "field:longitude": "Longitude",
             "field:latitudeError": "Veuillez spécifier une latitude valide comprise entre {0} et {1}.",
-            "field:longitudeError": "Veuillez spécifier une longitude valide comprise entre {0} et {1}."
+            "field:longitudeError": "Veuillez spécifier une longitude valide comprise entre {0} et {1}.",
+            "groupTab:label": "{0} ({1}) {2}",
+            "submit:default": "Envoyer"
+        },
+        "transferList": {
+            "selected": "{0}/{1} sélectionné(s)",
+            "btn:validate": "Valider",
+            "btn:cancel": "Annuler",
+            "toast:error": "Une erreur est survenue lors de l'opération."
         },
         "form::authentication": {
             "title": "Connectez-vous avec une adresse de messagerie",

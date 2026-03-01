@@ -2,6 +2,7 @@ import React from 'react';
 import { Stack } from '@mui/material';
 import { useAuthContext } from 'components/authentication';
 import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'utils';
 import useFormDialog from 'dialogs/FormDialog';
 import SubGalleryForm from './SubGalleryForm';
 import { Fab } from "@mui/material";
@@ -9,6 +10,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 
 const DestinationAdminTools = ({destination}) => {
+    const t = useTranslation("pages.destinationAdmin.tools");
     const authContext = useAuthContext();
     const history = useHistory();
     const { dialogProps, openDialog, FormDialog } = useFormDialog();
@@ -44,17 +46,17 @@ const DestinationAdminTools = ({destination}) => {
                     variant="extended"
                 >
                     <AddCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
-                    Ajouter une sous-galerie
+                    {t("btn:addSubGallery")}
                 </Fab>
                 <Fab
                     onClick={onManageImages}
                     variant="extended"
                 >
                     <TuneOutlinedIcon fontSize="large" sx={{ mr: 1 }} />
-                    Gérer les images
+                    {t("btn:manageImages")}
                 </Fab>
             </Stack>
-            <FormDialog title="Créer une sous-galerie" {...dialogProps}>
+            <FormDialog title={t("dlg:createSubGallery")} {...dialogProps}>
                 <SubGalleryForm subGallery={subGalleryToEdit} destination={destination}/>
             </FormDialog>
         </React.Fragment>

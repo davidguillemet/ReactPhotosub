@@ -1,41 +1,51 @@
 import React from 'react';
+import { useTranslation } from 'utils';
 import { useQueryContext } from 'components/queryContext';
 import Form, {
     FIELD_TYPE_TAGS_FIELD,
     FIELD_TYPE_TEXT,
 } from 'components/form';
 
-const imageFields = [
-    {
-        id: "title",
-        label: "Titre en français",
-        required: false,
-        type: FIELD_TYPE_TEXT,
-        multiline: false,
-        default: ""
-    },
-    {
-        id: "description",
-        label: "Titre en anglais",
-        required: false,
-        type: FIELD_TYPE_TEXT,
-        multiline: false,
-        default: ""
-    },
-    {
-        id: "tags",
-        label: "Tags",
-        required: true,
-        errorText: "Merci d'ajouter des tags qui caractérisent l'image (lieu, espèce, couleur, etc).",
-        type: FIELD_TYPE_TAGS_FIELD,
-        multiline: true,
-        default: []
-    },
-];
+
+function getFields(t) {
+    return [
+        {
+            id: "title",
+            label: t("field:titleFr"),
+            required: false,
+            type: FIELD_TYPE_TEXT,
+            multiline: false,
+            default: ""
+        },
+        {
+            id: "description",
+            label: t("field:titleEn"),
+            required: false,
+            type: FIELD_TYPE_TEXT,
+            multiline: false,
+            default: ""
+        },
+        {
+            id: "tags",
+            label: t("field:tags"),
+            required: true,
+            errorText: t("error:tags"),
+            type: FIELD_TYPE_TAGS_FIELD,
+            multiline: true,
+            default: []
+        },
+    ];
+}
 
 const ImageForm = ({image, onChange, onCancel}) => {
-
+    const t = useTranslation("pages.admin.images.form");
     const queryContext = useQueryContext();
+
+    const [ fields, setFields ] = React.useState(null);
+
+    React.useEffect(() => {
+        setFields(getFields(t));
+    }, [t]);
 
     const updateImageMutation = queryContext.useUpdateImageProperties();
 
@@ -53,11 +63,11 @@ const ImageForm = ({image, onChange, onCancel}) => {
 
     return (
         <Form
-            fields={imageFields}
+            fields={fields}
             initialValues={initialValues.current}
             submitAction={onSubmitImageForm}
-            submitCaption="Valider"
-            validationMessage="Les nouvelles propriétés de l'image ont été sauvegardées."
+            submitCaption={t("btn:validate")}
+            validationMessage={t("success:saved")}
             onChange={onChange}
             onCancel={onCancel}
             readOnly={false}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'utils';
 import { Box } from '@mui/system';
 import { ListItemText } from '@mui/material';
 import { useQueryContext } from 'components/queryContext';
@@ -34,7 +35,7 @@ const RegionItem = ({option}) => {
 }
 
 const RegionForm = ({region, regions, onChange, onCancel, onNewRegion}) => {
-
+    const t = useTranslation("pages.admin.regions.regionForm");
     const queryContext = useQueryContext();
     const [regionFields, setRegionFields] = React.useState(null);
 
@@ -67,9 +68,9 @@ const RegionForm = ({region, regions, onChange, onCancel, onNewRegion}) => {
         setRegionFields([
             {
                 id: "title",
-                label: "Titre",
+                label: t("field:title"),
                 required: true,
-                errorText: "Merci d'indiquer le titre de la région.",
+                errorText: t("error:title"),
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
                 default: "",
@@ -78,7 +79,7 @@ const RegionForm = ({region, regions, onChange, onCancel, onNewRegion}) => {
             },
             {
                 id: "parent",
-                label: "Region parent",
+                label: t("field:parentRegion"),
                 required: false,
                 type: FIELD_TYPE_SELECT,
                 options: () => regions,
@@ -86,15 +87,15 @@ const RegionForm = ({region, regions, onChange, onCancel, onNewRegion}) => {
                 default: null
             }
         ]);
-    }, [regions]);
+    }, [regions, t]);
 
     return (
         <Form
             fields={regionFields}
             initialValues={initialValues.current}
             submitAction={onSubmitRegionForm}
-            submitCaption="Valider"
-            validationMessage="La région a bien été enregistrée."
+            submitCaption={t("btn:validate")}
+            validationMessage={t("success:saved")}
             onChange={onChange}
             onCancel={onCancel}
         />

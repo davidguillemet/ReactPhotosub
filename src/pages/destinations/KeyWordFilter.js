@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'utils';
 import { TextField } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
 const KeyWordFilter = ({onChange}) => {
+    const t = useTranslation("pages.destinations.keywordFilter");
 
     const [filter, setFilter] = React.useState("");
     const [error, setError] = React.useState(false);
@@ -37,11 +39,11 @@ const KeyWordFilter = ({onChange}) => {
             <TextField
                 id="keyword-filter"
                 value={filter}
-                label="Filtrer par mots clés"
+                label={t("label")}
                 variant="outlined"
                 fullWidth
                 error={error}
-                helperText={error ? "Veuillez saisir au moins 3 caractères" : "Saisissez des mots clés pour affiner votre recherche"}
+                helperText={error ? t("errorTooShort") : t("helperText")}
                 onChange={handleChange}
                 slotProps={{
                     input: {

@@ -10,12 +10,14 @@ import { useImageContext } from '../ImageContext';
 import { useUploadContext } from '../upload/UploadContext';
 import { canUpload } from '../common';
 import FolderForm from '../FolderForm';
+import { useTranslation } from 'utils';
 import { HorizontalSpacing } from 'template/spacing';
 
 const DefaultToolbar = () => {
     const uploadContext = useUploadContext();
     const imageContext = useImageContext();
     const { dialogProps, openDialog, FormDialog } = useFormDialog();      
+    const t = useTranslation("pages.admin.images");
     const uploadButtonRef = React.useRef(null);
 
     const openUploadSelection = () => {
@@ -49,7 +51,7 @@ const DefaultToolbar = () => {
                     />
                     <HorizontalSpacing factor={1} />
                 </Stack>
-                <FormDialog title="Création d'un répertoire" {...dialogProps} >
+                <FormDialog title={t("folderDialogTitle")} {...dialogProps} >
                     <FolderForm />
                 </FormDialog>
             </Stack>

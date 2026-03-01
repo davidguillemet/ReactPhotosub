@@ -43,7 +43,11 @@
     "build4Firebase": "mv .env.production.local .env.tmp && react-scripts build && mv .env.tmp .env.production.local && mkdir -p functions/web && mv build/index.html functions/web/index.html",
     "build4deploy": "mv .env.production.local .env.tmp && GENERATE_SOURCEMAP=false react-scripts build && mv .env.tmp .env.production.local && mkdir -p functions/web && mv build/index.html functions/web/index.html",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "i18n": "node scripts/i18n-cli.js",
+    "i18n:file": "node scripts/i18n-cli.js --file",
+    "i18n:examples": "node scripts/i18n-examples.js",
+    "i18n:validate": "node scripts/i18n-validate.js"
   },
   "eslintConfig": {
     "extends": [

@@ -71,7 +71,7 @@ const Images = () => {
                     sx={{mr: 1}}
                 >
                     <CloudUploadOutlinedIcon fontSize="large" sx={{ mr: 1 }} />
-                    Ajouter une image
+                    {t("toolbar.btn:addImage")}
                 </Fab>
                 <Fab
                     variant="extended"
@@ -79,7 +79,7 @@ const Images = () => {
                     onClick={onDisplayDestination}
                 >
                     <CollectionsOutlinedIcon fontSize="large" sx={{ mr: 1 }} />
-                    Afficher la destination
+                    {t("toolbar.btn:showDestination")}
                 </Fab>
             </Div>
         )

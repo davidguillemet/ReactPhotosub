@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'utils';
 import { Box } from '@mui/system';
 import { ListItemText } from '@mui/material';
 import { useQueryContext } from 'components/queryContext';
@@ -36,7 +37,7 @@ const RegionItem = ({option}) => {
 }
 
 const LocationForm = ({location, locations, regions, onChange, onCancel, onNewLocation}) => {
-
+    const t = useTranslation("pages.admin.regions.locationForm");
     const queryContext = useQueryContext();
     const [locationFields, setLocationFields] = React.useState(null);
 
@@ -77,9 +78,9 @@ const LocationForm = ({location, locations, regions, onChange, onCancel, onNewLo
         setLocationFields([
             {
                 id: "title",
-                label: "Titre",
+                label: t("field:title"),
                 required: true,
-                errorText: "Merci d'indiquer le titre du lieu.",
+                errorText: t("error:title"),
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
                 default: "",
@@ -87,9 +88,9 @@ const LocationForm = ({location, locations, regions, onChange, onCancel, onNewLo
             },
             {
                 id: "region",
-                label: "Region",
+                label: t("field:region"),
                 required: true,
-                errorText: "Merci de sélectionner une région.",
+                errorText: t("error:region"),
                 type: FIELD_TYPE_SELECT,
                 options: () => regions,
                 optionComponent: RegionItem,
@@ -102,23 +103,23 @@ const LocationForm = ({location, locations, regions, onChange, onCancel, onNewLo
             },
             {
                 id: "link",
-                label: "Site internet",
+                label: t("field:website"),
                 required: false,
-                errorText: "Merci d'indiquer la longitude du lieu.",
+                errorText: t("field:website"),
                 type: FIELD_TYPE_URL,
                 multiline: false,
                 default: ""
             },
         ]);
-    }, [regions]);
+    }, [regions, t]);
 
     return (
         <Form
             fields={locationFields}
             initialValues={initialValues.current}
             submitAction={onSubmitLocationForm}
-            submitCaption="Valider"
-            validationMessage="Le lieu a bien été enregistré."
+            submitCaption={t("btn:validate")}
+            validationMessage={t("success:saved")}
             onChange={onChange}
             onCancel={onCancel}
         />

@@ -160,20 +160,20 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
     const onDeleteLocation = React.useCallback(() => {
         return deleteLocationMutation.mutateAsync(locationToDelete)
             .then(() => {
-                toast.success("Le lieu a bien été supprimé.")
+                toast.success(t("messages.success:locationDeleted"))
             }).catch((e) => {
-                toast.error(`Une erreur est survenue lors de la suppression du lieu: ${e.message}`);
+                toast.error(t("messages.error:locationDelete", [e.message]));
             });
-    }, [deleteLocationMutation, locationToDelete, toast]);
+    }, [deleteLocationMutation, locationToDelete, toast, t]);
 
     const onDeleteRegion = React.useCallback(() => {
         return deleteRegionMutation.mutateAsync(regionToDelete)
             .then(() => {
-                toast.success("La région a bien été supprimée.")
+                toast.success(t("messages.success:regionDeleted"))
             }).catch((e) => {
-                toast.error(`Une erreur est survenue lors de la suppression de la région: ${e.message}`);
+                toast.error(t("messages.error:regionDelete", [e.message]));
             });
-    }, [deleteRegionMutation, regionToDelete, toast]);
+    }, [deleteRegionMutation, regionToDelete, toast, t]);
 
     const onConfirmDeleteLocationOpenChanged = React.useCallback((open) => {
         if (open === false) {
@@ -266,24 +266,24 @@ const RegionsTreeView = withLoading(({regions, regionMap, locations}) => {
 
     const getEditLocationDialogTitle = React.useCallback(() => {
         if (locationToEdit === null || locationToEdit.id === undefined) {
-            return "Nouveau lieu"
+            return t("dialogs.newLocation:title")
         } else {
-            return "Modifier le lieu"
+            return t("dialogs.editLocation:title")
         }
-    }, [locationToEdit]);
+    }, [locationToEdit, t]);
 
     const getEditRegionDialogTitle = React.useCallback(() => {
         if (regionToEdit === null || regionToEdit.id === undefined) {
-            return "Nouvelle région"
+            return t("dialogs.newRegion:title")
         } else {
-            return "Modifier la région"
+            return t("dialogs.editRegion:title")
         }
-    }, [regionToEdit]);
+    }, [regionToEdit, t]);
 
     return (
         <React.Fragment>
             <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', mb: 1}}>
-                <Button onClick={handleAddRegion}>Nouvelle Région</Button>
+                <Button onClick={handleAddRegion}>{t("toolbar.btn:newRegion")}</Button>
                 <HorizontalSpacing factor={2} />
                 <Button disabled={expanded.length === regions.length} onClick={handleExpandAllClick}>{t("expandAll")}</Button>
                 <HorizontalSpacing factor={2} />

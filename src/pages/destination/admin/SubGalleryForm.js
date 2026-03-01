@@ -1,10 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'utils';
 import Form, { FIELD_TYPE_TEXT, FIELD_TYPE_NUMBER, FIELD_TYPE_SELECT } from "components/form";
 import { useQueryContext } from 'components/queryContext';
 import { useDestinationGalleryContext } from './DestinationGalleryContext';
 
 const SubGalleryForm = ({destination, subGallery, onCancel}) => {
-
+    const t = useTranslation("pages.destinationAdmin.subGalleryForm");
     const galleryContext = useDestinationGalleryContext();
     const queryContext = useQueryContext();
     const subGalleryAddMutation = queryContext.useAddSubGallery();
@@ -30,8 +31,8 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
         if (isError === true) {
             throw error;
         }
-        return [ {title: "Pas de lieu", value: null, id: null}, ...data];
-    }, [queryContext]);
+        return [ {title: t("field:noLocation"), value: null, id: null}, ...data];
+    }, [queryContext, t]);
 
     const getFirstAvailableIndex = React.useCallback(() => {
         let minAvailableIndex = 1;
@@ -57,9 +58,9 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
         setFields([
             {
                 id: "title",
-                label: "Titre",
+                label: t("field:title"),
                 required: true,
-                errorText: "Merci d'indiquer un titre.",
+                errorText: t("error:title"),
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
                 default: "",
@@ -68,7 +69,7 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
             },
             {
                 id: "desc",
-                label: "Description",
+                label: t("field:description"),
                 required: false,
                 type: FIELD_TYPE_TEXT,
                 multiline: true,
@@ -78,18 +79,18 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
             },
             {
                 id: "location",
-                label: "Lieu",
+                label: t("field:location"),
                 required: false,
-                errorText: "Merci de renseigner un lieu",
+                errorText: t("error:location"),
                 type: FIELD_TYPE_SELECT,
                 options: getLocations,
                 default: null
             },
             {
                 id: "index",
-                label: "Position",
+                label: t("field:position"),
                 required: true,
-                errorText: "Merci d'indiquer une position non utilisée.",
+                errorText: t("error:position"),
                 type: FIELD_TYPE_NUMBER,
                 step: 1,
                 min: 1,
@@ -98,7 +99,7 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
                 invalidValues: getUsedIndices()
             },
         ]);
-    }, [getFirstAvailableIndex, getUsedIndices, getLocations]);
+    }, [getFirstAvailableIndex, getUsedIndices, getLocations, t]);
 
     React.useEffect(() => {
         if (subGallery === null) {
@@ -113,9 +114,9 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
             fields={fields}
             initialValues={values}
             submitAction={onSubmitGalleryForm}
-            submitCaption="Valider"
+            submitCaption={t("btn:validate")}
             onCancel={onCancel}
-            validationMessage="La sous-galerie a été sauvegardée."
+            validationMessage={t("success:saved")}
         />
     );
 }

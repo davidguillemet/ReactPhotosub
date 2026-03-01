@@ -1,24 +1,33 @@
 import React from 'react';
+import { useTranslation } from 'utils';
 import Form, {
     FIELD_TYPE_TEXT
 } from 'components/form';
 import { useImageContext } from './ImageContext';
 
-const formFields = [
-    {
-        id: "name",
-        label: "Nom du Répertoire",
-        required: true,
-        errorText: "Merci d'indiquer le nom du répertoire.",
-        type: FIELD_TYPE_TEXT,
-        multiline: false,
-        default: "",
-        focus: true
-    }
-];
+function getFields(t) {
+    return [
+        {
+            id: "name",
+            label: t("field:name"),
+            required: true,
+            errorText: t("error:name"),
+            type: FIELD_TYPE_TEXT,
+            multiline: false,
+            default: "",
+            focus: true
+        }
+    ];
+}
 
 const FolderForm = ({onChange, onCancel}) => {
+    const t = useTranslation("pages.admin.images.folderForm");
     const imageContext = useImageContext();
+    const [ fields, setFields ] = React.useState(null);
+
+    React.useEffect(() => {
+        setFields(getFields(t));
+    }, [t]);
 
     const onSubmitFolderForm = React.useCallback((values) => {
         const createFolder = imageContext.createFolder;
@@ -27,10 +36,10 @@ const FolderForm = ({onChange, onCancel}) => {
 
     return (
         <Form
-            fields={formFields}
+            fields={fields}
             submitAction={onSubmitFolderForm}
-            submitCaption="Valider"
-            validationMessage="Le répertoire a été créé avec succès."
+            submitCaption={t("btn:validate")}
+            validationMessage={t("success:created")}
             onChange={onChange}
             onCancel={onCancel}
         />
