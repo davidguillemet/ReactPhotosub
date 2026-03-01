@@ -138,8 +138,9 @@ const DestinationsComponent = withLoading(({destinations}) => {
             //     ....
             // }
             return destinations.filter(destination => {
-                // Build a string that contains the title, title_en, and all title/title_en from the region path
-                const destinationString = `${destination.title} ${destination.title_en} ${destination.regionpath.map(region => `${region.title} ${region.title_en}`).join(' ')}`;
+                // Build a string that contains the title, title_en, the tags
+                // and all title/title_en from the region path
+                const destinationString = `${destination.title} ${destination.title_en} ${destination.tags?.join(' ') ?? ''} ${destination.regionpath.map(region => `${region.title} ${region.title_en}`).join(' ')}`;
                 // Check if all keywords are included in this string
                 return Array.from(keywordFilterSet).every(keyword => destinationString.toLowerCase().includes(keyword.toLowerCase()));
             });

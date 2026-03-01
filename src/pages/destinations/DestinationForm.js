@@ -3,7 +3,8 @@ import Form, {
     FIELD_TYPE_TEXT,
     FIELD_TYPE_SELECT,
     FIELD_TYPE_DATE,
-    FIELD_TYPE_SWITCH
+    FIELD_TYPE_SWITCH,
+    FIELD_TYPE_TAGS_FIELD
 } from 'components/form';
 import { useQueryContext } from '../../components/queryContext';
 import { useTranslation } from 'utils';
@@ -105,6 +106,14 @@ const DestinationForm = ({destination, onCancel}) => {
                 dependsOn: [
                     "path"
                 ]
+            },
+            {
+                id: "tags",
+                label: "Tags",
+                required: false,
+                type: FIELD_TYPE_TAGS_FIELD,
+                multiline: true,
+                default: []
             },
             {
                 id: "macro",
