@@ -2,7 +2,8 @@ module.exports = function(config) {
     const fetchAllDestinations = (req, res, next) => {
         // See https://firebase.google.com/docs/storage/web/download-files
         res.locals.errorMessage = "Failed to load destinations.";
-        return config.pool().select("d.*")
+        return config.pool()
+            .select("d.*", "l.title as location_title")
             .from({d: "destinations_with_regionpath"})
             .orderBy("d.date", "desc")
             .where((builder) => {
@@ -10,6 +11,8 @@ module.exports = function(config) {
                     builder.where("d.published", true);
                 }
             })
+            .andWhereRaw("d.location = l.id")
+            .leftJoin({l: "locations"}, "d.location", "l.id")
             .then((destinations) => {
                 destinations.forEach((destination) => {
                     // Convert cover property from '2014/misool/DSC_456.jpg' to a real url

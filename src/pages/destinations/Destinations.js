@@ -14,6 +14,7 @@ import { styled } from '@mui/material/styles';
 
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 import { PageTitle, Paragraph } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
@@ -28,7 +29,7 @@ import { isMobile } from 'react-device-detect';
 
 import { useReactQuery } from '../../components/reactQuery';
 import { useTranslation } from '../../utils';
-import { Alert } from '@mui/material';
+import { Alert, IconButton, Stack } from '@mui/material';
 
 const DestinationTabPanel = styled(TabPanel)(({ theme }) => ({
     '&.MuiTabPanel-root': {
@@ -99,6 +100,12 @@ const DestinationsComponent = withLoading(({destinations}) => {
 
     const [filterTab, setFilterTab] = useState(FILTER_REGION);
 
+    // Use these versions as component key to force remount the filters when they are cleared,
+    // to reset their internal state (for example the text in the keyword filter input)
+    const [regionFilterVersion, setRegionFilterVersion] = useState(0);
+    const [keywordFilterVersion, setKeywordFilterVersion] = useState(0);
+    const [dateFilterVersion, setDateFilterVersion] = useState(0);
+
     useEffect(() => {
 
         const filterDestinationsByRegion = (destinations) => {
@@ -140,7 +147,7 @@ const DestinationsComponent = withLoading(({destinations}) => {
             return destinations.filter(destination => {
                 // Build a string that contains the title, title_en, the tags
                 // and all title/title_en from the region path
-                const destinationString = `${destination.title} ${destination.title_en} ${destination.tags?.join(' ') ?? ''} ${destination.regionpath.map(region => `${region.title} ${region.title_en}`).join(' ')}`;
+                const destinationString = `${destination.title} ${destination.title_en} ${destination.location_title ?? ''} ${destination.tags?.join(' ') ?? ''} ${destination.regionpath.map(region => `${region.title} ${region.title_en}`).join(' ')}`;
                 // Check if all keywords are included in this string
                 return Array.from(keywordFilterSet).every(keyword => destinationString.toLowerCase().includes(keyword.toLowerCase()));
             });
@@ -200,13 +207,56 @@ const DestinationsComponent = withLoading(({destinations}) => {
         setFilterTab(newValue);
     }, []);
 
-    const tabCaption = React.useCallback((captionKey, isModified) => {
-        return `${t(captionKey)}${isModified ? ' *' : ''}`;
-    }, [t]);
+    const clearFilter = React.useCallback((filterId) => {
+         switch(filterId) {
+            case FILTER_REGION:
+                setRegionFilterSet(null);
+                setRegionFilterVersion(prev => prev + 1);
+                break;
+            case FILTER_KEYWORD:
+                setKeywordFilterSet(null);
+                setKeywordFilterVersion(prev => prev + 1);
+                break;
+            case FILTER_DATE:
+                setDateFilterSet(null);
+                setDateFilterVersion(prev => prev + 1);
+                break;
+            default:
+                break;
+         }
+     }, []);
 
-    const hasRegionFilter = regionFilterSet && regionFilterSet.size > 0;
-    const hasKeywordFilter = keywordFilterSet && keywordFilterSet.size > 0;
-    const hasDateFilter = dateFilterSet && dateFilterSet.size > 0;
+     const hasFilter = React.useCallback((filterId) => {
+        switch(filterId) {
+            case FILTER_REGION:
+                return regionFilterSet && regionFilterSet.size > 0;
+            case FILTER_KEYWORD:
+                return keywordFilterSet && keywordFilterSet.size > 0;
+            case FILTER_DATE:
+                return dateFilterSet && dateFilterSet.size > 0;
+            default:
+                return false;
+        }
+     }, [regionFilterSet, keywordFilterSet, dateFilterSet]);
+
+     const tabCaption = React.useCallback((captionKey, filterId) => {
+        const onClearFilter = React.useCallback((e) => {
+            e.stopPropagation(); // Don't trigger the tab change when clicking on the clear filter button
+            clearFilter(filterId);
+        }, [filterId]);
+
+        return (
+            <Stack direction="row" alignItems="center" spacing={0.5}>
+                {t(captionKey)}
+                {
+                    hasFilter(filterId) &&
+                    <IconButton size="small" color="warning" sx={{ ml: 0.5, mr: 0}} onClick={onClearFilter}>
+                        <HighlightOffIcon fontSize="small" />
+                    </IconButton>
+                }
+            </Stack>
+        )
+     }, [t, clearFilter, hasFilter]);
 
     return (
         <React.Fragment>
@@ -219,9 +269,9 @@ const DestinationsComponent = withLoading(({destinations}) => {
                 textColor="secondary"
                 indicatorColor="secondary"
             >
-                <Tab key={FILTER_REGION} sx={{ fontWeight: hasRegionFilter ? "bold" : "normal" }} label={tabCaption("filterTab:byRegions", hasRegionFilter)} />
-                <Tab key={FILTER_KEYWORD} sx={{ fontWeight: hasKeywordFilter ? "bold" : "normal" }} label={tabCaption("filterTab:byKeywords", hasKeywordFilter)} />
-                <Tab key={FILTER_DATE} sx={{ fontWeight: hasDateFilter ? "bold" : "normal" }} label={tabCaption("filterTab:byYear", hasDateFilter)} />
+                <Tab key={FILTER_REGION} sx={{ fontWeight: hasFilter(FILTER_REGION) ? "bold" : "normal" }} label={tabCaption("filterTab:byRegions", FILTER_REGION)} />
+                <Tab key={FILTER_KEYWORD} sx={{ fontWeight: hasFilter(FILTER_KEYWORD) ? "bold" : "normal" }} label={tabCaption("filterTab:byKeywords", FILTER_KEYWORD)} />
+                <Tab key={FILTER_DATE} sx={{ fontWeight: hasFilter(FILTER_DATE) ? "bold" : "normal" }} label={tabCaption("filterTab:byYear", FILTER_DATE)} />
             </Tabs>
             <Box
                 sx={{
@@ -232,17 +282,17 @@ const DestinationsComponent = withLoading(({destinations}) => {
             >
                 <Fade in={filterTab === FILTER_REGION} >
                     <Box sx={{ mb: 2, display: filterTab === FILTER_REGION ? 'block' : 'none' }} >
-                        <RegionFilter destinations={destinations} onChange={handleRegionFilterChange} />
+                        <RegionFilter key={regionFilterVersion} destinations={destinations} onChange={handleRegionFilterChange} />
                     </Box>
                 </Fade>
                 <Fade in={filterTab === FILTER_KEYWORD} >
                     <Box sx={{ mb: 2, display: filterTab === FILTER_KEYWORD ? 'block' : 'none' }} >
-                        <KeyWordFilter onChange={handleKeywordFilterChange} />
+                        <KeyWordFilter key={keywordFilterVersion} onChange={handleKeywordFilterChange} />
                     </Box>
                 </Fade>
                 <Fade in={filterTab === FILTER_DATE} >
                     <Box sx={{ mb: 2, display: filterTab === FILTER_DATE ? 'block' : 'none' }} >
-                        <DateFilter destinations={destinations} onChange={handleDateFilterChange} />
+                        <DateFilter key={dateFilterVersion} destinations={destinations} onChange={handleDateFilterChange} />
                     </Box>
                 </Fade>
             </Box>
