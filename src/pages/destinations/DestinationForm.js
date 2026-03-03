@@ -109,7 +109,7 @@ const DestinationForm = ({destination, onCancel}) => {
             },
             {
                 id: "tags",
-                label: "Tags",
+                label: t("form:tags"),
                 required: false,
                 type: FIELD_TYPE_TAGS_FIELD,
                 multiline: true,
