@@ -25,7 +25,6 @@ import DateFilter from './DateFilter';
 import { useQueryContext } from '../../components/queryContext';
 import DestinationGallery from './DestinationGallery';
 import { buildLoadingState, withLoading } from '../../components/hoc';
-import { isMobile } from 'react-device-detect';
 
 import { useReactQuery } from '../../components/reactQuery';
 import { useTranslation } from '../../utils';
@@ -74,7 +73,7 @@ const PictureTypeSelector = ({destinationType, onChange}) => {
     const t = useTranslation("pages.destinations");
     return (
         <ToggleButtonGroup
-            size={isMobile ? "small" : "medium"}
+            size={"small"}
             value={destinationType}
             onChange={onChange}
             exclusive
@@ -268,6 +267,8 @@ const DestinationsComponent = withLoading(({destinations}) => {
                 onChange={onChangeSearchTabIndex}
                 textColor="secondary"
                 indicatorColor="secondary"
+                variant="scrollable"
+                scrollButtons="auto"
             >
                 <Tab key={FILTER_REGION} sx={{ fontWeight: hasFilter(FILTER_REGION) ? "bold" : "normal" }} label={tabCaption("filterTab:byRegions", FILTER_REGION)} />
                 <Tab key={FILTER_KEYWORD} sx={{ fontWeight: hasFilter(FILTER_KEYWORD) ? "bold" : "normal" }} label={tabCaption("filterTab:byKeywords", FILTER_KEYWORD)} />
