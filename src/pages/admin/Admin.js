@@ -9,7 +9,7 @@ import { withUser } from 'components/hoc';
 import Regions from './regions/Regions';
 import Images from './images';
 import NotFound from 'pages/notFound';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const _tabs = [
     {
@@ -29,12 +29,12 @@ const _defaultTab = 0;
 const Admin = () => {
 
     const getQueryParameter = useQueryParameter();
-    const history = useHistory();
+    const navigate = useNavigate();
     const location = useLocation();
     const t = useTranslation("pages.admin");
     const [tabIndex, setTabIndex] = React.useState(_defaultTab);
     const handleChange = (event, newValue) => {
-        history.push({
+        navigate({
             pathname: location.pathname,
             search: `?tab=${_tabs[newValue].id}`
         });
@@ -78,4 +78,8 @@ const Admin = () => {
     );
 }
 
-export default withUser(Admin, { admin: true, alert: true});
+const AdminController = withUser(Admin, { admin: true, alert: true});
+
+export default AdminController;
+
+export const Component = AdminController;

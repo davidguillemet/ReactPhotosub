@@ -1,15 +1,38 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { routes } from 'navigation/routes';
+
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'fontsource-roboto';
 
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+
+const fullRoutes = [
+    {
+        element: <App />,
+        path: "/",
+        children: [
+            ...routes,
+            {
+                path: "*",
+                lazy: () => import('./pages/notFound')
+            }
+        ]
+    }
+];
+
+const router = createBrowserRouter(fullRoutes);
+
 const container = document.getElementById('root');
 const root = createRoot(container);
 root.render(
     <React.StrictMode>
-        <App />
+        <RouterProvider router={router} />
     </React.StrictMode>,
 );
 

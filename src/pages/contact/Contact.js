@@ -1,7 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Prompt } from "react-router-dom";
 import { PageTitle } from '../../template/pageTypography';
 import { useAuthContext } from '../../components/authentication';
+
+import { useBlocker } from "react-router-dom";
+import { ConfirmDialog } from 'dialogs';
 
 import Form, {
     FIELD_TYPE_TEXT,
@@ -73,6 +75,11 @@ const Contact = () => {
     const authContext = useAuthContext();
     const [initialValues, setInitialValues] = useState(null);
     const [ fields, setFields ] = useState(null);
+    const [isDirty, setIsDirty] = React.useState(false);
+
+    const blocker = useBlocker(
+        ({ currentLocation, nextLocation }) => isDirty && currentLocation.pathname !== nextLocation.pathname
+    );
 
     useEffect(() => {
         setFields(getFields(t));
@@ -89,9 +96,6 @@ const Contact = () => {
             };
         setInitialValues(initialValues);
     }, [authContext.user])
-
-
-    const [isDirty, setIsDirty] = React.useState(false);
 
     const onSubmitMessageForm = useCallback((values) => {
         setIsDirty(false);
@@ -115,10 +119,22 @@ const Contact = () => {
                 validationMessage={t("info:success")}
             />
 
-            <Prompt when={isDirty} message={t("warning:leave")} />
+            <ConfirmDialog
+                open={blocker.state === "blocked"}
+                title="Des modifications sont en cours."
+                dialogContent={[t("warning:leave")]}
+                onCancel={() => {
+                    blocker.reset();
+                }}
+                onValidate={() => {
+                    blocker.proceed();
+                }}
+            />
 
         </React.Fragment>
     );
 }
 
 export default Contact
+
+export const Component = Contact;

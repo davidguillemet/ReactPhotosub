@@ -12,7 +12,7 @@ import ExpandedView from './expandedView';
 import { withLoading, buildLoadingState } from '../../components/hoc';
 import MasonryGallery from '../masonryGallery';
 import { BlockQuote } from '../../template/pageTypography';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, Collapse } from '@mui/material';
 import { useTranslation } from 'utils';
 import { Body } from '../../template/pageTypography';
@@ -202,7 +202,7 @@ const Gallery = ({
     withFavorite = true,
     colWidth = "medium"}) => {
 
-    const history = useHistory();
+    const navigate = useNavigate();
     const location = useLocation();
 
     const [expandedImageIndex, setExpandedImageIndex] = useState(null);
@@ -232,14 +232,14 @@ const Gallery = ({
             if (location.search === search) {
                 return;
             }
-            history.push({
+            navigate({
                 pathname: location.pathname,
                 search: search
             });
         } else {
             setExpandedImageIndex(index)
         }
-    }, [pushHistory, images, history, location.search, location.pathname]);
+    }, [pushHistory, images, navigate, location.search, location.pathname]);
 
     const onImageClick = useCallback((imageIndex) => {
         handleOnImageClick(imageIndex);

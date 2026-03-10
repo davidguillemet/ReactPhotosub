@@ -349,3 +349,5 @@ const DestinationsController = () => {
 }
 
 export default DestinationsController;
+
+export const Component = DestinationsController;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Box, Paper } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import { Unstable_Popup as Popup } from '@mui/base/Unstable_Popup';
@@ -27,7 +27,7 @@ const HeaderSearch = ({
 }) => {
 
     const theme = useTheme();
-    const history = useHistory();
+    const navigate = useNavigate();
     const { subscribeHistory, unsubscribeHistory } = useAppContext();
 
     const t = useTranslation("components.search");
@@ -85,8 +85,8 @@ const HeaderSearch = ({
 
     const onSeeAllResults = React.useCallback(() => {
         handleClose();
-        pushSearchConfigHistory(history, searchResult.query, settings);
-    }, [history, searchResult, settings, handleClose]);
+        pushSearchConfigHistory(navigate, searchResult.query, settings);
+    }, [navigate, searchResult, settings, handleClose]);
 
     const handleNextSearchPage = React.useCallback(() => {
         setLoadingNextPage(true);

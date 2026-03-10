@@ -1,6 +1,6 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import TableContainer from '@mui/material/TableContainer';
@@ -39,15 +39,15 @@ columns.push({ id: 'tags', label: '...' });                         // Ok if the
 const Div = styled('div')(() => {});
 
 const Images = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const imageContext = useImageContext();
     const uploadContext = useUploadContext();
     const t = useTranslation("pages.admin.images");
     const folderName = imageContext.folderType === FOLDER_TYPE.root ? t("rootFolder") : imageContext.folderName;
 
     const onDisplayDestination = React.useCallback(() => {
-        history.push(`/destinations/${imageContext.destinationPath}`)
-    }, [history, imageContext.destinationPath]);
+        navigate(`/destinations/${imageContext.destinationPath}`);
+    }, [navigate, imageContext.destinationPath]);
 
     const onClickUpload = React.useCallback(() => {
         const uploadImage = uploadContext.onClickUpload;

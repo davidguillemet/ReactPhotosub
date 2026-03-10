@@ -151,3 +151,5 @@ const MySelection = withUser(() => {
 });
 
 export default MySelection;
+
+export const Component = MySelection;

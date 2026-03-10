@@ -300,3 +300,5 @@ const Destination = () => {
 };
 
 export default Destination;
+
+export const Component = Destination;

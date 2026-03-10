@@ -161,3 +161,5 @@ const AccountManagement = () => {
 };
 
 export default AccountManagement;
+
+export const Component = AccountManagement;

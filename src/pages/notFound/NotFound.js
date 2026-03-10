@@ -16,3 +16,5 @@ const NotFound = (props) => {
 }
 
 export default NotFound;
+
+export const Component = NotFound;

@@ -1,11 +1,11 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const AppContext = React.createContext(null);
 
 export const AppContextProvider = ({ children }) => {
 
-    const history = useHistory();
+    const location = useLocation();
     const historySubscriptions = React.useRef(new Map());
     const subscribeHistory = React.useCallback((key, func) => {
         historySubscriptions.current.set(key, func);
@@ -13,16 +13,15 @@ export const AppContextProvider = ({ children }) => {
     const unsubscribeHistory = React.useCallback((key) => {
         historySubscriptions.current.delete(key);
     }, []);
-    const callHistoryObservers = React.useCallback((location) => {
+    const callHistoryObservers = React.useCallback((loc) => {
         // [...xxx.values()] otherwise it does not work on mobile...
-        [...historySubscriptions.current.values()].forEach(fn => fn(location));
+        [...historySubscriptions.current.values()].forEach(fn => fn(loc));
     }, []);
 
+    // Effect called on location change, to notify all subscribers
     React.useEffect(() => {
-        history.listen((location, action) => {
-            callHistoryObservers(location);
-        });
-    }, [history, callHistoryObservers]);
+        callHistoryObservers(location);
+    }, [location, callHistoryObservers]);
 
     const [drawerOpen, setDrawerOpen] = React.useState(false);
 

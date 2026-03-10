@@ -1,7 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import { StyledEngineProvider } from '@mui/material/styles';
-import { BrowserRouter as Router } from "react-router-dom";
 import { FirebaseProvider } from './components/firebase';
 import ScrollTop from './template/scrollTop';
 
@@ -30,31 +29,29 @@ const App = (props) => {
     return (
         <Box sx={{ display: 'flex', minHeight: "100%"}} id="AppContainer">
             <StyledEngineProvider injectFirst>
-                <Router>
-                    <ChainedProviders
-                        providers={[
-                            HelmetProvider,
-                            ToastContextProvider,
-                            DarkModeProvider,
-                            CustomThemeProvider,
-                            OverlayProvider,
-                            TranslationProvider,
-                            ReactQueryClientProvider,
-                            FirebaseProvider,
-                            DataManagerProvider,
-                            QueryContextProvider,
-                            AuthProvider,
-                            FavoritesProvider
-                        ]}
-                    >
-                        <CssBaseline />
-                            <AppContent {...props} />
-                        <ScrollTop
-                            {...props}
-                            anchorSelector={`#${scrollTopAnchor}`}
-                        />
-                    </ChainedProviders>
-                </Router>
+                <ChainedProviders
+                    providers={[
+                        HelmetProvider,
+                        ToastContextProvider,
+                        DarkModeProvider,
+                        CustomThemeProvider,
+                        OverlayProvider,
+                        TranslationProvider,
+                        ReactQueryClientProvider,
+                        FirebaseProvider,
+                        DataManagerProvider,
+                        QueryContextProvider,
+                        AuthProvider,
+                        FavoritesProvider
+                    ]}
+                >
+                    <CssBaseline />
+                    <AppContent {...props} />
+                    <ScrollTop
+                        {...props}
+                        anchorSelector={`#${scrollTopAnchor}`}
+                    />
+                </ChainedProviders>
             </StyledEngineProvider>
         </Box>
     )

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useRouteMatch } from "react-router-dom";
+import { useMatch } from "react-router-dom";
 import { useQueryContext } from '../queryContext';
 import { formatDate, getThumbnailSrc, useLanguage } from '../../utils';
 import { DestinationsPath } from '../../navigation/routes';
@@ -100,10 +100,9 @@ const DestinationsMapWithLocationLoader = ({destinations, onClose}) => {
 
 export const DestinationsMap = ({destinations, onClose}) => {
 
-    const destinationsPageMatch = useRouteMatch({
+    const destinationsPageMatch = useMatch({
         path: DestinationsPath,
-        strict: true,
-        exact: true
+        end: true
     });
 
     if (destinationsPageMatch !== null) {

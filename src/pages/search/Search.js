@@ -42,3 +42,5 @@ const SearchPage = () => {
 };
 
 export default SearchPage;
+
+export const Component = SearchPage;

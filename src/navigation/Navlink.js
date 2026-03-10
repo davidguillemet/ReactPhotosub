@@ -1,12 +1,12 @@
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom"; // v6
 
 const NavLinkTemplate = props => (
   <NavLink
-      exact={true}
       to={props.to}
-      activeStyle={{
-        borderTopWidth: 4
-      }}
+      end={props.end}
+      style={({ isActive }) => ({
+        borderTopWidth: isActive ? 4 : undefined
+      })}
   >
     {props.label}
   </NavLink>

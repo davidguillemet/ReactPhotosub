@@ -303,3 +303,5 @@ const UserProfileController = withUser(() => {
 });
 
 export default UserProfileController;
+
+export const Component = UserProfileController;

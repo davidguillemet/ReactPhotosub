@@ -92,3 +92,5 @@ const Finning = () => {
 };
 
 export default Finning;
+
+export const Component = Finning;

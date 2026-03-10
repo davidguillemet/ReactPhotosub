@@ -1,28 +1,7 @@
-import React, { Suspense } from 'react';
-import Box from '@mui/material/Box';
+import React from 'react';
 import Container from '@mui/material/Container';
-import { Switch, Route } from "react-router-dom";
-import { routes } from '../../navigation/routes';
-import { FullPageLoading } from 'components/loading';
-import NotFound from '../../pages/notFound';
-import { HelmetFull } from '../seo';
+import { Outlet} from "react-router-dom";
 import { ToastNotifications } from '../../components/notifications';
-
-const RouteComponent = ({route}) => {
-    const Component = route.component;
-    if (route.fullWidth) {
-        return <Component />
-    } else {
-        return (
-            <Box sx={{
-                width: (theme) => theme.pageWidth.width,
-                maxWidth: (theme) => route.maxWidth || theme.pageWidth.maxWidth,
-            }}>
-                <Component />
-            </Box>
-        )
-    }
-}
 
 const PageContent = React.forwardRef((props, ref) => {
 
@@ -50,21 +29,7 @@ const PageContent = React.forwardRef((props, ref) => {
             maxWidth={false}
             {...props}
         >
-            <Suspense fallback={<FullPageLoading />}>
-                <Switch>
-                    {
-                        routes.map((route, index) => {
-                            return (
-                            <Route key={index} exact strict path={route.path}>
-                                <HelmetFull route={route} />
-                                <RouteComponent route={route} />
-                            </Route>
-                            );
-                        })
-                    }
-                    <Route path="*" component={NotFound} />
-                </Switch>
-            </Suspense>
+            <Outlet />
             <ToastNotifications />
         </Container>
     );

@@ -176,7 +176,7 @@ const DrawerContent = ({variant = "temporary"}) => {
                 {
                     routes.filter(route => route.sidebar).map((route, index) => {
                         return (
-                            <NavigationLink key={index} to={route.path} isActive={isLinkActive}>
+                            <NavigationLink key={index} to={route.path} >
                                 <ListItemButton>
                                     <MenuItemIcon variant={variant} route={route}>
                                         <ListItemIcon>

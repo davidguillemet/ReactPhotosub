@@ -226,3 +226,5 @@ const HomeController = () => {
 }
 
 export default HomeController;
+
+export const Component = HomeController;

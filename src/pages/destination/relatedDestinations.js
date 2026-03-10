@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react';
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Box from '@mui/material/Box';
 import lazyComponent from '../../components/lazyComponent';
 import { useQueryContext } from '../../components/queryContext';
@@ -43,12 +43,12 @@ const EmptyRelatedDestinations = () => {
 }
 
 const RelatedDestinationsSlider = withLoading(({destination, related, imageHeight}) => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const { language } = useLanguage();
     const images = useMemo(() => related.filter(dest => dest.id !== destination.id).map(dest => imageFromCover(dest, language)), [related, destination, language]);
 
     const onSelectDestination = (index) => {
-        history.push(`/destinations/${images[index].path}`);
+        navigate(`/destinations/${images[index].path}`);
     };
 
     const renderOverlay = useCallback((image) => {

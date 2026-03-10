@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useCallback, useMemo, useReducer, useRef } from 'react';
 import Button from '@mui/material/Button';
 import HelpIcon from '@mui/icons-material/Help';
-import { Prompt } from "react-router-dom";
+
+import { useBlocker } from "react-router-dom";
+import { ConfirmDialog } from 'dialogs';
 
 import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
@@ -63,6 +65,12 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
     const removeSimulation = queryContext.useRemoveSimulation();
     const simulationInitUser = useRef(undefined);
     const { toast } = useToast();
+
+    const blocker = useBlocker(
+        ({ currentLocation, nextLocation }) =>
+            state !== null && state.simulations.find(simulation => isDirty(simulation)) !== undefined &&
+            currentLocation.pathname !== nextLocation.pathname
+    );
 
     useEffect(() => {
         // No need to reinit simulations state if the user is the same
@@ -139,16 +147,13 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
     }, [setActionIsRunning, state, dispatch, toast, removeSimulation, t]);
 
     const promptMessage = useMemo(() => {
-        let message = "Des modifications sont en cours.\n"
-                    + "Cliquez sur OK pour confirmer la navigation et perdre vos modifications.\n"
+        let message = "Cliquez sur OK pour confirmer la navigation et perdre vos modifications.\n"
                     + "Cliquez sur Annuler pour rester sur la page et sauvegarder vos modifications";
         if (user === null) {
             message += " (connexion requise)";
         }
-        return message;
+        return message.split("\n");
     }, [user]);
-
-    const hasDirty = state !== null && state.simulations.find(simulation => isDirty(simulation)) !== undefined;
 
     // Add a simulation property to the simulation to recreate the component from scratch when the user changes
     // -> avoid an issue when refreshing the page
@@ -178,7 +183,17 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
                 key={simulationKey}
             />
 
-            <Prompt when={hasDirty} message={promptMessage} />
+            <ConfirmDialog
+                open={blocker.state === "blocked"}
+                title="Des modifications sont en cours."
+                dialogContent={promptMessage}
+                onCancel={() => {
+                    blocker.reset();
+                }}
+                onValidate={() => {
+                    blocker.proceed();
+                }}
+            />
 
         </React.Fragment>
     );
@@ -238,3 +253,5 @@ const SimulationManagerController = () => {
 }
 
 export default SimulationManagerController;
+
+export const Component = SimulationManagerController;

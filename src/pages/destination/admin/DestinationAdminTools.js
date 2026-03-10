@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack } from '@mui/material';
 import { useAuthContext } from 'components/authentication';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'utils';
 import useFormDialog from 'dialogs/FormDialog';
 import SubGalleryForm from './SubGalleryForm';
@@ -12,7 +12,7 @@ import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 const DestinationAdminTools = ({destination}) => {
     const t = useTranslation("pages.destinationAdmin.tools");
     const authContext = useAuthContext();
-    const history = useHistory();
+    const navigate = useNavigate();
     const { dialogProps, openDialog, FormDialog } = useFormDialog();
     const [ subGalleryToEdit, setSubGalleryToEdit ] = React.useState(null);
 
@@ -22,8 +22,8 @@ const DestinationAdminTools = ({destination}) => {
     }, [openDialog]);
 
     const onManageImages = React.useCallback(() => {
-        history.push(`/admin?tab=images&path=${encodeURIComponent(destination.path)}`)
-    }, [history, destination]);
+        navigate(`/admin?tab=images&path=${encodeURIComponent(destination.path)}`);
+    }, [navigate, destination]);
 
     if (!authContext.admin) {
         return null;

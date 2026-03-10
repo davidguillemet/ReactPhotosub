@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { buildLoadingState, withLoading } from 'components/hoc';
 import {
     extractDestinationPath,
@@ -96,7 +96,7 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     const firebaseContext = useFirebaseContext();
     const dataProvider = useDataProvider();
     const queryContext = useQueryContext();
-    const history = useHistory();
+    const navigate = useNavigate();
     const location = useLocation();
     const getQueryParameter = useQueryParameter();
     const [ rows, setRows ] = React.useState({});
@@ -256,11 +256,11 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
     }, []);
 
     const onSetBucketPath = React.useCallback((bucketPath) => {
-        history.push({
+        navigate({
             pathname: location.pathname,
             search: `?tab=images${bucketPath.length > 0 ? `&path=${encodeURIComponent(bucketPath)}` : ``}`
         });
-    }, [history, location]);
+    }, [navigate, location]);
 
     React.useLayoutEffect(() => {
         const pathParameter = getQueryParameter("path") || "";

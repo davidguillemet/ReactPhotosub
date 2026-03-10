@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 
 import SearchInput from './searchInput';
@@ -41,7 +41,7 @@ const Search = React.forwardRef(({
 
     const t = useTranslation("components.search");
     const { language } = useLanguage();
-    const history = useHistory();
+    const navigate = useNavigate();
     const dataProvider = useDataProvider();
     const queryContext = useQueryContext();
     const firebaseContext = useFirebaseContext();
@@ -173,7 +173,7 @@ const Search = React.forwardRef(({
 
     function handleChangeSettings(settings) {
         if (pushHistory ===  true) {
-            pushSearchConfigHistory(history, searchConfig.query, settings);
+            pushSearchConfigHistory(navigate, searchConfig.query, settings);
         } else {
             setSearchConfig(oldConfig => {
                 return {
@@ -187,7 +187,7 @@ const Search = React.forwardRef(({
 
     function setSearchQuery(newQuery) {
         if (pushHistory ===  true) {
-            pushSearchConfigHistory(history, newQuery, searchConfig.settings);
+            pushSearchConfigHistory(navigate, newQuery, searchConfig.settings);
         } else {
             setSearchConfig(oldConfig => {
                 return {

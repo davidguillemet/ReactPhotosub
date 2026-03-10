@@ -12,11 +12,14 @@ export default function ConfirmDialog({
     title,
     dialogContent,
     onOpenChanged,
-    onValidate
+    onValidate,
+    onCancel
 }) {
     const t = useTranslation("dialogs");
     const handleClose = () => {
-        onOpenChanged(false);
+        if (onOpenChanged) {
+            onOpenChanged(false);
+        }
     };
 
     const handleValidate = () => {
@@ -25,6 +28,13 @@ export default function ConfirmDialog({
             onValidate();
         }
     };
+
+    const handleCancel = () => {
+        handleClose();
+        if (onCancel) {
+            onCancel();
+        }
+    }
 
     return (
         <div>
@@ -41,7 +51,7 @@ export default function ConfirmDialog({
                     }
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} >
+                    <Button onClick={handleCancel} >
                     {t("cancel")}
                     </Button>
                     <Button onClick={handleValidate} >
