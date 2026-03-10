@@ -38,7 +38,6 @@ const SearchSettings = ({
                     checked={settings.exact}
                     onChange={onChangeExact}
                     name="checkedExact"
-                    color="primary"
                 />}
              label={t("exactSwitch")}
         />
