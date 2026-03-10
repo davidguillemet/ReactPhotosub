@@ -10,9 +10,11 @@ export function getInitialSearchResult() {
 }
 
 export function pushSearchConfigHistory(navigate, query, settings) {
-    let path = '/search';
+    let path = '/search?';
     if (query && query.length > 0) {
-        path += '?' + new URLSearchParams({query: query}).toString() + `&exact=${settings ? settings.exact : false}`;
+        path += new URLSearchParams({query: query}).toString();
+        path += '&';
     }
+    path += `exact=${settings ? settings.exact : false}`;
     navigate(path);
 }
