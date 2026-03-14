@@ -48,22 +48,6 @@ const closedMixin = (theme) => ({
     width: `${miniDrawerWidth}px`
 });
 
-function isLinkActive(match, location) {
-    if (match === null) {
-        return false;
-    }
-
-    if (match.url === "/" || match.url === "") {
-        return location.pathname === "/";
-    }
-
-    if (location.pathname.indexOf(match.url) === 0) {
-        return true;
-    }
-
-    return false;
-}
-
 const MenuItemIcon = ({route, variant, children}) => {
     const t = useTranslation(ROUTES_NAMESPACE);
     if (variant === "permanent") {
