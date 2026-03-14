@@ -54,6 +54,7 @@
             "error:message": "Please enter a message.",
             "switch:sendCopy": "Receive a copy of your message",
             "info:success": "Your message has been sent. Thank you!",
+            "warning:leaveTitle": "Unsaved changes",
             "warning:leave": "Your message was not sent after the last edits.\nDo you confirm you want to leave this page ?",
             "submitCaption": "Send"
         },

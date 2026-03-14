@@ -54,6 +54,7 @@
             "error:message": "Merci de saisir un message.",
             "switch:sendCopy": "Recevoir une copie de votre message",
             "info:success": "Votre message a bien été envoyé. Merci!",
+            "warning:leaveTitle": "Des modifications sont en cours.",
             "warning:leave": "Votre message n'a pas été envoyé après les dernières modifications.\nContinuer la navigation?",
             "submitCaption": "Envoyer"
         },

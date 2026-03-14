@@ -2,8 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo, useReducer, useRef } 
 import Button from '@mui/material/Button';
 import HelpIcon from '@mui/icons-material/Help';
 
-import { useBlocker } from "react-router-dom";
-import { ConfirmDialog } from 'dialogs';
+import useNavigationBlocker from 'navigation/useNavigationBlocker';
 
 import { PageTitle } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
@@ -66,10 +65,24 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
     const simulationInitUser = useRef(undefined);
     const { toast } = useToast();
 
-    const blocker = useBlocker(
+    const promptMessage = useMemo(() => {
+        let message = "Cliquez sur Valider pour confirmer la navigation et perdre vos modifications.\n"
+                    + "Cliquez sur Annuler pour rester sur la page et sauvegarder vos modifications";
+        if (user === null) {
+            message += " (connexion requise)";
+        }
+        return message.split("\n");
+    }, [user]);
+
+    const {
+        DialogComponent: BlockerDialog,
+        dialogProps: blockerDialogProps
+    } = useNavigationBlocker(
         ({ currentLocation, nextLocation }) =>
             state !== null && state.simulations.find(simulation => isDirty(simulation)) !== undefined &&
-            currentLocation.pathname !== nextLocation.pathname
+            currentLocation.pathname !== nextLocation.pathname,
+        "Des modifications sont en cours.",
+        promptMessage
     );
 
     useEffect(() => {
@@ -146,15 +159,6 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
 
     }, [setActionIsRunning, state, dispatch, toast, removeSimulation, t]);
 
-    const promptMessage = useMemo(() => {
-        let message = "Cliquez sur OK pour confirmer la navigation et perdre vos modifications.\n"
-                    + "Cliquez sur Annuler pour rester sur la page et sauvegarder vos modifications";
-        if (user === null) {
-            message += " (connexion requise)";
-        }
-        return message.split("\n");
-    }, [user]);
-
     // Add a simulation property to the simulation to recreate the component from scratch when the user changes
     // -> avoid an issue when refreshing the page
     const simulationKey = user !== null ? user.uid : "anonymous";
@@ -183,17 +187,7 @@ const SimulationManager = withLoading(({user, fetchedSimulations}) => {
                 key={simulationKey}
             />
 
-            <ConfirmDialog
-                open={blocker.state === "blocked"}
-                title="Des modifications sont en cours."
-                dialogContent={promptMessage}
-                onCancel={() => {
-                    blocker.reset();
-                }}
-                onValidate={() => {
-                    blocker.proceed();
-                }}
-            />
+            <BlockerDialog {...blockerDialogProps} />
 
         </React.Fragment>
     );

@@ -2,8 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { PageTitle } from '../../template/pageTypography';
 import { useAuthContext } from '../../components/authentication';
 
-import { useBlocker } from "react-router-dom";
-import { ConfirmDialog } from 'dialogs';
+import useNavigationBlocker from 'navigation/useNavigationBlocker';
 
 import Form, {
     FIELD_TYPE_TEXT,
@@ -77,8 +76,13 @@ const Contact = () => {
     const [ fields, setFields ] = useState(null);
     const [isDirty, setIsDirty] = React.useState(false);
 
-    const blocker = useBlocker(
-        ({ currentLocation, nextLocation }) => isDirty && currentLocation.pathname !== nextLocation.pathname
+    const {
+        DialogComponent: BlockerDialog,
+        dialogProps: blockerDialogProps
+    } = useNavigationBlocker(
+        ({ currentLocation, nextLocation }) => isDirty && currentLocation.pathname !== nextLocation.pathname,
+        t("warning:leaveTitle"),
+        [t("warning:leave")]
     );
 
     useEffect(() => {
@@ -119,17 +123,7 @@ const Contact = () => {
                 validationMessage={t("info:success")}
             />
 
-            <ConfirmDialog
-                open={blocker.state === "blocked"}
-                title="Des modifications sont en cours."
-                dialogContent={[t("warning:leave")]}
-                onCancel={() => {
-                    blocker.reset();
-                }}
-                onValidate={() => {
-                    blocker.proceed();
-                }}
-            />
+            <BlockerDialog {...blockerDialogProps} />
 
         </React.Fragment>
     );
