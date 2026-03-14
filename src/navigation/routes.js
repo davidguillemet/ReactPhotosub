@@ -40,7 +40,7 @@ const fixedWidthComponent = (Component, maxWidth) => () => {
     );
 };
 
-function lazyLoader(route) {
+function lazyLoader(route, queryClient, dataProvider) {
     const { page, fullWidth, maxWidth } = route;
     return async () => {
         const [PageModule, Helmet] = await Promise.all([
@@ -48,7 +48,7 @@ function lazyLoader(route) {
             import("template/seo"),
         ]);
         const { HelmetFull } = Helmet;
-        const { Component } = PageModule;
+        const { Component, loader } = PageModule;
         const FinalComponent = fullWidth ? Component : fixedWidthComponent(Component, maxWidth);
         return {
             Component: () => {
@@ -58,12 +58,13 @@ function lazyLoader(route) {
                          <FinalComponent />
                     </React.Fragment>
                 );
-            }
+            },
+            loader: loader ? loader(queryClient, dataProvider) : null
         };
     };
 };
 
-const nativeRoutes = [
+export const routes = [
     // Main Meu in Sidebar : sidebar = true
     {
         label: "home",
@@ -171,10 +172,10 @@ const nativeRoutes = [
     }
 ];
 
-export const routes = nativeRoutes.map(route => {
+export const buildRoutes = (queryClient, dataProvider) => routes.map(route => {
     return {
         ...route,
-        lazy: lazyLoader(route)
+        lazy: lazyLoader(route, queryClient, dataProvider)
     }
 });
 

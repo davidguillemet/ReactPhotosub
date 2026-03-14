@@ -1,38 +1,33 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { routes } from 'navigation/routes';
 
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'fontsource-roboto';
 
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-
-const fullRoutes = [
-    {
-        element: <App />,
-        path: "/",
-        children: [
-            ...routes,
-            {
-                path: "*",
-                lazy: () => import('./pages/notFound')
-            }
-        ]
-    }
-];
-
-const router = createBrowserRouter(fullRoutes);
+import ChainedProviders from './components/chainedProviders';
+import { ToastContextProvider } from './components/notifications';
+import { ReactQueryClientProvider } from './components/reactQuery';
+import { FirebaseProvider } from './components/firebase';
+import { TranslationProvider } from './utils';
+import { OverlayProvider } from './components/loading/loadingOverlay';
+import { DataManagerProvider } from './components/dataProvider';
+import ReactRouteProvider from './navigation/ReactRouteProvider';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
 root.render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <ChainedProviders providers={[
+            ToastContextProvider,
+            ReactQueryClientProvider,
+            OverlayProvider,
+            TranslationProvider,
+            FirebaseProvider,
+            DataManagerProvider,
+            ReactRouteProvider // Final RouteProvider should be the last provider in the chain
+        ]}>
+        </ChainedProviders>
     </React.StrictMode>,
 );
 

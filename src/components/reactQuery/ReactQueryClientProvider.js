@@ -14,7 +14,8 @@ const ReactQueryClientProvider = ({ children }) => {
     const queryClientRef = useRef(new QueryClient({
         defaultOptions: {
             queries: {
-                staleTime: Infinity,
+                staleTime: Infinity, // Data will never be stale, we will handle invalidation manually
+                cacheTime: 20*60*1000, // 20 minutes
                 refetchOnWindowFocus: false,
                 refetchOnMount: false,
                 refetchOnReconnect: false,
