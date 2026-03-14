@@ -4,8 +4,9 @@ import Box from '@mui/material/Box';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 
-import { uniqueID, shuffleArray, getThumbnailSrc, useImageKit } from 'utils';
-import { useQueryContext } from 'components/queryContext';
+import { Await, useLoaderData } from "react-router-dom";
+
+import { getThumbnailSrc, useImageKit } from 'utils';
 import { useScrollBlock } from 'utils';
 import { useAppContext } from 'template/app/appContext';
 import { useFocusManager, useResizeObserver } from 'components/hooks';
@@ -24,11 +25,11 @@ const MainImageStyled = styled('img')({
 
 const _imageSizeRatio = 600 / 400; // always landscape
 
-const MainImage = ({images, currentImageIndex, handleImageLoaded, width, height}) => {
+const _defaultImageSrc = useImageKit ?
+    "photosub.appspot.com/home/DSC_0706-Modifier.jpg" :
+    "/home_initial.jpg";
 
-    let defaultImageSrc = useImageKit ?
-        "photosub.appspot.com/home/DSC_0706-Modifier.jpg" :
-        "/home_initial.jpg";
+const MainImage = ({images, currentImageIndex, handleImageLoaded, width, height}) => {
 
     // If the height is less than the image height which width is the available width, all is ok
     // -> get the thumbnail with the same width as the available width
@@ -48,7 +49,7 @@ const MainImage = ({images, currentImageIndex, handleImageLoaded, width, height}
         const currentImage = images[currentImageIndex % images.length];
         originalImageSrc = currentImage.src;
     } else {
-        originalImageSrc = defaultImageSrc;
+        originalImageSrc = _defaultImageSrc;
     }
 
     const currentImageSrc = React.useMemo(() => getThumbnailSrc({
@@ -77,7 +78,7 @@ const Home = ({images, currentIndex}) => {
 
     const { focus: onFocus } = useFocusManager();
 
-    const isPlaying = !drawerOpen && onFocus;
+    const isPlaying = !drawerOpen && onFocus && images !== null && images.length > 1;
 
     useEffect(() => {
         blockScroll();
@@ -200,31 +201,19 @@ const Home = ({images, currentIndex}) => {
         </Box>
     )
 };
-
+    
 const HomeController = () => {
-    const queryContext = useQueryContext();
-    const [images, setImages] = useState(null);
-    const { data } = queryContext.useFetchHomeSlideshow();
-    useEffect(() => {
-        if (data === undefined) {
-            return;
-        }
-        setImages(shuffleArray(data).map(image => {
-            return {
-                ...image,
-                ...(process.env.REACT_APP_USE_FUNCTIONS_EMULATOR === 'true' && {
-                    src: image.src.replace("127.0.0.1", process.env.REACT_APP_DEV_HOST)
-                }),
-                id: uniqueID()
-            }
-        }));
-    }, [data]);
-
+    const { images } = useLoaderData();
     return (
-        <Home images={images} currentIndex={-1} />
+        <React.Suspense
+            fallback={<Home images={[{src: _defaultImageSrc}]} currentIndex={-1} />}
+        >
+            <Await resolve={images}>
+                {images => <Home images={images} currentIndex={-1} />}
+            </Await>
+        </React.Suspense>
     )
 }
 
 export default HomeController;
-
 export const Component = HomeController;
