@@ -30,11 +30,11 @@ const SimulationImage = ({image, selected, border, shadowFactor, dispatch, onCli
         dragging.current = true;
     }
     const onDragStop = (event, data) => {
-        dispatch(moveImage(image.id, data.y, data.x, simulationIndex))
         if (dragging.current === false) {
             handleClick();
         } else {
             dragging.current = false;
+            dispatch(moveImage(image.id, data.y, data.x, simulationIndex))
         }
     };
 

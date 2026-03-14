@@ -110,11 +110,6 @@ function imageReducer(state, action) {
                 src: action.src
             };
         case ACTION_MOVE_IMAGE:
-            if (action.position.top === state.position.top &&
-                action.position.left === state.position.left) {
-                // No change: it might happen when we just click on the image
-                return state;
-            }
             return {
                 ...state,
                 position: action.position
