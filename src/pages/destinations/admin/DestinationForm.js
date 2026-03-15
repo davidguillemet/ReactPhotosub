@@ -6,7 +6,7 @@ import Form, {
     FIELD_TYPE_SWITCH,
     FIELD_TYPE_TAGS_FIELD
 } from 'components/form';
-import { useQueryContext } from '../../components/queryContext';
+import { useQueryContext } from 'components/queryContext';
 import { useTranslation } from 'utils';
 
 const DestinationForm = ({destination, onCancel}) => {

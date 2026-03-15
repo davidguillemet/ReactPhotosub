@@ -19,9 +19,9 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { PageTitle, Paragraph } from '../../template/pageTypography';
 import { VerticalSpacing } from '../../template/spacing';
 import { DestinationsMap } from '../../components/map';
-import RegionFilter from './RegionFilter';
-import KeyWordFilter from './KeyWordFilter';
-import DateFilter from './DateFilter';
+import RegionFilter from './filters/RegionFilter'
+import KeyWordFilter from './filters/KeyWordFilter';
+import DateFilter from './filters/DateFilter';
 import { useQueryContext } from '../../components/queryContext';
 import DestinationGallery from './DestinationGallery';
 import { buildLoadingState, withLoading } from '../../components/hoc';
@@ -326,8 +326,7 @@ const DestinationsComponent = withLoading(({destinations}) => {
         </React.Fragment>
     )
 }, [
-    buildLoadingState("destinations", [null, undefined]),
-    buildLoadingState("regionHierarchy", [null]),
+    buildLoadingState("destinations", [null, undefined])
 ]);
 
 const DestinationsController = () => {

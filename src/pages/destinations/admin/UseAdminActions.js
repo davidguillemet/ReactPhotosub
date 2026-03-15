@@ -2,11 +2,11 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Fab } from "@mui/material";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { useQueryContext } from '../../components/queryContext';
+import { useQueryContext } from 'components/queryContext';
 import useFormDialog from 'dialogs/FormDialog';
 import DestinationForm from './DestinationForm';
 import { useTranslation, destinationTitle } from 'utils';
-import ConfirmDialog from '../../dialogs/ConfirmDialog';
+import ConfirmDialog from 'dialogs/ConfirmDialog';
 import { useAuthContext } from 'components/authentication';
 
 const Div = styled('div')(() => {});
