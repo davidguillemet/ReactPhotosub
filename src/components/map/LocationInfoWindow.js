@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 import { Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import DestinationLink from '../destinationLink';
@@ -92,9 +93,13 @@ const InfoWindowContainer = styled('div')(({ theme }) => ({
 
 const LocationTitleLink = ({isDestinationPage, isSubGallery, title, children}) => {
 
+    const navigate = useNavigate();
+
     const onClickGallery = React.useCallback(() => {
-        window.location.hash = getSubGalleryAnchorName(title);
-    }, [title]);
+        navigate({
+            hash: `#${getSubGalleryAnchorName(title)}`
+        });
+    }, [title, navigate]);
 
     if (isDestinationPage && isSubGallery) {
         return (
