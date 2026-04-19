@@ -9,7 +9,6 @@ import ChainedProviders from './components/chainedProviders';
 import { DarkModeProvider } from 'components/theme';
 import CustomThemeProvider from 'template/theme';
 import { QueryContextProvider } from './components/queryContext';
-import { AuthProvider } from './components/authentication';
 import { FavoritesProvider } from './components/favorites';
 import { HelmetProvider } from 'react-helmet-async';
 
@@ -28,7 +27,6 @@ const App = (props) => {
                         DarkModeProvider,
                         CustomThemeProvider,
                         QueryContextProvider,
-                        AuthProvider,
                         FavoritesProvider
                     ]}
                 >

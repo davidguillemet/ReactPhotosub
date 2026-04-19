@@ -8,9 +8,10 @@ module.exports = function(admin, config) {
         .post(async function(req, res, next) {
             const newDestination = req.body;
             res.locals.errorMessage = `Failed to insert destination ${newDestination.title}/${newDestination.path}.`;
+            const newDestinationData = await getDestinationPropsToUpdate(newDestination);
             return config.pool("destinations")
                 .returning("id")
-                .insert(newDestination)
+                .insert(newDestinationData)
                 .then(() => {
                     return fetchAllDestinations(req, res, next);
                 })

@@ -12,6 +12,7 @@ import { FirebaseProvider } from './components/firebase';
 import { TranslationProvider } from './utils';
 import { OverlayProvider } from './components/loading/loadingOverlay';
 import { DataManagerProvider } from './components/dataProvider';
+import { AuthProvider } from './components/authentication';
 import ReactRouteProvider from './navigation/ReactRouteProvider';
 
 const container = document.getElementById('root');
@@ -25,7 +26,8 @@ root.render(
             TranslationProvider,
             FirebaseProvider,
             DataManagerProvider,
-            ReactRouteProvider // Final RouteProvider should be the last provider in the chain
+            AuthProvider,       // Before ReactRouteProvider to allow route guards based on authentication
+            ReactRouteProvider  // Final RouteProvider should be the last provider in the chain
         ]}>
         </ChainedProviders>
     </React.StrictMode>,

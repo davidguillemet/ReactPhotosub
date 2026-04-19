@@ -1,4 +1,5 @@
 import React from 'react';
+//import { styled } from '@mui/material/styles';
 import { useToast } from '../notifications';
 import { useOverlay } from '../loading/loadingOverlay';
 import {
@@ -8,8 +9,10 @@ import {
     SwitchField,
     CaptchaField,
     GenericTextField,
-    LatLongField
+    LatLongField,
+    HiddenField
 } from './fields';
+import { useAsyncFetcher } from 'components/reactRouter';
 
 export const FIELD_TYPE_TEXT = 'text';
 export const FIELD_TYPE_TAGS_FIELD = 'tagsField';
@@ -24,6 +27,7 @@ export const FIELD_TYPE_PASSWORD = 'password';
 export const FIELD_TYPE_PASSWORD_CONFIRM = 'passwordConfirm';
 export const FIELD_TYPE_LATLONG = "latlong";
 export const FIELD_TYPE_CAPTCHA = 'reCaptcha';
+export const FIELD_TYPE_HIDDEN = 'hidden';
 
 const FormContext = React.createContext(null);
 
@@ -40,7 +44,8 @@ const _FormFields = {
     [FIELD_TYPE_PASSWORD]: GenericTextField,
     [FIELD_TYPE_PASSWORD_CONFIRM]: GenericTextField,
     [FIELD_TYPE_LATLONG]: LatLongField,
-    [FIELD_TYPE_CAPTCHA]: CaptchaField
+    [FIELD_TYPE_CAPTCHA]: CaptchaField,
+    [FIELD_TYPE_HIDDEN]: HiddenField
 };
 
 export const getFieldSpecFromField = (field) => {
@@ -73,6 +78,8 @@ const getValuesFromFields = (fieldSpecs, initialValues) => {
     return values;
 }
 
+const dummyFetcherName = "dummy";
+
 export const FormContextProvider = (props) => {
 
     const {
@@ -83,11 +90,13 @@ export const FormContextProvider = (props) => {
         validationMessage = "Les modifications ont été enregistrées avec succès.",
         onChange = null,
         readOnly = false,
+        fetcherName = dummyFetcherName,
         children
     } = props;
 
     const fieldSpecs = React.useMemo(() => getFieldSpecs(nativeFields), [nativeFields]);
 
+    const { submit: fetcherSubmit, fetcher } = useAsyncFetcher(fetcherName);
     const { toast } = useToast();
     const [errors, setErrors] = React.useState(new Set());
     const [values, setValues] = React.useState(() => getValuesFromFields(fieldSpecs, initialValues));
@@ -95,6 +104,21 @@ export const FormContextProvider = (props) => {
 
 
     const { overlay: sending, setOverlay: setSending } = useOverlay();
+
+    // With react-router V7, try to reset the fetcher.
+    // React.useEffect(() => {
+    //     return () => {
+    //         if (fetcherName && fetcherName !== dummyFetcherName) {
+    //             fetcher.reset();
+    //         }
+    //     }
+    // }, [fetcher, fetcherName]);
+
+    React.useEffect(() => {
+        return () => {
+            setSending(false);
+        }
+    }, [setSending]);
 
     React.useEffect(() => {
         setValues(getValuesFromFields(fieldSpecs, initialValues));
@@ -164,8 +188,8 @@ export const FormContextProvider = (props) => {
             }
         });
 
-        submitAction(formValues)
-        .then(() => {
+        const submitPromise = fetcherName && fetcherName !== dummyFetcherName ? fetcherSubmit(formValues) : submitAction(formValues);
+        submitPromise.then(() => {
             if (onCancel) {
                 onCancel();
             }
@@ -197,7 +221,8 @@ export const FormContextProvider = (props) => {
         isValid: checkValidity(),
         readOnly,
         fieldSpecs,
-        values
+        values,
+        FormComponent: fetcher.Form,
     };
 
     return (

@@ -4,7 +4,7 @@ import Switch from "@mui/material/Switch";
 import FormControl from '@mui/material/FormControl';
 import { useFormContext } from '../FormContext';
 
-const validateSwitchField = (_fieldSpec, _value) => true;
+const validateSwitchField = (_field, _value) => true;
 
 const SwitchFieldComp = ({ fieldSpec, value, handleChange }) => {
     const formContext = useFormContext();

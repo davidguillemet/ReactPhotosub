@@ -4,11 +4,13 @@ const DestinationGalleryContext = React.createContext(null);
 
 export const DestinationGalleryContextProvider = ({destination, images, galleries, children}) => {
 
-    const galleryContext = {
-        destination,
-        images,
-        galleries
-    };
+    const galleryContext = React.useMemo(() => {
+        return {
+            destination,
+            images,
+            galleries
+        };
+    }, [destination, images, galleries]);
 
     return (
         <DestinationGalleryContext.Provider value={galleryContext}>

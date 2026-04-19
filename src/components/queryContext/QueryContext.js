@@ -4,31 +4,12 @@ import { useDataProvider } from '../dataProvider/dataManagerProvider';
 import { useFirebaseContext } from '../firebase';
 import { CheckErrorsAfterAddImage, CheckErrorsAfterRemoveImage } from 'common/GlobalErrors';
 import { isDestinationPath } from 'utils';
-
-const DESTINATION_PROPS = {
-    HEADER: "header",
-    DESC: "desc",
-    IMAGES: "images",
-    GALLERIES: "galleries"
-};
-
-const DESTINATION_QUERY_BASE_KEY = "destination";
-
-const getFetchDestinationKey = (path, props) => {
-    return [
-        DESTINATION_QUERY_BASE_KEY,
-        path,
-        props
-    ];
-};
-
-// A destination key is like [ "destination", "<year>/<title>", "<props>" ]
-const isDestinationKey = (queryKey, path) => {
-    return  queryKey.length >= 3 &&
-            queryKey[0] === DESTINATION_QUERY_BASE_KEY &&
-            queryKey[1] === path;
-            // We could also check the props is defined as DESTINATION_PROPS property...
-}
+import {
+    getFetchDestinationKey,
+    isDestinationKey,
+    DESTINATION_PROPS,
+    DESTINATION_QUERY_BASE_KEY
+} from 'utils/destinations';
 
 const QueryContext = createContext(null);
 
@@ -40,7 +21,8 @@ export const QueryContextProvider = ({children}) => {
 
     const getUser = () => firebaseContext.auth.currentUser;
     const userId = () => getUser().uid
-    const addDestinationImage = (newImage) => {
+
+    const addDestinationImage = React.useCallback((newImage) => {
         const queryKey = getFetchDestinationKey(newImage.path, DESTINATION_PROPS.IMAGES);
         const prevData = queryClient.getQueryData(queryKey);
         // We might upload the same image again or just update image properties,
@@ -65,7 +47,7 @@ export const QueryContextProvider = ({children}) => {
         if (newImageErrors !== null) {
             queryClient.setQueryData(['imageErrors'], newImageErrors);
         }
-    };
+    }, [queryClient]);
 
     const queryContext = useRef({
         invalidateDestinations: async () => {
@@ -88,35 +70,9 @@ export const QueryContextProvider = ({children}) => {
                 refetchType: 'all'
             });
         },
-        useFetchHomeSlideshow: () => useQuery(['homeslideshow'], () => dataProvider.getImageDefaultSelection()),
         useFetchLocations: () => useQuery(['locations'], () => dataProvider.getLocations()), 
         useFetchRegions: () => useQuery(['regions'], () => dataProvider.getRegions()),
-        useFetchDestinations: () => useQuery(['destinations'], () => dataProvider.getDestinations()),
 
-        // Destinations
-        useAddDestination: () => useMutation((destination) => dataProvider.createDestination(destination), {
-            onSuccess: (data) => {
-                queryClient.setQueryData(['destinations'], data)
-            }
-        }),
-        useDeleteDestination: () => useMutation((destination) => dataProvider.deleteDestination(destination.id), {
-            onSuccess: ({id}, destination) => {
-                if (id !== destination.id) {
-                    throw new Error("Mismatching destination ids...");
-                }
-                const prevDestinations = queryClient.getQueryData(['destinations']);
-                const newDestinations = prevDestinations.filter(d => d.id !== destination.id);
-                queryClient.setQueryData(['destinations'], newDestinations);
-                queryClient.invalidateQueries({
-                    // Invalidate all queries related to destination path "year/title"
-                    predicate: (query) => {
-                        const shouldInvalidated = isDestinationKey(query.queryKey, destination.path);
-                        return shouldInvalidated;
-                    },
-                    refetchType: 'all'
-                })
-            }
-        }),
         useUpdateDestination: () => useMutation((destination) => dataProvider.updateDestination(destination), {
             onSuccess: ({data}, destination) => {
                 queryClient.setQueryData(['destinations'], data);
@@ -178,7 +134,6 @@ export const QueryContextProvider = ({children}) => {
 
         useFetchRelatedDestinations: (regions, macro, wide) => useQuery(['related', ...regions, macro, wide], () => dataProvider.getRelatedDestinations(regions, macro, wide)),
         useFetchDestinationDesc: (destinationPath) => useQuery(getFetchDestinationKey(destinationPath, DESTINATION_PROPS.DESC), () => dataProvider.getDestinationDescFromPath(destinationPath)),
-        useFetchDestinationHeader: (destinationPath) => useQuery(getFetchDestinationKey(destinationPath, DESTINATION_PROPS.HEADER), () => dataProvider.getDestinationDetailsFromPath(destinationPath)),
 
         useFetchDestinationImages: (destinationPath) => useQuery({
             queryKey: getFetchDestinationKey(destinationPath, DESTINATION_PROPS.IMAGES),
@@ -245,52 +200,6 @@ export const QueryContextProvider = ({children}) => {
 
         useFetchImageErrors: () => useQuery(['imageErrors'], () => dataProvider.getImageErrors()),
 
-        useFetchSubGalleries: (destination) => useQuery(getFetchDestinationKey(destination.path, DESTINATION_PROPS.GALLERIES), () => dataProvider.getDestinationSubGalleries(destination.id)),
-        useAddSubGallery: () => useMutation(({subGallery, destination}) => dataProvider.createSubGallery(subGallery), {
-            onSuccess: (data, {destination}) => {
-                queryClient.setQueryData(getFetchDestinationKey(destination.path, DESTINATION_PROPS.GALLERIES), data);
-            }
-        }),
-        useUpdateSubGallery: () => useMutation(({subGallery, destination}) => dataProvider.updateSubGallery(subGallery), {
-            onSuccess: (data, {destination}) => {
-                queryClient.setQueryData(getFetchDestinationKey(destination.path, DESTINATION_PROPS.GALLERIES), data);
-            }
-        }),
-        useUpdateSubGalleryIndices: () => useMutation((updateInfos) => dataProvider.updateSubGalleryIndices(updateInfos), {
-            onSuccess: (data, updateInfos) => {
-                const destination = updateInfos.destination;
-                queryClient.setQueryData(getFetchDestinationKey(destination.path, DESTINATION_PROPS.GALLERIES), data);
-            }
-        }),
-        useUpdateSubGalleryImages: () => useMutation((updateInfos) => dataProvider.updateSubGalleryImages(updateInfos), {
-            onSuccess: (data, updateInfos) => {
-                const queryKey = getFetchDestinationKey(updateInfos.destination.path, DESTINATION_PROPS.IMAGES);
-                const destinationImages = queryClient.getQueryData(queryKey);
-                destinationImages.forEach(image => {
-                    if (updateInfos.add && updateInfos.add.includes(image.id)) {
-                        image.sub_gallery_id = updateInfos.galleryId;
-                    } else if (updateInfos.remove && updateInfos.remove.includes(image.id)) {
-                        image.sub_gallery_id = null;
-                    }
-                });
-                queryClient.setQueryData(queryKey, [...destinationImages]);
-            }
-        }),
-        useDeleteSubGallery: () => useMutation((group) => dataProvider.deleteSubGallery(group.gallery), {
-            onSuccess: (data, group) => {
-                const imagesQueryQuey = getFetchDestinationKey(group.destination.path, DESTINATION_PROPS.IMAGES);
-                const destinationImages = queryClient.getQueryData(imagesQueryQuey);
-                // Remove sub_gallery_id for impacted images
-                // -> on backend side, it has been done automatically by postgresql (foreign key)
-                destinationImages.forEach((image) => {
-                    if (image.sub_gallery_id === group.gallery.id) {
-                        image.sub_gallery_id = null;
-                    }
-                });
-                queryClient.setQueryData(imagesQueryQuey, [...destinationImages]);
-                queryClient.setQueryData(getFetchDestinationKey(group.destination.path, DESTINATION_PROPS.GALLERIES), data);
-            }
-        }),
         useFetchUsers: () => useQuery(['users'], () => dataProvider.getUsers()),
     });
 

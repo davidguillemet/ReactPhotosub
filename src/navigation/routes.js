@@ -14,6 +14,10 @@ import SvgIcon from '@mui/material/SvgIcon';
 import { styled } from '@mui/material/styles';
 import React from "react";
 
+import ErrorAlert from 'components/error';
+
+import actionFactory from "./ActionFactory";
+
 export const HomePath = "/";
 export const DestinationsPath = "/destinations";
 export const SearchPath = "/search";
@@ -48,7 +52,7 @@ function lazyLoader(route, queryClient, dataProvider) {
             import("template/seo"),
         ]);
         const { HelmetFull } = Helmet;
-        const { Component, loader } = PageModule;
+        const { Component, loaderFactory, actionProperties } = PageModule;
         const FinalComponent = fullWidth ? Component : fixedWidthComponent(Component, maxWidth);
         return {
             Component: () => {
@@ -59,7 +63,9 @@ function lazyLoader(route, queryClient, dataProvider) {
                     </React.Fragment>
                 );
             },
-            loader: loader ? loader(queryClient, dataProvider) : null
+            loader: loaderFactory ? loaderFactory(queryClient, dataProvider) : null,
+            action: actionProperties ? actionFactory(queryClient, dataProvider, actionProperties) : null,
+            errorElement: <ErrorAlert/>
         };
     };
 };
@@ -175,6 +181,11 @@ export const routes = [
 export const buildRoutes = (queryClient, dataProvider) => routes.map(route => {
     return {
         ...route,
+        // TODO: separate loader and lazy
+        // lazyLoader should only be responsible for loading the component, not the loader and action of the page, which are used by react-router to load data and handle actions before rendering the component, so they should be defined at the route level and not inside the lazyLoader.
+        // see https://remix.run/blog/lazy-loading-routes
+        // loader: ...,
+        // action: ...,
         lazy: lazyLoader(route, queryClient, dataProvider)
     }
 });

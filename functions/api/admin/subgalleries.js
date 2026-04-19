@@ -1,5 +1,5 @@
 module.exports = function(admin, config) {
-    const fetchAllSubGalleries = require("../utils/fetchSubGalleries")(config);
+    const {fetchAllSubGalleries} = require("../utils/fetchSubGalleries")(config);
 
     const {getSubGalleryPropsToUpdate} = require("../utils/updateUtils")(config);
 
@@ -14,9 +14,10 @@ module.exports = function(admin, config) {
         .post(async function(req, res, next) {
             const subGallery = req.body;
             res.locals.errorMessage = `Failed to insert sub gallery ${subGallery.title}.`;
+            const subGalleryData = await getSubGalleryPropsToUpdate(subGallery);
             return config.pool("sub_galleries")
                 .returning("id")
-                .insert(subGallery)
+                .insert(subGalleryData)
                 .then((data) => {
                     return fetchAllSubGalleries(subGallery.destination_id, req, res, next);
                 })

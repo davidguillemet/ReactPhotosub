@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { useParams } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import {isMobile} from 'react-device-detect';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -13,16 +13,12 @@ import { formatDate, formatDateShort, useLanguage, regionTitle, useTranslation, 
 import Gallery from 'components/gallery';
 import { PageSubTitle, PageHeader, Paragraph } from 'template/pageTypography';
 import { LazyDialog } from 'dialogs';
-import { withLoading, buildLoadingState } from 'components/hoc';
-import { useQueryContext } from 'components/queryContext';
 import DestinationLink from 'components/destinationLink';
 import { VerticalSpacing } from 'template/spacing';
 import { DestinationsMap } from 'components/map';
 import lazyComponent from 'components/lazyComponent';
 import RelatedDestinations from './relatedDestinations';
-import NotFound from '../notFound';
 import { HelmetDestination } from 'template/seo';
-import { useReactQuery } from 'components/reactQuery';
 import { useAuthContext } from 'components/authentication';
 import GroupBuilderFactory from './groupBuilder';
 import { DestinationGalleryContextProvider } from './admin/DestinationGalleryContext';
@@ -30,6 +26,7 @@ import { SubGalleryHeaderComponent } from './admin/SubGalleryHeaderComponent';
 import { PublicationAlert } from 'components/publication';
 import DestinationAdminTools from './admin/DestinationAdminTools';
 import { NoWrapAndEllipsis } from 'template/pageTypography';
+import { ReactRouterAwaiter } from 'components/reactRouter';
 
 const RegionChip = ({region}) => {
     const { language } = useLanguage();
@@ -186,30 +183,6 @@ const DestinationDetails = ({destination}) => {
     );
 }
 
-const useFetchImagesAndSubGalleries = (destination) => {
-    const queryContext = useQueryContext();
-    const { data: images } = useReactQuery(queryContext.useFetchDestinationImages, [destination.path]);
-    const { data: galleries } = useReactQuery(queryContext.useFetchSubGalleries, [destination]);
-
-    if (images === null || images === undefined || galleries === null || galleries === undefined) {
-        return {
-            images: null,
-            galleries: null
-        }
-    }
-
-    // check if galleries contain images
-    galleries.forEach((gallery) => {
-        const hasImages = images.find(image => image.sub_gallery_id === gallery.id);
-        gallery.hasImages = hasImages ? true : false;
-    })
-
-    return {
-        images,
-        galleries
-    };
-}
-
 const getGroupDestinations = (destination, galleries, language) => {
     if (!galleries) {
         return [];
@@ -225,28 +198,51 @@ const getGroupDestinations = (destination, galleries, language) => {
         }));
 }
 
-const DestinationDisplay = withLoading(({destination}) => {
-
+const DestinationGallery = ({destination, destinationImages, onGalleryIsReady}) => {
     const { language } = useLanguage();
-    const { images, galleries } = useFetchImagesAndSubGalleries(destination);
-    const [ galleryIsReady, setGalleryIsReady ] = useState(false);
     const authContext = useAuthContext();
+    const { images, galleries } = destinationImages;
+    const groupBuilder = React.useMemo(() => GroupBuilderFactory(destination, galleries, language), [destination, galleries, language]);
+
+    return (
+        <Gallery
+            images={images}
+            onReady={onGalleryIsReady}
+            displayDestination={false}
+            sort="asc"
+            pushHistory={true}
+            groupBuilder={groupBuilder}
+            groupHeaderEndComponent={authContext.admin === true ? SubGalleryHeaderComponent : null}
+        />
+    )
+};
+
+const DestinationMap = ({destination, destinationImages}) => {
+    const { language } = useLanguage();
+    const { galleries } = destinationImages;
+    const groupDestinations = React.useMemo(() => getGroupDestinations(destination, galleries, language), [destination, galleries, language]);
+    const destinations = useMemo(() => [destination], [destination]);
+    return <DestinationsMap destinations={groupDestinations.length > 0 ? groupDestinations : destinations} />
+};
+
+const DestinationDisplay = ({destination}) => {
+
+    const { destinationImages } = useLoaderData();
+    const [ galleryIsReady, setGalleryIsReady ] = useState(false);
 
     const onGalleryIsReady = useCallback(() => {
         setGalleryIsReady(true);
     }, []);
 
-    const groupBuilder = React.useMemo(() => GroupBuilderFactory(destination, galleries, language), [destination, galleries, language]);
-    const groupDestinations = React.useMemo(() => getGroupDestinations(destination, galleries, language), [destination, galleries, language]);
-    const destinations = useMemo(() => [destination], [destination]);
-
     return (
-        <DestinationGalleryContextProvider destination={destination} images={images} galleries={galleries}>
+        <React.Fragment>
             <PublicationAlert destination={destination} sx={{width: "100%", mt: 1}} />
             <RegionPath regions={destination.regionpath}></RegionPath>
 
             <Box sx={{ width: "100%", height: isMobile ? "300px" : "400px", position: "relative" }}>
-                <DestinationsMap destinations={groupDestinations.length > 0 ? groupDestinations : destinations} />
+                <ReactRouterAwaiter value={destinationImages} fallback={<DestinationsMap destinations={[destination]} />}>
+                    {destinationImages => <DestinationMap destination={destination} destinationImages={destinationImages} />}
+                </ReactRouterAwaiter>
                 <DestinationDetails destination={destination} />
             </Box>
 
@@ -256,15 +252,22 @@ const DestinationDisplay = withLoading(({destination}) => {
 
             <VerticalSpacing factor={2} />
 
-            <Gallery
-                images={images}
-                onReady={onGalleryIsReady}
-                displayDestination={false}
-                sort="asc"
-                pushHistory={true}
-                groupBuilder={groupBuilder}
-                groupHeaderEndComponent={authContext.admin === true ? SubGalleryHeaderComponent : null}
-            />
+            <ReactRouterAwaiter value={destinationImages}>
+                {destinationImages =>
+                    <DestinationGalleryContextProvider
+                        destination={destination}
+                        images={destinationImages.images}
+                        galleries={destinationImages.galleries}
+                    >
+                        <DestinationGallery
+                            destinationImages={destinationImages}
+                            destination={destination}
+                            onGalleryIsReady={onGalleryIsReady}
+                        />
+                        <DestinationAdminTools destination={destination} />
+                    </DestinationGalleryContextProvider>
+                }
+            </ReactRouterAwaiter>
 
             <VerticalSpacing factor={2} />
 
@@ -282,21 +285,17 @@ const DestinationDisplay = withLoading(({destination}) => {
                 <RelatedDestinations destination={destination} />
             }
 
-            <DestinationAdminTools destination={destination} />
-
-        </DestinationGalleryContextProvider>
+        </React.Fragment>
     );
-}, [buildLoadingState("destination", [null, undefined])]);
+};
 
 const Destination = () => {
-    const queryContext = useQueryContext();
-    const { year, title } = useParams();
-    const { data, isError, error} = useReactQuery(queryContext.useFetchDestinationHeader, [`${year}/${title}`]);
-    if (isError === true && error.response && error.response.status === 404) {
-        return <NotFound />
-    } else {
-        return <DestinationDisplay destination={data} />
-    }
+    const { destinationHeader } = useLoaderData();
+    return (
+        <ReactRouterAwaiter value={destinationHeader} >
+            {destinationHeader => <DestinationDisplay destination={destinationHeader} />}
+        </ReactRouterAwaiter>
+    )
 };
 
 export default Destination;

@@ -12,5 +12,6 @@ export {
     FIELD_TYPE_SWITCH,
     FIELD_TYPE_TAGS_FIELD,
     FIELD_TYPE_TEXT,
-    FIELD_TYPE_URL
+    FIELD_TYPE_URL,
+    FIELD_TYPE_HIDDEN
 } from './FormContext';

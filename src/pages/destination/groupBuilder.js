@@ -13,7 +13,8 @@ const GroupBuilderFactory = (destination, galleries, language) => {
 
         const groups = new Map();
         galleries.forEach(gallery => {
-            const newGroup = createGroup(gallery[getPropFromLanguage("title", language)]);
+            const newGroup = createGroup(gallery.id);
+            newGroup.caption = gallery[getPropFromLanguage("title", language)];
             newGroup.index = gallery.index;
             newGroup.destination = destination;
             newGroup.gallery = gallery;

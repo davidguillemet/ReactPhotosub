@@ -1,7 +1,7 @@
 import React from 'react';
+import { useAsyncFetcher } from 'components/reactRouter';
 import { useTranslation } from 'utils';
 import Box from '@mui/material/Box';
-import { useQueryContext } from 'components/queryContext';
 import useFormDialog from 'dialogs/FormDialog';
 import SubGalleryForm from './SubGalleryForm';
 import { IconButton } from '@mui/material';
@@ -17,6 +17,11 @@ import { useDestinationGalleryContext } from './DestinationGalleryContext';
 import { sortImagesAscending } from 'utils';
 import { RenderTransferListImage } from './RenderTransferListImage';
 import { GroupContextProvider } from './GroupContext';
+import {
+    SUB_GALLERY_INTENT_UPDATE_INDICES,
+    SUB_GALLERY_INTENT_DELETE,
+    SUB_GALLERY_INTENT_UPDATE_IMAGES
+} from 'utils/destinations';
 
 const _getAvailableImages = (images) => {
     return images.filter(image => image.sub_gallery_id === null);
@@ -25,11 +30,7 @@ const _getAvailableImages = (images) => {
 export const SubGalleryHeaderComponent = ({ group }) => {
     const t = useTranslation("pages.destinationAdmin.subGalleryHeader");
     const galleryContext = useDestinationGalleryContext();
-    const queryContext = useQueryContext();
-
-    const deleteGalleryMutation = queryContext.useDeleteSubGallery();
-    const updateGalleryImagesMutation = queryContext.useUpdateSubGalleryImages();
-    const updateGalleryIndices = queryContext.useUpdateSubGalleryIndices();
+    const { submit: fetcherSubmit } = useAsyncFetcher("subGalleryForm");
 
     const { toast } = useToast();
     const { dialogProps: EditDialogProps, openDialog: openEditDialog, FormDialog: EditFormDialog } = useFormDialog();
@@ -55,11 +56,15 @@ export const SubGalleryHeaderComponent = ({ group }) => {
     }, []);
 
     const onDeleteGallery = React.useCallback(() => {
-        return deleteGalleryMutation.mutateAsync(group)
-            .then(() => {
-                toast.success(t("success:deleted"));
-            });
-    }, [group, deleteGalleryMutation, toast, t]);
+        const deletePayload = {
+            ...group.gallery,
+            intent: SUB_GALLERY_INTENT_DELETE,
+            destinationPath: galleryContext.destination.path
+        }; 
+        fetcherSubmit(deletePayload).then(() => {
+            toast.success(t("success:deleted"));
+        });
+    }, [group, galleryContext.destination, fetcherSubmit, toast, t]);
 
     const onSelectImages = React.useCallback(() => {
         openImageDialog();
@@ -70,7 +75,9 @@ export const SubGalleryHeaderComponent = ({ group }) => {
             destination: galleryContext.destination,
             galleryId: group.gallery.id,
             add: [],
-            remove: []
+            remove: [],
+            intent: SUB_GALLERY_INTENT_UPDATE_IMAGES,
+            destinationPath: galleryContext.destination.path
         };
         // Set gallery id for the final selection
         selection.forEach(image => updatePayload.add.push(image.id));
@@ -79,22 +86,22 @@ export const SubGalleryHeaderComponent = ({ group }) => {
             const removedImages = group.images.filter(image => selection.indexOf(image) === -1);
             removedImages.forEach(image => updatePayload.remove.push(image.id));
         }
-        return updateGalleryImagesMutation.mutateAsync(updatePayload)
-            .then(() => {
-                toast.success(t("success:updated"));
-            });
+        return fetcherSubmit(updatePayload).then(() => {
+            toast.success(t("success:updated"));
+        });
     }, [
         toast,
         group.gallery.id,
         group.images,
-        updateGalleryImagesMutation,
+        fetcherSubmit,
         galleryContext.destination,
         t
     ]);
 
     const canDecreaseIndex = React.useCallback(() => {
-        return group.gallery.index > 1;
-    }, [group.gallery]);
+        const minIndex = galleryContext.galleries.reduce((minIndex, gallery) => gallery.index < minIndex ? gallery.index : minIndex, Infinity);
+        return group.gallery.index > minIndex;
+    }, [galleryContext.galleries, group.gallery]);
 
     const canIncreaseIndex = React.useCallback(() => {
         const maxIndex = galleryContext.galleries.reduce((maxIndex, gallery) => gallery.index > maxIndex ? gallery.index : maxIndex, 0);
@@ -104,10 +111,14 @@ export const SubGalleryHeaderComponent = ({ group }) => {
     const updateGalleries = React.useCallback((updateInfos) => {
         const updatePayload = {
             update: updateInfos,
-            destination: galleryContext.destination
+            destination: galleryContext.destination,
+            intent: SUB_GALLERY_INTENT_UPDATE_INDICES,
+            destinationPath: galleryContext.destination.path
         };
-        updateGalleryIndices.mutateAsync(updatePayload);
-    }, [galleryContext.destination, updateGalleryIndices]);
+        fetcherSubmit(updatePayload).then(() => {
+            toast.success(t("success:updated"));
+        });
+    }, [galleryContext.destination, toast, fetcherSubmit, t]);
 
     const onIndexUp = React.useCallback(() => {
         const currentGalleryIndex = galleryContext.galleries.findIndex(gallery => gallery.id === group.gallery.id);

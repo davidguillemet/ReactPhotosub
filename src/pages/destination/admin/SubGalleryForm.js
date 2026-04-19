@@ -1,30 +1,17 @@
 import React from 'react';
 import { useTranslation } from 'utils';
-import Form, { FIELD_TYPE_TEXT, FIELD_TYPE_NUMBER, FIELD_TYPE_SELECT } from "components/form";
+import Form, { FIELD_TYPE_TEXT, FIELD_TYPE_NUMBER, FIELD_TYPE_SELECT, FIELD_TYPE_HIDDEN } from "components/form";
 import { useQueryContext } from 'components/queryContext';
 import { useDestinationGalleryContext } from './DestinationGalleryContext';
+import { SUB_GALLERY_INTENT_CREATE, SUB_GALLERY_INTENT_UPDATE } from 'utils/destinations';
 
 const SubGalleryForm = ({destination, subGallery, onCancel}) => {
     const t = useTranslation("pages.destinationAdmin.subGalleryForm");
     const galleryContext = useDestinationGalleryContext();
     const queryContext = useQueryContext();
-    const subGalleryAddMutation = queryContext.useAddSubGallery();
-    const subGalleryUpdateMutation = queryContext.useUpdateSubGallery();
     const [ fields, setFields ] = React.useState(null);
 
     const [values, setValues] = React.useState(null);
-
-    const onSubmitGalleryForm = React.useCallback((values) => {
-        const finalValues = {
-            ...subGallery, // Set initial values (including id)
-            ...values,     // Override with form values
-            destination_id: destination.id // And add the destination id if needed (new gallery)
-        };
-        if (subGallery === null)
-            return subGalleryAddMutation.mutateAsync({ subGallery: finalValues, destination });
-        else
-            return subGalleryUpdateMutation.mutateAsync({ subGallery: finalValues, destination });
-    }, [destination, subGalleryAddMutation, subGalleryUpdateMutation, subGallery]);
 
     const getLocations = React.useCallback(() => {
         const { data, isError, error } = queryContext.useFetchLocations();
@@ -98,8 +85,28 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
                 default: getFirstAvailableIndex(),
                 invalidValues: getUsedIndices()
             },
+            {
+                id: "id",
+                type: FIELD_TYPE_HIDDEN,
+                default: subGallery === null ? null : subGallery.id // Set the sub gallery id if needed (update form)
+            },
+            {
+                id: "destination_id",
+                type: FIELD_TYPE_HIDDEN,
+                default: destination.id // Add the destination id if needed (new gallery)
+            },
+            {
+                id: "destinationPath",
+                type: FIELD_TYPE_HIDDEN,
+                default: destination.path // Used to update the query cache after mutation (query key)
+            },
+            {
+                id: "intent",
+                type: FIELD_TYPE_HIDDEN,
+                default: subGallery === null ? SUB_GALLERY_INTENT_CREATE : SUB_GALLERY_INTENT_UPDATE
+            }
         ]);
-    }, [getFirstAvailableIndex, getUsedIndices, getLocations, t]);
+    }, [getFirstAvailableIndex, getUsedIndices, getLocations, subGallery, destination, t]);
 
     React.useEffect(() => {
         if (subGallery === null) {
@@ -113,10 +120,10 @@ const SubGalleryForm = ({destination, subGallery, onCancel}) => {
         <Form
             fields={fields}
             initialValues={values}
-            submitAction={onSubmitGalleryForm}
             submitCaption={t("btn:validate")}
             onCancel={onCancel}
             validationMessage={t("success:saved")}
+            fetcherName={`subGalleryForm-${destination.id}-${subGallery ? subGallery.id : "new"}`} // Unique fetcher name to avoid conflicts with other forms
         />
     );
 }

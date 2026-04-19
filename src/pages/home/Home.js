@@ -4,12 +4,13 @@ import Box from '@mui/material/Box';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 
-import { Await, useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 
 import { getThumbnailSrc, useImageKit } from 'utils';
 import { useScrollBlock } from 'utils';
 import { useAppContext } from 'template/app/appContext';
 import { useFocusManager, useResizeObserver } from 'components/hooks';
+import { ReactRouterAwaiter } from 'components/reactRouter';
 
 const _diaporamaInterval = 15000;
 const _transitionDuration = 2000;
@@ -205,13 +206,12 @@ const Home = ({images, currentIndex}) => {
 const HomeController = () => {
     const { images } = useLoaderData();
     return (
-        <React.Suspense
+        <ReactRouterAwaiter
+            value={images} 
             fallback={<Home images={[{src: _defaultImageSrc}]} currentIndex={-1} />}
         >
-            <Await resolve={images}>
-                {images => <Home images={images} currentIndex={-1} />}
-            </Await>
-        </React.Suspense>
+            {images => <Home images={images} currentIndex={-1} />}
+        </ReactRouterAwaiter>
     )
 }
 

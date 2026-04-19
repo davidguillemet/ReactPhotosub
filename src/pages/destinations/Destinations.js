@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { useLoaderData, useRevalidator } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
@@ -22,13 +22,13 @@ import { DestinationsMap } from '../../components/map';
 import RegionFilter from './filters/RegionFilter'
 import KeyWordFilter from './filters/KeyWordFilter';
 import DateFilter from './filters/DateFilter';
-import { useQueryContext } from '../../components/queryContext';
 import DestinationGallery from './DestinationGallery';
-import { buildLoadingState, withLoading } from '../../components/hoc';
 
-import { useReactQuery } from '../../components/reactQuery';
 import { useTranslation } from '../../utils';
 import { Alert, IconButton, Stack } from '@mui/material';
+import { ReactRouterAwaiter } from 'components/reactRouter';
+import { useAuthContext } from 'components/authentication';
+import { useQueryContext } from 'components/queryContext';
 
 const DestinationTabPanel = styled(TabPanel)(({ theme }) => ({
     '&.MuiTabPanel-root': {
@@ -85,7 +85,7 @@ const PictureTypeSelector = ({destinationType, onChange}) => {
     );
 }
 
-const DestinationsComponent = withLoading(({destinations}) => {
+const DestinationsComponent = ({destinations}) => {
 
     const t = useTranslation("pages.destinations");
 
@@ -238,7 +238,7 @@ const DestinationsComponent = withLoading(({destinations}) => {
         }
      }, [regionFilterSet, keywordFilterSet, dateFilterSet]);
 
-     const tabCaption = React.useCallback((captionKey, filterId) => {
+     const TabCaption = (captionKey, filterId) => {
         const onClearFilter = React.useCallback((e) => {
             e.stopPropagation(); // Don't trigger the tab change when clicking on the clear filter button
             clearFilter(filterId);
@@ -255,7 +255,7 @@ const DestinationsComponent = withLoading(({destinations}) => {
                 }
             </Stack>
         )
-     }, [t, clearFilter, hasFilter]);
+     };
 
     return (
         <React.Fragment>
@@ -270,9 +270,9 @@ const DestinationsComponent = withLoading(({destinations}) => {
                 variant="scrollable"
                 scrollButtons="auto"
             >
-                <Tab key={FILTER_REGION} sx={{ fontWeight: hasFilter(FILTER_REGION) ? "bold" : "normal" }} label={tabCaption("filterTab:byRegions", FILTER_REGION)} />
-                <Tab key={FILTER_KEYWORD} sx={{ fontWeight: hasFilter(FILTER_KEYWORD) ? "bold" : "normal" }} label={tabCaption("filterTab:byKeywords", FILTER_KEYWORD)} />
-                <Tab key={FILTER_DATE} sx={{ fontWeight: hasFilter(FILTER_DATE) ? "bold" : "normal" }} label={tabCaption("filterTab:byYear", FILTER_DATE)} />
+                <Tab key={FILTER_REGION} sx={{ fontWeight: hasFilter(FILTER_REGION) ? "bold" : "normal" }} label={TabCaption("filterTab:byRegions", FILTER_REGION)} />
+                <Tab key={FILTER_KEYWORD} sx={{ fontWeight: hasFilter(FILTER_KEYWORD) ? "bold" : "normal" }} label={TabCaption("filterTab:byKeywords", FILTER_KEYWORD)} />
+                <Tab key={FILTER_DATE} sx={{ fontWeight: hasFilter(FILTER_DATE) ? "bold" : "normal" }} label={TabCaption("filterTab:byYear", FILTER_DATE)} />
             </Tabs>
             <Box
                 sx={{
@@ -325,23 +325,33 @@ const DestinationsComponent = withLoading(({destinations}) => {
             </TabContext>
         </React.Fragment>
     )
-}, [
-    buildLoadingState("destinations", [null, undefined])
-]);
+};
 
 const DestinationsController = () => {
 
     const t = useTranslation("pages.destinations");
+    const authContext = useAuthContext();
+    const { destinations } = useLoaderData();
+    const revalidator = useRevalidator();
     const queryContext = useQueryContext();
 
-    // Fetch Destinations & Regions
-    const { data: destinations } = useReactQuery(queryContext.useFetchDestinations);
+    const userObserver = React.useCallback(async () => {
+        await queryContext.invalidateDestinations();
+        revalidator.revalidate();
+    }, [revalidator, queryContext]);
+
+    React.useEffect(() => {
+        const unregisterUserObserver = authContext.registerUserObserver(userObserver);
+        return () => unregisterUserObserver();
+    }, [userObserver, authContext]);
 
     return (
         <React.Fragment>
             <PageTitle>{t("title")}</PageTitle>
             <VerticalSpacing factor={2} />
-            <DestinationsComponent destinations={destinations} />
+            <ReactRouterAwaiter value={destinations} >
+               {destinations => <DestinationsComponent destinations={destinations} />}
+            </ReactRouterAwaiter>
         </React.Fragment>
     )
 

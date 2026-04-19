@@ -50,8 +50,8 @@ const getMissingStorageFolders = (currentPath, foldersFromStorage, foldersFromDb
 const useDestinationImages = (destinationPath) => {
     const queryContext = useQueryContext();
     const { data } = queryContext.useFetchDestinationImages(destinationPath);
-    if (destinationPath !== null) {
-        return data;
+    if (destinationPath !== null && data !== undefined) {
+        return data.images;
     } else {
         return null;
     }

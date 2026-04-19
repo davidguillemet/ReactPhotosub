@@ -2,26 +2,26 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Fab } from "@mui/material";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { useQueryContext } from 'components/queryContext';
 import useFormDialog from 'dialogs/FormDialog';
 import DestinationForm from './DestinationForm';
 import { useTranslation, destinationTitle } from 'utils';
 import ConfirmDialog from 'dialogs/ConfirmDialog';
 import { useAuthContext } from 'components/authentication';
+import { useAsyncFetcher } from 'components/reactRouter';
+import { DESTINATION_INTENT_DELETE } from 'utils/destinations';
 
 const Div = styled('div')(() => {});
 
 export default function useAdminActions() {
 
     const t = useTranslation("pages.destinations");
-    const queryContext = useQueryContext();
     const authContext = useAuthContext();
 
     const [destinationToEdit, setDestinationToEdit] = React.useState(null);
     const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
     const { dialogProps, openDialog, FormDialog } = useFormDialog();
 
-    const deleteDestinationMutation = queryContext.useDeleteDestination();
+    const { submit: fetcherSubmit } = useAsyncFetcher("subGalleryForm");
 
     const onNewDestination = React.useCallback(() => {
         setDestinationToEdit(null);
@@ -33,18 +33,22 @@ export default function useAdminActions() {
         openDialog();
     }, [openDialog]);
 
-    const onClickDeleteDestination = (destination) => {
+    const onClickDeleteDestination = React.useCallback((destination) => {
         setDestinationToEdit(destination);
         setConfirmDeleteOpen(true);
-    }
+    }, []);
 
     const onDeleteDestination = React.useCallback(() => {
-        return deleteDestinationMutation.mutateAsync(destinationToEdit);
-    }, [deleteDestinationMutation, destinationToEdit]);
+        const deletePayload = {
+            ...destinationToEdit,
+            intent: DESTINATION_INTENT_DELETE
+        };
+        return fetcherSubmit(deletePayload);
+    }, [fetcherSubmit, destinationToEdit]);
 
-    const onCloseDestinationEditor = () => {
+    const onCloseDestinationEditor = React.useCallback(() => {
         setDestinationToEdit(null);
-    };
+    }, []);
 
     const AdminActionsComponent = React.useMemo(() => {
 
@@ -110,6 +114,7 @@ export default function useAdminActions() {
         dialogProps,
         onDeleteDestination,
         onNewDestination,
+        onCloseDestinationEditor,
         authContext.admin
     ]);
 

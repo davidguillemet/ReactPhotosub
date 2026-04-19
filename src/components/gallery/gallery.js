@@ -124,8 +124,8 @@ const GroupGalleryWithHeader = ({
     const GroupHeaderEndComponent = groupHeaderEndComponent;
     const groupTitle =
         group.showCount ?
-        `${group.key} - ${t("lbl:groupImageCount", group.images.length)}` :
-        group.key;
+        `${group.caption} - ${t("lbl:groupImageCount", group.images.length)}` :
+        group.caption;
 
     if (!authContext.admin && (!group.images || group.images.length === 0)) {
         return null;
@@ -148,7 +148,7 @@ const GroupGalleryWithHeader = ({
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Box><span id={getSubGalleryAnchorName(group.gallery?.location_title || group.key)}>{groupTitle}</span></Box>
+                    <Box><span id={getSubGalleryAnchorName(group.gallery?.location_title || group.caption)}>{groupTitle}</span></Box>
                     {
                         groupHeaderEndComponent !== null &&
                         <GroupHeaderEndComponent group={group} />
@@ -171,7 +171,6 @@ const GroupGalleryWithHeader = ({
                 <VerticalSpacing factor={0.5} />
                 <GroupGallery
                     images={group.images}
-                    key={group.key}
                     onReady={onReady}
                     renderItem={renderItem}
                     allImages={allImages}
@@ -290,7 +289,7 @@ const Gallery = ({
                         :
                         <GroupGallery
                             images={group.images}
-                            key={group.key}
+                            key={"emptyGroup"}
                             groupIndex={groupIndex}
                             onReady={onReady}
                             renderItem={(item, index, width) => renderItem(item, index, width, groupIndex)}

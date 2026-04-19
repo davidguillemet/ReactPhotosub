@@ -3,8 +3,8 @@ import TextField from '@mui/material/TextField';
 import { Chip, Autocomplete } from '@mui/material';
 import { useFormContext } from '../FormContext';
 
-const validateTagsFieldValue = (_fieldSpec, value) => {
-    return Array.isArray(value) && value.length > 0;
+const validateTagsFieldValue = (field, value) => {
+    return (Array.isArray(value) && value.length > 0) || field.required === false;
 };
 
 const TagsFieldComp = ({ fieldSpec, value, handleChange }) => {

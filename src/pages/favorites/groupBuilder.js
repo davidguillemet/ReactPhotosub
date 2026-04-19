@@ -16,6 +16,7 @@ const GroupBuilder = (images) => {
         let yearGroup = imagesByYear.get(imageProps.year);
         if (yearGroup === undefined) {
             yearGroup = createGroup(imageProps.year);
+            yearGroup.caption = imageProps.year;
             imagesByYear.set(imageProps.year, yearGroup);
         }
         yearGroup.images.push(image);

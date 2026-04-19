@@ -38,7 +38,7 @@ const initializeLocation = (value) => {
     }
 };
 
-const validateLatLong = (_fieldSpec, latLongValue) => {
+const validateLatLong = (_field, latLongValue) => {
     return latLongValue !== null && latLongValue !== undefined &&
            validateLatitude(latLongValue.latitude) && validateLongitude(latLongValue.longitude);
 };

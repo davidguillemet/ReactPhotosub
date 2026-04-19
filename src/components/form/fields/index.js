@@ -5,3 +5,4 @@ export { default as LatLongField } from './LatLongField';
 export { default as SelectControl } from './SelectControl';
 export { default as SwitchField } from './SwitchField';
 export { default as TagsField } from './TagsField';
+export { default as HiddenField } from './HiddenField';

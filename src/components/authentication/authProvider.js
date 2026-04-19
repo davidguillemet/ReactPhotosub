@@ -3,12 +3,10 @@ import { EmailAuthProvider, onAuthStateChanged, reauthenticateWithCredential } f
 import AuthContext from './authContext';
 import { useFirebaseContext } from '../firebase';
 import { useToast } from '../notifications';
-import { useQueryContext } from 'components/queryContext';
 import { FullPageLoading } from 'components/loading';
 
 const AuthProvider = ({ children }) => {
 
-    const queryContext = useQueryContext();
     const firebaseContext = useFirebaseContext();
     const { toast } = useToast();
     const userObservers = useRef([]);
@@ -18,12 +16,16 @@ const AuthProvider = ({ children }) => {
         return () => userObservers.current = userObservers.current.filter(obs => obs !== userObserver)
     }, []);
 
+    const notifyObservers = useCallback(() => {
+        userObservers.current.forEach(observer => observer())
+    }, []);
+
     const reloadUser = useCallback(() => {
         return firebaseContext.auth.currentUser.reload()
         .then(() => {
-            userObservers.current.forEach(observer => observer())
+            notifyObservers();
         })
-    }, [firebaseContext.auth.currentUser])
+    }, [firebaseContext.auth.currentUser, notifyObservers])
 
     const reauthenticateWithCredentialIndirection = useCallback((email, password) => {
         const credential = EmailAuthProvider.credential(email, password);
@@ -41,8 +43,7 @@ const AuthProvider = ({ children }) => {
     useEffect(() => {
         const unregisterAuthObserver = onAuthStateChanged(firebaseContext.auth, async (user) => {
 
-            const queryContext_invalidateDestinations = queryContext.invalidateDestinations;
-            await queryContext_invalidateDestinations();
+            notifyObservers();
 
             if (user) { // user is signed in
 
@@ -88,7 +89,7 @@ const AuthProvider = ({ children }) => {
             }
         });
         return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-    }, [firebaseContext, toast, queryContext.invalidateDestinations]);
+    }, [firebaseContext, toast, notifyObservers]);
 
     if (userContext.user === undefined) {
         return (

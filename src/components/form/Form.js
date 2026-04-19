@@ -14,7 +14,6 @@ import TabList from '@mui/lab/TabList';
 import { styled } from '@mui/material/styles';
 import { withLoading, buildLoadingState } from 'components/hoc';
 const Div = styled('div')(() => {});
-const HtmlForm = styled('form')(() => {})
 
 const getFieldGroups = (fieldSpecs) => {
     const fieldsGroup = fieldSpecs.reduce((groups, fieldSpec) => {
@@ -162,7 +161,7 @@ const Form = ({
 
     return (
         <React.Fragment>
-            <HtmlForm sx={{width: "100%"}}>
+            <formContext.FormComponent method="post" style={{width: "100%"}}>
             <Stack spacing={2} alignItems="center" sx={{width: '100%', paddingTop: 1}}>
             {
                 fieldGroups.map(group => {
@@ -219,7 +218,7 @@ const Form = ({
             }
             { endCustomComponent !== null &&  <EndCustomComponent values={formContext.values} /> }
             </Stack>
-            </HtmlForm>
+            </formContext.FormComponent>
         </React.Fragment>
     )
 };

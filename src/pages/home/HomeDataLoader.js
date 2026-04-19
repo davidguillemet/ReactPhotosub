@@ -33,4 +33,4 @@ const SlideshowLoader = (queryClient, dataProvider) => async ({ request, params 
     });
 };
 
-export const loader = SlideshowLoader;
+export const loaderFactory = SlideshowLoader;

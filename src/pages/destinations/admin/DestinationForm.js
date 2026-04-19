@@ -4,18 +4,21 @@ import Form, {
     FIELD_TYPE_SELECT,
     FIELD_TYPE_DATE,
     FIELD_TYPE_SWITCH,
-    FIELD_TYPE_TAGS_FIELD
+    FIELD_TYPE_TAGS_FIELD,
+    FIELD_TYPE_HIDDEN
 } from 'components/form';
 import { useQueryContext } from 'components/queryContext';
 import { useTranslation } from 'utils';
+
+import {
+    DESTINATION_INTENT_CREATE,
+    DESTINATION_INTENT_UPDATE
+} from 'utils/destinations';
 
 const DestinationForm = ({destination, onCancel}) => {
 
     const t = useTranslation("pages.destinations");
     const queryContext = useQueryContext();
-
-    const addDestinationMutation = queryContext.useAddDestination();
-    const updateDestinationMutation = queryContext.useUpdateDestination();
 
     const [fields, setFields] = useState([]);
 
@@ -24,7 +27,7 @@ const DestinationForm = ({destination, onCancel}) => {
         if (isError === true) {
             throw error;
         }
-        return data;
+        return data ? data.images : null;
     }, [queryContext]);
 
     const getLocations = useCallback(() => {
@@ -132,9 +135,19 @@ const DestinationForm = ({destination, onCancel}) => {
                 label: t("form:published"),
                 type: FIELD_TYPE_SWITCH,
                 default: true
+            },
+            {
+                id: "id",
+                type: FIELD_TYPE_HIDDEN,
+                default: destination === null ? null : destination.id // Set the destination id if needed (update form)
+            },
+            {
+                id: "intent",
+                type: FIELD_TYPE_HIDDEN,
+                default: destination === null ? DESTINATION_INTENT_CREATE : DESTINATION_INTENT_UPDATE
             }
         ]);
-    }, [getImagesFromPath, getImageFolders, getLocations, t]);
+    }, [getImagesFromPath, getImageFolders, getLocations, destination, t]);
 
     const [values, setValues] = useState(null);
 
@@ -151,24 +164,14 @@ const DestinationForm = ({destination, onCancel}) => {
 
     }, [destination]);
 
-    const onSubmitDestinationForm = React.useCallback((values) => {
-        if (destination === null) {
-            // New Destination
-            return addDestinationMutation.mutateAsync(values);
-        } else {
-            // Update destination
-            return updateDestinationMutation.mutateAsync({id: destination.id, ...values});
-        }
-    }, [destination, addDestinationMutation, updateDestinationMutation]);
-
     return (
         <Form
             fields={fields}
             initialValues={values}
-            submitAction={onSubmitDestinationForm}
             submitCaption={t("validate")}
             onCancel={onCancel}
             validationMessage={t("validationMessage")}
+            fetcherName={`destinationForm-${destination ? destination.id : "new"}`}
         />
     )
 }

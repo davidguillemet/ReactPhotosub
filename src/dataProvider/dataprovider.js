@@ -77,11 +77,20 @@ DataProvider.prototype.getDestinationDetailsFromPath = function(destinationPath)
 };
 
 DataProvider.prototype.getDestinationImagesFromPath = function(destinationPath) {
-    return this.getDestinationProps([destinationPath], "images");
-};
-
-DataProvider.prototype.getDestinationSubGalleries = function(id) {
-    return this.getDestinationProps([id], "galleries");
+    return this.getDestinationProps([destinationPath], "images")
+    .then(destinationImages => {
+        const { images, galleries } = destinationImages;
+        // check if galleries contain images
+        // This information is used in the DestinationMap to avoid displaying a link in the marker for empty galleries
+        const decoratedGalleries = galleries.map(gallery => {
+            const hasImages = images.find(image => image.sub_gallery_id === gallery.id);
+            return {
+                ...gallery,
+                hasImages: hasImages ? true : false
+            }
+        });
+        return { images, galleries: decoratedGalleries };
+    });
 };
 
 DataProvider.prototype.getUserData = function() {
@@ -238,7 +247,10 @@ DataProvider.prototype.createDestination = function(destination) {
     });
 }
 DataProvider.prototype.updateDestination = function(destination) {
-    return this.axios.put('/admin/destinations', destination);
+    return this.axios.put('/admin/destinations', destination)
+    .then(response => {
+        return response.data; // contains the new destinations
+    });
 }
 DataProvider.prototype.deleteDestination = function(destinationId) {
     return this.axios.delete('/admin/destinations', {data: { id: destinationId } })

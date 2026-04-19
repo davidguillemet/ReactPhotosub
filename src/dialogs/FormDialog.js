@@ -84,10 +84,12 @@ export default function useFormDialog(onClose = null) {
         }
     }, [onClose]);
 
-    const dialogProps = {
-        open: isOpen,
-        onClose: closeDialog
-    };
+    const dialogProps = React.useMemo(() => {
+        return {
+            open: isOpen,
+            onClose: closeDialog
+        };
+    }, [isOpen, closeDialog]);
 
     return {
         dialogProps,

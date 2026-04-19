@@ -17,12 +17,12 @@ function getDestinationPath(req) {
 }
 
 module.exports = function(app, config) {
-    const fetchAllSubGalleries = require("../utils/fetchSubGalleries")(config);
+    const {fetchAllSubGalleriesFromPath} = require("../utils/fetchSubGalleries")(config);
 
     // Get sub-galleries for a specific destination from identifier
-    app.route("/destination/:id/galleries")
+    app.route("/destination/:year/:title/galleries")
         .get(function(req, res, next) {
-            return fetchAllSubGalleries(req.params.id, req, res, next);
+            return fetchAllSubGalleriesFromPath(getDestinationPath(req), req, res, next);
         });
 
     // Get minimal destination info to get the desc (title, date, cover, location)
@@ -93,16 +93,35 @@ module.exports = function(app, config) {
     app.route("/destination/:year/:title/images")
         .get(function(req, res, next) {
             res.locals.errorMessage = `Failed to load images for destination '${getDestinationPath(req)}'`;
-            return config.pool({i: "images"})
+            const destinationPath = getDestinationPath(req);
+            const destinationImagesPromise = config.pool({i: "images"})
                 .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create, i.tags, i.sub_gallery_id"))
-                .where("i.path", getDestinationPath(req))
-                .orderBy("i.create", "asc")
-                .then((images) => {
-                    images.forEach((image) => {
-                        // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
-                        image.src = config.convertPathToUrl(image.path + "/" + image.name);
-                    });
-                    res.json(images);
-                }).catch(next);
+                .where("i.path", destinationPath)
+                .orderBy("i.create", "asc");
+
+            const destinationGalleriesPromise = config.pool()
+                .with(
+                    "destination_id_from_path",
+                    config.pool("destinations")
+                        .select("id")
+                        .where("destinations.path", destinationPath))
+                .select("sub_galleries.*", "locations.title as location_title", "locations.latitude", "locations.longitude")
+                .from("sub_galleries")
+                .whereRaw("sub_galleries.destination_id = (select id from destination_id_from_path)")
+                .leftJoin("locations", "sub_galleries.location", "locations.id")
+                .orderBy("index");
+
+            const promises = [destinationImagesPromise, destinationGalleriesPromise];
+
+            Promise.all(promises).then(([destinationImages, destinationGalleries]) => {
+                destinationImages.forEach((image) => {
+                    // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
+                    image.src = config.convertPathToUrl(image.path + "/" + image.name);
+                });
+                res.json({
+                    images: destinationImages,
+                    galleries: destinationGalleries,
+                });
+            }).catch(next);
         });
 };
