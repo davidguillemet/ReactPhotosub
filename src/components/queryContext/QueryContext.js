@@ -25,17 +25,18 @@ export const QueryContextProvider = ({children}) => {
     const addDestinationImage = React.useCallback((newImage) => {
         const queryKey = getFetchDestinationKey(newImage.path, DESTINATION_PROPS.IMAGES);
         const prevData = queryClient.getQueryData(queryKey);
+        const { images, galleries } = prevData;
         // We might upload the same image again or just update image properties,
         // in which case we must replace the image in the data
-        const imageIndex = prevData.findIndex(img => newImage.name === img.name && newImage.path === img.path);
+        const imageIndex = images.findIndex(img => newImage.name === img.name && newImage.path === img.path);
         if (imageIndex === -1) {
             // New image
-            prevData.push(newImage);
+            images.push(newImage);
         } else {
             // Upload again an existing image / Update image properties
-            prevData.splice(imageIndex, 1, newImage);
+            images.splice(imageIndex, 1, newImage);
         }
-        queryClient.setQueryData(queryKey, [...prevData]);
+        queryClient.setQueryData(queryKey, { galleries, images: [...images] });
 
         const prevImageFolders = queryClient.getQueryData(['imageFolders']);
         if (prevImageFolders.findIndex(folder => folder.path === newImage.path) === -1) {
@@ -145,7 +146,8 @@ export const QueryContextProvider = ({children}) => {
         removeDestinationImage: (destinationPath, imageFullPath) => {
             const queryKey = getFetchDestinationKey(destinationPath, DESTINATION_PROPS.IMAGES);
             const prevData = queryClient.getQueryData(queryKey);
-            const newData = prevData.filter(image => `${image.path}/${image.name}` !== imageFullPath);
+            const { images, galleries } = prevData;
+            const newData = { galleries, images: images.filter(image => `${image.path}/${image.name}` !== imageFullPath) };
             queryClient.setQueryData(queryKey, newData);
 
             const prevImageErrors = queryClient.getQueryData(['imageErrors']);
