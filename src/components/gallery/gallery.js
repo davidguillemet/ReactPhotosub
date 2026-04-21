@@ -12,7 +12,7 @@ import ExpandedView from './expandedView';
 import { withLoading, buildLoadingState } from '../../components/hoc';
 import MasonryGallery from '../masonryGallery';
 import { BlockQuote } from '../../template/pageTypography';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { Box, Collapse } from '@mui/material';
 import { useTranslation } from 'utils';
 import { Body } from '../../template/pageTypography';

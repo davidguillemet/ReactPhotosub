@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import Box from '@mui/material/Box';
 import HomeIcon from '@mui/icons-material/Home';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';

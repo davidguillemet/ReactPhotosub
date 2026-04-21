@@ -1,5 +1,5 @@
 import React from 'react';
-import { Await } from 'react-router-dom';
+import { Await } from 'react-router';
 
 import ErrorAlert from 'components/error';
 import { Loading } from 'components/hoc';

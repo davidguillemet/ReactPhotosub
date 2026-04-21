@@ -1,6 +1,6 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Box, Paper } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import { Unstable_Popup as Popup } from '@mui/base/Unstable_Popup';

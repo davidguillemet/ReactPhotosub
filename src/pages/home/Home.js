@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router";
 
 import { getThumbnailSrc, useImageKit } from 'utils';
 import { useScrollBlock } from 'utils';

@@ -1,4 +1,3 @@
-import { defer } from "react-router-dom";
 import { getFetchDestinationKey, DESTINATION_PROPS } from "utils/destinations";
 
 const destinationHeaderQuery = (dataProvider, destinationPath) => ({
@@ -25,10 +24,10 @@ const destinationLoaderFactory = (queryClient, dataProvider) => async ({ request
     // no need to use defer in the loader itself.
     const { year, title } = params;
     const destinationPath = `${year}/${title}`;
-    return defer({
+    return {
         destinationHeader: getDestinationHeader(queryClient, dataProvider, destinationPath),
         destinationImages: getDestinationImages(queryClient, dataProvider, destinationPath),
-    });
+    };
 };
 
 export const loaderFactory = destinationLoaderFactory;

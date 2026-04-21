@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router";
 import {isMobile} from 'react-device-detect';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';

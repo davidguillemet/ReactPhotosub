@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFetcher } from 'react-router-dom';
+import { useFetcher } from 'react-router';
 
 export const useAsyncFetcher = (fetcherKey, action = null) => {
     const fetcher = useFetcher({ key: fetcherKey });

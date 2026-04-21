@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import DestinationLink from '../destinationLink';

@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom"; // v6
+import { NavLink } from "react-router";
 
 const NavLinkTemplate = props => (
   <NavLink

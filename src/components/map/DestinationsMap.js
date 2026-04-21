@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useMatch } from "react-router-dom";
+import { useMatch } from "react-router";
 import { useQueryContext } from '../queryContext';
 import { formatDate, getThumbnailSrc, useLanguage } from '../../utils';
 import { DestinationsPath } from '../../navigation/routes';

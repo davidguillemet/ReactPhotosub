@@ -2,7 +2,7 @@
 import {
   createBrowserRouter,
   RouterProvider,
-} from "react-router-dom";
+} from "react-router";
 
 import App from '../App';
 
@@ -29,7 +29,18 @@ const ReactRouteProvider = ({ children }) => {
         }
     ];
 
-    const router = createBrowserRouter(fullRoutes);
+    const router = createBrowserRouter(fullRoutes, {
+        future: {
+            // Activate V7 features before upgrading
+            // https://reactrouter.com/upgrading/v6
+            v7_relativeSplatPath: true,
+            v7_fetcherPersist: true,
+            v7_normalizeFormMethod: true,
+            v7_partialHydration: true,
+            v7_skipActionErrorRevalidation: true,
+            v7_startTransition: true
+        }
+    });
 
     return (
         <RouterProvider router={router}>

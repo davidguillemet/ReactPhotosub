@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAsyncError, useRouteError, isRouteErrorResponse } from 'react-router-dom';
+import { useAsyncError, useRouteError, isRouteErrorResponse } from 'react-router';
 import { Alert, AlertTitle, Box } from '@mui/material';
 import { useTranslation } from 'utils';
 

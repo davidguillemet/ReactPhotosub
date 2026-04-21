@@ -1,5 +1,5 @@
 import { ConfirmDialog } from 'dialogs';
-import { useBlocker } from "react-router-dom";
+import { useBlocker } from "react-router";
 
 const useNavigationBlocker = (blockerFunction, title, dialogContent) => {
     const blocker = useBlocker(blockerFunction);

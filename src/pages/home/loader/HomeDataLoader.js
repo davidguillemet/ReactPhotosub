@@ -1,4 +1,3 @@
-import { defer } from "react-router-dom"; // Remove it with react-router v7 when we can return the promise directly from the loader without using defer, react-router will automatically defer it and stream the response as the data is loaded, no need to use defer in the loader itself.
 import { uniqueID, shuffleArray } from 'utils';
 
 const processSlideshowData = async (data) => {
@@ -28,9 +27,9 @@ const SlideshowLoader = (queryClient, dataProvider) => async ({ request, params 
     // when migrating to react-router V7, just remove the defer and return the promise directly from the loader,
     // react-router will automatically defer it and stream the response as the data is loaded,
     // no need to use defer in the loader itself. 
-    return defer({
+    return {
         images: getSlideshowImages(queryClient, dataProvider)
-    });
+    };
 };
 
 export const loaderFactory = SlideshowLoader;

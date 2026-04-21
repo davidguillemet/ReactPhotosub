@@ -1,6 +1,6 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Box } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import TableContainer from '@mui/material/TableContainer';

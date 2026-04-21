@@ -9,7 +9,7 @@ import { withUser } from 'components/hoc';
 import Regions from './regions/Regions';
 import Images from './images';
 import NotFound from 'pages/notFound';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 
 const _tabs = [
     {
