@@ -1,3 +1,5 @@
+import React from 'react';
+import { useLocation } from "react-router";
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import { StyledEngineProvider } from '@mui/material/styles';
@@ -17,6 +19,28 @@ import AppContent from './template';
 const scrollTopAnchor = "back-to-top-anchor";
 
 const App = (props) => {
+
+    const { pathname, hash, key } = useLocation();
+
+    React.useEffect(() => {
+        // if not a hash link, scroll to top
+        if (hash === '') {
+            window.scrollTo(0, 0);
+        }
+        // else scroll to id
+        else {
+            setTimeout(() => {
+                const id = hash.replace('#', '');
+                const element = document.getElementById(id);
+                if (element) {
+                    window.scrollTo({
+                        behavior: "smooth",
+                        top: element.offsetTop
+                    });
+                }
+            }, 10);
+        }
+    }, [pathname, hash, key]);
 
     return (
         <Box sx={{ display: 'flex', minHeight: "100%"}} id="AppContainer">

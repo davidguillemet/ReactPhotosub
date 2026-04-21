@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from "react-router";
 import { PageTitle, PageHeader, BlockQuote } from '../../template/pageTypography';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemButton from '@mui/material/ListItemButton';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
@@ -25,20 +27,38 @@ const getMenuItems = (t) => {
     return menuItems;
 }
 
-const ListItemLink = (props) => {
-    return <ListItem component="a" {...props} sx ={{ py: 0, color: theme => theme.palette.link.main}}/>;
-}
-
 const FinningListItem = ({caption, index}) => {
+
+    const navigate = useNavigate();
+    const href = React.useMemo(() => `#section${index}`, [index]);
+
+    const onClickItem = React.useCallback(() => {
+        navigate({
+            hash: href
+        });
+    }, [href, navigate]);
+
     return (
-        <ListItemButton>
-            <ListItemIcon sx={{ minWidth: 'unset'}}>
-                <NavigateNextIcon />
-            </ListItemIcon>
-            <ListItemLink href={`#anchor${index}`}>
-                {caption}
-            </ListItemLink>
-        </ListItemButton>
+        <ListItem disablePadding>
+            <ListItemButton onClick={onClickItem}>
+                <ListItemIcon sx={{ minWidth: 'unset'}}>
+                    <NavigateNextIcon />
+                </ListItemIcon>
+                <ListItemText
+                    slotProps={
+                        {
+                            primary: {
+                                sx: {
+                                    fontSize: '1.1em',
+                                    fontWeight: 300,
+                                    color: theme => theme.palette.link.main
+                                }
+                            }
+                        }
+                    }
+                    primary={caption} />
+            </ListItemButton>
+        </ListItem>
     );
 }
 

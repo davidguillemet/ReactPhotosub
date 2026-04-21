@@ -11,8 +11,8 @@ const HeaderTypography = ({children, ...other}) => (<Typography variant="h4" {..
 const ParagraphTypography = ({children, ...other}) => (<Typography variant="h6" {...other}>{children}</Typography>);
 const BodyTypography = ({children, ...other}) => (<Typography variant="body1" {...other}>{children}</Typography>);
 
-export const Anchor = ({index}) => (
-    <span id={`anchor${index}`} />
+export const Anchor = ({name = "section", index}) => (
+    <span id={`${name}${index}`} />
 );
 
 export const NoWrapAndEllipsis = {
