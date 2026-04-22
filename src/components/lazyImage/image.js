@@ -93,14 +93,18 @@ const LazyImage = ({
     }
 
     const onMouseEnter = () => {
-        gsap.to(selector(`#${imageOverlayId}`), { duration: 0.4, opacity: 1 });
+        if (withOverlay && renderOverlay === null) {
+            gsap.to(selector(`#${imageOverlayId}`), { duration: 0.4, opacity: 1 });
+        }
         gsap.to(selector(`#${imageId}`), { scale: 1.1, ease: "bounce.out" });
     };
 
     const onMouseLeave = () => {
-        gsap.to(selector(`#${imageOverlayId}`), { duration: 0.4, opacity: 0 });
+        if (withOverlay && renderOverlay === null) {
+            gsap.to(selector(`#${imageOverlayId}`), { duration: 0.4, opacity: 0 });
+        }
         gsap.to(selector(`#${imageId}`), { scale: 1, ease: "bounce.out" });
-    }
+    };
 
     return (
         <Box
