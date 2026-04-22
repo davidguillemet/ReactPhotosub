@@ -32,7 +32,7 @@ const RegionChip = ({region}) => {
     const { language } = useLanguage();
 
     return (
-        <Chip label={regionTitle(region, language)} sx={{m: 0, mr: 0.5}} color="secondary" variant="outlined"/>
+        <Chip label={regionTitle(region, language)} sx={{m: 0, mr: 0.5, mt: 1}} color="secondary" variant="outlined"/>
     )
 }
 
@@ -45,7 +45,7 @@ const RegionPath = ({regions}) => {
                 flexDirection: 'row',
                 flexWrap: 'wrap',
                 justifyContent: 'flex-start',
-                my: 1,
+                mb: 1,
                 width: "100%"
             }}
         >

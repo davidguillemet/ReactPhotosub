@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import {isMobile} from 'react-device-detect';
+import React, { useRef, useState, useLayoutEffect } from 'react';
+import { isMobile } from 'react-device-detect';
 import { gsap } from "gsap";
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';    
@@ -16,18 +16,29 @@ import { PublicationIndicator } from 'components/publication';
 import useAdminActions from './admin/UseAdminActions';
 import LazyImage from '../../components/lazyImage';
 
-const DestinationDetails = ({destination}) => {
+const DestinationDetails = ({destination, onHeightCalculated}) => {
     const { language } = useLanguage();
+
+    const visibleRef = useRef();
+
+    useLayoutEffect(() => {
+        if (visibleRef.current && onHeightCalculated) {
+            onHeightCalculated(visibleRef.current.offsetHeight);
+        }
+    }, [onHeightCalculated]);
 
     return (
         <React.Fragment>
+            <div ref={visibleRef}>
             <Typography variant="h5">{destinationTitle(destination, language)}</Typography>
             <Typography variant='h6' sx={{fontWeight: 300}}>{formatDate(new Date(destination.date), language)}</Typography>
+            </div>
             <Box
                 style={{
                     display: 'flex',
                     flexDirection: 'row',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    flexWrap: 'wrap',
                 }}
             >
                 {destination.regionpath.slice(0).reverse().map((region, index) => {
@@ -40,6 +51,7 @@ const DestinationDetails = ({destination}) => {
                             color="primary"
                             sx={{
                                 ml: index > 0 ? '5px' : 0,
+                                mt: 0.5,
                                 '&.MuiChip-outlinedPrimary': {
                                     color: '#fff',
                                     border: '1px solid #fff'
@@ -65,10 +77,17 @@ const DestinationContent = ({item, index, width, params}) => {
     const { onEdit, onDelete } = params;
 
     const container = useRef();
+    const [visibleHeight, setVisibleHeight] = useState(65); // Default value, will be updated on mount
 
     const onMouseEnter = () => {
         const selector = gsap.utils.selector(container);
-        gsap.to(selector(".details"), { y: -30, ease: "bounce.out" });
+        gsap.to(selector(".details"), {
+            y: (index, target, targets) => {
+                const detailsHeight = target.offsetHeight;
+                return -(detailsHeight - visibleHeight);
+            },
+            ease: "bounce.out"
+        });
     };
 
     const onMouseLeave = () => {
@@ -87,7 +106,6 @@ const DestinationContent = ({item, index, width, params}) => {
     const onImageLoaded = React.useCallback(() => {
         const selector = gsap.utils.selector(container);
         gsap.to(selector(".details"), { opacity: 1, ease: "bounce.out" });
-        //gsap.to(selector(".imageLoader"), { opacity: 0, ease: "bounce.out" });
     }, [container]);
 
     return (
@@ -121,13 +139,14 @@ const DestinationContent = ({item, index, width, params}) => {
                         position: 'absolute',
                         height: 'auto',
                         paddingBottom: '5px',
-                        bottom: isMobile ? '0px' : '-30px',
+                        ...(isMobile && { bottom: '0px' }),
+                        ...(!isMobile && { top: `calc(100% - ${visibleHeight}px)` }),
                         color: 'white',
                         opacity: 0
                     }}
                     className="details"
                 >
-                    <DestinationDetails destination={destination} />
+                    <DestinationDetails destination={destination} onHeightCalculated={setVisibleHeight} />
                 </Box>
             </DestinationLink>
             {
