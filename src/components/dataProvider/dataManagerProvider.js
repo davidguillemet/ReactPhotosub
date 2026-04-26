@@ -20,7 +20,7 @@ const createAxiosInstance = (firebaseContext) => {
 
     const axiosInstance = axios.create({
         baseURL: apiBaseUrl + '/api',
-        timeout: isDev() ? 1200000 /* 20mn in case of debug */ : 10000 /* 10s */,
+        timeout: isDev() ? 1200000 /* 20mn in case of debug */ : 20000 /* 20s */,
     });
 
     axiosInstance.defaults.headers = {
