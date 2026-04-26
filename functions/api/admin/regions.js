@@ -23,7 +23,7 @@ module.exports = function(admin, config) {
                 .update({
                     "title": region.title,
                     "title_en": region.title_en,
-                    "parent": region.region,
+                    "parent": region.parent,
                 }).then(() => {
                     return fetchAllRegions(req, res, next);
                 }).catch(next);
