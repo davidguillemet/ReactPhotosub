@@ -51,11 +51,7 @@ const DestinationDetails = ({destination, onHeightCalculated}) => {
                             color="primary"
                             sx={{
                                 ml: index > 0 ? '5px' : 0,
-                                mt: 0.5,
-                                '&.MuiChip-outlinedPrimary': {
-                                    color: '#fff',
-                                    border: '1px solid #fff'
-                                }
+                                mt: 0.5
                             }}
                         />
                     );
@@ -154,14 +150,18 @@ const DestinationContent = ({item, index, width, params}) => {
                 <Stack
                     direction="row"
                     alignItems="center"
-                    sx={{position: "absolute", top: 0, right: 0}}
+                    sx={{
+                        position: "absolute",
+                        top: 8,
+                        right: 0,
+                    }}
                 >
-                    <PublicationIndicator published={destination.published} />
-                    <IconButton aria-label="edit" onClick={onEditDestination}>
-                        <EditIcon sx={{color: "white"}}/>
+                    <PublicationIndicator published={destination.published} sx={{mr: 1}} />
+                    <IconButton aria-label="edit" onClick={onEditDestination} sx={{mr: 1}}>
+                        <EditIcon />
                     </IconButton>
-                    <IconButton aria-label="remove" onClick={onDeleteDestination}>
-                        <DeleteIcon sx={{color: "white"}}/>
+                    <IconButton aria-label="remove" onClick={onDeleteDestination} sx={{mr: 1}}>
+                        <DeleteIcon />
                     </IconButton>
                 </Stack>
             }

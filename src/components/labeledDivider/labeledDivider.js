@@ -27,7 +27,7 @@ const LabeledDivider = ({label}) => {
             }}
         >
             <Separator />
-            <PageHeader sx={{my: 0, color: theme => theme.palette.text.disabled, fontWeight: "400"}}>{label}</PageHeader>
+            <PageHeader sx={{my: 0, color: theme => theme.palette.text.muted, fontWeight: "400"}}>{label}</PageHeader>
             <Separator />
         </Box>
     )

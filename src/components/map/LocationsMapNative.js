@@ -25,7 +25,6 @@ import { IconButton } from '@mui/material';
 import { uniqueID } from 'utils';
 
 import LocationMarker from './LocationMarker';
-import { useDarkMode } from 'components/theme';
 
 const _locationKey = "id"; // We should get the location id from the destinations...
 
@@ -80,12 +79,13 @@ export const LocationsMapNativeUI = withLoading(({
     onMapClick,
     isDestinationPage = false}) => {
 
-    const { darkMode } = useDarkMode();
     const map = useMap();
     const [markers, setMarkers] = React.useState({});
     const [fullScreen, setFullScreen] = React.useState(false);
     const clusterer = React.useRef(null);
     const fullScreenContainer = React.useRef(null);
+
+    const [openMarkerIndex, setOpenMarkerIndex] = React.useState(null);
 
     const onClickFullScreen = React.useCallback(() => {
         setFullScreen(prev => !prev);
@@ -189,13 +189,21 @@ export const LocationsMapNativeUI = withLoading(({
         });
     }, [markers]);
 
+    const onCloseMarkerInfoWindow = React.useCallback((index) => {
+        setOpenMarkerIndex(null);
+    }, []);
+
+    const onOpenMarkerInfoWindow = React.useCallback((index) => {
+        setOpenMarkerIndex(index);
+    }, []);
+
     return (
         <Box
             sx={{
                 width: "100%",
                 height: "100%",
                 position: "relative",
-                borderRadius: '5px',
+                borderRadius: theme => theme.shape.borderRadius,
                 overflow: 'hidden'
             }}
         >
@@ -212,7 +220,8 @@ export const LocationsMapNativeUI = withLoading(({
                 gestureHandling="cooperative" // For mobile device,
                 streetViewControl={false}
                 disableDefaultUI={false}
-                mapId={darkMode ? "e0a208ca413d2495" : "c5d263b03424670c"}
+                // mapId={darkMode ? "e0a208ca413d2495" : "c5d263b03424670c"}
+                mapId={"e0a208ca413d2495"}
                 onCameraChanged={ (event /* MapCameraChangedEvent */) => {
                     //console.log('camera changed:', event.detail.center, 'zoom:', event.detail.zoom)
                 }}
@@ -236,6 +245,9 @@ export const LocationsMapNativeUI = withLoading(({
                             ref={setMarkerRef}
                             isDestinationPage={isDestinationPage}
                             index={index}
+                            infoOpen={openMarkerIndex === index}
+                            onClose={onCloseMarkerInfoWindow}
+                            onOpen={onOpenMarkerInfoWindow}
                         />
                     ))
                 }

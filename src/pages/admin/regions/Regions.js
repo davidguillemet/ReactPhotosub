@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@mui/system';
+import { Box, Stack } from '@mui/system';
 import { Button } from '@mui/material';
 import { IconButton, Typography } from '@mui/material';
 import useRegions from 'components/hooks/useRegions';
@@ -52,12 +52,14 @@ const LocationItem = ({location, onEdit, onDelete}) => {
                     <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
                         {location.title}
                     </Typography>
-                    <IconButton onClick={onClickEdit} size='small'>
-                        <EditLocationAltIcon fontSize='inherit'/>
-                    </IconButton>
-                    <IconButton onClick={onClickDelete} size='small'>
-                        <DeleteIcon fontSize='inherit'/>
-                    </IconButton>
+                    <Stack direction="row" spacing={0.5}>
+                        <IconButton onClick={onClickEdit} size='small'>
+                            <EditLocationAltIcon fontSize='inherit'/>
+                        </IconButton>
+                        <IconButton onClick={onClickDelete} size='small'>
+                            <DeleteIcon fontSize='inherit'/>
+                        </IconButton>
+                    </Stack>
                 </Box>
             }
         />
@@ -98,15 +100,17 @@ const RegionItem = ({region, children, onEditLocation, onEditRegion, onDeleteReg
                     <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
                         {regionTitle(region, language)}
                     </Typography>
-                    <IconButton onClick={handleAddLocation} size='small'>
-                        <AddLocationAltIcon fontSize='inherit' />
-                    </IconButton>
-                    <IconButton onClick={handleEditRegion} size='small'>
-                        <EditLocationAltIcon fontSize='inherit' />
-                    </IconButton>
-                    <IconButton onClick={handleDeleteRegion} size='small' disabled={hasChildren}>
-                        <DeleteIcon fontSize='inherit'/>
-                    </IconButton>
+                    <Stack direction="row" spacing={0.5}>
+                        <IconButton onClick={handleAddLocation} size='small'>
+                            <AddLocationAltIcon fontSize='inherit' />
+                        </IconButton>
+                        <IconButton onClick={handleEditRegion} size='small'>
+                            <EditLocationAltIcon fontSize='inherit' />
+                        </IconButton>
+                        <IconButton onClick={handleDeleteRegion} size='small' disabled={hasChildren}>
+                            <DeleteIcon fontSize='inherit'/>
+                        </IconButton>
+                    </Stack>
                 </Box>
             }
         >

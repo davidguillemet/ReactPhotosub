@@ -53,7 +53,7 @@ module.exports = function(app, config) {
         .get(config.checkAuthentication, function(req, res, next) {
             res.locals.errorMessage = `Failed to load information for destination '${getDestinationPath(req)}'`;
             const isAdmin = config.isAdmin(res);
-            const adminWhereClauseForPrevNext = isAdmin ? "" : " and destinations.published = true";
+            const adminWhereClauseForPrevNext = isAdmin ? "" : " and destinations_with_regionpath.published = true";
             return config.pool().raw(
                 `WITH destination AS (
                     SELECT
@@ -63,10 +63,10 @@ module.exports = function(app, config) {
                     where l.id = d.location and d.path = ?
                 ),
                 prevDest AS (
-                    SELECT destinations.* from destinations, destination where destinations.date < destination.date ${adminWhereClauseForPrevNext} ORDER BY destinations.date DESC LIMIT 1
+                    SELECT destinations_with_regionpath.* from destinations_with_regionpath, destination where destinations_with_regionpath.date < destination.date ${adminWhereClauseForPrevNext} ORDER BY destinations_with_regionpath.date DESC LIMIT 1
                 ),
                 nextDest AS (
-                    SELECT destinations.* from destinations, destination where destinations.date > destination.date ${adminWhereClauseForPrevNext} ORDER BY destinations.date ASC LIMIT 1
+                    SELECT destinations_with_regionpath.* from destinations_with_regionpath, destination where destinations_with_regionpath.date > destination.date ${adminWhereClauseForPrevNext} ORDER BY destinations_with_regionpath.date ASC LIMIT 1
                 )
                 SELECT d.title, d.title_en, d.date, d.cover, d.path, d.id, d.location, d.longitude, d.latitude, d.link, d.macro, d.wide, d.published, d.regionpath,
                        (select row_to_json(prevDest.*) from prevDest) as prev,

@@ -164,7 +164,7 @@ const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = fa
                 scope="row"
                 padding="none"
             >
-                <Chip color="error" icon={<InsertPhotoIcon />} label={itemName} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
+                <Chip color="error" variant="outlined" icon={<InsertPhotoIcon />} label={itemName} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
             </TableCell>
             {
                 !useImageKit && // No thumbnails

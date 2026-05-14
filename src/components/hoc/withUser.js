@@ -10,7 +10,7 @@ const Unauthorized = ({admin}) => {
     return (
         <React.Fragment>
             <VerticalSpacing factor={2} />
-            <Alert severity="warning" elevation={4} variant="filled">
+            <Alert severity="warning" >
             { 
                 admin === true ? t("adminRestriction") : t("userRestriction")
             }

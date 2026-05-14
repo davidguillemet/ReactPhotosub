@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMemo } from 'react';
-import { Fab } from '@mui/material';
+import { IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import LazyImage from '../lazyImage';
@@ -52,9 +52,8 @@ const Thumbnail = React.forwardRef(({
 
             {
                 image.uploaded &&
-                <Fab
+                <IconButton
                     size="small"
-                    color="secondary"
                     disabled={image.deletable}
                     onClick={handleDelete}
                     style={{
@@ -62,9 +61,10 @@ const Thumbnail = React.forwardRef(({
                         top: 5,
                         right: 5
                     }}
+                    variant="light"
                 >
                     <DeleteOutlineOutlinedIcon />
-                </Fab>
+                </IconButton>
             }
 
             <SelectionMarker

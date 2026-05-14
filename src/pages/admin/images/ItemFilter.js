@@ -18,8 +18,10 @@ const FilterStatus = ({status}) => {
             label={status}
             size='small'
             color={status}
-            variant={imageContext.displayStatus(status) ? "" : "outlined"}
-            onClick={toggleStatus}/>
+            disabled={!imageContext.displayStatus(status)}
+            onClick={toggleStatus}
+            onDelete={toggleStatus}
+        />
     );
 };
  
@@ -40,7 +42,7 @@ const ItemFilter = () => {
                     return <FilterStatus key={status} status={status} />
                 })
             }
-            <IconButton onClick={reset}>
+            <IconButton onClick={reset} variant="noBorder">
                 <HighlightOffIcon />
             </IconButton>
         </Stack>

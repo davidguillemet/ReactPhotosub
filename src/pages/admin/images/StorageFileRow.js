@@ -88,6 +88,7 @@ const StorageFileRow = ({row, selected}) => {
                         size="small"
                         onClick={toggleExpanded}
                         disabled={hasThumbs === false}
+                        sx={{ml: 1}}
                     >
                         {expanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>

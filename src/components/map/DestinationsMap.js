@@ -52,7 +52,7 @@ const DestinationsMapUi = withLoading(({destinations, locations, onClose, isDest
             locationMap.set(location.id, location);
         })
 
-        const destinationsPerlocation = new Map();
+        const destinationsPerLocation = new Map();
         destinations.forEach(destination => {
 
             const modifiedDestination = {
@@ -61,17 +61,17 @@ const DestinationsMapUi = withLoading(({destinations, locations, onClose, isDest
                 cover: getThumbnailSrc(destination.cover, _infoCoverWidth)
             };
             let locationInstance;
-            if (destinationsPerlocation.has(destination.location)) {
-                locationInstance = destinationsPerlocation.get(destination.location);
+            if (destinationsPerLocation.has(destination.location)) {
+                locationInstance = destinationsPerLocation.get(destination.location);
             } else {
                 locationInstance = { ...locationMap.get(destination.location) }
                 locationInstance.destinations = [];
-                destinationsPerlocation.set(destination.location, locationInstance);
+                destinationsPerLocation.set(destination.location, locationInstance);
             }
             locationInstance.destinations.push(modifiedDestination);    
         });
 
-        setDestinationsPerLocation([ ...destinationsPerlocation.values() ]);
+        setDestinationsPerLocation([ ...destinationsPerLocation.values() ]);
     // Don't need dependency with isDestinationPage
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [destinations, locations, language]);

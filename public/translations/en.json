@@ -1,7 +1,7 @@
 {
     "menu": {
         "home": "Home",
-        "destinations" : "Destinations",
+        "destinations": "Destinations",
         "destination": "Destination",
         "search": "Search",
         "finning": "Finning",
@@ -14,7 +14,7 @@
         "logout": "Logout",
         "acctMgmt": "Account Management"
     },
-    "pages" : {
+    "pages": {
         "404": {
             "title": "Oops...",
             "explanation": "It seems that the page you requested does not exist or has been deleted."
@@ -39,9 +39,7 @@
             "enterNewPassword": "Enter your new password:",
             "resetPasswordSuccess": "Your password has been changed successfully.\nYou are now signed-in."
         },
-        "home": {
-
-        },
+        "home": {},
         "contact": {
             "title": "To contact me",
             "field:name": "Your name",
@@ -78,7 +76,7 @@
             "confirmRemove": "Do you confirm the deletion of the destination '{0}'?",
             "warningConfirmRemove": "Please note, this action is irreversible.",
             "title:newDestination": "New destination",
-            "title:editDestination" : "Edit destination",
+            "title:editDestination": "Edit destination",
             "validate": "Validate",
             "form:titleField": "Title",
             "form:titleError": "Please indicate a destination title.",
@@ -232,7 +230,7 @@
                     "success:saved": "The region has been saved."
                 }
             },
-            "images" : {
+            "images": {
                 "ImageFormDialogTitle": "Edit image properties",
                 "folderDialogTitle": "Create folder",
                 "title:deleteItems": "Delete pictures",
@@ -315,7 +313,7 @@
             "btn:modifyData": "Edit information",
             "btn:sendMailVerification": "Verify email",
             "title:authDialog": "Authentication",
-            "desc:authDialog" : "You must re-authenticate to modify your personal data.",
+            "desc:authDialog": "You must re-authenticate to modify your personal data.",
             "field:authDialog": "Enter your password",
             "btn:cancel": "Cancel",
             "btn:validate": "Validate",
@@ -329,7 +327,7 @@
     },
     "components": {
         "error": {
-           "caption": "Oops...An error has occurred"
+            "caption": "Oops...An error has occurred"
         },
         "search": {
             "inputPlaceHolder": "Search within {0} images...",
@@ -403,7 +401,7 @@
         "hoc": {
             "withUser": {
                 "adminRestriction": "This page is only accessible to the administrator",
-                "userRestriction" : "This page is only accessible to logged in users"
+                "userRestriction": "This page is only accessible to logged in users"
             }
         },
         "imageDescription": {
@@ -413,6 +411,9 @@
             "dark": "Dark",
             "light": "Light",
             "systemSuffix": " (System)"
+        },
+        "imageSlider": {
+            "loadNextImages": "Load the next images"
         }
     },
     "dialogs": {

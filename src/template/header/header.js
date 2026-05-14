@@ -41,7 +41,7 @@ const AppBar = styled(MuiAppBar, {
 
 const TopToolBar = () => {
 
-    const { drawerOpen: open, setDrawerOpen } = useAppContext();
+    const { drawerOpen: open, setDrawerOpen, setSearchOpen } = useAppContext();
 
     const menuIconRef = React.useRef(null);
     const loginRef = React.useRef(null);
@@ -98,6 +98,11 @@ const TopToolBar = () => {
         loginRef.current.style.removeProperty('width');
     }, []);
 
+    const handleSearchExpandedChange = React.useCallback((expanded) => {
+        setSearchOpen(expanded);
+        setSearchExpanded(expanded);
+    }, [setSearchOpen]);
+
     return (
         <HideOnScroll>
         <AppBar
@@ -134,22 +139,20 @@ const TopToolBar = () => {
                             aria-label="open drawer"
                             onClick={() => setDrawerOpen(true)}
                             sx={{
+                                ml: "-5px",
                                 mr: 0,
                                 transition: 'opacity 0.5s'
                             }}
+                            variant="noBorder"
                         >
-                            <MenuIcon
-                                sx={{
-                                    color: theme => isHomePage === true ? theme.palette.common.white : theme.palette.text.primary
-                                }}
-                            />
+                            <MenuIcon />
                         </IconButton>
                     </Box>
 
                     <Box sx={{ display: "flex", flex: 1 }}>
                         <HeaderSearch
                             visible={!isSearchPage}
-                            onExpandedChange={setSearchExpanded}
+                            onExpandedChange={handleSearchExpandedChange}
                         />
                     </Box>
 

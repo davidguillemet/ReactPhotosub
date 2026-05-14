@@ -67,13 +67,13 @@ const StorageBreadcrumbs = () => {
         <Stack direction="row" alignItems="center">
             <HorizontalSpacing factor={1} />
             <GlobalStatus />
-            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" sx={{color: theme => theme.palette.primary.contrastText}}/>} sx={{ml: 2, pv: 1}} >
+            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ml: 2, pv: 1}} >
             {
                 refHierarchy.map((ref, index) => {
                     return (
-                        index < refHierarchy.length - 1 ? <Link underline="hover" key={ref.fullPath} id={ref.fullPath} onClick={handleClick} sx={{cursor: 'pointer', color: theme => theme.palette.primary.contrastText}}>{ref.name}</Link> :
+                        index < refHierarchy.length - 1 ? <Link underline="hover" key={ref.fullPath} id={ref.fullPath} onClick={handleClick} sx={{cursor: 'pointer'}}>{ref.name}</Link> :
                         editMode === true ? <TextField key={ref.fullPath} value={newFolderName} multiline={false} size="small" onChange={onFolderNameChange}/> :
-                        <Box key={ref.fullPath} sx={{color: theme => theme.palette.primary.contrastText}}>{ref.name}</Box>
+                        <Box key={ref.fullPath}>{ref.name}</Box>
                     )
                 })
             }
@@ -83,8 +83,8 @@ const StorageBreadcrumbs = () => {
                 <IconButton onClick={editMode ? handleOnClickSaveName : handleOnClickEdit} sx={{ml: 1, mv: 0}}>
                 {
                     editMode === true ?
-                    <CheckOutlinedIcon fontSize='small' sx={{color: theme => theme.palette.primary.contrastText}}/> :
-                    <EditOutlinedIcon fontSize='small' sx={{color: theme => theme.palette.primary.contrastText}}/>
+                    <CheckOutlinedIcon fontSize='small' /> :
+                    <EditOutlinedIcon fontSize='small' />
                 }
                 </IconButton>
             }

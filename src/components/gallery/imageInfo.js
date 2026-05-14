@@ -8,7 +8,7 @@ import ImageDescription from '../imageDescription';
 import ImageDestinationLink from './imageDestinationLink';
 import { Alert, IconButton, Stack } from '@mui/material';
 import { useTranslation } from 'utils';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import CloseIcon from '@mui/icons-material/Close';
 
 const imageInfoId = "imageInfoId";
 const imageInfoAnimationDuration = 0.5;
@@ -90,7 +90,7 @@ const ImageInfo = ({image, displayDestination, style, container, visible, displa
                     display: 'flex',
                     justifyContent: 'center',
                     padding: 0,
-                    bgcolor: 'rgb(0,0,0,0.9)',
+                    bgcolor: theme => `${theme.palette.background.paperLight}cc`,
                     pointerEvents: 'auto',
                     position: 'absolute',
                     overflowY: 'auto',
@@ -103,17 +103,19 @@ const ImageInfo = ({image, displayDestination, style, container, visible, displa
                     } : {
                         minWidth: '70%'
                     }),
-                    borderColor: '#ffffff58',
+                    borderColor: theme => theme.palette.divider,
                     borderWidth: 1,
-                    borderStyle: 'solid'
+                    borderStyle: 'solid',
+                    borderRadius: theme => theme.shape.borderRadius
                 }}
             >
                 <IconButton
                     size='small'
-                    sx={{position: 'absolute', top: 0, right: 0, color: theme => theme.palette.grey[400]}}
+                    sx={{position: 'absolute', top: 0, right: 0}}
                     onClick={onClose}
+                    variant="noBorder"
                 >
-                    <HighlightOffIcon />
+                    <CloseIcon />
                 </IconButton>
                 <Stack
                     direction='column'

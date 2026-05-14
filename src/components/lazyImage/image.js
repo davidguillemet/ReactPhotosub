@@ -168,7 +168,6 @@ const LazyImage = ({
                 <FavoriteButton
                     image={image}
                     size={isMobile ? 'small' : 'large'}
-                    color={'white'}
                     style={{
                         position: "absolute",
                         bottom: 0,

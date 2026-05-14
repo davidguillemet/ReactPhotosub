@@ -24,7 +24,7 @@ const SelectionMarker = ({
                 }),
                 ...(selected && markerWidth > 0 ?
                     {
-                        borderColor: theme => theme.palette.secondary.light,
+                        borderColor: theme => theme.palette.primary.light,
                         borderWidth: `${markerWidth}px`,
                         borderStyle: "solid",
                         backgroundColor: 'transparent',

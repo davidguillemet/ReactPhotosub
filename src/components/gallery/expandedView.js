@@ -17,12 +17,12 @@ import CloseIcon from '@mui/icons-material/CloseOutlined';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 import AppsIcon from '@mui/icons-material/Apps';
-import { useEventListener, getThumbnailSrc, useTranslation, useLanguage, parseImageDescription } from '../../utils';
+import { useEventListener, getThumbnailSrc, useTranslation, useLanguage, parseImageDescription } from 'utils';
 import FavoriteButton from './favoriteButton';
 import ImageSlider from '../imageSlider';
 import ImageInfo from './imageInfo';
 import { useResizeObserver } from 'components/hooks';
-import { useScrollBlock, openFullscreen, closeFullscreen } from '../../utils';
+import { useScrollBlock, openFullscreen, closeFullscreen } from 'utils';
 
 import TooltipIconButton from 'components/tooltipIconButton';
 import { HorizontalSpacing } from 'template/spacing';
@@ -87,6 +87,7 @@ function StopButtonWithCircularProgress({ onClick, onCompletedRef, duration, siz
             tooltip={t("btn:stopSlideshow")}
             onClick={handleClick}
             size={size}
+            variant="noBorder"
         >
             <StopIcon fontSize='inherit'></StopIcon>
             <CircularProgress
@@ -505,6 +506,7 @@ const ExpandedView = React.forwardRef(({
                                 onClick={handlePlayClick}
                                 disabled={playable === false}
                                 size={toolbarIconSize}
+                                variant="noBorder"
                             >
                                 <PlayCircleOutlineIcon fontSize="inherit" />
                             </TooltipIconButton>
@@ -515,6 +517,7 @@ const ExpandedView = React.forwardRef(({
                             tooltip={infoVisible ? t("btn:hideDetails") : t("btn:showDetails")}
                             onClick={handleInfoClick}
                             size={toolbarIconSize}
+                            variant="noBorder"
                         >
                             {
                                 infoVisible ?
@@ -527,6 +530,7 @@ const ExpandedView = React.forwardRef(({
                             tooltip={fullScreen ? t("btn:exitFullScreen") : t("btn:enterFullScreen")}
                             onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}
                             size={toolbarIconSize}
+                            variant="noBorder"
                         >
                         {   
                             fullScreen ?
@@ -538,6 +542,7 @@ const ExpandedView = React.forwardRef(({
                             tooltip={showThumbnails ? t("btn:hideThumbnails") : t("btn:showThumbnails")}
                             onClick={handleClickToggleThumbnails}
                             size={toolbarIconSize}
+                            variant="noBorder"
                         >
                             <AppsIcon fontSize="inherit" />
                         </TooltipIconButton>
@@ -571,6 +576,7 @@ const ExpandedView = React.forwardRef(({
                             tooltip={t("btn:closeViewer")}
                             onClick={handleCloseClick}
                             size={toolbarIconSize}
+                            variant="noBorder"
                         >
                             <CloseIcon fontSize="inherit"></CloseIcon>
                         </TooltipIconButton>
@@ -627,9 +633,8 @@ const ExpandedView = React.forwardRef(({
                             style={{
                                 left: 10
                             }}
-                            size="large"
                         >
-                            <ArrowBackIosRoundedIcon fontSize='large' />
+                            <ArrowBackIosRoundedIcon />
                         </NavigationButton>
                     </Collapse>
                 }
@@ -643,9 +648,8 @@ const ExpandedView = React.forwardRef(({
                             style={{
                                 right: 10
                             }}
-                            size="large"
                         >
-                            <ArrowForwardIosRoundedIcon fontSize='large' />
+                            <ArrowForwardIosRoundedIcon />
                         </NavigationButton>
                     </Collapse>
                 }

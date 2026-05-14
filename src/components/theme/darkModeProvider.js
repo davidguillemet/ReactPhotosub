@@ -6,7 +6,8 @@ const DarkModeContext = React.createContext(undefined);
 export const DarkModeProvider = ({ children }) => {
 
     const systemDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-    const [darkModeOverride, setDarkModeOverride] = useState(/*undefined*/systemDarkMode);
+    // eslint-disable-next-line no-unused-vars
+    const [darkModeOverride, setDarkModeOverride] = useState(systemDarkMode);
 
     useEffect(() => {
         setDarkModeOverride(systemDarkMode);
@@ -14,7 +15,7 @@ export const DarkModeProvider = ({ children }) => {
 
     return (
         <DarkModeContext.Provider value={{
-            darkMode: /*darkModeOverride !== undefined ? darkModeOverride : */darkModeOverride,
+            darkMode: true, // darkModeOverride,
             systemDarkMode: systemDarkMode,
             setDarkMode: setDarkModeOverride
         }}>

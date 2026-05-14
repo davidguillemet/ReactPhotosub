@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAsyncFetcher } from 'components/reactRouter';
 import { useTranslation } from 'utils';
-import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import useFormDialog from 'dialogs/FormDialog';
 import SubGalleryForm from './SubGalleryForm';
 import { IconButton } from '@mui/material';
@@ -141,34 +141,29 @@ export const SubGalleryHeaderComponent = ({ group }) => {
 
     return (
         <GroupContextProvider group={group}>
-        <Box>
+        <Stack direction="row" spacing={1}>
             <IconButton
-                sx={{ color: theme => theme.palette.primary.contrastText }}
                 onClick={onConfirmDeleteGallery}
             >
                 <DeleteIcon />
             </IconButton>
             <IconButton
-                sx={{ color: theme => theme.palette.primary.contrastText }}
                 onClick={onEditGallery}
             >
                 <EditIcon />
             </IconButton>
             <IconButton
-                sx={{ color: theme => theme.palette.primary.contrastText }}
                 onClick={onSelectImages}
             >
                 <CollectionsIcon />
             </IconButton>
             <IconButton
-                sx={{ color: theme => theme.palette.primary.contrastText }}
                 onClick={onIndexUp}
                 disabled={!canIncreaseIndex()}
             >
                 <ArrowDownwardIcon />
             </IconButton>
             <IconButton
-                sx={{ color: theme => theme.palette.primary.contrastText }}
                 onClick={onIndexDown}
                 disabled={!canDecreaseIndex()}
             >
@@ -195,7 +190,7 @@ export const SubGalleryHeaderComponent = ({ group }) => {
                     t("dlg:deleteConfirmation", [group.gallery.title]),
                     t("dlg:deleteWarning")
                 ]} />
-        </Box>
+        </Stack>
         </GroupContextProvider>
     );
 };

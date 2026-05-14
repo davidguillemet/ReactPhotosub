@@ -3,20 +3,22 @@ import { styled } from '@mui/material/styles';
 import {isMobile} from 'react-device-detect';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import LoadingButton from '@mui/lab/LoadingButton';
 import { withLoading, buildLoadingState } from '../hoc';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
-import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
-import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
-import { useResizeObserver } from '../../components/hooks';
+import { useResizeObserver } from 'components/hooks';
+import TooltipIconButton from 'components/tooltipIconButton';
 
 import Thumbnail from './thumbnail';
 import './style.css';
 
-const _nextPageButtonWidth = 60;
+import { useTranslation } from 'utils';
+
+const _nextPageButtonWidth = 40;
 
 const CustomBox = styled(Box)(({ theme }) => ({ }));
 
@@ -51,6 +53,8 @@ const ImageSlider = ({
     hasNext = false,
     renderOverlay = null,
     resetScrollOnChangeImages = false}) => {
+    
+    const t = useTranslation("components.imageSlider");
     
     const [thumbnailScrollActivation, setThumbnailScrollActivation] = useState({ scrollLeft: false, scrollRight: false });
     const lastThumbRight = useMemo(() => getLastThumbnailRightPosition(images, imageHeight, spacing, hasNext), [images, imageHeight, spacing, hasNext]);
@@ -149,6 +153,9 @@ const ImageSlider = ({
         }
     }, [onNextPage]);
 
+    const verticalPadding = 8;
+    const fullHeight = imageHeight + verticalPadding*2; // 8px top & bottom for selection shadow and thumbnail translate
+
     return (
         <Box
             sx={{
@@ -163,8 +170,10 @@ const ImageSlider = ({
                 <IconButton
                     onClick={handleThumbnailsScrollLeft}
                     disabled={!thumbnailScrollActivation.scrollLeft}
-                    size="small">
-                    <ArrowCircleLeftOutlinedIcon fontSize="inherit"/>
+                    size="small"
+                    sx={{mr: 1, ml: 1}}
+                >
+                    <ArrowBackIcon fontSize="inherit"/>
                 </IconButton>
             }
 
@@ -172,14 +181,15 @@ const ImageSlider = ({
                 ref={resizeObserver.ref}
                 className="hideScroll" 
                 sx={{
+                    position: 'relative',
                     flex: 1,
                     overflowY: 'hidden',
                     overflowX: 'auto',
                     display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'flex-start',
-                    paddingTop: '8px',
-                    height: `${imageHeight + 8*2}px`, // 8px top & bottom for selection shadow and thumbnail translate
+                    paddingTop: `${verticalPadding}px`,
+                    height: `${fullHeight}px`,
                     mx: 0
                 }}
                 data-body-scroll-lock-ignore
@@ -220,23 +230,19 @@ const ImageSlider = ({
                 }
                 {
                     hasNext &&
-                    <LoadingButton
+                    <TooltipIconButton
+                        tooltip={t("loadNextImages")}
+                        variant="light"
                         loading={searchRunning}
-                        variant="outlined"
-                        size="large"
                         onClick={handleNextSearchPage}
                         sx={{
-                            height: `${imageHeight}px`,
-                            mr: `${spacing}px`,
-                            minWidth: `${_nextPageButtonWidth}px`,
-                            px: 1,
-                            '& .MuiButton-startIcon': {
-                                mr: 0
-                            }
+                            width: `${_nextPageButtonWidth - 5}px`,
+                            height: `${_nextPageButtonWidth - 5}px`,
+                            top: `${(imageHeight - _nextPageButtonWidth + 5) / 2}px`
                         }}
-                        startIcon={<MoreHorizIcon />}
                     >
-                    </LoadingButton>
+                        <SkipNextIcon />
+                    </TooltipIconButton>
                 }
             </CustomBox>
 
@@ -245,8 +251,10 @@ const ImageSlider = ({
                 <IconButton
                     onClick={handleThumbnailsScrollRight}
                     disabled={!thumbnailScrollActivation.scrollRight}
-                    size="small">
-                    <ArrowCircleRightOutlinedIcon fontSize="inherit"/>
+                    size="small"
+                    sx={{mr: 1, ml: 1}}
+                >
+                    <ArrowForwardIcon fontSize="inherit"/>
                 </IconButton>
             }
         </Box>

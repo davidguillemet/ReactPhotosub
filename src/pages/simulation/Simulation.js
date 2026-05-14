@@ -151,7 +151,7 @@ const EmptySimulationImages = ({type, images, searchResult}) => {
                 alignItems: 'center',
                 px: 1
             }}>
-                <Alert severity={severity} elevation={4} variant="filled">{message}</Alert>
+                <Alert severity={severity}>{message}</Alert>
             </Box>
         );
     }

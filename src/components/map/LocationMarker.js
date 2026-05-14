@@ -9,21 +9,18 @@ import {
 
 const _infoCoverWidth = 150;
 
-const LocationMarker = React.forwardRef(({location, isDestinationPage, index}, ref) => {
+const LocationMarker = React.forwardRef(({location, isDestinationPage, onClose, onOpen, infoOpen, index}, ref) => {
 
     const map = useMap();
-    const [infoWindowShown, setInfoWindowShown] = React.useState(false);
 
     const handleLocationClick = React.useCallback((event /* google.maps.MapMouseEvent */) => {
         map.panTo(location.position);
-        setInfoWindowShown(true);
-    }, [location, map]);
+        onOpen(index);
+    }, [location, map, onOpen, index]);
 
     const localRef = React.useCallback((marker) => {
         ref(marker, location)
     }, [ref, location]);
-
-    const handleClose = React.useCallback(() => setInfoWindowShown(false), []);
 
     return (
         <>
@@ -45,10 +42,10 @@ const LocationMarker = React.forwardRef(({location, isDestinationPage, index}, r
             </AdvancedMarker>
 
             {
-                infoWindowShown &&
+                infoOpen &&
                 <InfoWindow
                     position={location.position}
-                    onClose={handleClose}
+                    onClose={onClose}
                     disableAutoPan={false}
                     pixelOffset={[0,0]}
                 >

@@ -22,7 +22,7 @@ import PageContent from '../pageContent';
 import { VerticalSpacing } from '../spacing';
 import SocialIcons from 'components/socialIcons';
 import LanguageSelector from 'components/language';
-import { DarkModeSelector } from 'components/theme';
+// import { DarkModeSelector } from 'components/theme';
 import { useTranslation } from '../../utils';
 import { AppContextProvider, useAppContext } from './appContext';
 
@@ -54,7 +54,6 @@ const MenuItemIcon = ({route, variant, children}) => {
         return (
             <Tooltip
                 title={t(route.label)}
-                arrow
                 placement="right"
             >
                 {children}
@@ -118,6 +117,7 @@ const DrawerContent = ({variant = "temporary"}) => {
                         edge="start"
                         sx={{ ml: "-5px" }}
                         size="large"
+                        variant="noBorder"
                     >
                         <CloseIcon />
                     </IconButton>
@@ -130,8 +130,9 @@ const DrawerContent = ({variant = "temporary"}) => {
                         edge="start"
                         sx={{ ml: "-5px", ...(open && { display: 'none' }) }}
                         size="large"
+                        variant="noBorder"
                     >
-                        <MenuIcon sx={{ color: theme => theme.palette.text.primary }}/>
+                        <MenuIcon />
                     </IconButton>
                 }
             </DrawerHeader>
@@ -167,7 +168,9 @@ const DrawerContent = ({variant = "temporary"}) => {
                                             {route.icon}
                                         </ListItemIcon>
                                     </MenuItemIcon>
-                                    <ListItemText primary={t(route.label)} />
+                                    <ListItemText
+                                        primary={t(route.label)}
+                                    />
                                 </ListItemButton>
                             </NavigationLink>
                         );
@@ -189,7 +192,7 @@ const DrawerContent = ({variant = "temporary"}) => {
                         <VerticalSpacing factor={2}/>
                         <LanguageSelector />
                         <VerticalSpacing factor={2}/>
-                        <DarkModeSelector />
+                        {/* <DarkModeSelector /> */}
                         <VerticalSpacing factor={2}/>
                     </Box>
                     <SocialIcons />
@@ -252,7 +255,6 @@ const AppContentUI = React.forwardRef((props, ref) => {
                         '& .MuiDrawer-paper': {
                             boxSizing: 'border-box',
                             width: drawerWidth,
-                            backgroundColor: 'primary.main'
                         },
                         '& .MuiPaper-root': {
                             width: drawerWidth
@@ -269,9 +271,6 @@ const AppContentUI = React.forwardRef((props, ref) => {
                     open={false}
                     variant="permanent"
                     sx={{
-                        '& .MuiDrawer-paper': {
-                            backgroundColor: 'primary.main'
-                        },
                         display: {
                             xs: 'none',
                             lg: (isHomePage ? 'none' : 'block')

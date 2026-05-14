@@ -2,29 +2,36 @@ import Tooltip from '@mui/material/Tooltip';
 import Zoom from '@mui/material/Zoom';
 import IconButton from '@mui/material/IconButton';
 
-const TooltipIconButton = ({tooltip, onClick, disabled = false, children, style, size = 'large', edge = false}) => {
+const TooltipIconButton = (props) => {
+
+    const {
+        sx = null,
+        tooltip,
+        children,
+        ...iconButtonProps // onClick, disabled, style, size, edge, variant, ...
+    } = props;
 
     return (
         <Tooltip
             title={tooltip}
             placement="bottom"
-            TransitionComponent={Zoom}
-            arrow
+            slots={{
+                transition: Zoom
+            }}
         >
             <IconButton
-                edge={edge}
                 sx={{
                     mr: {
                         xs: 0,
                         sm: 0
-                    }
+                    },
+                    ...(sx && { ...sx })
+
                 }}
                 color="inherit"
                 aria-label="menu"
-                onClick={onClick}
-                disabled={disabled}
-                style={style}
-                size={size}>
+                {...iconButtonProps}
+            >
                 {children}
             </IconButton>
         </Tooltip>

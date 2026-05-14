@@ -4,7 +4,7 @@ import { Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import DestinationLink from '../destinationLink';
 import { useLanguage, destinationTitle, getSubGalleryAnchorName } from 'utils';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const PREFIX = 'MapInfoWindow';
 const makeClassName = (name) => `${PREFIX}-${name}`
@@ -103,7 +103,7 @@ const LocationTitleLink = ({isDestinationPage, isSubGallery, title, children}) =
 
     if (isDestinationPage && isSubGallery) {
         return (
-            <Button onClick={onClickGallery} endIcon={<OpenInNewIcon />}>
+            <Button onClick={onClickGallery} endIcon={<ArrowForwardIcon />} variant="contained" color="secondary">
                 {children}
             </Button>
         )

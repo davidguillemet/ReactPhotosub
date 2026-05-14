@@ -1,7 +1,7 @@
 import React from 'react';
-import LoadingButton from "@mui/lab/LoadingButton";
-import { Stack, Box } from '@mui/material';
+import { Stack, Box, Button } from '@mui/material';
 import { useTranslation } from 'utils';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
 
 const NextPageButton = ({
     onClick,
@@ -20,7 +20,7 @@ const NextPageButton = ({
                         mt: 1,
                         flexGrow: 1,
                         height: 6,
-                        backgroundColor: "grey.200",
+                        backgroundColor: theme => theme.palette.text.secondary,
                         borderWidth: 0,
                         borderRadius: 3,
                         width: "100%",
@@ -37,12 +37,14 @@ const NextPageButton = ({
                         }}
                     />
                 </Box>
-                <LoadingButton
+                <Button
                     loading={loading}
                     sx={{ mt: 3 }}
-                    onClick={onClick}>
+                    onClick={onClick}
+                    endIcon={<SkipNextIcon />}
+                >
                         {t("nextResults")}
-                </LoadingButton>
+                </Button>
             </Stack>    
     );
 };

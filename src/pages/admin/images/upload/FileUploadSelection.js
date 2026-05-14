@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useUploadContext } from './UploadContext';
 
@@ -34,14 +34,12 @@ const FileUploadSelection = React.forwardRef(({caption, disabled}, ref) => {
                 ref={ref}
             />
             <label htmlFor="contained-button-file">
-                <Button
-                    variant="contained"
-                    component="span"
-                    startIcon={<CloudUploadIcon />}
+                <IconButton
                     disabled={disabled}
+                    component="span"
                 >
-                    {caption}
-                </Button>
+                    <CloudUploadIcon />
+                </IconButton>
             </label>
         </React.Fragment>
     );

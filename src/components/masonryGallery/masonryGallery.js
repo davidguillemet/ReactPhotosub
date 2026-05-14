@@ -52,7 +52,7 @@ const MasonryGallery = ({
 
     if (items.length === 0 && emptyMessage !== null) {
         return (
-            <Alert severity="info" elevation={4} variant="filled">{emptyMessage}</Alert>
+            <Alert severity="info">{emptyMessage}</Alert>
         );
     }
 

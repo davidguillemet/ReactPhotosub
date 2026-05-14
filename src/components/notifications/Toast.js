@@ -11,9 +11,10 @@ const Toast = React.forwardRef(({toast}, ref) => {
             ref={ref}
             severity={type}
             onClose={()=>removeToast(toast)}
-            elevation={6}
-            variant="filled"
-            sx={{"white-space": "pre-wrap"}}
+            sx={{
+                bgcolor: 'background.paperLight',
+                "white-space": "pre-wrap"
+            }}
         >
             {message}
         </Alert>

@@ -40,23 +40,25 @@ const FinningListItem = ({caption, index}) => {
 
     return (
         <ListItem disablePadding>
-            <ListItemButton onClick={onClickItem}>
+            <ListItemButton
+                onClick={onClickItem}
+                sx={{
+                    py: '2px'
+                }}
+            >
                 <ListItemIcon sx={{ minWidth: 'unset'}}>
                     <NavigateNextIcon />
                 </ListItemIcon>
                 <ListItemText
-                    slotProps={
-                        {
-                            primary: {
-                                sx: {
-                                    fontSize: '1.1em',
-                                    fontWeight: 300,
-                                    color: theme => theme.palette.link.main
-                                }
+                    primary={caption}
+                    slotProps={{
+                        primary: {
+                            sx: {
+                                fontSize: '1.1rem !important'
                             }
                         }
-                    }
-                    primary={caption} />
+                    }}
+                />
             </ListItemButton>
         </ListItem>
     );
@@ -78,16 +80,32 @@ const Finning = () => {
     return (
         <React.Fragment>
             <PageTitle>{t("title")}</PageTitle>
-            <PageHeader sx={{color: 'red', fontWeight: 400, textAlign: 'center'}}>{t("euroInitiative1")}<br></br>{t("euroInitiative2")}</PageHeader>
+            <PageHeader
+                sx={{
+                    color: theme => theme.palette.error.main,
+                    fontWeight: 400,
+                    textAlign: 'center'
+                }}
+            >
+                {t("euroInitiative1")}<br></br>{t("euroInitiative2")}
+            </PageHeader>
             <Link href="https://www.stop-finning.eu/" target="_blank">
-            <Box sx={{ width: '100%', bgcolor: 'black', p: '20px', mb: 3}}>
-                <img src="/logo-stop-finning.png" alt="Stop Finninf" style={{maxWidth: '100%'}}/>
-            </Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        width: '100%',
+                        p: '20px',
+                        mb: 3
+                    }}
+                >
+                    <img src="/logo-stop-finning.png" alt="Stop Finninf" style={{maxWidth: '100%'}}/>
+                </Box>
             </Link>
             <Box sx={{
                 width: '100%',
             }}>
-                <PageHeader>{t("introduction")}</PageHeader>
+                <PageHeader >{t("introduction")}</PageHeader>
                 <BlockQuote sx={{
                     pl: 0
                 }}>

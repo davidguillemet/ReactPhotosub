@@ -135,7 +135,7 @@ const AccountManagement = () => {
         return (
             <React.Fragment>
                 <VerticalSpacing factor={2}></VerticalSpacing>
-                <Alert severity='error' variant='filled'>{t("invalidActionLink")}</Alert>
+                <Alert severity='error'>{t("invalidActionLink")}</Alert>
             </React.Fragment>
         )
     }

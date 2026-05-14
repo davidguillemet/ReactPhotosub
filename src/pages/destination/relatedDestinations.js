@@ -37,7 +37,7 @@ const EmptyRelatedDestinations = () => {
             justifyContent: 'center',
             alignItems: 'center'
         }}>
-            <Alert severity="info" elevation={4} variant="filled">{t("info:noRelatedDest")}</Alert>
+            <Alert severity="info">{t("info:noRelatedDest")}</Alert>
         </Box>
     );
 }
@@ -65,7 +65,10 @@ const RelatedDestinationsSlider = withLoading(({destination, related, imageHeigh
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    color: "#fff",
+                    borderColor: theme => `${theme.palette.text.muted}60`,
+                    borderWidth: 1,
+                    borderStyle: 'solid',
+                    color: theme => theme.palette.text.primary,
                     backgroundColor: 'rgba(0, 0, 0, 0.3)'
                 }}
             >
@@ -77,7 +80,7 @@ const RelatedDestinationsSlider = withLoading(({destination, related, imageHeigh
                         transform: 'translateX(-50%) translateY(-50%)'
                     }}
                 >
-                    <ImageDescription image={image} />
+                    <ImageDescription image={image} withNavigation={false} />
                 </Box>
                 <Box
                     sx={{

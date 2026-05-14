@@ -3,7 +3,6 @@ import { CircularProgress, IconButton, Stack, Tooltip } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
-import HtmlTooltip from 'components/htmlTooltip';
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -46,27 +45,39 @@ const StorageItemStatusContent = ({status, messages, errorIcon, remediation = nu
     // STATUS_ERROR = the property messages is expected as an array of error messages
     return (
         <React.Fragment>
-            <HtmlTooltip title={
+            <Tooltip title={
                 <React.Fragment>
-                    <List dense={true}>
+                    <List dense={true} sx={{p: 0, m: 0}}>
                         {
                             messages && messages.map((message, index) => 
-                                <ListItem key={`${index}`}>
+                                <ListItem key={`${index}`} sx={{p: 0}}>
                                     <ListItemIcon><ErrorOutlineIcon color="error" /></ListItemIcon>
-                                    <ListItemText primary={message} />
+                                    <ListItemText
+                                        primary={message}
+                                        slotProps={{
+                                            primary: {
+                                                sx: {
+                                                    fontFamily: '"JetBrains Mono", ui-monospace, monospace !important',
+                                                    fontSize: '0.58rem !important',
+                                                    textTransform: "none !important",
+                                                    color: theme => `${theme.palette.text.primary} !important`
+                                                }
+                                            }
+                                        }}
+                                    />
                                 </ListItem>
                             )
                         }
                     </List>
                 </React.Fragment>}>
-                <ErrorIcon fontSize='small' color="error" />
-            </HtmlTooltip>
+                <ErrorIcon fontSize='small' color="error" sx={{mr: 0.5}}/>
+            </Tooltip>
             {
                 remediation !== null && remediation.map((remediation, index) => {
                     const FixIcon = remediation.fixIcon ?? AutoFixHighOutlinedIcon;
                     return (
                         <Tooltip key={index} title={remediation.fixCaption}>
-                            <IconButton onClick={remediation.onFix} sx={{m: 0}}>
+                            <IconButton onClick={remediation.onFix} sx={{mr: 0.5, ml: 0.5}} size="small">
                                 <FixIcon fontSize='small' />
                             </IconButton>
                         </Tooltip>

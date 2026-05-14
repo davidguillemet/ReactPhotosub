@@ -1,22 +1,22 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useLoaderData } from "react-router";
 import {isMobile} from 'react-device-detect';
-import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Chip from '@mui/material/Chip';
-import { formatDate, formatDateShort, useLanguage, regionTitle, useTranslation, destinationTitle, getPropFromLanguage } from 'utils';
+import {
+    formatDate,
+    useLanguage,
+    useTranslation,
+    destinationTitle,
+    getPropFromLanguage,
+} from 'utils';
 import Gallery from 'components/gallery';
-import { PageSubTitle, PageHeader, Paragraph } from 'template/pageTypography';
+import { PageSubTitle, Paragraph } from 'template/pageTypography';
 import { LazyDialog } from 'dialogs';
-import DestinationLink from 'components/destinationLink';
 import { VerticalSpacing } from 'template/spacing';
 import { DestinationsMap } from 'components/map';
-import lazyComponent from 'components/lazyComponent';
 import RelatedDestinations from './relatedDestinations';
 import { HelmetDestination } from 'template/seo';
 import { useAuthContext } from 'components/authentication';
@@ -25,110 +25,9 @@ import { DestinationGalleryContextProvider } from './admin/DestinationGalleryCon
 import { SubGalleryHeaderComponent } from './admin/SubGalleryHeaderComponent';
 import { PublicationAlert } from 'components/publication';
 import DestinationAdminTools from './admin/DestinationAdminTools';
-import { NoWrapAndEllipsis } from 'template/pageTypography';
 import { ReactRouterAwaiter } from 'components/reactRouter';
-
-const RegionChip = ({region}) => {
-    const { language } = useLanguage();
-
-    return (
-        <Chip label={regionTitle(region, language)} sx={{m: 0, mr: 0.5, mt: 1}} color="secondary" variant="outlined"/>
-    )
-}
-
-const RegionPath = ({regions}) => {
-
-    return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                justifyContent: 'flex-start',
-                mb: 1,
-                width: "100%"
-            }}
-        >
-        { regions.slice(0).reverse().map(region => <RegionChip key={region.id} region={region} />) }
-        </Box>
-    );
-}
-
-const NavigationItem = ({destination, type, caption}) => {
-    const { language } = useLanguage();
-    if (destination === null) {
-        return null;
-    }
-
-    const destinationDate = new Date(destination.date);
-    const dateFormatter = isMobile ? formatDateShort : formatDate;
-    const formattedDate = dateFormatter(destinationDate, language);
-
-    return (
-        <DestinationLink destination={destination}>
-            <Paper
-                elevation={3}
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: type === "left" ? "flex-start" : "flex-end",
-                    alignItems: 'center',
-                    width: "100%",
-                    py: 1,
-                    px: 1
-                }}
-            >
-                {
-                    type === "left" &&
-                    <ArrowBackIosIcon sx={{
-                            mx: 1,
-                            fontSize: { xs: 20, md: 40},
-                            ml: 0
-                        }}
-                    />
-                }
-                <Stack sx={{ alignItems: type === "left" ? "flex-start" : "flex-end", width: "100%", overflow: "hidden" }}>
-                    <PageHeader
-                        sx={{
-                            my: 0,
-                            fontWeight: "300",
-                            textAlign: type,
-                            ...NoWrapAndEllipsis
-                        }}
-                        variant={isMobile ? "h6" : "h4"}
-                    >
-                        {destinationTitle(destination, language)}
-                    </PageHeader>
-                    <Paragraph sx={{my: 0, fontWeight: "100", textAlign: type, ...NoWrapAndEllipsis}}>
-                        { formattedDate }
-                    </Paragraph>
-                </Stack>
-                {
-                    type === "right" &&
-                    <ArrowForwardIosIcon sx={{
-                        mx: 1,
-                        fontSize: { xs: 20, md: 40 },
-                        mr: 0
-                    }} />
-                }
-            </Paper>
-        </DestinationLink>
-    )
-}
-
-const Navigation = lazyComponent(({destination}) => {
-    const t = useTranslation("pages.destination");
-    return (
-        <Grid container spacing={{ xs: 0.5, md: 1}} sx={{width: '100%'}}>
-            <Grid item xs={6}>
-                <NavigationItem destination={destination.prev} type="left" caption={t("btn:prevDestination")}/>
-            </Grid>
-            <Grid item xs={6}>
-                <NavigationItem destination={destination.next} type="right" caption={t("btn:nextDestination")}/>
-            </Grid>
-        </Grid>
-    )
-}, { height: 90 });
+import Navigation from './navigation';
+import RegionPath from './regionPath';
 
 const DestinationDetails = ({destination}) => {
 
@@ -155,16 +54,16 @@ const DestinationDetails = ({destination}) => {
                 position: "absolute",
                 left: 10,
                 bottom: 10,
-                py: 1,
+                py: 2,
                 px: isMobile ? 1 : 4,
-                backgroundColor: (theme) => theme.palette.primary.main,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start'
             }}>
             <HelmetDestination destination={destination} />
-            <PageSubTitle component="h1" sx={{m: 0, color: theme => theme.palette.primary.contrastText, whiteSpace: "nowrap", fontWeight: 300}}>{destinationTitle(destination, language)}</PageSubTitle>
-            <PageHeader sx={{m: 0, color: theme => theme.palette.primary.contrastText}}>{formattedDate}</PageHeader>
+            <PageSubTitle component="h1" sx={{m: 0, whiteSpace: "nowrap", fontWeight: 300}}>{destinationTitle(destination, language)}</PageSubTitle>
+            <Paragraph sx={{m: 0}}>{formattedDate}</Paragraph>
+            <RegionPath regions={destination.regionpath}></RegionPath>
             {
                 destination.link &&
                 <Chip color="primary" size="small" label={destination.location} component="a" href={destination.link} clickable target="_blank" />
@@ -236,8 +135,7 @@ const DestinationDisplay = ({destination}) => {
 
     return (
         <React.Fragment>
-            <PublicationAlert destination={destination} sx={{width: "100%", mt: 1}} />
-            <RegionPath regions={destination.regionpath}></RegionPath>
+            <PublicationAlert destination={destination} sx={{width: "100%", mt: 1, mb: 1}} />
 
             <Box sx={{ width: "100%", height: isMobile ? "300px" : "400px", position: "relative" }}>
                 <ReactRouterAwaiter value={destinationImages} fallback={<DestinationsMap destinations={[destination]} />}>

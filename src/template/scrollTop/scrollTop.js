@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
-import { green } from '@mui/material/colors';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Zoom from '@mui/material/Zoom';
 import Fab from '@mui/material/Fab';
@@ -54,7 +53,7 @@ const ScrollTop = ({anchorSelector}) => {
                     zIndex: (theme) => theme.zIndex.appBar
                 }}
             >
-                <Fab color="secondary" size="small" aria-label="scroll back to top" >
+                <Fab color="primary" size="small" aria-label="scroll back to top" >
                     <KeyboardArrowUpIcon />
                 </Fab>
                 <CircularProgress
@@ -63,7 +62,7 @@ const ScrollTop = ({anchorSelector}) => {
                     value={scroll < 100 ? scroll : 100}
                     size={50}
                     sx={{
-                        color: green[500],
+                        color: theme => theme.palette.warning.light,
                         position: 'absolute',
                         top: -5,
                         left: -5,

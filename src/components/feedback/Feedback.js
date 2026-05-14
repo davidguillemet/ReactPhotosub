@@ -36,7 +36,7 @@ const FeedbackMessage = ({severity, message}) => {
             autoHideDuration={6000}
             onClose={handleClose}
         >
-            <Alert onClose={handleClose} severity={feedback.severity} elevation={6} variant="filled">
+            <Alert onClose={handleClose} severity={feedback.severity} elevation={6}>
                 {feedback.message}
             </Alert>
         </Snackbar>

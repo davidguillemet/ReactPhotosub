@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import IconButton from '@mui/material/IconButton';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './styles.css';
 
@@ -69,17 +75,18 @@ const MainImage = ({images, currentImageIndex, handleImageLoaded, width, height}
 
 const Home = ({images, currentIndex}) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
-    const [initialTimeoutCompleted, setInitialTimeoutCompleted] = useState(false);
     const [blockScroll, allowScroll] = useScrollBlock();
     const diaporamaTimeoutRef = useRef(null);
-    const initialTimeoutRef = useRef(null);
-    const { drawerOpen } = useAppContext();
+    const { drawerOpen, searchOpen} = useAppContext();
     const resizeObserver = useResizeObserver();
     const boxRef = React.createRef(null);
-
+    const [isPlaying, setIsPlaying] = useState(true);
     const { focus: onFocus } = useFocusManager();
 
-    const isPlaying = !drawerOpen && onFocus && images !== null && images.length > 1;
+    useEffect(() => {
+        const playing = !drawerOpen && !searchOpen && onFocus && images !== null && images.length > 1;
+        setIsPlaying(playing);
+    }, [drawerOpen, searchOpen, onFocus, images]);
 
     useEffect(() => {
         blockScroll();
@@ -89,60 +96,42 @@ const Home = ({images, currentIndex}) => {
     }, [blockScroll, allowScroll]);
 
     useEffect(() => {
-        // Just create a first timeout to display the first image a few seconds...
-        initialTimeoutRef.current = setTimeout(() => {
-            setInitialTimeoutCompleted(true);
-        }, 5000);
-    }, []);
-
-    useEffect(() => {
         return () => {
-            clearTimeout(initialTimeoutRef.current);
             clearTimeout(diaporamaTimeoutRef.current);
         }
     }, []);
-
-    useEffect(() => {
-        // Just display the next image when all images are loaded and the first one
-        // has been displayed a few seconds
-        if (images !== null && initialTimeoutCompleted === true) {
-            setCurrentImageIndex(prevIndex => prevIndex + 1);
-        }
-    }, [images, initialTimeoutCompleted]);
 
     const handleNextImage = useCallback(() => {
-        if (images === null) {
-            return;
-        }
-        diaporamaTimeoutRef.current = null;
         setCurrentImageIndex(prevIndex => prevIndex + 1);
+    }, []);
+
+    const handlePreviousImage = useCallback(() => {
+        setCurrentImageIndex(prevIndex => {
+            const newIndex = prevIndex - 1;
+            return newIndex >= 0 ? newIndex : (images.length - 1);
+        });
     }, [images]);
 
-    const nextImage = useCallback(() => {
-        if (initialTimeoutCompleted === true) {
-            clearTimeout(diaporamaTimeoutRef.current);
-            diaporamaTimeoutRef.current = setTimeout(handleNextImage, _diaporamaInterval);
-        }
-    }, [handleNextImage, initialTimeoutCompleted]);
-
     const stopSlideshow = useCallback(() => {
-        if (typeof initialTimeoutRef.current === 'number') {
-            clearTimeout(initialTimeoutRef.current);
-        }
         if (typeof diaporamaTimeoutRef.current === 'number') {
             clearTimeout(diaporamaTimeoutRef.current);
         }
     }, []);
 
-    const resumeSlideshow = useCallback(() => {
-        nextImage();
-    }, [nextImage]);
-
     const handleImageLoaded = useCallback((event) => {
         if (isPlaying) {
-            nextImage();
+            clearTimeout(diaporamaTimeoutRef.current);
+            diaporamaTimeoutRef.current = setTimeout(handleNextImage, _diaporamaInterval);
         }
-    }, [nextImage, isPlaying]);
+    }, [handleNextImage, isPlaying]);
+
+    const resumeSlideshow = useCallback(() => {
+        handleImageLoaded();
+    }, [handleImageLoaded]);
+
+    const togglePlay = useCallback(() => {
+        setIsPlaying(prev => !prev);
+    }, []);
 
     useEffect(() => {
         if (isPlaying) {
@@ -199,18 +188,77 @@ const Home = ({images, currentIndex}) => {
                     </Box>
                 </CSSTransition>
             </TransitionGroup>
+            <Box sx={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                width: '100%',
+                height: 5,
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+            }}>
+                <Box
+                    key={`${currentImageIndex}-${isPlaying}`}
+                    sx={{
+                        height: '100%',
+                        width: isPlaying ? '100%' : '0px',
+                        backgroundColor: theme => theme.palette.primary.main,
+                        transformOrigin: 'left',
+                        animation: isPlaying
+                            /* see key-frames in style.css */
+                            ? `diaporama-progress ${_diaporamaInterval}ms linear forwards`
+                            : 'none',
+                    }}
+                />
+            </Box>
+            <Box sx={{
+                position: 'absolute',
+                transform: 'translateY(-50%)',
+                top: '50%',
+                right: 0,
+                padding: 1,
+            }}>
+                <Stack
+                    direction="column"
+                    alignItems="center"
+                    justifyContent="center"
+                    spacing={2}
+                    sx={{
+                        opacity: 0.5,
+                        '&:hover': {
+                            opacity: 0.8,
+                        }
+                    }}
+                >
+                    <IconButton
+                        onClick={togglePlay}
+                    >
+                        {
+                            isPlaying ? <PauseIcon /> : <PlayArrowIcon />
+                        }
+                    </IconButton>
+                    <IconButton
+                        onClick={handleNextImage}
+                    >
+                        <ArrowUpwardIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={handlePreviousImage}
+                    >
+                        <ArrowDownwardIcon />
+                    </IconButton>
+                </Stack>
+            </Box>
         </Box>
     )
-};
+}
     
 const HomeController = () => {
     const { images } = useLoaderData();
     return (
         <ReactRouterAwaiter
             value={images} 
-            fallback={<Home images={[{src: _defaultImageSrc}]} currentIndex={-1} />}
         >
-            {images => <Home images={images} currentIndex={-1} />}
+            {images => <Home images={images} currentIndex={0} />}
         </ReactRouterAwaiter>
     )
 }

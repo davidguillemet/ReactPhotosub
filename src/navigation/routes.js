@@ -193,13 +193,13 @@ export const buildRoutes = (queryClient, dataProvider) => routes.map(route => {
 export const NavigationLink = styled(NavLink)(
     ({theme}) => ({
         textDecoration: 'none',
-        color: theme.palette.text.primary,
-        "&.active span": {
+        "&.active span, &.active p, &.active svg": {
             fontWeight: "bold",
-            color: theme.palette.link.main
+            color: theme.palette.link.active
         },
-        "&.active > div, &.active > li": {
-            backgroundColor: "rgba(0,0,0,0.06)"
+        "&:hover span, &:hover p, &:hover svg": {
+            fontWeight: "bold",
+            color: theme.palette.link.hover
         }
     })
 );

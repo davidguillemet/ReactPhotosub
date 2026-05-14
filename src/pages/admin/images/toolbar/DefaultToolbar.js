@@ -42,8 +42,8 @@ const DefaultToolbar = () => {
             >
                 <StorageBreadcrumbs />
                 <Stack direction="row" alignItems="center">
-                    <IconButton onClick={openDialog}>
-                        <CreateNewFolderOutlinedIcon sx={{color: theme => theme.palette.primary.contrastText}}></CreateNewFolderOutlinedIcon>
+                    <IconButton onClick={openDialog} size="medium" sx={{mr: 1}}>
+                        <CreateNewFolderOutlinedIcon />
                     </IconButton>
                     <FileUploadSelection
                         ref={uploadButtonRef}

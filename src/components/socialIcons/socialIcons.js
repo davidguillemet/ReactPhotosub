@@ -6,7 +6,6 @@ import IconButton from '@mui/material/IconButton';
 import { Link } from '@mui/material';
 
 const StyledSvgIcon = styled(SvgIcon)(({ theme }) => ({
-    color: theme.palette.grey[500]
 }));
 
 const ExternalLink = React.forwardRef((props, ref) => (
@@ -86,25 +85,33 @@ const SocialIcons = () => (
         <IconButton
             component={ExternalLink} href="https://www.instagram.com/david.guillemet/"
             edge="start"
-            size="small">
+            size="small"
+            variant="noBorder"
+        >
             <InstagramIcon />
         </IconButton>
         <IconButton
             component={ExternalLink} href="https://www.facebook.com/davidphotosub/"
             edge="start"
-            size="small">
+            size="small"
+            variant="noBorder"
+        >
             <FacebookIcon />
         </IconButton>
         <IconButton
             component={ExternalLink} href="https://www.flickr.com/photos/dguillemet/"
             edge="start"
-            size="small">
+            size="small"
+            variant="noBorder"
+        >
             <FlickrIcon />
         </IconButton>
         <IconButton
             component={ExternalLink} href="https://500px.com/davidguillemet"
             edge="start"
-            size="small">
+            size="small"
+            variant="noBorder"
+        >
             <FiveHundredsIcon />
         </IconButton>
     </Box>

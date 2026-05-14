@@ -144,6 +144,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     onClick={handleSave}
                     disabled={isDirty(simulation) === false}
                     edge="start"
+                    variant="noBorder"
                 >
                     <SaveOutlinedIcon />
                 </TooltipIconButton>
@@ -152,6 +153,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     tooltip={t("btn:rename")}
                     onClick={onRenameCurrent}
                     edge="start"
+                    variant="noBorder"
                 >
                     <DriveFileRenameOutlineIcon />
                 </TooltipIconButton>
@@ -160,6 +162,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     tooltip={simulation.isLocked ? t("btn:unlock") : t("btn:lock")}
                     onClick={handleToggleLock}
                     edge="start"
+                    variant="noBorder"
                 >
                     {
                         simulation.isLocked ?
@@ -172,6 +175,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                     tooltip={t("btn:add")}
                     onClick={handleAdd}
                     edge="start"
+                    variant="noBorder"
                 >
                     <AddOutlinedIcon />
                 </TooltipIconButton>
@@ -186,6 +190,7 @@ const SimulationToolBar = ({simulations, currentIndex, onSave, onAdd, onDelete, 
                         marginLeft: 10,
                         marginRight: -12
                     }}
+                    variant="noBorder"
                 >
                     <DeleteOutlineOutlinedIcon />
                 </TooltipIconButton>

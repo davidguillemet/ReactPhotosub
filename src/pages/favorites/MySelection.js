@@ -1,8 +1,5 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Grow, Snackbar } from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import UndoIcon from '@mui/icons-material/Undo';
 import { useAuthContext } from '../../components/authentication';
 import Gallery from '../../components/gallery';
@@ -14,6 +11,8 @@ import { useTranslation } from 'utils';
 import GroupBuilder from './groupBuilder';
 import UserSelection from './userSelection';
 import { VerticalSpacing } from 'template/spacing';
+import TooltipIconButton from 'components/tooltipIconButton';
+
 
 const MySelectionContent = withLoading(({images, uid}) => {
     const t = useTranslation("pages.favorites");
@@ -48,7 +47,6 @@ const MySelection = withUser(() => {
     const favoritesContext = useFavorites();
     const [ removedFavorites, setRemovedFavorites ] = useState([]);
     const [ undoRunning, setUndoRunning ] = useState(false);
-    const undoTimerRef = useRef(null);
     const [ favoritesUserUid, setFavoritesUserUid ] = useState(authContext.user && authContext.user.uid);
 
     const { data: images } = queryContext.useFetchFavorites(favoritesUserUid, true);
@@ -76,28 +74,9 @@ const MySelection = withUser(() => {
     }, []);
 
     useEffect(() => {
-        if (removedFavorites.length > 0) {
-            // reinit the interval
-            if (undoTimerRef.current !== null) {
-                clearTimeout(undoTimerRef.current);
-            }
-            // Clear removed favorites in 5s
-            undoTimerRef.current = setTimeout(() => { setRemovedFavorites([]); }, 5000);
-        }
-        return () => clearTimeout(undoTimerRef.current)
-    }, [removedFavorites])
-
-    useEffect(() => {
         favoritesContext.subscribeFavorites(favoriteAction);
         return () => favoritesContext.unsubscribeFavorites(favoriteAction);
     }, [favoriteAction, favoritesContext])
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-          return;
-        }
-        setRemovedFavorites([]);
-    };
 
     const handleUndo = () => {
         setUndoRunning(true);
@@ -110,23 +89,16 @@ const MySelection = withUser(() => {
 
     const undoAction = (
         <React.Fragment>
-            <LoadingButton
+            <TooltipIconButton
+                tooltip={t("btn:cancelDeletion")}
                 size="small"
                 onClick={handleUndo}
                 loading={undoRunning}
-                endIcon={<UndoIcon />}
                 loadingPosition="end"
             >
-                {t("btn:cancelDeletion")}
-            </LoadingButton>
-            <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={handleClose}
-            >
-            <CloseIcon fontSize="small" />
-          </IconButton>
+                <UndoIcon size="small" />
+                {/* {t("btn:cancelDeletion")} */}
+            </TooltipIconButton>
         </React.Fragment>
     );
 
@@ -136,15 +108,14 @@ const MySelection = withUser(() => {
             <UserSelection onChange={onUserChange} />
             <VerticalSpacing factor={4}/>
             <MySelectionContent images={images} uid={favoritesUserUid}></MySelectionContent>
-            {
-                removedFavorites.length > 0 && 
-                <Snackbar
-                    open={true}
-                    message={t("info:favoritesDeleted", removedFavorites.length)}
-                    action={undoAction}
-                    TransitionComponent={Grow}
-                />
-            }
+            <Snackbar
+                open={removedFavorites.length > 0 }
+                message={t("info:favoritesDeleted", removedFavorites.length)}
+                action={undoAction}
+                slots={{
+                    transition: Grow
+                }}
+            />
 
         </React.Fragment>
     );

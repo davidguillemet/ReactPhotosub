@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { styled } from '@mui/material/styles';
-import { green, orange, red } from '@mui/material/colors';
 import { isMobile } from 'react-device-detect';
 import Box from "@mui/material/Box";
 import Paper from '@mui/material/Paper';
@@ -26,12 +25,10 @@ import { useTheme } from '@mui/material/styles';
 gsap.registerPlugin(useGSAP);
 
 const SearchIconButton = styled(IconButton)(({theme}) => ({
-    padding: 10,
-    color: "inherit"
+    padding: 10
 }));
 
 const StatusIcon = ({searchIsRunning}) => {
-    const { isHomePage } = useCurrentPage();
     return (
         <Box sx={{
             display: 'flex',
@@ -44,12 +41,9 @@ const StatusIcon = ({searchIsRunning}) => {
         }}>
             {
                 searchIsRunning === true ?
-                <CircularProgress size={20} sx={{ color: theme => theme.palette.text.primary }} /> :
+                <CircularProgress size={20} /> :
                 <SearchIcon
                     fontSize={isMobile ? "small" : "medium"}
-                    sx={{
-                        color: theme => isHomePage === true ? theme.palette.common.white : theme.palette.text.primary
-                    }}
                 />
             }
         </Box>
@@ -59,11 +53,11 @@ const StatusIcon = ({searchIsRunning}) => {
 const ResultStatus = ({searchResult}) => {
     const totalCount = searchResult.totalCount;
     if (searchResult.hasError === true) {
-        return <ErrorIcon sx={{ml: 1, color: red[400]}} />
+        return <ErrorIcon sx={{ml: 1,}} color="error"/>
     } else if (totalCount === 0) {
-        return <WarningIcon sx={{ml: 1, color: orange[400]}} />
+        return <WarningIcon sx={{ml: 1}} color="warning" />
     } else if (totalCount > 0) {
-        return <Chip color="secondary" sx={{ml: 1, bgcolor: totalCount > 0 ? green[400] : orange[700]}} label={totalCount}></Chip>
+        return <Chip color="success" sx={{ ml: 1 }} label={totalCount}></Chip>
     }
 
     return null;
@@ -141,8 +135,8 @@ const SearchInput = ({
                     duration: animationDuration,
                     ease: animationEase,
                     width: `100%`,
-                    borderColor: isHomePage ? theme.palette.grey[400] : theme.palette.divider,
-                    backgroundColor: isHomePage ? 'rgb(0,0,0,0.3)' : theme.palette.background.default,
+                    borderColor: theme.palette.divider,
+                    backgroundColor: theme.palette.background.paper,
                     onStart: () => {
                         if (onExpandedChange) onExpandedChange(true);
                     }
@@ -196,21 +190,33 @@ const SearchInput = ({
                 borderRadius: (theme) => theme.shape.borderRadius,
                 borderStyle: "solid",
                 borderWidth: "1px",
-                borderColor: theme => expandable ? 'rgb(255,255,255,0)' : theme.palette.divider,
-                backgroundColor: 'rgb(255,255,255,0)',
+                borderColor: theme => expandable ? 'transparent' : theme.palette.divider,
+                backgroundColor: 'transparent',
                 py: '2px',
                 px: '4px',
                 m: 0,
-                color: isHomePage ? theme.palette.common.white :'inherit',
                 '&.withResults': {
                     borderBottomLeftRadius: 0,
                     borderBottomRightRadius: 0
+                },
+                '&:hover': {    
+                    color: theme.palette.text.secondary,
+                    ...(!expandable && {
+                        borderColor: theme.palette.border.hover,
+                    })
+                },
+                '&:has(div.Mui-focused)': {    
+                    color: theme.palette.text.secondary,
+                    ...(!expandable && {
+                        borderColor: theme.palette.border.focused,
+                    })
                 }
             }}
         >
             <SearchIconButton
                 disabled={!expandable}
                 onClick={expandable ? debouncedOnClickSearchIcon : null}
+                variant="noBorder"
             >
                 <StatusIcon searchIsRunning={running} />
             </SearchIconButton>
@@ -221,7 +227,6 @@ const SearchInput = ({
                     ml: 1,
                     opacity: expandable ? 0 : 1,
                     display: expandable ? 'none' : 'flex',
-                    color: 'inherit'
                 }}
                 placeholder={imageCount !== undefined  ? t("inputPlaceHolder", imageCount) : ""}
                 autoFocus={true}
@@ -232,9 +237,9 @@ const SearchInput = ({
                 value={value}
                 endAdornment={
                     <IconButton
-                        color="inherit"
                         onClick={expandable ? debouncedOnClickSearchIcon : onClearSearch}
                         size='small'
+                        variant="noBorder"
                     >
                         <CloseIcon fontSize="small" />
                     </IconButton>
@@ -265,7 +270,7 @@ const SearchInput = ({
                 }
                 {
                     showHelp &&
-                    <SearchIconButton color="inherit" onClick={onOpenHelp} size='small'>
+                    <SearchIconButton onClick={onOpenHelp} size='small' variant="noBorder">
                         <HelpIcon fontSize='small' sx={{color: "inherit" }}/>
                     </SearchIconButton>
                 }

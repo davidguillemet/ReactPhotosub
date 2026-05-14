@@ -53,21 +53,23 @@ const FavoriteButton = ({image, size = 'medium', style, color }) => {
 
     return (
         <TooltipIconButton
+            variant="noBorder"
             tooltip={
                 <Box style={{
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center'
                 }}>
-                    <Typography variant="body1">{title}</Typography>
+                    <Typography variant="caption">{title}</Typography>
                     {
                         authContext.user === null &&
                         <Box style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            alignItems: 'center'
+                            alignItems: 'center',
+                            margin: '5px 0 0 0'
                         }}>
-                            <ErrorOutlineIcon style={{marginRight: 5}}></ErrorOutlineIcon>
+                            <ErrorOutlineIcon style={{marginRight: 5}} color="warning"></ErrorOutlineIcon>
                             <Typography variant="caption">Connexion requise</Typography>
                         </Box>
                     }        

@@ -1,10 +1,9 @@
 import React from 'react';
 import Stack from '@mui/material/Stack';
-import SendIcon from '@mui/icons-material/Send';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Button } from '@mui/material';
 import { useTranslation, useLanguage } from 'utils';
 import { useFormContext, FormContextProvider } from './FormContext';
-import { useDarkMode } from 'components/theme';
 import { useFormDialogContext } from 'dialogs/FormDialog';
 
 import Tab from '@mui/material/Tab';
@@ -38,7 +37,6 @@ const getFieldGroups = (fieldSpecs) => {
 
 const GroupedFormField = ({fieldSpecs}) => {
 
-    const { darkMode } = useDarkMode();
     const formContext = useFormContext();
     const [ languageTab, setLanguageTab ] = React.useState(fieldSpecs[0].field.lang);
 
@@ -46,7 +44,7 @@ const GroupedFormField = ({fieldSpecs}) => {
         setLanguageTab(newValue);
     };
 
-    const selectedTabBgColor = (theme) => darkMode ? theme.palette.grey[700] : theme.palette.grey[200];
+    const selectedTabBgColor = (theme) => theme.palette.border.focused;
 
     return (
         <TabContext value={languageTab}>
@@ -88,13 +86,14 @@ const GroupedFormField = ({fieldSpecs}) => {
                                         marginLeft: 0.5
                                     },
                                     '&.Mui-selected' : {
-                                        backgroundColor: selectedTabBgColor
+                                        backgroundColor: selectedTabBgColor,
+                                        color: theme => theme.palette.primary.contrastText
                                     },
                                     ...(hasError && {
                                         color: theme => theme.palette.error.main,
                                         '&.Mui-selected': {
-                                            color: theme => theme.palette.error.main,
-                                            backgroundColor: selectedTabBgColor
+                                            color: theme => theme.palette.error.dark,
+                                            backgroundColor: theme => theme.palette.error.light
                                         }
                                     })
                                 }}
@@ -137,8 +136,8 @@ const Form = ({
     submitAction,
     onCancel = null,
     submitCaption,
-    submitIcon = <SendIcon />,
-    submitIconPosition = "start",
+    submitIcon = <ArrowForwardIcon />,
+    submitIconPosition = "end",
     startCustomComponent = null,
     endCustomComponent = null}) => {
 
@@ -162,7 +161,13 @@ const Form = ({
     return (
         <React.Fragment>
             <formContext.FormComponent method="post" style={{width: "100%"}}>
-            <Stack spacing={2} alignItems="center" sx={{width: '100%', paddingTop: 1}}>
+            <Stack
+                spacing={2}
+                alignItems="center"
+                sx={{
+                    width: '100%',
+                    paddingTop: 1
+                }}>
             {
                 fieldGroups.map(group => {
                     if (group.fieldSpecs.length === 1) {
@@ -209,7 +214,6 @@ const Form = ({
                             loadingPosition={submitIconPosition}
                             loading={formContext.sending}
                             type="submit"
-                            variant="contained"
                         >
                             {finalSubmitCaption}
                         </Button>

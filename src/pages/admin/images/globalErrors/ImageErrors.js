@@ -59,7 +59,7 @@ const ImageErrorTableRow = ({file, errorType}) => {
     return (
         <TableRow>
             <TableCell align={'left'} sx={{paddingTop: 1, paddingBottom: 1}}>
-                <Chip color="error" icon={<InsertPhotoIcon />} label={file.name} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
+                <Chip color="error" variant="outlined" icon={<InsertPhotoIcon />} label={file.name} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
             </TableCell>
             <TableCell align={'left'} sx={{paddingTop: 0, paddingBottom: 0}}>
                 <Box sx={{display: "flex", flexDirection: "row", alignItems: "center", paddingTop: 0, paddingBottom: 0}}>
@@ -70,7 +70,6 @@ const ImageErrorTableRow = ({file, errorType}) => {
             <TableCell align={'left'} sx={{paddingTop: 0, paddingBottom: 0}}>
                 <Tooltip
                     title={errorType.getErrorMessage(file)}
-                    arrow
                     placement="right"
                 >
                     <ItemErrorIcon sx={{mr: 1, ml: 0, opacity: 0.6}}></ItemErrorIcon>
@@ -119,7 +118,6 @@ const ImageErrorsUi = withLoading(({errors}) => {
         >
             <Alert
                 severity="error"
-                variant='filled'
                 action={
                     <IconButton color="inherit" size="small" onClick={onToggleExpand}>
                         {

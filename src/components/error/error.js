@@ -39,7 +39,6 @@ const ErrorAlert = ({maxWidth}) => {
         }}>
             <Alert
                 severity="error"
-                variant="filled"
                 sx={{my: 0, py: 0}}
                 action={ hasRouterError &&
                     <IconButton

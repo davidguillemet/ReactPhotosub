@@ -6,16 +6,15 @@ import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import Typography from '@mui/material/Typography';
 import Popper from '@mui/material/Popper';
 import Grow from '@mui/material/Grow';
 import Paper from '@mui/material/Paper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import MenuList from '@mui/material/MenuList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { useCurrentPage } from 'components/hooks';
 
 import { useAuthContext } from '../authentication';
 import { routes, NavigationLink, ROUTES_NAMESPACE } from '../../navigation/routes';
@@ -26,8 +25,6 @@ import AuthenticationForm from './authenticationForm';
 
 const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => {
 
-    const { isHomePage } = useCurrentPage();
-
     return (
         <IconButton
             onClick={onClick}
@@ -36,8 +33,9 @@ const ConnexionButtonBase = React.forwardRef(({onClick}, ref) => {
                 color: theme => theme.palette.text.primary
             }}
             size="large"
+            variant="noBorder"
         >
-            <AccountCircleOutlinedIcon sx={{ color: theme => isHomePage === true ? theme.palette.common.white : theme.palette.text.primary }} />
+            <AccountCircleOutlinedIcon />
         </IconButton>
     )
 });
@@ -69,8 +67,6 @@ const SignedInButton = ({handleLogout}) => {
     const [userDisplayName, setUserDisplayName] = React.useState(authContext.user.displayName);
     const [menuOpen, setMenuOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
-
-    const { isHomePage } = useCurrentPage();
 
     const onUserUpdated = useCallback(() => {
         setUserDisplayName(authContext.user.displayName);
@@ -116,9 +112,8 @@ const SignedInButton = ({handleLogout}) => {
                 deleteIcon={<MoreVertIcon />}
                 onDelete={handleToggle}
                 sx={{
-                    borderColor: theme => isHomePage === true ? theme.palette.common.white : theme.palette.text.primary,
                     '& .MuiChip-avatar, & .MuiChip-deleteIcon, & .MuiChip-deleteIcon:hover, & .MuiChip-label': {
-                        color: theme => isHomePage === true ? theme.palette.common.white : theme.palette.text.primary
+                        color: theme => "inherit"
                     }
                 }}
             />
@@ -148,7 +143,14 @@ const SignedInButton = ({handleLogout}) => {
                     {...TransitionProps}
                     style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
                 >
-                    <Paper>
+                    <Paper
+                        variant='outlined'
+                        sx={{
+                            border: theme => `1px solid ${theme.palette.divider}`,
+                            borderRadius: 4,
+                            mt: 1
+                        }}
+                    >
                         <ClickAwayListener onClickAway={handleClose}>
                             <MenuList autoFocusItem={menuOpen} id="menu-list-grow" onKeyDown={handleListKeyDown}>
                                 {
@@ -156,23 +158,23 @@ const SignedInButton = ({handleLogout}) => {
                                     .map((route, index) => {
                                         return (
                                             <NavigationLink key={index} to={route.path}>
-                                                <MenuItem onClick={handleClose}>
+                                                <ListItemButton onClick={handleClose} sx={{ paddingTop: "5px", paddingBottom: "5px" }}>
                                                     <ListItemIcon>
                                                         {route.icon}
                                                     </ListItemIcon>
-                                                    <Typography variant="inherit">{t(route.label)}</Typography>
-                                                </MenuItem>
+                                                    <ListItemText primary={t(route.label)} />
+                                                </ListItemButton>
                                             </NavigationLink>
                                         );
                                     })
                                 }
                                 <Divider />
-                                <MenuItem onClick={logout}>
+                                <ListItemButton onClick={logout}>
                                     <ListItemIcon>
                                         <ExitToAppIcon fontSize="small" />
                                     </ListItemIcon>
-                                    <Typography variant="inherit">{t("logout")}</Typography>
-                                </MenuItem>
+                                    <ListItemText primary={t("logout")} />
+                                </ListItemButton>
                             </MenuList>
                         </ClickAwayListener>
                     </Paper>

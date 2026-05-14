@@ -26,9 +26,9 @@ export const PublicationAlert = styled(({destination, ...other}) => {
     return (
         <Alert
             severity='error'
-            variant="filled" {...other}
+            {...other}
             action={
-                <Button size="small" variant='contained' onClick={handlePublish}>
+                <Button size="small" onClick={handlePublish}>
                     Publier
                 </Button>
             }

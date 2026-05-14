@@ -1,7 +1,7 @@
 {
     "menu": {
         "home": "Accueil",
-        "destinations" : "Destinations",
+        "destinations": "Destinations",
         "destination": "Destination",
         "search": "Recherche",
         "finning": "Le Finning",
@@ -14,7 +14,7 @@
         "logout": "Déconnexion",
         "acctMgmt": "Gestion des comptes"
     },
-    "pages" : {
+    "pages": {
         "404": {
             "title": "Oups...",
             "explanation": "Il semblerait que la page que vous avez demandée n'existe pas ou a été supprimée."
@@ -39,9 +39,7 @@
             "enterNewPassword": "Saisissez votre nouveau mot de passe:",
             "resetPasswordSuccess": "Votre mot de passe a été changé avec succès.\nVous êtes maintenant connecté."
         },
-        "home": {
-
-        },
+        "home": {},
         "contact": {
             "title": "Pour me contacter",
             "field:name": "Votre nom",
@@ -78,7 +76,7 @@
             "confirmRemove": "Confirmez-vous la suppression de la destination '{0}' ?",
             "warningConfirmRemove": "Attention, cette action est irreversible.",
             "title:newDestination": "Nouvelle destination",
-            "title:editDestination" : "Modifier la destination",
+            "title:editDestination": "Modifier la destination",
             "validate": "Valider",
             "form:titleField": "Titre",
             "form:titleError": "Merci d'indiquer un titre de destination.",
@@ -232,7 +230,7 @@
                     "success:saved": "La région a bien été enregistrée."
                 }
             },
-            "images" : {
+            "images": {
                 "ImageFormDialogTitle": "Modifier les propriétés de l'image",
                 "folderDialogTitle": "Création d'un répertoire",
                 "title:deleteItems": "Supprimer des images",
@@ -315,7 +313,7 @@
             "btn:modifyData": "Modifier les informations",
             "btn:sendMailVerification": "Vérifier l'eMail",
             "title:authDialog": "Authentification",
-            "desc:authDialog" : "Veuillez vous ré-authentifier pour modifier vos informations personnelles",
+            "desc:authDialog": "Veuillez vous ré-authentifier pour modifier vos informations personnelles",
             "field:authDialog": "Veuillez saisir votre mot de passe",
             "btn:cancel": "Annuler",
             "btn:validate": "Valider",
@@ -329,7 +327,7 @@
     },
     "components": {
         "error": {
-           "caption": "Oups...Une erreur s'est produite"
+            "caption": "Oups...Une erreur s'est produite"
         },
         "search": {
             "inputPlaceHolder": "Rechercher parmi {0} images...",
@@ -403,7 +401,7 @@
         "hoc": {
             "withUser": {
                 "adminRestriction": "Cette page n'est accessible qu'à l'administrateur",
-                "userRestriction" : "Cette page n'est accessible qu'aux utilisateurs connectés"
+                "userRestriction": "Cette page n'est accessible qu'aux utilisateurs connectés"
             }
         },
         "imageDescription": {
@@ -413,6 +411,9 @@
             "dark": "Sombre",
             "light": "Clair",
             "systemSuffix": " (Système)"
+        },
+        "imageSlider": {
+            "loadNextImages": "Charger les images suivantes"
         }
     },
     "dialogs": {

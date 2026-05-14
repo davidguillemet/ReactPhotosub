@@ -1,4 +1,5 @@
 import React from 'react';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { isMobile } from 'react-device-detect';
 import { Stack } from '@mui/material';
 import Form, {
@@ -16,8 +17,7 @@ import { useToast } from 'components/notifications';
 
 import { validateEmail, validatePassword } from 'utils';
 
-import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOutlined';
-import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const STEP = {
     CHECK_EMAIL: "check_email",
@@ -43,7 +43,7 @@ const CustomButtons = ({onCancel, onPrev, step}) => {
                 <Button
                     disabled={step.id !== STEP.LOGIN_ENTER_PASSWORD && step.id !== STEP.CREATE_ACCOUNT}
                     onClick={onPrev}
-                    startIcon={<ArrowCircleLeftOutlinedIcon />}
+                    startIcon={<ArrowBackIcon />}
                 >
                     { isMobile ? "" : t("previous") }
                 </Button>
@@ -83,7 +83,7 @@ const ResetPasswordLink = ({values}) => {
             size="small"
             disabled={!validateEmail(values.email)}
             onClick={handleResetPasswordClick}
-            sx={{textTransform: 'none'}}
+            endIcon={<ArrowForwardIcon />}
         >
             {t("linkResetPassword")}
         </Button>
@@ -315,8 +315,6 @@ const AuthenticationForm = ({onCancel}) => {
                 validationMessage={validationMessage}
                 startCustomComponent={<CustomButtons onCancel={handleCancel} onPrev={handleOnPrevious} step={step} />}
                 endCustomComponent={ResetPasswordLink}
-                submitIcon={<ArrowCircleRightOutlinedIcon/>}
-                submitIconPosition="end"
             />
         </React.Fragment>
     )

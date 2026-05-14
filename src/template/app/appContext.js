@@ -24,12 +24,15 @@ export const AppContextProvider = ({ children }) => {
     }, [location, callHistoryObservers]);
 
     const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [searchOpen, setSearchOpen] = React.useState(false);
 
     return (
         <AppContext.Provider
             value={{
                 drawerOpen,
                 setDrawerOpen,
+                searchOpen,
+                setSearchOpen,
                 subscribeHistory,
                 unsubscribeHistory
             }}

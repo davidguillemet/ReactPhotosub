@@ -133,18 +133,19 @@ const GroupGalleryWithHeader = ({
 
     return (
         <Stack sx={{width: '100%'}}>
-            <BlockQuote sx={{
-                mb: 1,
-                mt: 3,
-                ml: 0,
-                pl: 1,
-                pr: 1,
-                fontWeight: "bold",
-                color: theme => theme.palette.primary.contrastText,
-                bgcolor: theme => theme.palette.primary.light}}
+            <BlockQuote
+                sx={{
+                    mb: 1,
+                    mt: 3,
+                    ml: 0,
+                    pl: 1,
+                    pr: 1,
+                    fontWeight: "bold",
+                    bgcolor: theme => theme.palette.background.paperLight,
+                }}
             >
                 <Stack
-                    sx={{width: '100%'}} direction='row'
+                    sx={{width: '100%', pt: 1, pb: 1}} direction='row'
                     justifyContent="space-between"
                     alignItems="center"
                 >
@@ -153,14 +154,11 @@ const GroupGalleryWithHeader = ({
                         groupHeaderEndComponent !== null &&
                         <GroupHeaderEndComponent group={group} />
                     }
-                    <IconButton
-                        sx={{color: theme => theme.palette.primary.contrastText}}
-                        onClick={onToggleExpanded}
-                    >
+                    <IconButton onClick={onToggleExpanded} >
                         {
                             isExpanded
-                            ? <ExpandLessOutlinedIcon fontSize="large" />
-                            : <ExpandMoreOutlinedIcon fontSize="large" />
+                            ? <ExpandLessOutlinedIcon  />
+                            : <ExpandMoreOutlinedIcon  />
                         }
                     </IconButton>
                 </Stack>
@@ -262,7 +260,7 @@ const Gallery = ({
 
     if (images.length === 0 && emptyMessage !== null) {
         return (
-            <Alert severity="info" elevation={4} variant="filled">{emptyMessage}</Alert>
+            <Alert severity="info" >{emptyMessage}</Alert>
         );
     }
 

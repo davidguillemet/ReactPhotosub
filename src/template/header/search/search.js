@@ -1,16 +1,17 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useNavigate } from 'react-router';
-import { Box, Paper } from '@mui/material';
+import { Box, Button, Paper, Stack } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import { Unstable_Popup as Popup } from '@mui/base/Unstable_Popup';
 import { size } from '@floating-ui/dom';
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
 import Divider from '@mui/material/Divider';
-import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+
 
 import Search, { SearchResult, SearchSettings, defaultSettings, getInitialSearchResult, pushSearchConfigHistory } from 'components/search';
 import { HorizontalSpacing, VerticalSpacing } from 'template/spacing';
@@ -177,7 +178,6 @@ const HeaderSearch = ({
                             display: 'flex',
                             flexDirection: 'column',
                             width: '100%',
-                            backgroundColor: (theme) => theme.palette.primary.main
                         }}
                     >
                         <VerticalSpacing factor={0.5} />
@@ -195,40 +195,48 @@ const HeaderSearch = ({
                         <VerticalSpacing />
                         <Divider />
                         <VerticalSpacing />
-                        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
-                            <TooltipIconButton
-                                tooltip={t("nextResults")}
-                                disabled={!searchResult.hasNext}
-                                onClick={handleNextSearchPage}
-                                size="medium"
-                            >
-                                <SkipNextIcon fontSize="inherit" />
-                            </TooltipIconButton>
-                            <TooltipIconButton
-                                tooltip={t("seeAllResults")}
+
+                        {/* Bottom Toolbar */}
+                        <Stack
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                        >
+                            <Box sx={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'center'}}>
+                                <TooltipIconButton
+                                    tooltip={t("nextResults")}
+                                    disabled={!searchResult.hasNext}
+                                    onClick={handleNextSearchPage}
+                                    size="medium"
+                                    sx={{mr: 1}}
+                                >
+                                    <SkipNextIcon fontSize="inherit" />
+                                </TooltipIconButton>
+                                <Divider
+                                    sx={{
+                                        height: '28px',
+                                        m: '4px'
+                                    }}
+                                    orientation="vertical"
+                                />
+                                <HorizontalSpacing factor={0.5} />
+                                <TooltipIconButton
+                                    tooltip={t("close")}
+                                    onClick={handleClose}
+                                    size="medium"
+                                >
+                                    <CloseIcon fontSize="inherit" />
+                                </TooltipIconButton>
+                            </Box>
+                            <Button
                                 disabled={resultPageSize >= searchResult.totalCount}
                                 onClick={onSeeAllResults}
-                                size="medium"
+                                endIcon={<ArrowForwardIcon />}
+                                variant="text"
                             >
-                                <SearchIcon fontSize="inherit" />
-                            </TooltipIconButton>
-                            <HorizontalSpacing factor={1} />
-                            <Divider
-                                sx={{
-                                    height: '28px',
-                                    m: '4px'
-                                }}
-                                orientation="vertical"
-                            />
-                            <HorizontalSpacing factor={1} />
-                            <TooltipIconButton
-                                tooltip={t("close")}
-                                onClick={handleClose}
-                                size="medium"
-                            >
-                                <CloseIcon fontSize="inherit" />
-                            </TooltipIconButton>
-                        </Box>
+                                {t("seeAllResults")}
+                            </Button>
+                        </Stack>
                     </Paper>
                 </Popup>
             </Box>
