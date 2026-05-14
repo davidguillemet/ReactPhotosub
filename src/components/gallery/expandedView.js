@@ -657,12 +657,14 @@ const ExpandedView = React.forwardRef(({
                 { /* Overlay when waiting for the next page */ }
                 <Dialog
                     open={waitingForNextPage.current}
-                    PaperProps={{
-                        sx: {
-                            backgroundColor: 'transparent',
-                            textAlign: 'center',
-                            overflow: 'hidden',
-                            boxShadow: 'unset'
+                    slotProps={{
+                        paper: {
+                            sx: {
+                                backgroundColor: 'transparent',
+                                textAlign: 'center',
+                                overflow: 'hidden',
+                                boxShadow: 'unset'
+                            }
                         }
                     }}
                 >

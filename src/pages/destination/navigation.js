@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
 import {
@@ -149,18 +149,18 @@ const Navigation = lazyComponent(({destination}) => {
     const t = useTranslation("pages.destination");
     return (
         <Grid container spacing={0.5} sx={{width: '100%'}}>
-            <Grid item xs={6}>
+            <Grid size={6}>
                 {
                     destination.prev && <NavigationItem destination={destination.prev} type="left" caption={t("btn:prevDestination")}/>
                 }
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={6}>
                 {
                     destination.next && <NavigationItem destination={destination.next} type="right" caption={t("btn:nextDestination")}/>
                 }
             </Grid>
         </Grid>
-    )
+    );
 }, { height: 90 });
 
 export default Navigation;
