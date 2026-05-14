@@ -138,7 +138,8 @@ const DestinationContent = ({item, index, width, params}) => {
                         ...(isMobile && { bottom: '0px' }),
                         ...(!isMobile && { top: `calc(100% - ${visibleHeight}px)` }),
                         color: 'white',
-                        opacity: 0
+                        opacity: 0,
+                        pointerEvents: 'none'
                     }}
                     className="details"
                 >
