@@ -69,9 +69,9 @@ const AutoCompleteTagInput = ({
                         />
                     </StyledListItem>
                 )}
-                renderTags={(tagValue, getTagProps) =>
+                renderValue={(tagValue, getItemProps) =>
                     tagValue.map((option, index) => {
-                        const tagProps = getTagProps({ index });
+                        const tagProps = getItemProps({ index });
                         const { key, ...otherProps } = tagProps;
                         return (
                             <Chip

@@ -41,8 +41,8 @@ const TagsFieldComp = ({ fieldSpec, value, handleChange }) => {
                     readOnly={isReadOnly}
                     disabled={isReadOnly} />
             )}
-            renderTags={(tagValue, getTagProps) => tagValue.map((option, index) => {
-                return <Chip variant="outlined" label={option} {...getTagProps({ index })} disabled={isReadOnly} />;
+            renderValue={(tagValue, getItemProps) => tagValue.map((option, index) => {
+                return <Chip variant="outlined" label={option} {...getItemProps({ index })} disabled={isReadOnly} />;
             })}
             onChange={onChange}
             value={value || []}

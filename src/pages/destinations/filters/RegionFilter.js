@@ -37,90 +37,90 @@ const RegionFilterUI = ({hierarchy, onChange}) => {
 
     return (
         <React.Fragment>
-        <Autocomplete
-            id='regionSelector'
-            sx={{
-                width: '100%',
-            }}
-            slotProps={{
-                listbox: {
-                    sx: {
-                        p: 1,
-                        maxHeight: '100vh',
-                        '& .MuiAutocomplete-option': {
-                            p: {
-                                xs: 0,
+            <Autocomplete
+                id='regionSelector'
+                sx={{
+                    width: '100%',
+                }}
+                slotProps={{
+                    listbox: {
+                        sx: {
+                            p: 1,
+                            maxHeight: '100vh',
+                            '& .MuiAutocomplete-option': {
+                                p: {
+                                    xs: 0,
+                                },
+                                minHeight: {
+                                    xs: 0
+                                }
                             },
-                            minHeight: {
-                                xs: 0
+                            '& .MuiAutocomplete-option:hover': {
+                                bgcolor: 'unset'
+                            },
+                            '& .MuiAutocomplete-option[aria-selected="true"]': {
+                                bgcolor: 'unset'
+                            },
+                            '& .MuiAutocomplete-option[aria-selected="true"]:hover': {
+                                bgcolor: 'unset'
                             }
-                        },
-                        '& .MuiAutocomplete-option:hover': {
-                            bgcolor: 'unset'
-                        },
-                        '& .MuiAutocomplete-option[aria-selected="true"]': {
-                            bgcolor: 'unset'
-                        },
-                        '& .MuiAutocomplete-option[aria-selected="true"]:hover': {
-                            bgcolor: 'unset'
                         }
                     }
-                }
-            }}
-            multiple
-            disableCloseOnSelect
-            filterSelectedOptions={false}
-            options={options}
-            noOptionsText={t("noRegion")}
-            getOptionLabel={(option) => regionTitle(option, language)}
-            defaultValue={[]}
-            renderInput={(params) => (
-                <TextField
-                    {...params}
-                    label={t("filterByRegions")}
-                />
-            )}
-            renderOption={(props, option, { selected }) => (
-                <StyledListItem {...props}
-                    key={option.id}
-                    value={option}
-                    sx={{
-                        width: 'auto',
-                        float: 'left',
-                        p: {
-                            xs: 0
-                        },
-                        m: {
-                            xs: 0.5
-                        }
-                    }}
-                >
-                    <Chip
-                        label={regionTitle(option, language)}
-                        clickable={true}
-                        color={selected? 'primary' : 'default'}
+                }}
+                multiple
+                disableCloseOnSelect
+                filterSelectedOptions={false}
+                options={options}
+                noOptionsText={t("noRegion")}
+                getOptionLabel={(option) => regionTitle(option, language)}
+                defaultValue={[]}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        label={t("filterByRegions")}
                     />
-                </StyledListItem>
-            )}
-            renderTags={(tagValue, getTagProps) =>
-                tagValue.map((option, index) => {
-                    const tagProps = getTagProps({ index });
-                    const { key, ...otherProps } = tagProps;
-                    return (
+                )}
+                renderOption={(props, option, { selected }) => (
+                    <StyledListItem {...props}
+                        key={option.id}
+                        value={option}
+                        sx={{
+                            width: 'auto',
+                            float: 'left',
+                            p: {
+                                xs: 0
+                            },
+                            m: {
+                                xs: 0.5
+                            }
+                        }}
+                    >
                         <Chip
-                            key={key}
                             label={regionTitle(option, language)}
-                            {...otherProps}
-                            disabled={index < tagValue.length - 1}
-                        />)
-                })
-            }
-            onChange={handleChange}
-            value={filter}
-        />
-        <FormHelperText style={{ textAlign: "left", paddingLeft: 16 }}>{t("filterTip")}</FormHelperText>
+                            clickable={true}
+                            color={selected? 'primary' : 'default'}
+                        />
+                    </StyledListItem>
+                )}
+                renderValue={(tagValue, getItemProps) =>
+                    tagValue.map((option, index) => {
+                        const tagProps = getItemProps({ index });
+                        const { key, ...otherProps } = tagProps;
+                        return (
+                            <Chip
+                                key={key}
+                                label={regionTitle(option, language)}
+                                {...otherProps}
+                                disabled={index < tagValue.length - 1}
+                            />)
+                    })
+                }
+                onChange={handleChange}
+                value={filter}
+            />
+            <FormHelperText style={{ textAlign: "left", paddingLeft: 16 }}>{t("filterTip")}</FormHelperText>
         </React.Fragment>
-    )
+    );
 }
 
 function buildRegionHierarchy(destinations, language) {
