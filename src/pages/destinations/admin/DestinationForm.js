@@ -38,10 +38,14 @@ const DestinationForm = ({destination, onCancel}) => {
         return data;
     }, [queryContext]);
 
-    const getImageFolders = useCallback(() => {
+    const getImageFolders = useCallback(([date]) => {
         const { data, isError, error } = queryContext.useFetchImageFolders();
         if (isError === true) {
             throw error;
+        }
+        if (data && date) {
+            const datePrefix = date.substring(0, 4); // Get the year from the date
+            return data.filter(folder => folder.path.startsWith(datePrefix));
         }
         return data;
     }, [queryContext])
@@ -65,7 +69,10 @@ const DestinationForm = ({destination, onCancel}) => {
                 required: true,
                 errorText: t("form:dateError"),
                 type: FIELD_TYPE_DATE,
-                default: ""
+                default: "",
+                dependencies: [
+                    "path"
+                ]
             },
             {
                 id: "location",
@@ -91,6 +98,9 @@ const DestinationForm = ({destination, onCancel}) => {
                 default: "",
                 dependencies: [
                     'cover'
+                ],
+                dependsOn: [
+                    "date"
                 ]
             },
             {
