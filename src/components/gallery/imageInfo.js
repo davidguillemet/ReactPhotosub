@@ -119,10 +119,12 @@ const ImageInfo = ({image, displayDestination, style, container, visible, displa
                 </IconButton>
                 <Stack
                     direction='column'
-                    alignItems='center'
                     spacing={1}
-                    sx={{m: 1.5, p: 0}}
-                >
+                    sx={{
+                        alignItems: 'center',
+                        m: 1.5,
+                        p: 0
+                    }}>
                     <ImageDescription image={image} />
                     {
                         displayDestination &&

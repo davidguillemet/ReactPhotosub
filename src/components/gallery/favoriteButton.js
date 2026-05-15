@@ -4,7 +4,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined';
 
 import TooltipIconButton from '../tooltipIconButton';
 import { useAuthContext } from '../authentication';

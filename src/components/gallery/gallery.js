@@ -145,9 +145,14 @@ const GroupGalleryWithHeader = ({
                 }}
             >
                 <Stack
-                    sx={{width: '100%', pt: 1, pb: 1}} direction='row'
-                    justifyContent="space-between"
-                    alignItems="center"
+                    direction='row'
+                    sx={{
+                        width: '100%',
+                        pt: 1,
+                        pb: 1,
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                    }} 
                 >
                     <Box><span id={getSubGalleryAnchorName(group.gallery?.location_title || group.caption)}>{groupTitle}</span></Box>
                     {

@@ -89,47 +89,44 @@ const TransferControls = () => {
     const transferContext = useTransferContext();
 
     return (
-        <Stack direction='column'>
-        <IconButton
-            sx={{ my: 0.5 }}
-            variant="outlined"
-            size="large"
-            onClick={transferContext.handleAllRight}
-            disabled={transferContext.left.length === 0}
-            aria-label="move all right"
+        <Stack
+            direction='column'
+            sx={{
+                alignItems: 'center'
+            }}
         >
-            <KeyboardDoubleArrowRightIcon fontSize='large'/>
-        </IconButton>
-        <IconButton
-            sx={{ my: 0.5 }}
-            variant="outlined"
-            size="large"
-            onClick={transferContext.handleCheckedRight}
-            disabled={transferContext.leftChecked.length === 0}
-            aria-label="move selected right"
-        >
-            <KeyboardArrowRightIcon fontSize='large'/>
-        </IconButton>
-        <IconButton
-            sx={{ my: 0.5 }}
-            variant="outlined"
-            size="large"
-            onClick={transferContext.handleCheckedLeft}
-            disabled={transferContext.rightChecked.length === 0}
-            aria-label="move selected left"
-        >
-            <KeyboardArrowLeftIcon fontSize='large'/>
-        </IconButton>
-        <IconButton
-            sx={{ my: 0.5 }}
-            variant="outlined"
-            size="large"
-            onClick={transferContext.handleAllLeft}
-            disabled={transferContext.right.length === 0}
-            aria-label="move all left"
-        >
-            <KeyboardDoubleArrowLeftIcon fontSize='large'/>
-        </IconButton>
+            <IconButton
+                sx={{ my: 0.5 }}
+                onClick={transferContext.handleAllRight}
+                disabled={transferContext.left.length === 0}
+                aria-label="move all right"
+            >
+                <KeyboardDoubleArrowRightIcon />
+            </IconButton>
+            <IconButton
+                sx={{ my: 0.5 }}
+                onClick={transferContext.handleCheckedRight}
+                disabled={transferContext.leftChecked.length === 0}
+                aria-label="move selected right"
+            >
+                <KeyboardArrowRightIcon />
+            </IconButton>
+            <IconButton
+                sx={{ my: 0.5 }}
+                onClick={transferContext.handleCheckedLeft}
+                disabled={transferContext.rightChecked.length === 0}
+                aria-label="move selected left"
+            >
+                <KeyboardArrowLeftIcon />
+            </IconButton>
+            <IconButton
+                sx={{ my: 0.5 }}
+                onClick={transferContext.handleAllLeft}
+                disabled={transferContext.right.length === 0}
+                aria-label="move all left"
+            >
+                <KeyboardDoubleArrowLeftIcon />
+            </IconButton>
         </Stack>
     )
 }
@@ -137,12 +134,18 @@ const TransferControls = () => {
 const TransferListUI = ({renderItem, onCancel}) => {
     const transferContext = useTransferContext();
     return (
-        <Stack direction={'row'} alignItems='center' spacing={2} >
+        <Stack
+            direction={'row'}
+            spacing={2}
+            sx={{
+                alignItems: 'center'
+            }}
+        >
             <CustomMasonry title={""} items={transferContext.left} renderItem={renderItem} type={SOURCE_LIST} />
             <TransferControls />
             <CustomMasonry title={""} items={transferContext.right} renderItem={renderItem} type={TARGET_LIST} />
         </Stack>
-    )
+    );
 }
 
 const TransferListWithContext = ({renderItem, onCancel, onValidate}) => {
@@ -164,14 +167,26 @@ const TransferListWithContext = ({renderItem, onCancel, onValidate}) => {
     }, [onValidate, transferContext, toast, onCancel, t]);
 
     return (
-        <Stack direction={'column'} spacing={2} sx={{height: "100%"}}>
+        <Stack
+            direction={'column'}
+            spacing={2}
+            sx={{
+                height: "100%"
+            }}
+        >
             <TransferListUI renderItem={renderItem} onCancel={onCancel} />
-            <Stack direction={'row'} alignItems='center' spacing={2} justifyContent={"flex-end"}>
+            <Stack
+                direction={'row'}
+                spacing={2}
+                sx={{
+                    alignItems: 'center',
+                    justifyContent: "flex-end"
+                }}>
                 <Button onClick={handleValidate} disabled={!transferContext.isDirty}>{t("btn:validate")}</Button>
                 <Button onClick={onCancel}>{t("btn:cancel")}</Button>
             </Stack>
         </Stack>
-    )
+    );
 };
 
 const TransferList = ({allItems, rightList, renderItem, sortFunc, onCancel, onValidate}) => {

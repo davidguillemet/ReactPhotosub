@@ -394,34 +394,44 @@ const deepOceanTheme = createTheme({
                         background: 'transparent',
                     },
                 },
-                // Variante accent (primary) — phosphor cyan
-                containedPrimary: {
-                    background: tokens.accent,
-                    color: tokens.bg,
-                    '&:hover': {
-                        background: tokens.accentLight,
-                        boxShadow: `0 8px 24px ${tokens.accentGlow}`,
-                    },
                 },
-                containedSecondary: {
-                    background: tokens.accent2,
-                    color: tokens.ink,
-                    '&:hover': {
-                        background: tokens.accent2Dark,
-                        boxShadow: `0 8px 24px ${tokens.accentGlow}`,
-                        color: tokens.ink
-                    },
-                },
-                outlinedPrimary: {
-                    borderColor: tokens.ink,
-                    color: tokens.ink,
-                    '&:hover': {
-                        background: tokens.ink,
+            variants: [
+                {
+                    props: { variant: 'outlined', color: 'primary' },
+                    style: {
                         borderColor: tokens.ink,
-                        color: tokens.bg,
+                        color: tokens.ink,
+                        '&:hover': {
+                            background: tokens.ink,
+                            borderColor: tokens.ink,
+                            color: tokens.bg,
+                        },
                     },
                 },
-            },
+                {
+                    props: { variant: 'contained', color: 'primary' },
+                    style: {
+                        background: tokens.accent,
+                        color: tokens.bg,
+                        '&:hover': {
+                            background: tokens.accentLight,
+                            boxShadow: `0 8px 24px ${tokens.accentGlow}`,
+                        },
+                    },
+                },
+                {
+                    props: { variant: 'contained', color: 'secondary' },
+                    style: {
+                        background: tokens.accent2,
+                        color: tokens.ink,
+                        '&:hover': {
+                            background: tokens.accent2Dark,
+                            boxShadow: `0 8px 24px ${tokens.accentGlow}`,
+                            color: tokens.ink
+                        },
+                    },
+                },
+            ],
         },
 
         // ── IconButton ────────────────────────────────────────
@@ -443,12 +453,6 @@ const deepOceanTheme = createTheme({
                         borderColor: tokens.ink3,
                     }
                 },
-                colorWarning: {
-                    color: tokens.warning,
-                    '&:hover': {
-                        color: tokens.warningLight,
-                    },
-                }
             },
             variants: [
                 {
@@ -463,9 +467,11 @@ const deepOceanTheme = createTheme({
                 {
                     props: { variant: 'noBorder', color: 'warning' },
                     style: {
+                        color: tokens.warning,
                         border: 'none',
                         '&:hover': {
                             background: 'transparent',
+                            color: tokens.warningLight
                         },
                     },
                 },
@@ -614,7 +620,9 @@ const deepOceanTheme = createTheme({
         MuiTextField: {
             defaultProps: {
                 variant: 'outlined',
-                InputLabelProps: { shrink: true },
+                slotProps: {
+                    inputLabel: { shrink: true }
+                },
             },
         },
 
@@ -714,25 +722,33 @@ const deepOceanTheme = createTheme({
                         borderColor: tokens.ink3,
                     },
                 },
-                outlinedError: {
-                    background: `${tokens.errorMain}25`,
-                    color: tokens.errorMain,
-                    border: `1px solid ${tokens.errorMain}40`,
-                    '&:hover': {
-                        background: 'rgba(248,113,113,0.05)',
-                        border: `1px solid ${tokens.errorMain}60`,
-                    },
-                },
-                outlinedSuccess: {
-                    background: `${tokens.successMain}25`,
-                    color: tokens.successMain,
-                    border: `1px solid ${tokens.successMain}40`,
-                    '&:hover': {
-                        background: 'rgba(248,113,113,0.05)',
-                        border: `1px solid ${tokens.successMain}60`,
-                    },
-                },
             },
+            variants: [
+                {
+                    props: { variant: 'outlined', color: 'error' },
+                    style: {
+                        background: `${tokens.errorMain}25`,
+                        color: tokens.errorMain,
+                        border: `1px solid ${tokens.errorMain}40`,
+                        '&:hover': {
+                            background: 'rgba(248,113,113,0.05)',
+                            border: `1px solid ${tokens.errorMain}60`,
+                        },
+                    },
+                },
+                {
+                    props: { variant: 'outlined', color: 'success' },
+                    style: {
+                        background: `${tokens.successMain}25`,
+                        color: tokens.successMain,
+                        border: `1px solid ${tokens.successMain}40`,
+                        '&:hover': {
+                            background: 'rgba(248,113,113,0.05)',
+                            border: `1px solid ${tokens.successMain}60`,
+                        },
+                    },
+                },
+            ],
         },
 
         // ── Divider ───────────────────────────────────────────
@@ -998,28 +1014,42 @@ const deepOceanTheme = createTheme({
                     fontSize: '0.8rem',
                     fontWeight: 300,
                     alignItems: 'center',
-                },
-                outlinedInfo: {
-                    borderColor: `rgba(0,192,212,0.3)`,
-                    color: tokens.accent,
-                    background: tokens.accentDim,
-                },
-                outlinedSuccess: {
-                    borderColor: `rgba(74,222,128,0.3)`,
-                    color: tokens.successMain,
-                    background: `rgba(74,222,128,0.08)`,
-                },
-                outlinedWarning: {
-                    borderColor: `rgba(232,196,106,0.3)`,
-                    color: tokens.warning,
-                    background: `rgba(232,196,106,0.08)`,
-                },
-                outlinedError: {
-                    borderColor: `rgba(248,113,113,0.3)`,
-                    color: tokens.error,
-                    background: `rgba(248,113,113,0.08)`,
                 }
             },
+            variants: [
+                {
+                    props: { variant: 'outlined', severity: 'warning' },
+                    style: {
+                        borderColor: `rgba(232,196,106,0.3)`,
+                        color: tokens.warning,
+                        background: `rgba(232,196,106,0.08)`,
+                    }
+                },
+                {
+                    props: { variant: 'outlined', severity: 'success' },
+                    style: {
+                        borderColor: `rgba(74,222,128,0.3)`,
+                        color: tokens.successMain,
+                        background: `rgba(74,222,128,0.08)`,
+                    }
+                },
+                {
+                    props: { variant: 'outlined', severity: 'error' },
+                    style: {
+                        borderColor: `rgba(248,113,113,0.3)`,
+                        color: tokens.error,
+                        background: `rgba(248,113,113,0.08)`,
+                    }
+                },
+                {
+                    props: { variant: 'outlined', severity: 'info' },
+                    style: {
+                        borderColor: `rgba(0,192,212,0.3)`,
+                        color: tokens.accent,
+                        background: tokens.accentDim,
+                    }
+                }
+            ]
         },
 
         MuiSnackbar: {

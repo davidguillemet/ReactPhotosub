@@ -199,8 +199,10 @@ const HeaderSearch = ({
                         {/* Bottom Toolbar */}
                         <Stack
                             direction="row"
-                            justifyContent="space-between"
-                            alignItems="center"
+                            sx={{
+                                justifyContent: "space-between",
+                                alignItems: "center"
+                            }}
                         >
                             <Box sx={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'center'}}>
                                 <TooltipIconButton

@@ -64,7 +64,12 @@ const StorageBreadcrumbs = () => {
     }, []);
 
     return (
-        <Stack direction="row" alignItems="center">
+        <Stack
+            direction="row"
+            sx={{
+                alignItems: "center"
+            }}
+        >
             <HorizontalSpacing factor={1} />
             <GlobalStatus />
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ml: 2, pv: 1}} >
@@ -89,7 +94,7 @@ const StorageBreadcrumbs = () => {
                 </IconButton>
             }
         </Stack>
-    )
+    );
 }
 
 export default StorageBreadcrumbs;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CircularProgress, IconButton, Stack, Tooltip } from '@mui/material';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
 
 import List from '@mui/material/List';
@@ -90,8 +90,13 @@ const StorageItemStatusContent = ({status, messages, errorIcon, remediation = nu
 
 export const StorageItemStatus = (props) => {
     return (
-        <Stack direction="row" alignItems="center">
+        <Stack
+            direction="row"
+            sx={{
+                alignItems: "center"
+            }}
+        >
             <StorageItemStatusContent {...props} />
         </Stack>
-    )
+    );
 }

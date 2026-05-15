@@ -219,11 +219,12 @@ const Home = ({images, currentIndex}) => {
             }}>
                 <Stack
                     direction="column"
-                    alignItems="center"
-                    justifyContent="center"
                     spacing={2}
                     sx={{
+                        alignItems: "center",
+                        justifyContent: "center",
                         opacity: 0.5,
+
                         '&:hover': {
                             opacity: 0.8,
                         }
@@ -249,7 +250,7 @@ const Home = ({images, currentIndex}) => {
                 </Stack>
             </Box>
         </Box>
-    )
+    );
 }
     
 const HomeController = () => {

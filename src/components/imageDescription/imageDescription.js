@@ -64,13 +64,12 @@ const ImageDescription = ({ image, withNavigation = true}) => {
         <Stack
             direction='row'
             spacing={1}
-            alignItems='center'
             sx={{
+                alignItems: 'center',
                 my: 0,
                 mx: 0,
                 justifyContent: 'center'
-            }}
-        >
+            }}>
             {
                 withNavigation &&
                 <NavigationButton
@@ -84,7 +83,6 @@ const ImageDescription = ({ image, withNavigation = true}) => {
                     <NavigateBeforeIcon fontSize='small' />
                 </NavigationButton>
             }
-
             <Stack
                 direction='column'
                 sx={{
@@ -115,7 +113,6 @@ const ImageDescription = ({ image, withNavigation = true}) => {
                     </React.Fragment>
                 }
             </Stack>
-
             {
                 withNavigation && 
                 <NavigationButton
@@ -129,7 +126,6 @@ const ImageDescription = ({ image, withNavigation = true}) => {
                     <NavigateNextIcon fontSize='small' />
                 </NavigationButton>
             }
-
         </Stack>
     );
 }

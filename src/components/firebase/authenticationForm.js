@@ -34,7 +34,10 @@ const INITIAL_STEP = {
 const CustomButtons = ({onCancel, onPrev, step}) => {
     const t = useTranslation("components.form::authentication");
     return (
-        <Stack direction={"row"} spacing={2}>
+        <Stack
+            direction={"row"}
+            spacing={2}
+        >
             <Button onClick={onCancel}>
                 {t("cancel")}
             </Button>

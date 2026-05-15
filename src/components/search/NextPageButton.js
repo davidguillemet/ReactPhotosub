@@ -11,41 +11,48 @@ const NextPageButton = ({
 }) => {
     const t = useTranslation("components.search");
     return (
-            <Stack direction={"column"} alignItems="center" sx={{ width: "100%", mt: 3 }}>
-                <Box sx={{ flexGrow: 1 }} >
-                    {t("resultsCountWithTotal", [count, totalCount])}
-                </Box>
-                <Box
-                    sx={{
-                        mt: 1,
-                        flexGrow: 1,
-                        height: 6,
-                        backgroundColor: theme => theme.palette.text.secondary,
+        <Stack
+            direction={"column"}
+            sx={{
+                alignItems: "center",
+                width: "100%",
+                mt: 3
+            }}
+        >
+            <Box sx={{ flexGrow: 1 }} >
+                {t("resultsCountWithTotal", [count, totalCount])}
+            </Box>
+            <Box
+                sx={{
+                    mt: 1,
+                    flexGrow: 1,
+                    height: 6,
+                    backgroundColor: theme => theme.palette.text.secondary,
+                    borderWidth: 0,
+                    borderRadius: 3,
+                    width: "100%",
+                    maxWidth: 300,
+                    p: 0
+                }}
+            >
+                <Box sx={{
+                        height: "100%",
+                        backgroundColor: theme => theme.palette.secondary.dark,
                         borderWidth: 0,
                         borderRadius: 3,
-                        width: "100%",
-                        maxWidth: 300,
-                        p: 0
+                        width: `${(count / totalCount) * 100}%`
                     }}
-                >
-                    <Box sx={{
-                            height: "100%",
-                            backgroundColor: theme => theme.palette.secondary.dark,
-                            borderWidth: 0,
-                            borderRadius: 3,
-                            width: `${(count / totalCount) * 100}%`
-                        }}
-                    />
-                </Box>
-                <Button
-                    loading={loading}
-                    sx={{ mt: 3 }}
-                    onClick={onClick}
-                    endIcon={<SkipNextIcon />}
-                >
-                        {t("nextResults")}
-                </Button>
-            </Stack>    
+                />
+            </Box>
+            <Button
+                loading={loading}
+                sx={{ mt: 3 }}
+                onClick={onClick}
+                endIcon={<SkipNextIcon />}
+            >
+                    {t("nextResults")}
+            </Button>
+        </Stack>
     );
 };
 

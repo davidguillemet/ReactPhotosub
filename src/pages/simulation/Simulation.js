@@ -81,7 +81,12 @@ const SimulationFormControl = ({
                     color: theme => theme.palette.text.primary
                 }}
             >
-                <Stack direction='row' alignItems={'center'}>
+                <Stack
+                    direction='row'
+                    sx={{
+                        alignItems: 'center'
+                    }}
+                >
                     <Typography variant="h4" style={{fontWeight: "100"}}>{label}</Typography>
                     {
                         collapsible &&
@@ -94,15 +99,13 @@ const SimulationFormControl = ({
                     }
                 </Stack>
             </FormLabel>
-
             <Collapse in={isExpanded} sx={{ width: "100%" }}>
                 <Box sx={{ width: '100%'}}>
                     {children}
                 </Box>
             </Collapse>
-
         </FormControl>
-    )
+    );
 };
 
 const EmptySimulationImages = ({type, images, searchResult}) => {
@@ -291,7 +294,6 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     return (
         <Box sx={{ maxWidth: 1200, width: '100%'}}>
-
             <SimulationFormControl label={t("interiorSelection")}>
                 {
                     userUploadRef &&
@@ -320,11 +322,14 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     emptyComponent={<EmptySimulationImages type={LIST_INTERIORS} images={interiors} />}
                 />
             </SimulationFormControl>
-
             <VerticalSpacing factor={3} />
-
             <SimulationFormControl label={t("imageSelection")}>
-                <Stack direction={'column'} alignItems={'center'}>
+                <Stack
+                    direction={'column'}
+                    sx={{
+                        alignItems: 'center'
+                    }}
+                >
                     <ToggleButtonGroup exclusive value={listType} onChange={handleListType} >
                         <ToggleButton value={LIST_HOME_SLIDESHOW} >
                             <Tooltip title={t("imageType:preSelection")}>
@@ -381,9 +386,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                     />
                 </Stack>
             </SimulationFormControl>
-
             <VerticalSpacing factor={3} />
-            
             <SimulationFormControl label={t("frameSelection")} collapsible={true} expanded={false}>
 
                 <Box style={{
@@ -477,9 +480,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 </Box>
 
             </SimulationFormControl>
-
             <VerticalSpacing factor={3} />
-
             <SimulationDisplay
                 ref={resizeObserver.ref}
                 simulations={simulations}
@@ -489,7 +490,6 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                 selectedImage={currentImageId}
                 width={resizeObserver.width}
             />
-
         </Box>
     );
 };

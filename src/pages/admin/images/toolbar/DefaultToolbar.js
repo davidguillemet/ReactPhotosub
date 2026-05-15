@@ -31,8 +31,8 @@ const DefaultToolbar = () => {
         <Fade in={imageContext.selectionCount === 0}>
             <Stack
                 direction="row"
-                justifyContent="space-between"
                 sx={{
+                    justifyContent: "space-between",
                     position: "absolute",
                     top: 0,
                     left: 0,
@@ -41,8 +41,13 @@ const DefaultToolbar = () => {
                 }}
             >
                 <StorageBreadcrumbs />
-                <Stack direction="row" alignItems="center">
-                    <IconButton onClick={openDialog} size="medium" sx={{mr: 1}}>
+                <Stack
+                    direction="row"
+                    sx={{
+                        alignItems: "center"
+                    }}
+                >
+                    <IconButton onClick={openDialog} sx={{mr: 1}}>
                         <CreateNewFolderOutlinedIcon />
                     </IconButton>
                     <FileUploadSelection
@@ -55,7 +60,7 @@ const DefaultToolbar = () => {
                     <FolderForm />
                 </FormDialog>
             </Stack>
-         </Fade>
+        </Fade>
     );
 }
 

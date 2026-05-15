@@ -245,24 +245,25 @@ const DestinationsComponent = ({destinations}) => {
         }, [filterId]);
 
         return (
-            <Stack direction="row" alignItems="center" spacing={1}>
-                {t(captionKey)}
+            <Stack
+                direction="row"
+                spacing={0.5}
+                sx={{
+                    alignItems: "center"
+                }}
+            >
+                <span>{t(captionKey)}</span>
                 {
                     hasFilter(filterId) &&
-                    /* Adding a Box to activate the left margin of the IconButton */
-                    /* The spacing prop of the Stack is not working here... */
-                    /* and without the box, the left margin of the icon button by the */
-                    <Box sx={{}}>
-                        <IconButton
-                            variant="noBorder"
-                            size="small"
-                            color="warning"
-                            sx={{ p: 0, ml: 0.5}}
-                            onClick={onClearFilter}
-                        >
-                            <HighlightOffIcon fontSize="small" />
-                        </IconButton>
-                    </Box>
+                    <IconButton
+                        variant="noBorder"
+                        size="small"
+                        color="warning"
+                        sx={{ p: 0, ml: 0.5}}
+                        onClick={onClearFilter}
+                    >
+                        <HighlightOffIcon fontSize="small" />
+                    </IconButton>
                 }
             </Stack>
         )

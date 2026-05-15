@@ -1,7 +1,7 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Fab } from "@mui/material";
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
 import useFormDialog from 'dialogs/FormDialog';
 import DestinationForm from './DestinationForm';
 import { useTranslation, destinationTitle } from 'utils';

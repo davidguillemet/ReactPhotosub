@@ -35,7 +35,14 @@ const ItemFilter = () => {
     }, [imageContext.setDefaultItemStatusFilter]);
 
     return (
-        <Stack direction='row' spacing={1} sx={{mb: 1, alignItems: 'center'}}>
+        <Stack
+            direction='row'
+            spacing={1}
+            sx={{
+                mb: 1,
+                alignItems: 'center'
+            }}
+        >
             <Body sx={{mt: 0}}>{t("filter")}</Body>
             {
                 Object.keys(imageContext.getStatusFilter()).map(status => {

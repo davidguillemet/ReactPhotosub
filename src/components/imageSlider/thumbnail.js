@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMemo } from 'react';
 import { IconButton } from '@mui/material';
-import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import LazyImage from '../lazyImage';
 import SelectionMarker from '../selectionMarker';
@@ -25,18 +25,20 @@ const Thumbnail = React.forwardRef(({
     }
 
     return (
-        <Box
+        <Card
             ref={ref}
             sx={{
                 position: 'relative',
+                overflow: 'visible',
+                borderWidth: 0,
+                '&:hover': {
+                    borderWidth: 0,
+                },
                 p: 0,
                 mr: `${spacing}px`,
                 ml: index === 0 ? `${spacing}px` : 0,
                 height: `${imageHeight}px`,
                 width: `${imageWidth}px`,
-                ...(selected && {
-                    transform: 'translateX(-2px) translateY(-2px)'
-                })
             }}
         >
             <LazyImage
@@ -75,7 +77,7 @@ const Thumbnail = React.forwardRef(({
                 withCheck={false}
             />
 
-        </Box>
+        </Card>
     );
 });
 

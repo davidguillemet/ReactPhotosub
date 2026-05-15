@@ -48,7 +48,12 @@ const LocationItem = ({location, onEdit, onDelete}) => {
             itemId={locationId}
             label={
                 <Box sx={{ display: 'flex', alignItems: 'center', p: 0 }}>
-                    <Box component={FmdGoodIcon} color="inherit" sx={{ mr: 1 }} />
+                    <Box
+                        component={FmdGoodIcon}
+                        sx={{
+                            color: "inherit",
+                            mr: 1
+                        }} />
                     <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
                         {location.title}
                     </Typography>
@@ -63,7 +68,7 @@ const LocationItem = ({location, onEdit, onDelete}) => {
                 </Box>
             }
         />
-    )
+    );
 };
 
 const RegionItem = ({region, children, onEditLocation, onEditRegion, onDeleteRegion}) => {
@@ -96,7 +101,12 @@ const RegionItem = ({region, children, onEditLocation, onEditRegion, onDeleteReg
             icon={isEmpty ? <EmptySquare /> : null}
             label={
                 <Box sx={{ display: 'flex', alignItems: 'center', p: 0 }}>
-                    <Box component={TravelExploreIcon} color="inherit" sx={{ mr: 1 }} />
+                    <Box
+                        component={TravelExploreIcon}
+                        sx={{
+                            color: "inherit",
+                            mr: 1
+                        }} />
                     <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
                         {regionTitle(region, language)}
                     </Typography>

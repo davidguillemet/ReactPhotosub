@@ -1,7 +1,7 @@
 import React from 'react';
 import {isMobile} from 'react-device-detect';
 import { styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
+import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Grid';
@@ -48,7 +48,7 @@ const NavigationItem = ({destination, type, caption}) => {
 
     return (
         <DestinationLink destination={destination}>
-            <Paper
+            <Card
                 ref={navigationResizeObserver.ref}
                 sx={{
                     position: "relative",
@@ -140,7 +140,7 @@ const NavigationItem = ({destination, type, caption}) => {
                         justifyContent={type === 'left' ? 'flex-start' : 'flex-end'}
                     />
                 </Stack>
-            </Paper>
+            </Card>
         </DestinationLink>
     )
 }

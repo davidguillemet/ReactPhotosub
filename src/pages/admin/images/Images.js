@@ -86,58 +86,64 @@ const Images = () => {
     }
 
     return (
-        <Stack direction="column" alignItems="flex-start" spacing={1}>
-        <ImageErrors />
-        <Paragraph>{t("imageCount", [imageContext.itemCount, folderName])}</Paragraph>
-        <AdminTools />
-        <ItemFilter />
-        <TableContainer component={Paper} sx={{display: 'flex', flexDirection: 'column'}}>
-            <TableToolbar />
-            <Table sx={{ width: "100%" }} size="medium">
-                <TableHead>
-                    <TableRow>
-                        <TableCell padding="checkbox">
-                            <Checkbox
-                                indeterminate={imageContext.manySelected}
-                                checked={imageContext.allSelected}
-                                onChange={imageContext.onSelectAll}
-                            />
-                        </TableCell>
+        <Stack
+            direction="column"
+            spacing={1}
+            sx={{
+                alignItems: "flex-start"
+            }}
+        >
+            <ImageErrors />
+            <Paragraph>{t("imageCount", [imageContext.itemCount, folderName])}</Paragraph>
+            <AdminTools />
+            <ItemFilter />
+            <TableContainer component={Paper} sx={{display: 'flex', flexDirection: 'column'}}>
+                <TableToolbar />
+                <Table sx={{ width: "100%" }} size="medium">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell padding="checkbox">
+                                <Checkbox
+                                    indeterminate={imageContext.manySelected}
+                                    checked={imageContext.allSelected}
+                                    onChange={imageContext.onSelectAll}
+                                />
+                            </TableCell>
+                            {
+                                columns.map(column => {
+                                    return (
+                                        <TableCell
+                                            key={column.id}
+                                            align={'left'}
+                                        >
+                                            {column.label}
+                                        </TableCell>
+                                    )
+                                })
+                            }
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
                         {
-                            columns.map(column => {
-                                return (
-                                    <TableCell
-                                        key={column.id}
-                                        align={'left'}
-                                    >
-                                        {column.label}
-                                    </TableCell>
-                                )
-                            })
+                            // Don't use withLoading since a CircularProgress cannot be a child of TableBody
+                            imageContext.ready === true && 
+                            <React.Fragment>
+                                <MissingStorageFolders />
+                                <TableFolders />
+                                <TableFiles />
+                            </React.Fragment>
                         }
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {
-                        // Don't use withLoading since a CircularProgress cannot be a child of TableBody
-                        imageContext.ready === true && 
-                        <React.Fragment>
-                            <MissingStorageFolders />
-                            <TableFolders />
-                            <TableFiles />
-                        </React.Fragment>
-                    }
-                </TableBody>
-            </Table>
-            {
-                imageContext.ready === false &&
-                <Box sx={{padding: 1}} >
-                    <CircularProgress></CircularProgress>
-                </Box>
-            }
-        </TableContainer>
+                    </TableBody>
+                </Table>
+                {
+                    imageContext.ready === false &&
+                    <Box sx={{padding: 1}} >
+                        <CircularProgress></CircularProgress>
+                    </Box>
+                }
+            </TableContainer>
         </Stack>
-    )
+    );
 }
 
 const ImagesController = () => {

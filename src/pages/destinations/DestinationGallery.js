@@ -150,11 +150,11 @@ const DestinationContent = ({item, index, width, params}) => {
                 authContext.admin === true &&
                 <Stack
                     direction="row"
-                    alignItems="center"
                     sx={{
+                        alignItems: "center",
                         position: "absolute",
                         top: 8,
-                        right: 0,
+                        right: 0
                     }}
                 >
                     <PublicationIndicator published={destination.published} sx={{mr: 1}} />

@@ -97,7 +97,12 @@ const ActionToolbar = () => {
                     padding: 1
                 }}
             >
-                <Stack direction="row" alignItems="center">
+                <Stack
+                    direction="row"
+                    sx={{
+                        alignItems: "center"
+                    }}
+                >
                     <IconButton onClick={handleOnClose}>
                         <CloseIcon fontSize="small" sx={{color: theme => theme.palette.primary.contrastText}}/>
                     </IconButton>

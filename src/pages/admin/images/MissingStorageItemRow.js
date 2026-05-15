@@ -3,7 +3,7 @@ import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER } from "./common";
 import { TableRow, TableCell, Checkbox, Chip } from "@mui/material";
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { STATUS_ERROR, STATUS_NOT_AVAILABLE, STATUS_PENDING, StorageItemStatus } from './itemStatus/StorageItemStatus';

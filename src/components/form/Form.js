@@ -163,10 +163,10 @@ const Form = ({
             <formContext.FormComponent method="post" style={{width: "100%"}}>
             <Stack
                 spacing={2}
-                alignItems="center"
                 sx={{
                     width: '100%',
-                    paddingTop: 1
+                    paddingTop: 1,
+                    alignItems: "center"
                 }}>
             {
                 fieldGroups.map(group => {
@@ -193,7 +193,11 @@ const Form = ({
                 })
             }
             {   (submitAction || onCancel) &&
-                <Stack spacing={1} direction="row" sx={{mt: 2}}>
+                <Stack
+                    spacing={1}
+                    direction="row"
+                    sx={{mt: 2}}
+                >
                     { startCustomComponent !== null &&  startCustomComponent }
                     {
                         onCancel !== null &&

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Chip } from '@mui/material';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined';
 const { useImageContext } = require("../ImageContext")
 
 const GlobalStatus = () => {

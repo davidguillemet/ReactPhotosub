@@ -16,25 +16,27 @@ const ImageProperties = ({image}) => {
     return (
         <Stack
             direction={'column'}
-            justifyContent="flex-start"
-            alignItems="flex-start"
             spacing={0}
-            sx={{marginX: 1, p: 0}}
-        >
+            sx={{
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+                marginX: 1,
+                p: 0
+            }}>
             {
                 image.title ?
                 <Body sx={{m: 0}}>{image.title}</Body> :
-                <Alert severity='warning'>Pas de titre</Alert>
+                <Alert severity="warning">Pas de titre</Alert>
             }
             {
                 image.description ?
                 <Body sx={{m: 0}}>{image.description}</Body> :
-                <Alert severity='warning'>Pas de description</Alert>
+                <Alert severity="warning">Pas de description</Alert>
             }
             <Box>
                 {
                     image.tags === null ?
-                    <Alert severity='warning'>Pas de tags...</Alert> :
+                    <Alert severity="warning">Pas de tags...</Alert> :
                     image.tags.map(tag => {
                         return (
                             <Chip key={tag} label={tag} size="small" sx={{marginRight: 0.5, marginTop: 0.5}} />
@@ -43,7 +45,7 @@ const ImageProperties = ({image}) => {
                 }
             </Box>
         </Stack>
-    )
+    );
 }
 
 const ImagePreview = ({image, file}) => {
@@ -88,7 +90,13 @@ const ImagePreviewWrapper = ({image, children}) => {
             <React.Fragment>
                 <Stack direction={'column'}>
                     { children }
-                    <Stack direction={'row'} sx={{marginBottom: 1}} justifyContent="flex-end" spacing={0.5}>
+                    <Stack
+                        direction={'row'}
+                        spacing={0.5}
+                        sx={{
+                            justifyContent: "flex-end",
+                            marginBottom: 1
+                        }}>
                         <Button startIcon={<ContentCopyIcon/>} disabled={!hasTags} variant="outlined" size="small" onClick={onCopyTags}>Copier les tags</Button>
                         <Button startIcon={<EditIcon/>} variant="outlined" size="small" onClick={openDialog}>Modifier</Button>
                     </Stack>
@@ -97,7 +105,7 @@ const ImagePreviewWrapper = ({image, children}) => {
                     <ImageForm image={image} />
                 </FormDialog>
             </React.Fragment>
-        )
+        );
     } else {
         return children;
     }

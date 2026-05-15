@@ -6,7 +6,7 @@ import { useTranslation } from 'utils';
 import useFormDialog from 'dialogs/FormDialog';
 import SubGalleryForm from './SubGalleryForm';
 import { Fab } from "@mui/material";
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 
 const DestinationAdminTools = ({destination}) => {
