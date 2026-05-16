@@ -1,5 +1,5 @@
 const admin = require("firebase-admin");
-const functions = require("firebase-functions");
+const logger = require("firebase-functions/logger");
 
 if (process.env.NODE_ENV === "remote") {
     const serviceAccount = require("../../../gcp/photosub-firebase-adminsdk-8x9sm-78af4aa631.json");
@@ -25,5 +25,5 @@ module.exports = {
     bucket: bucket,
     // https://firebase.google.com/docs/functions/writing-and-viewing-logs
     // --> the Cloud Functions logger SDK is recommended for most situations
-    logger: functions.logger,
+    logger: logger,
 };

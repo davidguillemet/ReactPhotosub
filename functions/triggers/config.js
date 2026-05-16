@@ -1,4 +1,4 @@
-const functions = require("firebase-functions");
+const logger = require("firebase-functions/logger");
 const verifyCustomTokenApiBaseUrl = "www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken?key=" + process.env.CONFIG_APIKEY;
 
 exports.apiBaseUrl =
@@ -14,4 +14,4 @@ exports.verifyCustomTokenApiUrl =
 
 // https://firebase.google.com/docs/functions/writing-and-viewing-logs
 // --> the Cloud Functions logger SDK is recommended for most situations
-exports.logger = functions.logger;
+exports.logger = logger;
