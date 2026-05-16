@@ -74,6 +74,7 @@ const HeaderSearch = ({
         setLoadingNextPage(false);
         setResultsOpen(searchResult.totalCount >= 0);
         setSearchResult(searchResult);
+        setPageIndex(searchResult.page);
     }, []);
 
     const handleChangeSettings = React.useCallback((settings) => {
