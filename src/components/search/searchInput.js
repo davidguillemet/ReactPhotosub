@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { styled } from '@mui/material/styles';
 import { isMobile } from 'react-device-detect';
 import Box from "@mui/material/Box";
@@ -18,7 +18,7 @@ import { gsap } from "gsap";
 import { useGSAP } from '@gsap/react';
 
 import { useTranslation, debounce } from 'utils';
-import { useStateWithDep, useCurrentPage } from '../hooks';
+import { useStateWithDep } from '../hooks';
 import { useTheme } from '@mui/material/styles';
 
 
@@ -85,7 +85,6 @@ const SearchInput = ({
     const containerRef = React.useRef(null);
     const inputRef = React.useRef(null);
     const inputAdornmentRef = React.useRef(null);
-    const { isHomePage } = useCurrentPage();
 
     const onValueChange = React.useCallback((event) => {
         setValue(event.target.value);
@@ -119,14 +118,12 @@ const SearchInput = ({
     const animationDuration = 0.4;
     const expandTimelineRef = React.useRef(null);
 
-    useEffect(() => {
-        // If we navigated to the home page or leave it, clear the animation
-        // that depends from the isHomePage state
+    React.useLayoutEffect(() => {
         if (expandTimelineRef.current !== null) {
             expandTimelineRef.current.kill();
             expandTimelineRef.current = null;
         }
-    }, [isHomePage]);
+    }, []);
 
     useGSAP(() => {
         if (expanded) {
@@ -164,7 +161,7 @@ const SearchInput = ({
             expandTimelineRef.current.reverse();
         }
     }, {
-        dependencies: [expanded, isHomePage],
+        dependencies: [expanded],
         scope: containerRef,
     });
 
