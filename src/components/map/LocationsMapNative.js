@@ -20,7 +20,7 @@ import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import { Portal } from '@mui/base/Portal';
+import { Portal } from '@mui/material';
 import { IconButton } from '@mui/material';
 import { uniqueID } from 'utils';
 

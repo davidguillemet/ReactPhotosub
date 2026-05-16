@@ -1,10 +1,7 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useNavigate } from 'react-router';
-import { Box, Button, Paper, Stack } from '@mui/material';
-import { ClickAwayListener } from '@mui/base/ClickAwayListener';
-import { Unstable_Popup as Popup } from '@mui/base/Unstable_Popup';
-import { size } from '@floating-ui/dom';
+import { Backdrop, Box, Button, ClickAwayListener, Paper, Popper, Portal, Stack } from '@mui/material';
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
 import Divider from '@mui/material/Divider';
@@ -103,33 +100,36 @@ const HeaderSearch = ({
 
     const toolbarPadding = 10;
 
-    const popupMiddlewarePosition = React.useMemo(() => {
-        return {
-            name: "SearchResultsMiddlewarePosition",
-            fn: ({x, y, elements, rects}) => {
-                // Set zIndex between Drawer=1200 and Modal=1300 (ExpandedView)
-                elements.floating.style.setProperty("z-index", theme.zIndex.drawer + 10);
-                return {
-                    x: toolbarPadding,
-                    y: rects.reference.y + rects.reference.height,
-                };
+    const popperModifiers = React.useMemo(() => [
+        {
+            name: 'customPosition',
+            enabled: true,
+            phase: 'beforeWrite',
+            requires: ['computeStyles'],
+            fn({ state }) {
+                const { y, height } = state.rects.reference;
+                state.styles.popper.left = `${toolbarPadding}px`;
+                state.styles.popper.top = `${y + height}px`;
+                state.styles.popper.transform = 'none';
+                state.styles.popper.width = `${window.innerWidth - 2 * toolbarPadding}px`;
+                state.styles.popper.maxHeight = `${Math.max(0, window.innerHeight - y - height - 10)}px`;
             }
         }
-    }, [theme]);
-
-    const popupMiddlewareSizeOptions = React.useMemo(() => {
-        return {
-            apply: ({availableWidth, availableHeight, elements, rects}) => {
-                Object.assign(elements.floating.style, {
-                    width: `${window.innerWidth - 2*toolbarPadding}px`,
-                    maxHeight: `${Math.max(0, availableHeight - 10)}px`,
-                    display: 'flex'
-                });
-            }
-        };
-    }, []);
+    ], []);
 
     return (
+        <>
+        <Portal>
+            <Backdrop
+                open={resultsOpen}
+                onClick={handleClose}
+                sx={{
+                    zIndex: theme.zIndex.appBar - 1,
+                    backdropFilter: 'blur(10px)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                }}
+            />
+        </Portal>
         <ClickAwayListener onClickAway={handleClose}>
             <Box
                 sx={{
@@ -152,14 +152,16 @@ const HeaderSearch = ({
                     settings={settings}
                     alignItems='flex-start'
                 />
-                <Popup
+                <Popper
                     open={resultsOpen}
-                    anchor={searchInputBoxRef.current}
+                    anchorEl={searchInputBoxRef.current}
                     placement="bottom-start"
-                    middleware={[
-                        size(popupMiddlewareSizeOptions),
-                        popupMiddlewarePosition
-                    ]}
+                    popperOptions={{ strategy: 'fixed' }}
+                    modifiers={popperModifiers}
+                    sx={{
+                        zIndex: theme.zIndex.drawer + 10,
+                        display: 'flex',
+                    }}
                 >
                     <Paper
                         ref={resultsPaperRef}
@@ -241,9 +243,10 @@ const HeaderSearch = ({
                             </Button>
                         </Stack>
                     </Paper>
-                </Popup>
+                </Popper>
             </Box>
         </ClickAwayListener>
+        </>
     );
 };
 
