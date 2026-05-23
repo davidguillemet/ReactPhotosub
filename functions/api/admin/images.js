@@ -37,6 +37,7 @@ module.exports = function(admin, config) {
                 tags: image.tags,
                 title: image.title,
                 description: image.description,
+                portfolio: image.portfolio,
                 ...tagsFromTitle,
             }).then(() => {
                 res.json(image);

@@ -95,7 +95,7 @@ module.exports = function(app, config) {
             res.locals.errorMessage = `Failed to load images for destination '${getDestinationPath(req)}'`;
             const destinationPath = getDestinationPath(req);
             const destinationImagesPromise = config.pool({i: "images"})
-                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create, i.tags, i.sub_gallery_id"))
+                .select(config.pool().raw("i.id, i.name, i.path, i.title, i.description, i.\"sizeRatio\", i.create, i.tags, i.sub_gallery_id, i.portfolio"))
                 .where("i.path", destinationPath)
                 .orderBy("i.create", "asc");
 

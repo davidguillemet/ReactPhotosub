@@ -70,6 +70,7 @@ module.exports = function(pool, firebaseConfig) {
     require("./resources/images")(app, configuration);
     require("./resources/userdata")(app, configuration);
     require("./resources/favorites")(app, configuration);
+    require("./resources/portfolio")(app, configuration);
     require("./resources/simulations")(app, configuration);
     require("./resources/bucket")(app, configuration);
     require("./resources/search")(app, configuration);

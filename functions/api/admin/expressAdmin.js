@@ -8,4 +8,5 @@ module.exports = function(admin, config) {
     require("./regions")(admin, config);
     require("./locations")(admin, config);
     require("./users")(admin, config);
+    require("./portfolio")(admin, config);
 };
