@@ -1,7 +1,6 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
 import { isIOS } from 'react-device-detect'
-import { useLocation } from "react-router";
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -15,7 +14,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import MuiDrawer from '@mui/material/Drawer';
 
-import { routes, NavigationLink, ROUTES_NAMESPACE } from '../../navigation/routes';
+import { routes, NavigationLink, ROUTES_NAMESPACE } from 'navigation/routes';
 import Footer from '../footer';
 import Header from '../header';
 import PageContent from '../pageContent';
@@ -23,8 +22,10 @@ import { VerticalSpacing } from '../spacing';
 import SocialIcons from 'components/socialIcons';
 import LanguageSelector from 'components/language';
 // import { DarkModeSelector } from 'components/theme';
-import { useTranslation } from '../../utils';
+import { useTranslation } from 'utils';
 import { AppContextProvider, useAppContext } from './appContext';
+import { useCurrentPage } from 'components/hooks';
+
 
 const drawerWidth = 240;
 const miniDrawerWidth = 56;
@@ -210,9 +211,8 @@ const isImageLocation = (locationSearch) => {
 const AppContentUI = React.forwardRef((props, ref) => {
 
     const { drawerOpen, setDrawerOpen, subscribeHistory, unsubscribeHistory } = useAppContext();
-    const location = useLocation();
-    const isHomePage = location.pathname === '/';
-
+    const { isHomePage } = useCurrentPage();
+    
     const previousLocationSearch = React.useRef("");
 
     const handleHistoryChanged = React.useCallback((location) => {

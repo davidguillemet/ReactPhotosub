@@ -1,26 +1,36 @@
 import React from 'react';
-import { useLocation } from "react-router";
+import { useLoaderData, useLocation } from "react-router";
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import { StyledEngineProvider } from '@mui/material/styles';
-import ScrollTop from './template/scrollTop';
+import ScrollTop from '../../template/scrollTop';
+import { ReactRouterAwaiter } from 'components/reactRouter';
 
 import './App.css';
 
-import ChainedProviders from './components/chainedProviders';
-import { DarkModeProvider } from 'components/theme';
-import CustomThemeProvider from 'template/theme';
-import { QueryContextProvider } from './components/queryContext';
-import { FavoritesProvider } from './components/favorites';
+import ChainedProviders from '../../components/chainedProviders';
+import { QueryContextProvider } from '../../components/queryContext';
+import {
+    CustomThemeProvider,
+    DarkModeProvider,
+    FavoritesProvider,
+    PortfolioProvider
+} from '../../providers';
 import { HelmetProvider } from 'react-helmet-async';
 
-import AppContent from './template';
+import AppContent from '../../template';
 
 const scrollTopAnchor = "back-to-top-anchor";
 
+// TODO: as it is defined as the route page for the ReactRouteProvider,
+// create a new Page subfolder called "app" that contains this App component
+// alongside with a loader (and an action if needed) to handle data fetching and actions related to the App component itself,
+// such as the portfolio
 const App = (props) => {
 
     const { pathname, hash, key } = useLocation();
+    const { appData, ...otherProps} = props;
+    const { portfolio } = appData;
 
     React.useEffect(() => {
         // if not a hash link, scroll to top
@@ -55,9 +65,11 @@ const App = (props) => {
                     ]}
                 >
                     <CssBaseline />
-                    <AppContent {...props} />
+                    <PortfolioProvider portfolio={portfolio}>
+                        <AppContent {...otherProps} />
+                    </PortfolioProvider>
                     <ScrollTop
-                        {...props}
+                        {...otherProps}
                         anchorSelector={`#${scrollTopAnchor}`}
                     />
                 </ChainedProviders>
@@ -66,4 +78,15 @@ const App = (props) => {
     )
 }
 
-export default App;
+const AppController = (props) => {
+    const { appData } = useLoaderData();
+    return (
+        <ReactRouterAwaiter value={appData} >
+            {(appData) => <App {...props} appData={appData} />}
+        </ReactRouterAwaiter>
+    )
+};
+
+export default AppController;
+
+export const Component = AppController;

@@ -18,7 +18,7 @@ import { isMobile } from 'react-device-detect';
 
 // ── Tokens bruts — issus des CSS custom properties de deepOcean.css ──
 // oklch → hex/rgba approximations (for MUI color utilities compatibility)
-export const tokens = {
+const tokens = {
     bg: '#030a11',                  // --bg:   oklch(0.14 0.02 240)
     bg1: '#03111b',                 // --bg-1: oklch(0.17 0.03 240)
     bg2: '#051828', //'#071a27',  // --bg-2: oklch(0.21 0.035 240)
@@ -52,7 +52,7 @@ const breakpoints = {
 };
 
 // ── Thème complet ────────────────────────────────────────────
-const deepOceanTheme = createTheme({
+export const deepOceanTheme = createTheme({
     breakpoints,
 
     // Custom token pour largeur max des pages (cards, sections) — à utiliser dans les composants avec theme.pageWidth
@@ -154,7 +154,7 @@ const deepOceanTheme = createTheme({
         h1: {
             fontFamily: '"Roboto", Georgia, serif',
             fontWeight: 300,
-            fontSize: '5rem',
+            fontSize: 'clamp(1.5rem, 6.5vw, 3rem)',
             lineHeight: 0.95,
             letterSpacing: '-0.02em',
             color: tokens.ink,
@@ -162,7 +162,7 @@ const deepOceanTheme = createTheme({
         h2: {
             fontFamily: '"Roboto", Georgia, serif',
             fontWeight: 300,
-            fontSize: '3.5rem',
+            fontSize: 'clamp(1.35rem, 6vw, 2.5rem)', // '3.5rem',
             lineHeight: 1.0,
             letterSpacing: '-0.02em',
             color: tokens.ink,
@@ -170,7 +170,7 @@ const deepOceanTheme = createTheme({
         h3: {
             fontFamily: '"Roboto", Georgia, serif',
             fontWeight: 400,
-            fontSize: '3rem',
+            fontSize: 'clamp(1.25rem, 2.5vw, 2.1rem)',
             lineHeight: 1.1,
             letterSpacing: '-0.01em',
             color: tokens.ink,
@@ -178,7 +178,7 @@ const deepOceanTheme = createTheme({
         h4: {
             fontFamily: '"Roboto", Georgia, serif',
             fontWeight: 400,
-            fontSize: '1.5rem',
+            fontSize: 'clamp(1.25rem, 2vw, 1.8rem)',
             lineHeight: 1.25,
             letterSpacing: '0.05em',
             color: tokens.ink,
@@ -186,14 +186,14 @@ const deepOceanTheme = createTheme({
         h5: {
             fontFamily: '"Roboto", Georgia, serif',
             fontWeight: 400,
-            fontSize: '1.5rem',
+            fontSize: 'clamp(1.25rem, 2vw, 1.5rem)',
             lineHeight: 1.2,
             color: tokens.ink,
         },
         h6: {
             fontFamily: '"Roboto", Georgia, serif',
             fontWeight: 400,
-            fontSize: '1.15rem',
+            fontSize: 'clamp(1.15rem, 2vw, 1.25rem)',
             lineHeight: 1.5,
             color: tokens.ink,
         },
@@ -202,14 +202,14 @@ const deepOceanTheme = createTheme({
         body1: {
             fontFamily: '"Inter", sans-serif',
             fontWeight: 300,
-            fontSize: '1rem',
+            fontSize: 'clamp(1rem, 2vw, 1.25rem)',
             lineHeight: 1.5,
             color: tokens.ink2,
         },
         body2: {
             fontFamily: '"Inter", sans-serif',
             fontWeight: 300,
-            fontSize: '0.9rem',
+            fontSize: 'clamp(0.9rem, 1.8vw, 1.2rem)',
             lineHeight: 1.5,
             color: tokens.ink2,
         },
@@ -218,14 +218,14 @@ const deepOceanTheme = createTheme({
         subtitle1: {
             fontFamily: '"Inter", sans-serif',
             fontWeight: 400,
-            fontSize: '0.85rem',
+            fontSize: 'clamp(0.8rem, 1.3vw, 0.9rem)',
             lineHeight: 1.6,
             color: tokens.ink,
         },
         subtitle2: {
             fontFamily: '"Inter", sans-serif',
             fontWeight: 500,
-            fontSize: '0.75rem',
+            fontSize: 'clamp(0.7rem, 1.1vw, 0.8rem)',
             lineHeight: 1.5,
             letterSpacing: '0.05em',
             color: tokens.ink,
@@ -235,7 +235,7 @@ const deepOceanTheme = createTheme({
         overline: {
             fontFamily: '"JetBrains Mono", ui-monospace, monospace',
             fontWeight: 400,
-            fontSize: '0.65rem',
+            fontSize: 'clamp(0.6rem, 1vw, 0.7rem)',
             lineHeight: 1.5,
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
@@ -246,17 +246,19 @@ const deepOceanTheme = createTheme({
         caption: {
             fontFamily: '"JetBrains Mono", ui-monospace, monospace',
             fontWeight: 400,
-            fontSize: '0.6rem',
+            fontSize: 'clamp(0.55rem, 0.9vw, 0.65rem)',
             lineHeight: 1.5,
             letterSpacing: '0.06em',
             color: tokens.ink2,
         },
 
         // ── Boutons ─────────────────────────────────────────────
+        // Note: MuiButton/MuiTab/MuiToggleButton override fontSize via styleOverrides,
+        // so this only affects Typography variant="button" used standalone.
         button: {
             fontFamily: '"JetBrains Mono", ui-monospace, monospace',
             fontWeight: 500,
-            fontSize: '0.65rem',
+            fontSize: 'clamp(0.6rem, 1vw, 0.7rem)',
             letterSpacing: '0.22em',
             textTransform: 'uppercase',
         },
@@ -313,14 +315,15 @@ const deepOceanTheme = createTheme({
     components: {
 
         // ── Typography — responsive clamp() sizes ─────────────
-        MuiTypography: {
-            styleOverrides: {
-                h1: { fontSize: 'clamp(48px, 8vw, 120px)' /*clamp(3rem, 8vw, 7.5rem)'*/ },
-                h2: { fontSize: 'clamp(48px, 8vw, 120px)' /*clamp(2.5rem, 6vw, 5.5rem)'*/ },
-                h3: { fontSize: 'clamp(1.8rem, 3vw, 3rem)' },
-                h4: { fontSize: 'clamp(1.4rem, 2.5vw, 2.2rem)' },
-            },
-        },
+        // MuiTypography: {
+        //     styleOverrides: {
+        //         h1: { fontSize: 'clamp(1.25rem, 7vw, 3.5rem)' },
+        //         h2: { fontSize: 'clamp(2.5rem, 6.5vw, 120px)' },
+        //         h3: { fontSize: 'clamp(1.8rem, 4vw, 3rem)' },
+        //         h4: { fontSize: 'clamp(1rem, 2.5vw, 2.2rem)' },
+        //         h6: { fontSize: 'clamp(0.75rem, 2vw, 1.15rem)' },
+        //     },
+        // },
 
         // ── CssBaseline ───────────────────────────────────────
         MuiCssBaseline: {
@@ -349,6 +352,27 @@ const deepOceanTheme = createTheme({
         },
 
         // ── Button ────────────────────────────────────────────
+        MuiToggleButton: {
+            defaultProps: {
+                size: "small"
+            },
+            styleOverrides: {
+                root: ({ theme }) => ({
+                    borderRadius: 2,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+                    fontWeight: 500,
+                    fontSize: '0.8rem',
+                    transition: 'all 0.5s ease',
+                    padding: '8px 10px',
+                    [theme.breakpoints.down('sm')]: {
+                        fontSize: '0.7rem',
+                        padding: '6px 8px',
+                    },
+                }),
+            },
+        },
         MuiButton: {
             defaultProps: {
                 disableElevation: true,
@@ -356,7 +380,7 @@ const deepOceanTheme = createTheme({
                 size: "small"
             },
             styleOverrides: {
-                root: {
+                root: ({ theme }) => ({
                     borderRadius: 2,
                     letterSpacing: '0.22em',
                     textTransform: 'uppercase',
@@ -364,8 +388,12 @@ const deepOceanTheme = createTheme({
                     fontWeight: 500,
                     fontSize: '0.65rem',
                     transition: 'all 0.5s ease',
-                    padding: '14px 22px',
-                },
+                    padding: '10px 14px',
+                    [theme.breakpoints.down('sm')]: {
+                        fontSize: '0.55rem',
+                        padding: '8px 10px',
+                    },
+                }),
                 contained: {
                     background: tokens.ink,
                     color: tokens.bg,
@@ -597,7 +625,7 @@ const deepOceanTheme = createTheme({
 
         MuiTab: {
             styleOverrides: {
-                root: {
+                root: ({ theme }) => ({
                     fontFamily: '"JetBrains Mono", ui-monospace, monospace',
                     fontWeight: 400,
                     fontSize: '0.8rem',
@@ -612,7 +640,10 @@ const deepOceanTheme = createTheme({
                         color: tokens.ink,
                         background: 'transparent',
                     },
-                },
+                    [theme.breakpoints.down('sm')]: {
+                        fontSize: '0.7rem',
+                    },
+                }),
             },
         },
 
@@ -1223,5 +1254,3 @@ const deepOceanTheme = createTheme({
         },
     },
 });
-
-export default deepOceanTheme;

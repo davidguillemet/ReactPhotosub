@@ -35,7 +35,7 @@ const paletteLightMode = {
     }
 };
 
-const lightTheme = createTheme({
+export const lightTheme = createTheme({
     palette: paletteLightMode,
     pageWidth: {
         maxWidth: '800px',
@@ -62,7 +62,15 @@ const lightTheme = createTheme({
                 variant: "outlined",
                 color: "secondary",
                 size: isMobile ? "small" : "medium"
-            }
+            },
+            styleOverrides: {
+                root: ({ theme }) => ({
+                    [theme.breakpoints.down('sm')]: {
+                        fontSize: '0.75rem',
+                        padding: '4px 10px',
+                    },
+                }),
+            },
         },
         MuiLoadingButton: {
             defaultProps: {
@@ -123,5 +131,3 @@ const lightTheme = createTheme({
         // },
     }
 });
-
-export default lightTheme;

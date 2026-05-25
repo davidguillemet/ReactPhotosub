@@ -114,6 +114,28 @@ DataProvider.prototype.removeFavorite = function(path) {
     });
 };
 
+// Portfolio management
+DataProvider.prototype.getPortfolio = function() {
+    return this.axios.get('/portfolio')
+    .then(response => {
+        return response.data;
+    });
+};
+
+DataProvider.prototype.addToPortfolio = function(imageIds) {
+    return this.axios.post('/admin/portfolio', { imageIds })
+    .then(response => {
+        return response.data;
+    });
+};
+
+DataProvider.prototype.removeFromPortfolio = function(imageIds) {
+    return this.axios.delete('/admin/portfolio', { data: { imageIds } })
+    .then(response => {
+        return response.data;
+    });
+};
+
 DataProvider.prototype.getFavorites = function(uid) {
     // NOTE: this request should not be triggered...
     // the query data cache is hydrated from userdata response when getting user data at login time

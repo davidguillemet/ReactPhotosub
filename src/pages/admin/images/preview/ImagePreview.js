@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Chip, Stack, Box, Alert} from '@mui/material';
+import { Button, Chip, Stack, Box, Alert, Checkbox, FormControlLabel} from '@mui/material';
 import LazyImage from 'components/lazyImage';
 import { useFirebaseContext } from 'components/firebase';
 import { Body } from 'template/pageTypography';
@@ -33,6 +33,7 @@ const ImageProperties = ({image}) => {
                 <Body sx={{m: 0}}>{image.description}</Body> :
                 <Alert severity="warning">Pas de description</Alert>
             }
+            <FormControlLabel control={<Checkbox checked={image.portfolio} disabled />} label="Portfolio" />
             <Box>
                 {
                     image.tags === null ?
@@ -96,7 +97,8 @@ const ImagePreviewWrapper = ({image, children}) => {
                         sx={{
                             justifyContent: "flex-end",
                             marginBottom: 1
-                        }}>
+                        }}
+                    >
                         <Button startIcon={<ContentCopyIcon/>} disabled={!hasTags} variant="outlined" size="small" onClick={onCopyTags}>Copier les tags</Button>
                         <Button startIcon={<EditIcon/>} variant="outlined" size="small" onClick={openDialog}>Modifier</Button>
                     </Stack>

@@ -73,7 +73,6 @@ const PictureTypeSelector = ({destinationType, onChange}) => {
     const t = useTranslation("pages.destinations");
     return (
         <ToggleButtonGroup
-            size={"small"}
             value={destinationType}
             onChange={onChange}
             exclusive
@@ -290,7 +289,7 @@ const DestinationsComponent = ({destinations}) => {
                 sx={{
                     width: '95%',
                     maxWidth: 700,
-                    mt: 2
+                    mt: 4
                 }}
             >
                 <Fade in={filterTab === FILTER_REGION} >
@@ -360,7 +359,6 @@ const DestinationsController = () => {
     return (
         <React.Fragment>
             <PageTitle>{t("title")}</PageTitle>
-            <VerticalSpacing factor={2} />
             <ReactRouterAwaiter value={destinations} >
                {destinations => <DestinationsComponent destinations={destinations} />}
             </ReactRouterAwaiter>

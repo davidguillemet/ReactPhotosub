@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from "react-router";
+import { useCurrentPage } from 'components/hooks';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -25,8 +25,7 @@ const StyledFooter = styled('footer')``;
 
 const Footer = () => {
 
-    const location = useLocation();
-    const isHome = location.pathname === '/';
+    const { isHomePage } = useCurrentPage();
 
     return (
         <StyledFooter sx={{
@@ -38,7 +37,7 @@ const Footer = () => {
             borderTopWidth: '1px',
             borderTopStyle: 'solid',
             borderTopColor: 'divider',
-            ...(isHome && {
+            ...(isHomePage && {
                 backgroundColor: 'rgba(0,0,0,0.3)'
             }),
             zIndex: (theme) => theme.zIndex.appBar
@@ -46,7 +45,7 @@ const Footer = () => {
             <Box sx={{ display: "flex", width: "240px" }} >
                 <SocialIcons />
             </Box>
-            <Copyright isHome={isHome}/>
+            <Copyright isHome={isHomePage}/>
         </StyledFooter>
     )
 };

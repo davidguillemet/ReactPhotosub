@@ -39,7 +39,9 @@
             "enterNewPassword": "Saisissez votre nouveau mot de passe:",
             "resetPasswordSuccess": "Votre mot de passe a été changé avec succès.\nVous êtes maintenant connecté."
         },
-        "home": {},
+        "home": {
+            "btn:viewDestination": "Voir la destination"
+        },
         "contact": {
             "title": "Pour me contacter",
             "field:name": "Votre nom",
@@ -246,6 +248,7 @@
                 "form": {
                     "field:titleFr": "Titre en français",
                     "field:titleEn": "Titre en anglais",
+                    "field:portfolio": "Image du portfolio",
                     "field:tags": "Tags",
                     "error:tags": "Merci d'ajouter des tags qui caractérisent l'image (lieu, espèce, couleur, etc).",
                     "btn:validate": "Valider",
@@ -356,7 +359,7 @@
             "toast:error": "Une erreur est survenue lors de l'opération."
         },
         "form::authentication": {
-            "title": "Connectez-vous avec une adresse de messagerie",
+            "title": "Connexion",
             "subTitle:enterEmail": "Saisissez votre adresse de messagerie.",
             "subTitle:createAccount": "Cette adresse de messagerie ne correspond à aucun compte utilisateur.\nSaisissez un nom et un mot de passe pour créer un compte.",
             "subTitle:login": "Saisissez votre mot de passe.",
@@ -386,6 +389,8 @@
         "gallery": {
             "btn:addFavorite": "Ajouter aux favoris",
             "btn:deleteFavorite": "Retirer des favoris",
+            "btn:addToPortfolio": "Ajouter au portfolio",
+            "btn:deleteFromPortfolio": "Retirer du portfolio",
             "lbl:groupImageCount": "{0} image(s)",
             "btn:stopSlideshow": "Arrêter le diaporama",
             "btn:startSlideshow": "Démarrer le diaporama",

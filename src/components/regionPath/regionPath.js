@@ -14,14 +14,16 @@ const RegionChip = ({region}) => {
     )
 }
 
-const RegionPath = ({regions, justifyContent = 'flex-start'}) => {
+const RegionPath = ({destination, justifyContent = 'flex-start', flexWrap = 'wrap'}) => {
+
+    const regions = destination.regionpath;
 
     return (
         <Box
             sx={{
                 display: 'flex',
                 flexDirection: 'row',
-                flexWrap: 'wrap',
+                flexWrap: flexWrap,
                 justifyContent: justifyContent,
                 mb: 1,
                 width: "100%"

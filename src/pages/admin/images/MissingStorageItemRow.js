@@ -1,11 +1,12 @@
 import React from 'react';
 import { ITEM_TYPE_FILE, ITEM_TYPE_FOLDER } from "./common";
-import { TableRow, TableCell, Checkbox, Chip } from "@mui/material";
+import { TableRow, TableCell, Checkbox, Chip, Stack } from "@mui/material";
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import StarIcon from '@mui/icons-material/Star';
 import { STATUS_ERROR, STATUS_NOT_AVAILABLE, STATUS_PENDING, StorageItemStatus } from './itemStatus/StorageItemStatus';
 import { useImageContext } from './ImageContext';
 import { useUploadContext } from './upload/UploadContext';
@@ -135,18 +136,18 @@ const DatabaseIssueStatus = ({itemName, error, type}) => {
     )
 }
 
-const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = false}) => {
+const MissingStorageItemRow = ({item, type, dbIssue = false, thumbIssue = false}) => {
     const imageContext = useImageContext();
 
     React.useEffect(() => {
         const setContextItemStatus = imageContext.setItemStatus;
-        setContextItemStatus(itemName, "error");
+        setContextItemStatus(item.name, "error");
         // Cleanup function to decrease error count in case the removed item has an issue
         return function clearStatus() {
             const setContextItemStatus = imageContext.setItemStatus;
-            setContextItemStatus(itemName, "success");
+            setContextItemStatus(item.name, "success");
         }
-    }, [itemName, imageContext.setItemStatus]);
+    }, [item.name, imageContext.setItemStatus]);
 
     return (
         <TableRow
@@ -160,23 +161,30 @@ const MissingStorageItemRow = ({itemName, type, dbIssue = false, thumbIssue = fa
             </TableCell>
             <TableCell
                 component="th"
-                id={itemName}
+                id={item.name}
                 scope="row"
                 padding="none"
             >
-                <Chip color="error" variant="outlined" icon={<InsertPhotoIcon />} label={itemName} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
+                <Stack direction={'row'} sx={{alignItems: 'center'}}>
+                    <Chip color="error" variant="outlined" icon={<InsertPhotoIcon />} label={item.name} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
+                    {
+                        item.portfolio ?
+                        <StarIcon color="warning" sx={{ml: 0.5}} /> :
+                        null
+                    }
+                </Stack>
             </TableCell>
             {
                 !useImageKit && // No thumbnails
                 <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
-                    <ThumbIssueStatus itemName={itemName} error={thumbIssue} />
+                    <ThumbIssueStatus itemName={item.name} error={thumbIssue} />
                 </TableCell>
             }
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
-                <DatabaseIssueStatus itemName={itemName} type={type} error={dbIssue} />
+                <DatabaseIssueStatus itemName={item.name} type={type} error={dbIssue} />
             </TableCell>
             <TableCell align="left" sx={{paddingTop: 0, paddingBottom: 0}}>
-                <DataBasePropStatus name={itemName} fullPath={imageContext.getItemFullPath(itemName)} />
+                <DataBasePropStatus name={item.name} fullPath={imageContext.getItemFullPath(item.name)} />
             </TableCell>
         </TableRow>
     )

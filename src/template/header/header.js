@@ -8,13 +8,15 @@ import MenuIcon from '@mui/icons-material/Menu';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Slide from '@mui/material/Slide';
 import { FirebaseSignin } from 'components/firebase';
-import { useDarkMode } from 'components/theme';
+import { useDarkMode } from 'providers';
 import HeaderSearch from './search/search';
 import { useAppContext } from 'template/app/appContext';
 import { useCurrentPage } from 'components/hooks';
 
 import { gsap } from "gsap";
 import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(useGSAP);
 
 function HideOnScroll(props) {
     const { children } = props;

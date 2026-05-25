@@ -1,9 +1,10 @@
 import React from 'react';
-import { Chip, Collapse, IconButton } from '@mui/material';
+import { Chip, Collapse, IconButton, Stack } from '@mui/material';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import StarIcon from '@mui/icons-material/Star';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import RowSelector from './RowSelector';
 import DatabaseStatus from './itemStatus/DatabaseStatus';
@@ -82,17 +83,24 @@ const StorageFileRow = ({row, selected}) => {
                 scope="row"
                 padding="none"
             >
-                <Chip color={itemStatus} icon={<InsertPhotoIcon />} label={row.name} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
-                {
-                    <IconButton
-                        size="small"
-                        onClick={toggleExpanded}
-                        disabled={hasThumbs === false}
-                        sx={{ml: 1}}
-                    >
-                        {expanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                    </IconButton>
-                }
+                <Stack direction={'row'} sx={{alignItems: 'center'}}>
+                    <Chip color={itemStatus} icon={<InsertPhotoIcon />} label={row.name} sx={{paddingLeft: 1.5, paddingRight: 1.5}} />
+                    {
+                        <IconButton
+                            size="small"
+                            onClick={toggleExpanded}
+                            disabled={hasThumbs === false}
+                            sx={{ml: 1}}
+                        >
+                            {expanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                        </IconButton>
+                    }
+                    {
+                        imageFromDb.portfolio === true ?
+                        <StarIcon color="warning" sx={{ml: 0.5}} /> :
+                        null
+                    }
+                </Stack>
             </TableCell>
             {
                 !useImageKit &&

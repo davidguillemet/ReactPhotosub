@@ -29,12 +29,14 @@ import { HorizontalSpacing } from 'template/spacing';
 
 import {isMobile} from 'react-device-detect';
 
-import { gsap } from "gsap";
-import { useGSAP } from '@gsap/react';
-
 import useEmblaCarousel from 'embla-carousel-react';
 
 import './css/imageLoading.css';
+
+import { gsap } from "gsap";
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(useGSAP);
 
 const NavigationButton = styled(IconButton)(({ theme }) => ({
     position: 'absolute',

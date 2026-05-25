@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { useAuthContext } from '../authentication';
-import { useDataProvider } from '../dataProvider';
-import { useQueryContext } from '../queryContext';
+import { useAuthContext } from '../../components/authentication';
+import { useDataProvider } from '../../components/dataProvider';
+import { useQueryContext } from '../../components/queryContext';
 import FavoritesContext from './favoritesContext';
 
 const imagePath = (image) => `${image.path}/${image.name}`

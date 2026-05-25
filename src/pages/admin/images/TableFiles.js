@@ -17,21 +17,26 @@ const TableFiles = () => {
         const missingImagesFromDb = [];
         const isUploading = uploadContext.isUploading
         const getItemFullPath = imageContext.getItemFullPath
-        for (const itemName of imageContext.rows.missingFilesFromDb) {
-            if (!isUploading(getItemFullPath(itemName))) {
-                missingImagesFromDb.push(itemName);
+        for (const item of imageContext.rows.missingFilesFromDb) {
+            if (!isUploading(getItemFullPath(item.name))) {
+                missingImagesFromDb.push(item);
             }
         }
 
-        const allMissingImagesSet = new Set(missingImagesFromDb);
-        for (const itemName of imageContext.rows.missingFilesFromThumbs) {
-            if (!isUploading(getItemFullPath(itemName))) {
-                allMissingImagesSet.add(itemName);
-            }
-        }
+        //const allMissingImagesSet = new Set(missingImagesFromDb);
+        const allMissingImages = missingImagesFromDb; // We keep the array structure since we need the portfolio info for the status
 
-        const allMissingImagesArray = Array.from(allMissingImagesSet).sort();
-        setMissingStorageImages(allMissingImagesArray);
+        // We should never have missing files from thumbs since we are now using imageKit which does not create thumbnails,
+        // but we keep this code in case of future changes
+        // for (const itemName of imageContext.rows.missingFilesFromThumbs) {
+        //     if (!isUploading(getItemFullPath(itemName))) {
+        //         allMissingImagesSet.add(itemName);
+        //     }
+        // }
+
+        //const allMissingImagesArray = Array.from(allMissingImagesSet).sort();
+        // setMissingStorageImages(allMissingImagesArray);
+        setMissingStorageImages(allMissingImages);
     }, [
         uploadContext.isUploading,
         imageContext.getItemFullPath,
@@ -44,12 +49,12 @@ const TableFiles = () => {
     return (
         <React.Fragment>
         {
-            missingStorageImages.sort().map((image) => {
+            missingStorageImages.sort((i1, i2) => i1.name.localeCompare(i2.name)).map((image) => {
                 return <MissingStorageItemRow
-                            key={image}
-                            itemName={image}
+                            key={image.name}
+                            item={image}
                             type={ITEM_TYPE_FILE}
-                            dbIssue={imageContext.rows.missingFilesFromDb.has(image)}
+                            dbIssue={imageContext.rows.missingFilesFromDb.find((f) => f.name === image.name)}
                             thumbIssue={imageContext.rows.missingFilesFromThumbs.has(image)}
                         />
             })

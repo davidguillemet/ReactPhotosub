@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDarkMode } from 'components/theme';
+import { useDarkMode } from 'providers';
 import ReCAPTCHA from "react-google-recaptcha";
 
 const validateCaptcha = (_field, value) => {

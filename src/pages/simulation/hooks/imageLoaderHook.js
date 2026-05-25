@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
-import { uniqueID } from '../../../utils';
-import { useQueryContext } from '../../../components/queryContext';
+import { uniqueID } from 'utils';
+import { useQueryContext } from 'components/queryContext';
 import { useQueryClient } from '@tanstack/react-query';
-import { useReactQuery } from '../../../components/reactQuery';
+import { useReactQuery } from 'components/reactQuery';
+import { usePortfolio } from 'providers';
 
 export const LIST_HOME_SLIDESHOW = "list::slideshow";
 export const LIST_FAVORITES = "list::favorites";
@@ -13,13 +14,14 @@ const emptyArray = [];
 
 const useFetchSource = (listType, user, thenFunc) => {
 
+    const portfolioProvider = usePortfolio();
     const queryContext = useQueryContext();
-    const { data: defaultSelection } = useReactQuery(queryContext.useFetchDefaultSelection, [listType === LIST_HOME_SLIDESHOW, thenFunc]);
+
     const { data: favorites } = useReactQuery(queryContext.useFetchFavorites, [user && user.uid, listType === LIST_FAVORITES, thenFunc]);
     const { data: searchResult } = useReactQuery(queryContext.useFetchSearchResults, [listType === LIST_SEARCH, thenFunc]);
 
     switch (listType) {
-        case LIST_HOME_SLIDESHOW: return defaultSelection;
+        case LIST_HOME_SLIDESHOW: return portfolioProvider.portfolio;
         case LIST_FAVORITES: return favorites;
         case LIST_SEARCH: return searchResult;
         default: throw new Error(`Unexpected list type '${listType}'`)

@@ -53,9 +53,12 @@ const FinningListItem = ({caption, index}) => {
                     primary={caption}
                     slotProps={{
                         primary: {
-                            sx: {
-                                fontSize: '1.1rem !important'
-                            }
+                            sx: theme => ({
+                                fontSize: '1.1rem !important',
+                                [theme.breakpoints.down('sm')]: {
+                                    fontSize: '0.8rem !important',
+                                }
+                            })
                         }
                     }}
                 />

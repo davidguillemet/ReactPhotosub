@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'utils';
 import { useQueryContext } from 'components/queryContext';
 import Form, {
+    FIELD_TYPE_CHECK_BOX,
     FIELD_TYPE_TAGS_FIELD,
     FIELD_TYPE_TEXT,
 } from 'components/form';
@@ -24,6 +25,13 @@ function getFields(t) {
             type: FIELD_TYPE_TEXT,
             multiline: false,
             default: ""
+        },
+        {
+            id: "portfolio",
+            label: t("field:portfolio"),
+            required: false,
+            type: FIELD_TYPE_CHECK_BOX,
+            default: false
         },
         {
             id: "tags",

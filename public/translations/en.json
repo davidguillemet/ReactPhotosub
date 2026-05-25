@@ -39,7 +39,9 @@
             "enterNewPassword": "Enter your new password:",
             "resetPasswordSuccess": "Your password has been changed successfully.\nYou are now signed-in."
         },
-        "home": {},
+        "home": {
+            "btn:viewDestination": "View Destination"
+        },
         "contact": {
             "title": "To contact me",
             "field:name": "Your name",
@@ -246,6 +248,7 @@
                 "form": {
                     "field:titleFr": "Title in French",
                     "field:titleEn": "Title in English",
+                    "field:portfolio": "Portfolio Image",
                     "field:tags": "Tags",
                     "error:tags": "Please add tags that describe the image (location, species, color, etc).",
                     "btn:validate": "Validate",
@@ -356,7 +359,7 @@
             "toast:error": "An error occurred during the operation."
         },
         "form::authentication": {
-            "title": "Sign in with email",
+            "title": "Sign in",
             "subTitle:enterEmail": "Enter your email.",
             "subTitle:createAccount": "This email does not match any user account.\nEnter a name and a password to create an account.",
             "subTitle:login": "Enter your password.",
@@ -386,6 +389,8 @@
         "gallery": {
             "btn:addFavorite": "Add to favorites",
             "btn:deleteFavorite": "Remove from favorites",
+            "btn:addToPortfolio": "Add to portfolio",
+            "btn:deleteFromPortfolio": "Remove from portfolio",
             "lbl:groupImageCount": "{0} image(s)",
             "btn:stopSlideshow": "Stop slideshow",
             "btn:startSlideshow": "Start slideshow",

@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
@@ -12,65 +11,20 @@ import './styles.css';
 
 import { useLoaderData } from "react-router";
 
-import { getThumbnailSrc, useImageKit } from 'utils';
 import { useScrollBlock } from 'utils';
 import { useAppContext } from 'template/app/appContext';
 import { useFocusManager, useResizeObserver } from 'components/hooks';
 import { ReactRouterAwaiter } from 'components/reactRouter';
+import MainImage from './MainImage';
+import { DetailsProvider } from './useDetailsState';
 
 const _diaporamaInterval = 15000;
 const _transitionDuration = 2000;
 
-const MainImageStyled = styled('img')({
-    display: 'block',
-    minHeight: '100%',
-    minWidth : '100%',
-    width: 'auto',
-    height: 'auto',
-    objectFit: 'cover' // prevent image from shrinking when window width is too small
-});
-
-const _imageSizeRatio = 600 / 400; // always landscape
-
-const _defaultImageSrc = useImageKit ?
-    "photosub.appspot.com/home/DSC_0706-Modifier.jpg" :
-    "/home_initial.jpg";
-
-const MainImage = ({images, currentImageIndex, handleImageLoaded, width, height}) => {
-
-    // If the height is less than the image height which width is the available width, all is ok
-    // -> get the thumbnail with the same width as the available width
-    const availableWidth = width;
-    const availableHeight = height;
-
-    let thumbnailWidth = availableWidth;
-    const thumbnailHeight = thumbnailWidth / _imageSizeRatio;
-    if (thumbnailHeight < availableHeight) {
-        // Consider the image height and calculate the new thumbnail width
-        thumbnailWidth = availableHeight * _imageSizeRatio;
-    }
-
-    let originalImageSrc;
-
-    if (images !== null && currentImageIndex >= 0) {
-        const currentImage = images[currentImageIndex % images.length];
-        originalImageSrc = currentImage.src;
-    } else {
-        originalImageSrc = _defaultImageSrc;
-    }
-
-    const currentImageSrc = React.useMemo(() => getThumbnailSrc({
-        src: originalImageSrc,
-        sizeRatio: _imageSizeRatio
-    }, thumbnailWidth), [originalImageSrc, thumbnailWidth]);
-
-    return (
-        <MainImageStyled 
-            alt=""
-            onLoad={handleImageLoaded}
-            src={currentImageSrc}
-        />
-    )
+const filterLandscapeImages = (images) => {
+    return images.filter(image => {
+        return image.sizeRatio >= 1; // Keep only landscape or square images
+    });
 };
 
 const Home = ({images, currentIndex}) => {
@@ -83,10 +37,12 @@ const Home = ({images, currentIndex}) => {
     const [isPlaying, setIsPlaying] = useState(true);
     const { focus: onFocus } = useFocusManager();
 
+    const landscapeImages = React.useMemo(() => filterLandscapeImages(images), [images]);
+
     useEffect(() => {
-        const playing = !drawerOpen && !searchOpen && onFocus && images !== null && images.length > 1;
+        const playing = !drawerOpen && !searchOpen && onFocus && landscapeImages !== null && landscapeImages.length > 1;
         setIsPlaying(playing);
-    }, [drawerOpen, searchOpen, onFocus, images]);
+    }, [drawerOpen, searchOpen, onFocus, landscapeImages]);
 
     useEffect(() => {
         blockScroll();
@@ -108,9 +64,9 @@ const Home = ({images, currentIndex}) => {
     const handlePreviousImage = useCallback(() => {
         setCurrentImageIndex(prevIndex => {
             const newIndex = prevIndex - 1;
-            return newIndex >= 0 ? newIndex : (images.length - 1);
+            return newIndex >= 0 ? newIndex : (landscapeImages.length - 1);
         });
-    }, [images]);
+    }, [landscapeImages]);
 
     const stopSlideshow = useCallback(() => {
         if (typeof diaporamaTimeoutRef.current === 'number') {
@@ -118,7 +74,7 @@ const Home = ({images, currentIndex}) => {
         }
     }, []);
 
-    const handleImageLoaded = useCallback((event) => {
+    const handleImageLoaded = useCallback(() => {
         if (isPlaying) {
             clearTimeout(diaporamaTimeoutRef.current);
             diaporamaTimeoutRef.current = setTimeout(handleNextImage, _diaporamaInterval);
@@ -144,6 +100,7 @@ const Home = ({images, currentIndex}) => {
     }, [isPlaying, stopSlideshow, resumeSlideshow]);
 
     return (
+        <DetailsProvider>
         <Box
             ref={resizeObserver.ref}
             sx={{
@@ -179,7 +136,7 @@ const Home = ({images, currentIndex}) => {
                         }}
                     >
                         <MainImage
-                            images={images}
+                            images={landscapeImages}
                             currentImageIndex={currentImageIndex}
                             handleImageLoaded={handleImageLoaded}
                             width={resizeObserver.width}
@@ -194,7 +151,7 @@ const Home = ({images, currentIndex}) => {
                 left: 0,
                 width: '100%',
                 height: 5,
-                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                zIndex: (theme) => theme.zIndex.appBar + 1
             }}>
                 <Box
                     key={`${currentImageIndex}-${isPlaying}`}
@@ -250,14 +207,15 @@ const Home = ({images, currentIndex}) => {
                 </Stack>
             </Box>
         </Box>
+        </DetailsProvider>
     );
 }
-    
+
 const HomeController = () => {
     const { images } = useLoaderData();
     return (
         <ReactRouterAwaiter
-            value={images} 
+            value={images}
         >
             {images => <Home images={images} currentIndex={0} />}
         </ReactRouterAwaiter>

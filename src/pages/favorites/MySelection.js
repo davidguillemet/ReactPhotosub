@@ -6,7 +6,7 @@ import Gallery from '../../components/gallery';
 import { PageTitle, PageSubTitle } from '../../template/pageTypography';
 import { useQueryContext } from '../../components/queryContext';
 import { withLoading, buildLoadingState, withUser } from '../../components/hoc';
-import { useFavorites } from '../../components/favorites';
+import { useFavorites } from 'providers';
 import { useTranslation } from 'utils';
 import GroupBuilder from './groupBuilder';
 import UserSelection from './userSelection';

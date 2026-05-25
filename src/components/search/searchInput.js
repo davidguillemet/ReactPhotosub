@@ -14,13 +14,12 @@ import CircularProgress from '@mui/material/CircularProgress';
 import InputBase from '@mui/material/InputBase';
 import Chip from "@mui/material/Chip";
 
-import { gsap } from "gsap";
-import { useGSAP } from '@gsap/react';
-
 import { useTranslation, debounce } from 'utils';
 import { useStateWithDep } from '../hooks';
 import { useTheme } from '@mui/material/styles';
 
+import { gsap } from "gsap";
+import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(useGSAP);
 

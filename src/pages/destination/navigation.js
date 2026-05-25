@@ -20,7 +20,7 @@ import DestinationLink from 'components/destinationLink';
 import lazyComponent from 'components/lazyComponent';
 import { NoWrapAndEllipsis } from 'template/pageTypography';
 import { useResizeObserver } from 'components/hooks';
-import RegionPath from './regionPath';
+import RegionPath from 'components/regionPath';
 
 const MainImageStyled = styled('img')({
     display: 'block',
@@ -136,7 +136,7 @@ const NavigationItem = ({destination, type, caption}) => {
                         { formattedDate }
                     </Paragraph>
                     <RegionPath
-                        regions={destination.regionpath}
+                        destination={destination}
                         justifyContent={type === 'left' ? 'flex-start' : 'flex-end'}
                     />
                 </Stack>

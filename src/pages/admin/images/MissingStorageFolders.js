@@ -17,7 +17,7 @@ const MissingStorageFolders = () => {
             imageContext.rows.missingFolders.map((folder, index) => {
                 return <MissingStorageItemRow
                             key={folder.name}
-                            itemName={folder.name}
+                            item={folder}
                             type={ITEM_TYPE_FOLDER}
                             dbIssue={true}
                         />

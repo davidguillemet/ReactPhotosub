@@ -63,9 +63,9 @@ const getMissingImagesVersusDatabase = (files, imagesFromDatabase) => {
         const missingStorageImages = imagesFromDatabase.filter(dbImage => {
             return files.findIndex(storageImage => storageImage.name === dbImage.name) === -1;
         });
-        return missingStorageImages.map(image => image.name);
+        return missingStorageImages;
     } else {
-        return null;
+        return [];
     }
 };
 
@@ -221,13 +221,13 @@ export const ImageContextProvider = withLoading(({foldersFromDb, children}) => {
         }
 
         const missingImagesFromThumbs = new Set(getMissingImagesVersusThumbnails(rows.files, thumbs));
-        const missingImagesFromDatabase = new Set(getMissingImagesVersusDatabase(rows.files, dbImages));
+        const missingImagesFromDatabase = getMissingImagesVersusDatabase(rows.files, dbImages);
 
         setRows(prevRows => {
             return {
                 ...prevRows,
                 missingFilesFromThumbs: missingImagesFromThumbs,
-                missingFilesFromDb: missingImagesFromDatabase,
+                missingFilesFromDb: missingImagesFromDatabase, // Array of db images missing in storage (not just names because we need portfolio info for the status)
             }
         });
     }, [thumbs, dbImages, rows.files])

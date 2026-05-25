@@ -19,9 +19,6 @@ const getDestinationImages = async (queryClient, dataProvider, destinationPath) 
 };
 
 const destinationLoaderFactory = (queryClient, dataProvider) => async ({ request, params }) => {
-    // when migrating to react-router V7, just remove the defer and return the promise directly from the loader,
-    // react-router will automatically defer it and stream the response as the data is loaded,
-    // no need to use defer in the loader itself.
     const { year, title } = params;
     const destinationPath = `${year}/${title}`;
     return {

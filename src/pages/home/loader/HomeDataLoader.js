@@ -13,22 +13,29 @@ const processSlideshowData = async (data) => {
     return processedData;
 };
 
-const slideShowQuery = (dataProvider) => ({
-    queryKey: ['homeslideshow'],
-    queryFn: () => dataProvider.getImageDefaultSelection().then(processSlideshowData)
-});
+const slideShowQuery = async (dataProvider, firebaseProvider) => {
+    const portfolioEnabled = (await firebaseProvider.getConfigValue("portfolio_enabled")).asBoolean();
+    if (portfolioEnabled) {
+        return {
+            queryKey: ['portfolio'],
+            queryFn: () => dataProvider.getPortfolio()
+        };
+    } else {
+        return {
+            queryKey: ['homeslideshow'],
+            queryFn: () => dataProvider.getImageDefaultSelection().then(processSlideshowData)
+        };
+    }
+};
 
-const getSlideshowImages = async (queryClient, dataProvider) => {
-    const query = slideShowQuery(dataProvider);
+const getSlideshowImages = async (queryClient, dataProvider, firebaseProvider) => {
+    const query = await slideShowQuery(dataProvider, firebaseProvider);
     return queryClient.ensureQueryData(query);
 }
 
-const SlideshowLoader = (queryClient, dataProvider) => async ({ request, params }) => {
-    // when migrating to react-router V7, just remove the defer and return the promise directly from the loader,
-    // react-router will automatically defer it and stream the response as the data is loaded,
-    // no need to use defer in the loader itself. 
+const SlideshowLoader = (queryClient, dataProvider, firebaseProvider) => async ({ request, params }) => {
     return {
-        images: getSlideshowImages(queryClient, dataProvider)
+        images: getSlideshowImages(queryClient, dataProvider, firebaseProvider)
     };
 };
 

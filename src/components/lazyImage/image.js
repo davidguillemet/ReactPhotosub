@@ -3,11 +3,14 @@ import { gsap } from "gsap";
 import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import FavoriteButton from '../gallery/favoriteButton';
+import PortfolioButton from '../gallery/portfolioButton';
 import { getThumbnailSrc } from '../../utils';
 import { useVisible } from '../hooks';
 import { styled } from '@mui/material/styles';
 import ImageDescription from '../imageDescription';
 import {isMobile} from 'react-device-detect';
+import { Stack } from '@mui/material';
+import { useAuthContext } from '../authentication';
 
 const Image = styled('img')(({ theme }) => ({ }));
 
@@ -63,6 +66,7 @@ const LazyImage = ({
     const loaded = useRef(false);
     const container = useRef();
     const selector = gsap.utils.selector(container);
+    const authContext = useAuthContext();
 
     useEffect(() => {
         if (isVisible === true) {
@@ -165,15 +169,26 @@ const LazyImage = ({
 
             {
                 withFavorite && 
-                <FavoriteButton
-                    image={image}
-                    size={isMobile ? 'small' : 'large'}
-                    style={{
-                        position: "absolute",
-                        bottom: 0,
-                        right: 0
-                    }}
-                />
+                <Stack direction="row" sx={{
+                    position: "absolute",
+                    bottom: 0,
+                    right: 0,
+                    alignItems: "center"
+                }}>
+                    {
+                        // Portfolio button is only visible for admins
+                        authContext.admin &&
+                        <PortfolioButton
+                            image={image}
+                            size={isMobile ? 'small' : 'large'}
+                        />
+                    }
+                    <FavoriteButton
+                        image={image}
+                        size={isMobile ? 'small' : 'large'}
+                    />
+
+                </Stack>
             }
         </Box>
     );

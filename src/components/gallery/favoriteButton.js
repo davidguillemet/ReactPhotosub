@@ -9,7 +9,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined';
 import TooltipIconButton from '../tooltipIconButton';
 import { useAuthContext } from '../authentication';
 import './css/favorites.css';
-import { useFavorites } from '../favorites';
+import { useFavorites } from 'providers';
 import { useTranslation } from 'utils';
 import { useGalleryContext } from './galleryContext';
 

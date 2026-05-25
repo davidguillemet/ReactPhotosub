@@ -27,7 +27,7 @@ import { PublicationAlert } from 'components/publication';
 import DestinationAdminTools from './admin/DestinationAdminTools';
 import { ReactRouterAwaiter } from 'components/reactRouter';
 import Navigation from './navigation';
-import RegionPath from './regionPath';
+import RegionPath from 'components/regionPath';
 
 const DestinationDetails = ({destination}) => {
 
@@ -63,7 +63,7 @@ const DestinationDetails = ({destination}) => {
             <HelmetDestination destination={destination} />
             <PageSubTitle component="h1" sx={{m: 0, whiteSpace: "nowrap", fontWeight: 300}}>{destinationTitle(destination, language)}</PageSubTitle>
             <Paragraph sx={{m: 0}}>{formattedDate}</Paragraph>
-            <RegionPath regions={destination.regionpath}></RegionPath>
+            <RegionPath destination={destination}></RegionPath>
             {
                 destination.link &&
                 <Chip color="primary" size="small" label={destination.location} component="a" href={destination.link} clickable target="_blank" />

@@ -1,1 +1,2 @@
-export { default } from './themeProvider';
+export * from './deepOceanTheme';
+export * from './lightTheme';

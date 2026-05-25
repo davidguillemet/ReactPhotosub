@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { parseImageDescription, useLanguage } from '../../utils';
-import { VerticalSpacing } from 'template/spacing';
+import { parseImageDescription, useLanguage } from 'utils';
 import IconButton from '@mui/material/IconButton';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
@@ -105,12 +104,9 @@ const ImageDescription = ({ image, withNavigation = true}) => {
                 {
                     // The title/description might contain only a caption without any scientific name (Xxx xxx)
                     description[descriptionIndex].scientific &&
-                    <React.Fragment>
-                        <VerticalSpacing factor={1} />
-                        <Typography variant="subtitle2" sx={{ m: 0, lineHeight: 1.25, fontStyle: 'italic', color: 'white'}}>
-                            { `(${description[descriptionIndex].scientific})` }
-                        </Typography>
-                    </React.Fragment>
+                    <Typography variant="subtitle2" sx={{ m: 0, lineHeight: 1.25, fontStyle: 'italic', color: 'white'}}>
+                        { `(${description[descriptionIndex].scientific})` }
+                    </Typography>
                 }
             </Stack>
             {

@@ -5,10 +5,10 @@ import 'fontsource-roboto/100.css';
 import 'fontsource-roboto/300.css';
 import 'fontsource-roboto/400.css';
 
-const TitleTypography = ({children, ...other}) => (<Typography variant="h2" component="h1" {...other}>{children}</Typography>);
-const SubTitleTypography = ({children, ...other}) => (<Typography variant="h3" component="h2" {...other}>{children}</Typography>);
-const HeaderTypography = ({children, ...other}) => (<Typography variant="h4" {...other}>{children}</Typography>);
-const ParagraphTypography = ({children, ...other}) => (<Typography variant="h6" {...other}>{children}</Typography>);
+const TitleTypography = ({children, ...other}) => (<Typography variant="h1" {...other}>{children}</Typography>);
+const SubTitleTypography = ({children, ...other}) => (<Typography variant="h2" {...other}>{children}</Typography>);
+const HeaderTypography = ({children, ...other}) => (<Typography variant="h3" {...other}>{children}</Typography>);
+const ParagraphTypography = ({children, ...other}) => (<Typography variant="body1" {...other}>{children}</Typography>);
 const BodyTypography = ({children, ...other}) => (<Typography variant="body1" {...other}>{children}</Typography>);
 
 export const Anchor = ({name = "section", index}) => (

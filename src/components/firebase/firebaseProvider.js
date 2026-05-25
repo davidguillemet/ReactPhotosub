@@ -1,5 +1,7 @@
 import React from 'react';
 import { initializeApp } from "firebase/app"
+import { getRemoteConfig, getValue, fetchAndActivate } from "firebase/remote-config";
+
 import {
     applyActionCode,
     getAuth,
@@ -38,6 +40,33 @@ const firebaseApp = initializeApp({
 });
 
 const isDev = process.env.NODE_ENV === "development";
+
+const remoteConfig = getRemoteConfig(firebaseApp);
+// Set the minimum fetch interval to 30s for development to allow immediate reflection of changes in the Firebase console, and to 10mn for production to optimize performance and reduce costs. See https://firebase.google.com/docs/remote-config/use-config-web#fetch_and_activate_values for more details.
+remoteConfig.settings.minimumFetchIntervalMillis = isDev ? 30000 : 600000;
+remoteConfig.defaultConfig = {
+    "portfolio_enabled": isDev ? "true" : "false"
+};
+
+let configFetched = false;
+let configFetchPromise = null;
+
+const ensureConfigFetched = () => {
+    // In dev, skip the fetch so defaultConfig values are always used — the Firebase console
+    // value would override them otherwise, making dev/prod behave identically.
+    // In prod, fetch once and cache the result; concurrent callers await the same promise
+    // to avoid duplicate requests. On fetch error, fall back silently to defaultConfig.
+    if (isDev || configFetched) return Promise.resolve();
+    if (!configFetchPromise) {
+        configFetchPromise = fetchAndActivate(remoteConfig)
+            .catch(() => {})
+            .finally(() => {
+                configFetched = true;
+                configFetchPromise = null;
+            });
+    }
+    return configFetchPromise;
+};
 
 const firebaseAuth = getAuth(firebaseApp);
 const firebaseStorage = getStorage(firebaseApp);
@@ -117,7 +146,11 @@ const FirebaseProvider = ({children}) => {
             () => { } : // Empty function on dev context 
             (event, properties) => {
                 logEvent(firebaseAnalytics, event, properties);
-            } 
+            },
+        getConfigValue: async (key) => {
+            await ensureConfigFetched();
+            return getValue(remoteConfig, key);
+        }
     });
 
     return (

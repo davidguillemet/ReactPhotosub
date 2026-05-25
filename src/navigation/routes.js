@@ -18,7 +18,8 @@ import ErrorAlert from 'components/error';
 
 import actionFactory from "./ActionFactory";
 
-export const HomePath = "/";
+export const APP_ROUTE_PATH = "/";
+export const HomePath = "/home";
 export const DestinationsPath = "/destinations";
 export const SearchPath = "/search";
 export const FinningPath = "/finning";
@@ -44,7 +45,7 @@ const fixedWidthComponent = (Component, maxWidth) => () => {
     );
 };
 
-function lazyLoader(route, queryClient, dataProvider) {
+function lazyLoader(route, queryClient, dataProvider, firebaseProvider) {
     const { page, fullWidth, maxWidth } = route;
     return async () => {
         const [PageModule, Helmet] = await Promise.all([
@@ -56,15 +57,19 @@ function lazyLoader(route, queryClient, dataProvider) {
         const FinalComponent = fullWidth ? Component : fixedWidthComponent(Component, maxWidth);
         return {
             Component: () => {
-                return (
-                    <React.Fragment>
-                         <HelmetFull route={route} />
-                         <FinalComponent />
-                    </React.Fragment>
-                );
+                if (route.useHelmet === false) {
+                    return <FinalComponent />
+                } else {
+                    return (
+                        <React.Fragment>
+                            <HelmetFull route={route} />
+                            <FinalComponent />
+                        </React.Fragment>
+                    );
+                }
             },
-            loader: loaderFactory ? loaderFactory(queryClient, dataProvider) : null,
-            action: actionProperties ? actionFactory(queryClient, dataProvider, actionProperties) : null,
+            loader: loaderFactory ? loaderFactory(queryClient, dataProvider, firebaseProvider) : null,
+            action: actionProperties ? actionFactory(queryClient, dataProvider, actionProperties, firebaseProvider) : null,
             errorElement: <ErrorAlert/>
         };
     };
@@ -178,7 +183,7 @@ export const routes = [
     }
 ];
 
-export const buildRoutes = (queryClient, dataProvider) => routes.map(route => {
+export const buildRoute = (route, queryClient, dataProvider, firebaseProvider) => {
     return {
         ...route,
         // TODO: separate loader and lazy
@@ -186,9 +191,11 @@ export const buildRoutes = (queryClient, dataProvider) => routes.map(route => {
         // see https://remix.run/blog/lazy-loading-routes
         // loader: ...,
         // action: ...,
-        lazy: lazyLoader(route, queryClient, dataProvider)
+        lazy: lazyLoader(route, queryClient, dataProvider, firebaseProvider)
     }
-});
+};
+
+export const buildRoutes = (queryClient, dataProvider, firebaseProvider) => routes.map(route => buildRoute(route, queryClient, dataProvider, firebaseProvider));
 
 export const NavigationLink = styled(NavLink)(
     ({theme}) => ({
