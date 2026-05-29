@@ -9,6 +9,15 @@
 //   - Typo tolerance: each keyword token may differ from a destination word by a
 //     few edits (Levenshtein), so "califronie" still matches "californie".
 
+// How to use in Destinations.js
+// const filterDestinationsByKeyword = (destinations) => {
+//   if (!keywordFilterSet || keywordFilterSet.size === 0) {
+//      return destinations;
+//   }
+//   return destinations.filter(destination => matchDestination(destination, keywordFilterSet));
+// };
+
+
 const norm = (s) =>
     (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 
