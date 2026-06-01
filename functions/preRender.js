@@ -86,6 +86,8 @@ module.exports = function(pool, firebaseConfig) {
                 .replace(/__META_TITLE__/g, description)
                 .replace(/__META_DESCRIPTION__/g, description)
                 .replace(/__META_IMAGE__/g, imageUrl);
+            // For update notification:
+            // res.set('Cache-Control', 'no-cache, max-age=0, must-revalidate');
             return res.send(htmlData);
         });
     });
