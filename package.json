@@ -40,7 +40,7 @@
     "build": "react-scripts build",
     "firebase": "firebase emulators:start --only hosting,functions",
     "build4Firebase": "mv .env.production.local .env.tmp && react-scripts build && mv .env.tmp .env.production.local && mkdir -p functions/web && mv build/index.html functions/web/index.html",
-    "build4deploy": "mv .env.production.local .env.tmp && GENERATE_SOURCEMAP=false react-scripts build && mv .env.tmp .env.production.local && mkdir -p functions/web && mv build/index.html functions/web/index.html",
+    "build4deploy": "mv .env.production.local .env.tmp && REACT_APP_VERSION=$(git rev-parse --short HEAD) GENERATE_SOURCEMAP=false react-scripts build && node scripts/generate-version.js && mv .env.tmp .env.production.local && mkdir -p functions/web && mv build/index.html functions/web/index.html",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "i18n": "node scripts/i18n-cli.js",

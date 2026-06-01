@@ -47,9 +47,30 @@ const fixedWidthComponent = (Component, maxWidth) => () => {
     );
 };
 
+// Reload once when a dynamic import fails — almost always a stale chunk after a
+// deploy. The timestamp guard prevents an infinite reload loop if the chunk is
+// genuinely missing rather than just outdated.
+async function loadChunksWithReload(factory) {
+    try {
+        return await factory();
+    } catch (err) {
+        const KEY = 'chunk-reload-ts';
+        const last = Number(sessionStorage.getItem(KEY) || 0);
+        if (Date.now() - last > 10000) {
+            sessionStorage.setItem(KEY, String(Date.now()));
+            window.location.reload();
+            return new Promise(() => {}); // never resolves; we're reloading away
+        }
+        throw err; // already retried recently — let an error boundary handle it
+    }
+}
 function lazyLoader(route, queryClient, dataProvider, firebaseProvider) {
     const { page, fullWidth, maxWidth } = route;
     return async () => {
+        // const [PageModule, Helmet] = await loadChunksWithReload(() => Promise.all([
+        //     import("pages/" + page),
+        //     import("template/seo"),
+        // ]));
         const [PageModule, Helmet] = await Promise.all([
             import("pages/" + page),
             import("template/seo"),
