@@ -57,7 +57,6 @@ const Admin = () => {
     return (
         <React.Fragment>
             <PageTitle>{t("title")}</PageTitle>
-            <VerticalSpacing factor={2} />
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs
                     value={tabIndex}

@@ -10,6 +10,7 @@ import MailOutlineIcon from '@mui/icons-material/MailOutlined';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import SvgIcon from '@mui/material/SvgIcon';
+import CollectionsIcon from '@mui/icons-material/Collections';
 
 import { styled } from '@mui/material/styles';
 import React from "react";
@@ -31,6 +32,7 @@ export const ProfilPath = "/profil";
 export const DestinationPath = "/destinations/:year/:title";
 export const AdminPath = "/admin";
 export const AccountManagementPath = "/auth/action";
+export const PortfolioPath = "/portfolio";
 
 export const ROUTES_NAMESPACE = "menu";
 
@@ -85,6 +87,15 @@ export const routes = [
         icon: <HomeIcon />,
         sidebar: true,
         description: null
+    },
+    {
+        label: "portfolio",
+        path: PortfolioPath,
+        page: "portfolio",
+        fullWidth: true,
+        icon: <CollectionsIcon />,
+        private: true,
+        admin: true
     },
     {
         label: "destinations",

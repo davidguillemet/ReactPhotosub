@@ -152,16 +152,17 @@ export const deepOceanTheme = createTheme({
         // clamp() values are moved to MuiTypography styleOverrides to avoid
         // MUI's internal pxToRem() producing invalid rem values on non-numeric strings.
         h1: {
-            fontFamily: '"Roboto", Georgia, serif',
-            fontWeight: 300,
+            fontFamily: '"Roboto", Georgia, serif', //'"Open Sans", sans-serif',
+            fontWeight: 200,
             fontSize: 'clamp(1.5rem, 6.5vw, 3rem)',
             lineHeight: 0.95,
-            letterSpacing: '-0.02em',
+            letterSpacing: '0.05em', //'-0.02em',
             color: tokens.ink,
+            textTransform: "uppercase"
         },
         h2: {
             fontFamily: '"Roboto", Georgia, serif',
-            fontWeight: 300,
+            fontWeight: 200,
             fontSize: 'clamp(1.35rem, 6vw, 2.5rem)', // '3.5rem',
             lineHeight: 1.0,
             letterSpacing: '-0.02em',
@@ -169,11 +170,11 @@ export const deepOceanTheme = createTheme({
         },
         h3: {
             fontFamily: '"Roboto", Georgia, serif',
-            fontWeight: 400,
+            fontWeight: 200,
             fontSize: 'clamp(1.25rem, 2.5vw, 2.1rem)',
             lineHeight: 1.1,
             letterSpacing: '-0.01em',
-            color: tokens.ink,
+            color: tokens.ink
         },
         h4: {
             fontFamily: '"Roboto", Georgia, serif',

@@ -121,6 +121,30 @@ DataProvider.prototype.getPortfolio = function() {
         return response.data;
     });
 };
+DataProvider.prototype.getPortfolioCategories = function() {
+    return this.axios.get('/portfolio/categories')
+    .then(response => {
+        return response.data;
+    });
+};
+DataProvider.prototype.createPortfolioCategory = function(newCategory) {
+    return this.axios.post('/admin/portfolio/categories', newCategory)
+    .then(response => {
+        return response.data; // Returns the new category including new generated id
+    })
+}
+DataProvider.prototype.updatePortfolioCategory = function(category) {
+    return this.axios.put('/admin/portfolio/categories', category)
+    .then(response => {
+        return response.data;
+    })
+}
+DataProvider.prototype.deletePortfolioCategory = function(category) {
+    return this.axios.delete('/admin/portfolio/categories', {data: { category } })
+    .then(response => {
+        return response.data; // Should be empty
+    })
+}
 
 DataProvider.prototype.addToPortfolio = function(imageIds) {
     return this.axios.post('/admin/portfolio', { imageIds })

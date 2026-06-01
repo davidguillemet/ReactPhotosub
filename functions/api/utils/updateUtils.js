@@ -1,6 +1,7 @@
 module.exports = function(config) {
     const TABLE_DESTINATIONS = "destinations";
     const TABLE_SUB_GALLERIES = "sub_galleries";
+    const TABLE_PORTFOLIO_CATEGORIES = "portfolioCategories";
 
     const getPropsToUpdate = (element, databaseColumns) => {
         const elementUpdate = {};
@@ -22,8 +23,14 @@ module.exports = function(config) {
         return getPropsToUpdate(element, subGalleryColumns);
     };
 
+    const getPortfolioCategoriesPropsToUpdate = async (element) => {
+        const portfolioCategoriesColumns = await config.getTableColumns(TABLE_PORTFOLIO_CATEGORIES);
+        return getPropsToUpdate(element, portfolioCategoriesColumns);
+    };
+
     return {
         getDestinationPropsToUpdate,
         getSubGalleryPropsToUpdate,
+        getPortfolioCategoriesPropsToUpdate,
     };
 };

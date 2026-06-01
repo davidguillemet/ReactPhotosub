@@ -1,6 +1,7 @@
 {
     "menu": {
         "home": "Home",
+        "portfolio": "Portfolio",
         "destinations": "Destinations",
         "destination": "Destination",
         "search": "Search",
@@ -43,7 +44,7 @@
             "btn:viewDestination": "View Destination"
         },
         "contact": {
-            "title": "To contact me",
+            "title": "Contact",
             "field:name": "Your name",
             "error:name": "Please enter your name.",
             "field:email": "Your email address",
@@ -66,7 +67,7 @@
             "relatedDestinations": "Related destinations"
         },
         "destinations": {
-            "title": "All destinations",
+            "title": "Destinations",
             "count": "{0} Destination(s)",
             "filterByRegions": "Filter by regions",
             "noRegion": "No region...",
@@ -122,6 +123,39 @@
                 "field:label": "User selection",
                 "field:error": "Please select a user.",
                 "text:intro": "To view another user's selection:"
+            }
+        },
+        "portfolio": {
+            "title": "Portfolio",
+            "info:emptyPortfolio": "The portfolio is empty.",
+            "info:favoritesDeleted": "{0} image(s) removed from portfolio",
+            "info:portfolioImagesDeleted": "{0} image(s) removed from portfolio",
+            "btn:cancelDeletion": "Undo",
+            "groupBy:category": "By category",
+            "groupBy:destination": "By destination",
+            "groupBy:date": "By date",
+            "groupBy:none": "No grouping",
+            "groupLabel:category": "All categories",
+            "groupLabel:destination": "All destinations",
+            "groupLabel:date": "All dates",
+            "cat:sharks": "Sharks",
+            "cat:mollusc": "Molluscs",
+            "cat:shrimp": "Shrimps",
+            "cat:frogfish": "Frogfish",
+            "cat:other": "Others",
+            "admin": {
+                "field:key": "Key",
+                "error:title": "The key is required.",
+                "field:caption": "Caption",
+                "btn:validate": "Validate",
+                "success:saved": "Category saved.",
+                "btn:addCategory": "Add category",
+                "dlg:createCategory": "Create category",
+                "dlg:editCategory": "Edit category",
+                "title:confirmRemove": "Remove category",
+                "confirmRemove": "Do you confirm the deletion of the category '{0}'?",
+                "warningConfirmRemove": "Please note, this action is irreversible.",
+                "success:catDeleted": "The category '{0}' has been deleted."
             }
         },
         "finning": {

@@ -169,6 +169,10 @@ export function getThumbnailSrc(image, containerWidth, containerHeight) {
     if (!image) {
         return null;
     }
+    if (image.src && image.src.startsWith("/")) {
+        // Local asset
+        return image.src;
+    }
     let actualWidth = containerWidth;
     let longestEdge = actualWidth;
     if (image.sizeRatio !== undefined) {
@@ -186,7 +190,7 @@ export function getThumbnailSrc(image, containerWidth, containerHeight) {
         }
 
         // Update longest edge
-        if (image.sizeRatio > 1) {
+        if (isLandscape(image)) {
             // Landscape -> longest edge = width
             longestEdge = actualWidth;
         } else {
@@ -219,4 +223,8 @@ export function clearThumbnailSrc(image) {
         delete image[sizeSpec.propertyName];
     }
     return image;
+}
+
+export function isLandscape(image) {
+    return image.sizeRatio >= 1;
 }

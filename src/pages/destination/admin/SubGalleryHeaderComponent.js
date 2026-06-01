@@ -63,6 +63,8 @@ export const SubGalleryHeaderComponent = ({ group }) => {
         }; 
         fetcherSubmit(deletePayload).then(() => {
             toast.success(t("success:deleted"));
+        }).catch(e => {
+            toast.error(e.message);
         });
     }, [group, galleryContext.destination, fetcherSubmit, toast, t]);
 

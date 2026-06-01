@@ -4,6 +4,20 @@ const PortfolioContext = React.createContext(null);
 
 export const PortfolioProvider = ({ portfolio, children }) => {
 
+    const portfolioObservers = React.useRef([]);
+
+    const subscribe = React.useCallback((fn) => {
+        portfolioObservers.current.push(fn);
+    }, []);
+
+    const unsubscribe = React.useCallback((fn) => {
+        portfolioObservers.current = portfolioObservers.current.filter(observer => observer !== fn);
+    }, []);
+
+    const notifyObservers = React.useCallback((idArray, action) => {
+        portfolioObservers.current.forEach(observer => observer(idArray, action));
+    }, []);
+
     const portfolioContextValue = React.useMemo(() => {
         const portFolioMap = new Map();
         if (portfolio) {
@@ -12,12 +26,13 @@ export const PortfolioProvider = ({ portfolio, children }) => {
             });
         }
         return {
-            isInPortfolio: (image) => {
-                return portFolioMap.has(image.id);
-            },
-            portfolio
+            isInPortfolio: (image) => portFolioMap.has(image.id),
+            portfolio,
+            subscribe,
+            unsubscribe,
+            notifyObservers
         }
-    }, [portfolio]);
+    }, [portfolio, subscribe, unsubscribe, notifyObservers]);
 
     return (
         <PortfolioContext.Provider value={portfolioContextValue}>

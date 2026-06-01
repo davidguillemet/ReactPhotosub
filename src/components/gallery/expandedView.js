@@ -23,6 +23,7 @@ import ImageSlider from '../imageSlider';
 import ImageInfo from './imageInfo';
 import { useResizeObserver } from 'components/hooks';
 import { useScrollBlock, openFullscreen, closeFullscreen } from 'utils';
+import { useAuthContext } from 'components/authentication';
 
 import TooltipIconButton from 'components/tooltipIconButton';
 import { HorizontalSpacing } from 'template/spacing';
@@ -35,6 +36,7 @@ import './css/imageLoading.css';
 
 import { gsap } from "gsap";
 import { useGSAP } from '@gsap/react';
+import PortfolioButton from './portfolioButton';
 
 gsap.registerPlugin(useGSAP);
 
@@ -251,6 +253,7 @@ const ExpandedView = React.forwardRef(({
     onNextPage = null}, ref) => {
 
     const t = useTranslation("components.gallery");
+    const authContext = useAuthContext();
     const { language } = useLanguage();
     const [currentIndex, setCurrentIndex] = useState(index);
     const [infoVisible, setInfoVisible] = useState(false);
@@ -528,6 +531,8 @@ const ExpandedView = React.forwardRef(({
                             }
                         </TooltipIconButton>
                         <FavoriteButton size={toolbarIconSize} image={currentImage} />
+                        {/* Portfolio button is only shown if the user is an admin */}
+                        { authContext.admin && <PortfolioButton size={toolbarIconSize} image={currentImage} /> }
                         <TooltipIconButton
                             tooltip={fullScreen ? t("btn:exitFullScreen") : t("btn:enterFullScreen")}
                             onClick={fullScreen ? handleClickExitFullScreen : handleClickFullScreen}

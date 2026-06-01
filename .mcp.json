@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "firebase": {
+      "type": "stdio",
+      "command": "/usr/local/bin/node",
+      "args": [
+        "/usr/local/bin/firebase",
+        "experimental:mcp"
+      ],
+      "env": {
+        "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    }
+  }
+}

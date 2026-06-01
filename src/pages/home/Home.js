@@ -11,7 +11,7 @@ import './styles.css';
 
 import { useLoaderData } from "react-router";
 
-import { useScrollBlock } from 'utils';
+import { useScrollBlock, isLandscape } from 'utils';
 import { useAppContext } from 'template/app/appContext';
 import { useFocusManager, useResizeObserver } from 'components/hooks';
 import { ReactRouterAwaiter } from 'components/reactRouter';
@@ -22,9 +22,7 @@ const _diaporamaInterval = 15000;
 const _transitionDuration = 2000;
 
 const filterLandscapeImages = (images) => {
-    return images.filter(image => {
-        return image.sizeRatio >= 1; // Keep only landscape or square images
-    });
+    return images.filter(isLandscape);
 };
 
 const Home = ({images, currentIndex}) => {

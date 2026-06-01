@@ -3,62 +3,68 @@ import { styled } from '@mui/material/styles';
 import { Fab } from "@mui/material";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
 import useFormDialog from 'dialogs/FormDialog';
-import DestinationForm from './DestinationForm';
-import { useTranslation, destinationTitle } from 'utils';
+import CategoryForm from './CategoryForm';
+import { useTranslation } from 'utils';
 import ConfirmDialog from 'dialogs/ConfirmDialog';
 import { useAuthContext } from 'components/authentication';
 import { useAsyncFetcher } from 'components/reactRouter';
-import { DESTINATION_INTENT_DELETE } from 'utils/destinations';
+import { PORTFOLIO_CATEGORY_INTENT_DELETE } from 'utils/portfolio';
 import { useToast } from 'components/notifications';
 
 const Div = styled('div')(() => {});
 
+// Same Component as useAdminActions from destinations' page
+// What could we do to make things in common?
 export default function useAdminActions() {
 
-    const { toast } = useToast();
-    const t = useTranslation("pages.destinations");
+    const t = useTranslation("pages.portfolio.admin");
     const authContext = useAuthContext();
+    const { toast } = useToast();
 
-    const [destinationToEdit, setDestinationToEdit] = React.useState(null);
+    const [categoryToEdit, setCategoryToEdit] = React.useState(null);
     const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
     const { dialogProps, openDialog, FormDialog } = useFormDialog();
 
     const { submit: fetcherSubmit } = useAsyncFetcher("subGalleryForm");
 
-    const onNewDestination = React.useCallback(() => {
-        setDestinationToEdit(null);
+    const onNewCategory = React.useCallback(() => {
+        setCategoryToEdit(null);
         openDialog();
     }, [openDialog]);
 
-    const onEditDestination = React.useCallback((destination) => {
-        setDestinationToEdit(destination);
+    const onEditCategory = React.useCallback((category) => {
+        setCategoryToEdit(category);
         openDialog();
     }, [openDialog]);
 
-    const onClickDeleteDestination = React.useCallback((destination) => {
-        setDestinationToEdit(destination);
+    const onClickDeleteCategory = React.useCallback((category) => {
+        setCategoryToEdit(category);
         setConfirmDeleteOpen(true);
     }, []);
 
-    const onDeleteDestination = React.useCallback(() => {
+    const onDeleteCategory = React.useCallback(() => {
         const deletePayload = {
-            ...destinationToEdit,
-            intent: DESTINATION_INTENT_DELETE
+            ...categoryToEdit,
+            intent: PORTFOLIO_CATEGORY_INTENT_DELETE
         };
-        return fetcherSubmit(deletePayload).catch(e => toast.error(e.message));
-    }, [fetcherSubmit, destinationToEdit, toast]);
+        fetcherSubmit(deletePayload).then((data) => {
+            toast.success(t("success:catDeleted", categoryToEdit.key));
+        }).catch(e => {
+            toast.error(e.message);
+        });
+    }, [fetcherSubmit, categoryToEdit, toast, t]);
 
-    const onCloseDestinationEditor = React.useCallback(() => {
-        setDestinationToEdit(null);
+    const onCloseCategoryEditor = React.useCallback(() => {
+        setCategoryToEdit(null);
     }, []);
 
     const AdminActionsComponent = React.useMemo(() => {
 
         const getDialogTitle = () => {
-            if (destinationToEdit === null) {
-                return t("title:newDestination")
+            if (categoryToEdit === null) {
+                return t("dlg:createCategory")
             } else {
-                return t("title:editDestination")
+                return t("dlg:editCategory")
             }
         };
 
@@ -68,21 +74,21 @@ export default function useAdminActions() {
                     <React.Fragment>
 
                         <FormDialog title={getDialogTitle()} {...dialogProps}>
-                            <DestinationForm
-                                destination={destinationToEdit}
-                                onCancel={onCloseDestinationEditor}
+                            <CategoryForm
+                                category={categoryToEdit}
+                                onCancel={onCloseCategoryEditor}
                             />
                         </FormDialog>
 
                         {
-                            destinationToEdit &&
+                            categoryToEdit &&
                             <ConfirmDialog
                                 open={confirmDeleteOpen}
                                 onOpenChanged={setConfirmDeleteOpen}
-                                onValidate={onDeleteDestination}
+                                onValidate={onDeleteCategory}
                                 title={t("title:confirmRemove")}
                                 dialogContent={[
-                                    t("confirmRemove", destinationTitle(destinationToEdit, t.language)),
+                                    t("confirmRemove", categoryToEdit.key),
                                     t("warningConfirmRemove")
                                 ]}
                             />
@@ -96,9 +102,9 @@ export default function useAdminActions() {
                                 zIndex: (theme) => theme.zIndex.drawer
                             }}
                         >
-                            <Fab onClick={onNewDestination} variant="extended">
+                            <Fab onClick={onNewCategory} variant="extended">
                                 <AddCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
-                                Ajouter une destination
+                                {t("btn:addCategory")}
                             </Fab>
                         </Div>
 
@@ -112,17 +118,17 @@ export default function useAdminActions() {
     }, [
         t,
         confirmDeleteOpen,
-        destinationToEdit,
+        categoryToEdit,
         dialogProps,
-        onDeleteDestination,
-        onNewDestination,
-        onCloseDestinationEditor,
+        onDeleteCategory,
+        onNewCategory,
+        onCloseCategoryEditor,
         authContext.admin
     ]);
 
     return {
         AdminActions: AdminActionsComponent,
-        onEditDestination,
-        onClickDeleteDestination
+        onEditCategory,
+        onClickDeleteCategory
     };
 };

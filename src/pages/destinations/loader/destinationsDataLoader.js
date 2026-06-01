@@ -10,7 +10,7 @@ const getDestinations = async (queryClient, dataProvider) => {
 };
 
 const destinationsLoaderFactory = (queryClient, dataProvider) => async ({ request, params }) => {
-    return{
+    return {
         destinations: getDestinations(queryClient, dataProvider)
     };
 };

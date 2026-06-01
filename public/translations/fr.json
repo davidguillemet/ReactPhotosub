@@ -1,6 +1,7 @@
 {
     "menu": {
         "home": "Accueil",
+        "portfolio": "Portfolio",
         "destinations": "Destinations",
         "destination": "Destination",
         "search": "Recherche",
@@ -43,7 +44,7 @@
             "btn:viewDestination": "Voir la destination"
         },
         "contact": {
-            "title": "Pour me contacter",
+            "title": "Contact",
             "field:name": "Votre nom",
             "error:name": "Merci d'indiquer votre nom.",
             "field:email": "Votre adresse de messagerie",
@@ -66,7 +67,7 @@
             "relatedDestinations": "Destinations similaires"
         },
         "destinations": {
-            "title": "Toutes les destinations",
+            "title": "Destinations",
             "count": "{0} Destination(s)",
             "filterByRegions": "Filtrer par régions",
             "noRegion": "Aucune région...",
@@ -122,6 +123,39 @@
                 "field:label": "Sélection d'un utilisateur",
                 "field:error": "Merci de sélectionner un utilisateur.",
                 "text:intro": "Pour voir la sélection d'un autre utilisateur:"
+            }
+        },
+        "portfolio": {
+            "title": "Portfolio",
+            "info:emptyPortfolio": "Le portfolio est vide.",
+            "info:favoritesDeleted": "{0} image(s) retirée(s) du portfolio",
+            "info:portfolioImagesDeleted": "{0} image(s) retirée(s) du portfolio",
+            "btn:cancelDeletion": "Annuler",
+            "groupBy:category": "Par catégorie",
+            "groupBy:destination": "Par destination",
+            "groupBy:date": "Par date",
+            "groupBy:none": "Sans regroupement",
+            "groupLabel:category": "Toutes les catégories",
+            "groupLabel:destination": "Toutes les destinations",
+            "groupLabel:date": "Toutes les dates",
+            "cat:sharks": "Requins",
+            "cat:mollusc": "Mollusques",
+            "cat:shrimp": "Crevettes",
+            "cat:frogfish": "Antennaires",
+            "cat:other": "Autres",
+            "admin": {
+                "field:key": "Clé",
+                "error:title": "La clé est requise.",
+                "field:caption": "Libellé",
+                "btn:validate": "Valider",
+                "success:saved": "Catégorie enregistrée.",
+                "btn:addCategory": "Ajouter une catégorie",
+                "dlg:createCategory": "Créer une catégorie",
+                "dlg:editCategory": "Modifier la catégorie",
+                "title:confirmRemove": "Supprimer la catégorie",
+                "confirmRemove": "Confirmez-vous la suppression de la catégorie '{0}' ?",
+                "warningConfirmRemove": "Attention, cette action est irreversible.",
+                "success:catDeleted": "La catégorie '{0}' a été supprimée."
             }
         },
         "finning": {

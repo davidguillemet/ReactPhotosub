@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Grow, Snackbar } from '@mui/material';
 import UndoIcon from '@mui/icons-material/Undo';
-import { useAuthContext } from '../../components/authentication';
-import Gallery from '../../components/gallery';
-import { PageTitle, PageSubTitle } from '../../template/pageTypography';
-import { useQueryContext } from '../../components/queryContext';
-import { withLoading, buildLoadingState, withUser } from '../../components/hoc';
+import { useAuthContext } from 'components/authentication';
+import Gallery from 'components/gallery';
+import { PageTitle, PageSubTitle } from 'template/pageTypography';
+import { useQueryContext } from 'components/queryContext';
+import { withLoading, buildLoadingState, withUser } from 'components/hoc';
 import { useFavorites } from 'providers';
 import { useTranslation } from 'utils';
 import GroupBuilder from './groupBuilder';

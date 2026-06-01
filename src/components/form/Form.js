@@ -238,7 +238,7 @@ function getMultilingualFields(fields, supportedLanguages) {
             supportedLanguages.forEach(lang => {
                 const langField = {
                     ...field,
-                    id: lang === 'fr' ? field.id : `${field.id}_${lang}`,
+                    id: lang === 'fr' && !field.languageSuffix ? field.id : `${field.id}_${lang}`,
                     lang,
                     group: field.id // initial field id
                 };

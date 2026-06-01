@@ -51,7 +51,9 @@ const createAxiosInstance = (firebaseContext) => {
                     firebaseContext.signOut();
                     return;
                 }
-                throw new Error(err.response.data.error.message, { cause: err.response.data?.error });
+                const dataError = err.response.data.error;
+                const errorMessage = `${dataError.message}\n${dataError.detail}`;
+                throw new Error(errorMessage, { cause: dataError });
             }
             throw err;
         }

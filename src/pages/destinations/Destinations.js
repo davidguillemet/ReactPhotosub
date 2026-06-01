@@ -30,6 +30,8 @@ import { ReactRouterAwaiter } from 'components/reactRouter';
 import { useAuthContext } from 'components/authentication';
 import { useQueryContext } from 'components/queryContext';
 
+import { matchDestination } from './destinationSearch';
+
 const DestinationTabPanel = styled(TabPanel)(({ theme }) => ({
     '&.MuiTabPanel-root': {
         padding: 0,
@@ -142,13 +144,14 @@ const DestinationsComponent = ({destinations}) => {
             //     ],
             //     ....
             // }
-            return destinations.filter(destination => {
-                // Build a string that contains the title, title_en, the tags
-                // and all title/title_en from the region path
-                const destinationString = `${destination.title} ${destination.title_en} ${destination.location_title ?? ''} ${destination.tags?.join(' ') ?? ''} ${destination.regionpath.map(region => `${region.title} ${region.title_en}`).join(' ')}`;
-                // Check if all keywords are included in this string
-                return Array.from(keywordFilterSet).every(keyword => destinationString.toLowerCase().includes(keyword.toLowerCase()));
-            });
+            return destinations.filter(destination => matchDestination(destination, keywordFilterSet));
+            // return destinations.filter(destination => {
+            //     // Build a string that contains the title, title_en, the tags
+            //     // and all title/title_en from the region path
+            //     const destinationString = `${destination.title} ${destination.title_en} ${destination.location_title ?? ''} ${destination.tags?.join(' ') ?? ''} ${destination.regionpath.map(region => `${region.title} ${region.title_en}`).join(' ')}`;
+            //     // Check if all keywords are included in this string
+            //     return Array.from(keywordFilterSet).every(keyword => destinationString.toLowerCase().includes(keyword.toLowerCase()));
+            // });
         }
 
         const filterDestinationsByDate = (destinations) => {

@@ -16,11 +16,14 @@ import { useNavigate, useLocation } from 'react-router';
 import { Box, Collapse } from '@mui/material';
 import { useTranslation } from 'utils';
 import { Body } from '../../template/pageTypography';
-import { sortImagesAscending, sortImagesDescending, getSubGalleryAnchorName } from 'utils';
+import { getSubGalleryAnchorName } from 'utils';
 import { VerticalSpacing } from 'template/spacing';
 import { GalleryContextProvider } from './galleryContext';
 import { useGalleryContext } from './galleryContext';
 import { useAuthContext } from 'components/authentication';
+import { buildGroups } from './groupUtils';
+import { useAsyncFetcher } from 'components/reactRouter';
+import { APP_ROUTE_PATH } from 'navigation/routes';
 
 const _colWidth = {
     "small": {
@@ -35,46 +38,6 @@ const _colWidth = {
         mobile: 200,
         desktop: 400
     }
-}
-
-export const createGroup = (key) => {
-    return {
-        key: key,
-        images: [],
-        offset: 0,
-        showCount: true
-    };
-}
-
-const buildGroups = (images, groupBuilder, sortOrder) => {
-    let groups = null;
-
-    if (groupBuilder === null) {
-        // One global group without any label (destination gallery)
-        const group = createGroup(null);
-        group.images = [...images];
-        groups = [group];
-    } else {
-        groups = groupBuilder(images);
-    }
-
-    // sort images by date for each group
-    groups.forEach(group => group.images.sort(sortOrder === "asc" ? sortImagesAscending : sortImagesDescending));
-
-    // Compute group offset
-    let offset = 0;
-    for (let index = 0; index < groups.length; index++) {
-        groups[index].offset = offset;
-        offset += groups[index].images.length;
-    }
-
-    // Merge images from each groups to display all images from all groups in the expanded view
-    const allImages = groups.reduce((previousImages, group, index) => {
-        Array.prototype.push.apply(previousImages, group.images);
-        return previousImages;
-    }, [])
-
-    return [ groups, allImages];
 }
 
 const GroupGallery = ({images, onReady, renderItem}) => {
@@ -106,6 +69,24 @@ const GalleryDesc = ({group}) => {
     return descRows.map((row, index) => <Body sx={{mt: 0, mb: 0, fontWeight: "300"}} key={index}>{row}</Body>);
 }
 
+const StringGroupTitle = ({group}) => {
+    const t = useTranslation("components.gallery");
+    const groupTitle =
+        group.showCount ?
+        `${group.caption} - ${t("lbl:groupImageCount", group.images.length)}` :
+        group.caption;
+     return <Box><span id={getSubGalleryAnchorName(group.gallery?.location_title || group.caption)}>{groupTitle}</span></Box>;
+};
+
+const GroupTitle = ({group, onToggleExpanded}) => {
+    if (typeof group.caption === "string") {
+        return <StringGroupTitle group={group} />;
+    } else if (typeof group.caption === "function") {
+        const TitleComponent = group.caption;
+        return <TitleComponent group={group} onToggleExpanded={onToggleExpanded} />;
+    }
+}
+
 const GroupGalleryWithHeader = ({
     group,
     allImages,
@@ -114,18 +95,13 @@ const GroupGalleryWithHeader = ({
     groupHeaderEndComponent}) => {
 
     const authContext = useAuthContext();
-    const t = useTranslation("components.gallery");
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(group.closed !== undefined ? !group.closed : true);
 
     const onToggleExpanded = useCallback(() => {
         setIsExpanded(prevValue => !prevValue);
     }, []);
 
     const GroupHeaderEndComponent = groupHeaderEndComponent;
-    const groupTitle =
-        group.showCount ?
-        `${group.caption} - ${t("lbl:groupImageCount", group.images.length)}` :
-        group.caption;
 
     if (!authContext.admin && (!group.images || group.images.length === 0)) {
         return null;
@@ -154,7 +130,7 @@ const GroupGalleryWithHeader = ({
                         justifyContent: 'space-between'
                     }} 
                 >
-                    <Box><span id={getSubGalleryAnchorName(group.gallery?.location_title || group.caption)}>{groupTitle}</span></Box>
+                    <GroupTitle group={group} onToggleExpanded={onToggleExpanded} />
                     {
                         groupHeaderEndComponent !== null &&
                         <GroupHeaderEndComponent group={group} />
@@ -196,13 +172,17 @@ const Gallery = ({
     displayDestination = true,
     hasNext = false,
     onNextPage = null,
+    onImageClick = null,
     groupBuilder = null,
     groupHeaderEndComponent = null,
+    renderOverlay = null,
     // By default sort images by date, descending, i.e. from the most recent to the oldest
-    sort = "desc",
+    sort = "desc", // "desc", "asc", "none"
     pushHistory = false,
     withFavorite = true,
     colWidth = "medium"}) => {
+
+    const { submit: portfolioSubmit } = useAsyncFetcher(`portfolioButton`, APP_ROUTE_PATH);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -225,6 +205,11 @@ const Gallery = ({
     }, [location.search, images, pushHistory]);
 
     const handleOnImageClick = useCallback((index) => {
+        if (onImageClick) {
+            onImageClick(index);
+            return;
+        }
+
         if (pushHistory === true) {
             let search = null;
             if (index !== null) {
@@ -241,11 +226,7 @@ const Gallery = ({
         } else {
             setExpandedImageIndex(index)
         }
-    }, [pushHistory, images, navigate, location.search, location.pathname]);
-
-    const onImageClick = useCallback((imageIndex) => {
-        handleOnImageClick(imageIndex);
-    }, [handleOnImageClick]);
+    }, [pushHistory, images, navigate, location.search, location.pathname, onImageClick]);
 
     const onCloseModal = useCallback(() => {
         handleOnImageClick(null);
@@ -257,11 +238,13 @@ const Gallery = ({
             <LazyImage
                 index={index + offset}
                 image={item}
-                onClick={onImageClick}
+                onClick={handleOnImageClick}
                 width={width}
+                withFavorite={withFavorite}
+                renderOverlay={renderOverlay}
             />
         )
-    }, [groups, onImageClick]);
+    }, [groups, withFavorite, renderOverlay, handleOnImageClick]);
 
     if (images.length === 0 && emptyMessage !== null) {
         return (
@@ -273,7 +256,8 @@ const Gallery = ({
         <GalleryContextProvider
             options={{
                 withFavorite,
-                colWidth
+                colWidth,
+                portfolioSubmit
             }
         }>
             {

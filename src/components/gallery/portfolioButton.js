@@ -11,44 +11,45 @@ import './css/favorites.css';
 import { usePortfolio } from 'providers';
 import { useTranslation } from 'utils';
 import { useGalleryContext } from './galleryContext';
-import { useAsyncFetcher } from 'components/reactRouter';
 import { PORTFOLIO_INTENT_ADD, PORTFOLIO_INTENT_REMOVE } from 'utils/portfolio/portfolioIntents';
-import { APP_ROUTE_PATH } from 'navigation/routes';
+import { useToast } from 'components/notifications';
 
 const PortfolioButton = ({image, size = 'medium', style, color }) => {
 
+    const { toast } = useToast();
     const t = useTranslation("components.gallery");
     const authContext = useAuthContext();
-    const portfolioContext = usePortfolio();
-    const galleryContext = useGalleryContext();
+    const { isInPortfolio, notifyObservers } = usePortfolio();
+    const { portfolioSubmit, withFavorite } = useGalleryContext();
     const [ updating, setUpdating ] = useState(false);
-    const { submit: fetcherSubmit } = useAsyncFetcher("portfolioButton", APP_ROUTE_PATH);
 
-    const isInPortfolio = React.useMemo(() => {
-        const isIn = portfolioContext.isInPortfolio;
-        return isIn(image);
-    }, [portfolioContext, image]);
+    const imageIsInPortfolio = React.useMemo(() => {
+        return isInPortfolio(image);
+    }, [isInPortfolio, image]);
 
     const handleClick = React.useCallback(() => {
         setUpdating(true);
-        const updateIntent = isInPortfolio ? PORTFOLIO_INTENT_REMOVE : PORTFOLIO_INTENT_ADD;
+        const updateIntent = imageIsInPortfolio ? PORTFOLIO_INTENT_REMOVE : PORTFOLIO_INTENT_ADD;
         const submitData = {
             intent: updateIntent,
             ids: [image.id]
         }
-        fetcherSubmit(submitData)
-        .catch(err => {
+        portfolioSubmit(submitData)
+        .then(() => {
+            notifyObservers(submitData.ids, updateIntent);
+        }).catch(err => {
             // Empty... mutationCache is adding an error toast
+            toast.error(err.message);
         }).finally(() => {
             setUpdating(false);
         });
-    }, [fetcherSubmit, isInPortfolio, image]);
+    }, [portfolioSubmit, notifyObservers, imageIsInPortfolio, image, toast]);
 
-    const isDisabled = galleryContext && !galleryContext.withFavorite;
+    const isDisabled = !withFavorite;
 
     const buttonStyle = {...style};
     let title = t("btn:addToPortfolio");
-    if (isInPortfolio && updating === false) {
+    if (imageIsInPortfolio && updating === false) {
         title = t("btn:deleteFromPortfolio");
         buttonStyle.color = isDisabled ? 'grey' : 'red';
     } else if (color) {
@@ -77,7 +78,7 @@ const PortfolioButton = ({image, size = 'medium', style, color }) => {
                 <AutorenewIcon fontSize="inherit" sx={{
                     animation: 'favoriteUpdate 1.2s linear infinite' // see styles.css for favoriteUpdate
                 }}/> : 
-                isInPortfolio ?
+                imageIsInPortfolio ?
                 <StarIcon fontSize="inherit"/> :
                 <StarBorderIcon fontSize="inherit" />
             }

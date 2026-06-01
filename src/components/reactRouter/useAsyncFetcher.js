@@ -10,25 +10,23 @@ export const useAsyncFetcher = (fetcherKey, action = null) => {
         return new Promise((resolve, reject) => {
             const optionsBase = { method: "post", encType: "application/json" };
             const options = action ? { ...optionsBase, action } : optionsBase;
-            fetcher.submit(submitData, options);
             setIsLoading(true);
             setPendingPromise({ resolve, reject });
+            fetcher.submit(submitData, options);
         });
     }, [fetcher, action]);
 
     React.useEffect(() => {
         if (fetcher.state === 'idle' && pendingPromise) {
             setIsLoading(false);
-            pendingPromise.resolve();
+            if (fetcher.data?.error) {
+                pendingPromise.reject(fetcher.data.error);
+            } else {
+                pendingPromise.resolve(fetcher.data);
+            }
             setPendingPromise(null);
         }
-    }, [fetcher.state, pendingPromise])
-
-    React.useEffect(() => {
-        if (fetcher.data) {
-            // run alert from here
-        }
-    }, [fetcher.data]);
+    }, [fetcher.state, fetcher.data, pendingPromise])
 
     return { submit: asyncSubmit, isLoading, fetcher };
 };

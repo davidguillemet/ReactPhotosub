@@ -22,10 +22,6 @@ import AppContent from '../../template';
 
 const scrollTopAnchor = "back-to-top-anchor";
 
-// TODO: as it is defined as the route page for the ReactRouteProvider,
-// create a new Page subfolder called "app" that contains this App component
-// alongside with a loader (and an action if needed) to handle data fetching and actions related to the App component itself,
-// such as the portfolio
 const App = (props) => {
 
     const { pathname, hash, key } = useLocation();

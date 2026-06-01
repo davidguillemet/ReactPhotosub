@@ -41,6 +41,8 @@ const getPageProperties = async (req, pool, firebaseConfig) => {
     const path = req.path;
     if (path === "/auth/action") {
         pageName = "Account Management";
+    } else if (path === "/portfolio") {
+        pageName = "Portfolio";
     } else if (path === "/destinations") {
         pageName = "Destinations";
     } else if (path.startsWith("/destinations")) {

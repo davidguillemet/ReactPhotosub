@@ -1,1 +1,3 @@
-export { default, createGroup } from "./gallery";
+export { default } from "./gallery";
+export * from './groupUtils';
+export * from './hierarchicalGroupGallery'

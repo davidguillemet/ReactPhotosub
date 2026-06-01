@@ -14,14 +14,14 @@ const emptyArray = [];
 
 const useFetchSource = (listType, user, thenFunc) => {
 
-    const portfolioProvider = usePortfolio();
+    const { portfolio } = usePortfolio();
     const queryContext = useQueryContext();
 
     const { data: favorites } = useReactQuery(queryContext.useFetchFavorites, [user && user.uid, listType === LIST_FAVORITES, thenFunc]);
     const { data: searchResult } = useReactQuery(queryContext.useFetchSearchResults, [listType === LIST_SEARCH, thenFunc]);
 
     switch (listType) {
-        case LIST_HOME_SLIDESHOW: return portfolioProvider.portfolio;
+        case LIST_HOME_SLIDESHOW: return portfolio;
         case LIST_FAVORITES: return favorites;
         case LIST_SEARCH: return searchResult;
         default: throw new Error(`Unexpected list type '${listType}'`)

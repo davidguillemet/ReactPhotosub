@@ -25,35 +25,35 @@ export const NoWrapAndEllipsis = {
 export const CustomDivider = () => <Divider variant="middle" sx={{ my: 3, mx: '20%', borderBottomWidth: 3, borderBottomColor: (theme) => theme.palette.primary.light}}/>
 
 export const PageTitle = styled(TitleTypography)(({ theme }) => ({
-    fontWeight: "300",
-    color: theme.palette.text.secondary,
+    // fontWeight: "300",
+    // color: theme.palette.text.secondary,
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(3)
 }));
 
 export const PageSubTitle = styled(SubTitleTypography)(({ theme }) => ({
-    fontWeight: "100",
+    // fontWeight: "100",
     textAlign: 'left',
-    color: theme.palette.text.secondary,
+    // color: theme.palette.text.secondary,
     marginBottom: theme.spacing(2),
     marginTop: theme.spacing(3)
 }));
 
 export const PageHeader = styled(HeaderTypography)(({ theme }) => ({
-    fontWeight: "100",
+    // fontWeight: "100",
     textAlign: 'justify',
     marginBottom: theme.spacing(3)
 }));
 
 export const Paragraph = styled(ParagraphTypography)(({ theme }) => ({
-    fontWeight: "300",
+    // fontWeight: "300",
     textAlign: 'justify',
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
 }));
 
 export const Body = styled(BodyTypography)(({ theme }) => ({
-    fontWeight: "100",
+    //fontWeight: "100",
     textAlign: 'justify',
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
