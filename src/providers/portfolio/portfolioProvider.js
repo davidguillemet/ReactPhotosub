@@ -1,4 +1,5 @@
 import React from 'react';
+import { parsePortfolioCategoryImageId } from 'utils/portfolio';
 
 const PortfolioContext = React.createContext(null);
 
@@ -26,7 +27,10 @@ export const PortfolioProvider = ({ portfolio, children }) => {
             });
         }
         return {
-            isInPortfolio: (image) => portFolioMap.has(image.id),
+            isInPortfolio: (image) => {
+                const imageId = parsePortfolioCategoryImageId(image.id);
+                return portFolioMap.has(imageId);
+            },
             portfolio,
             subscribe,
             unsubscribe,

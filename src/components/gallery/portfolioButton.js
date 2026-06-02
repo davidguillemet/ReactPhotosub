@@ -13,6 +13,7 @@ import { useTranslation } from 'utils';
 import { useGalleryContext } from './galleryContext';
 import { PORTFOLIO_INTENT_ADD, PORTFOLIO_INTENT_REMOVE } from 'utils/portfolio/portfolioIntents';
 import { useToast } from 'components/notifications';
+import { parsePortfolioCategoryImageId } from 'utils/portfolio';
 
 const PortfolioButton = ({image, size = 'medium', style, color }) => {
 
@@ -32,7 +33,7 @@ const PortfolioButton = ({image, size = 'medium', style, color }) => {
         const updateIntent = imageIsInPortfolio ? PORTFOLIO_INTENT_REMOVE : PORTFOLIO_INTENT_ADD;
         const submitData = {
             intent: updateIntent,
-            ids: [image.id]
+            ids: [parsePortfolioCategoryImageId(image.id)]
         }
         portfolioSubmit(submitData)
         .then(() => {

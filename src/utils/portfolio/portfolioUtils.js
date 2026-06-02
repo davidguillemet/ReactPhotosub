@@ -1,0 +1,14 @@
+export const buildPortfolioCategoryImageId = (image, category) => {
+    return `${image.id}|${category.key}`;
+}
+
+export const parsePortfolioCategoryImageId = (imageId) => {
+    if (typeof imageId !== 'string') {
+        return imageId;
+    }
+    const parts = imageId.split('|');
+    if (parts.length !== 2) {
+        return imageId;
+    }
+    return parseInt(parts[0]);
+}

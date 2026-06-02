@@ -4,7 +4,7 @@ import { createGroup } from "components/gallery";
 import LazyImage from "components/lazyImage";
 import { formatDateShort, isLandscape } from "utils";
 import { Paragraph } from 'template/pageTypography';
-import { PORTFOLIO_CATEGORY_OTHER_KEY } from 'utils/portfolio';
+import { PORTFOLIO_CATEGORY_OTHER_KEY, buildPortfolioCategoryImageId } from 'utils/portfolio';
 
 const renderOverlayFactory = (caption) => {
     return ({image}) => {
@@ -130,18 +130,23 @@ export const GroupBuilderFactory = (categories, language, translator, admin) => 
         const imagesByCategory = new Map();
         const categorizedImages = new Set();
         images.forEach((image) => {
-            // TODO1: categories.filter since an image may belong to many categories
-            const categoryIndex = categories.findIndex(cat => image.tags.includes(cat.key));
-            if (categoryIndex !== -1) {
-                const category = categories[categoryIndex];
-                let categoryGroup = imagesByCategory.get(category.key);
+            const matchingCategories = categories.filter(cat => image.tags.includes(cat.key));
+            matchingCategories.forEach((matchingCategory, categoryIndex) => {
+                let categoryGroup = imagesByCategory.get(matchingCategory.key);
                 if (!categoryGroup) {
-                    categoryGroup = createPortfolioGroup(category.key);
-                    categoryGroup.caption = getCategoryCaption(category, language); //GroupHeaderFactory(translator(category.label));
+                    categoryGroup = createPortfolioGroup(matchingCategory.key);
+                    categoryGroup.caption = getCategoryCaption(matchingCategory, language); //GroupHeaderFactory(translator(matchingCategory.label));
                     categoryGroup.index = categoryIndex;
-                    imagesByCategory.set(category.key, categoryGroup);
+                    imagesByCategory.set(matchingCategory.key, categoryGroup);
                 }
-                categoryGroup.images.push(image);
+                // One unique Id per image in case it appears in multiple categories
+                const catImage = {
+                    ...image,
+                    id: buildPortfolioCategoryImageId(image, matchingCategory)
+                }
+                categoryGroup.images.push(catImage);
+             });
+             if (matchingCategories.length > 0) {
                 categorizedImages.add(image.id);
              }
         });
