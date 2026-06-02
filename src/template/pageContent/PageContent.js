@@ -1,9 +1,14 @@
 import React from 'react';
 import Container from '@mui/material/Container';
 import { Outlet} from "react-router";
-import { ToastNotifications } from '../../components/notifications';
+import { ToastNotifications } from 'components/notifications';
+import { hideBootOverlay } from 'components/loading/bootOverlay';
 
 const PageContent = React.forwardRef((props, ref) => {
+
+    React.useEffect(() => {
+        hideBootOverlay();
+    }, []);
 
     return (
         <Container
