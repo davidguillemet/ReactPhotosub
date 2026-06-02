@@ -24,6 +24,10 @@ const ImageDetails = ({image}) => {
     const t = useTranslation("pages.home");
     const imageCaption = React.useMemo(() => {
         const captions = parseImageDescription(image)[language];
+        if (!captions || captions.length === 0) {
+            // An image without description.
+            return null;
+        }
         return `${captions[0].vernacular[0]} (${captions[0].scientific})`;
     }, [image, language]);
 
@@ -110,7 +114,7 @@ const ImageDetails = ({image}) => {
                         overflow: 'hidden',
                     }}
                 >
-                    <Paragraph sx={{mb: 0.5, mt: 0}}>{imageCaption}</Paragraph>
+                    { imageCaption && <Paragraph sx={{mb: 0.5, mt: 0}}>{imageCaption}</Paragraph> }
                     <Stack direction="row" spacing={2} sx={{alignItems: 'baseline', justifyContent: 'flex-start'}}>
                         <PageHeader sx={{mb: 0}}>{destinationTitle(destination, language)}</PageHeader>
                         <Paragraph sx={{mb: 0}}>{formatDateShort(new Date(destination.date), language)}</Paragraph>
