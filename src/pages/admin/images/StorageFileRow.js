@@ -96,7 +96,7 @@ const StorageFileRow = ({row, selected}) => {
                         </IconButton>
                     }
                     {
-                        imageFromDb.portfolio === true ?
+                        imageFromDb?.portfolio === true ?
                         <StarIcon color="warning" sx={{ml: 0.5}} /> :
                         null
                     }
