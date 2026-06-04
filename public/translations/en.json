@@ -453,6 +453,12 @@
         },
         "imageSlider": {
             "loadNextImages": "Load the next images"
+        },
+        "updateNotifier": {
+            "newVersion": {
+                "message": "A new version is available. Click 'Refresh' to update.",
+                "refresh": "Refresh"
+            }
         }
     },
     "dialogs": {

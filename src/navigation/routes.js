@@ -67,14 +67,14 @@ async function loadChunksWithReload(factory) {
 function lazyLoader(route, queryClient, dataProvider, firebaseProvider) {
     const { page, fullWidth, maxWidth } = route;
     return async () => {
-        // const [PageModule, Helmet] = await loadChunksWithReload(() => Promise.all([
-        //     import("pages/" + page),
-        //     import("template/seo"),
-        // ]));
-        const [PageModule, Helmet] = await Promise.all([
+        const [PageModule, Helmet] = await loadChunksWithReload(() => Promise.all([
             import("pages/" + page),
             import("template/seo"),
-        ]);
+        ]));
+        // const [PageModule, Helmet] = await Promise.all([
+        //     import("pages/" + page),
+        //     import("template/seo"),
+        // ]);
         const { HelmetFull } = Helmet;
         const { Component, loaderFactory, actionProperties } = PageModule;
         const FinalComponent = fullWidth ? Component : fixedWidthComponent(Component, maxWidth);

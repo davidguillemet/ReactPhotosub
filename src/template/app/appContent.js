@@ -25,6 +25,7 @@ import LanguageSelector from 'components/language';
 import { useTranslation } from 'utils';
 import { AppContextProvider, useAppContext } from './appContext';
 import { useCurrentPage } from 'components/hooks';
+import { UpdateNotifier } from 'components/updateNotifier';
 
 
 const drawerWidth = 240;
@@ -299,6 +300,8 @@ const AppContentUI = React.forwardRef((props, ref) => {
                 <PageContent />
                 <Footer />
             </Box>
+
+            <UpdateNotifier />
 
         </React.Fragment>
     );

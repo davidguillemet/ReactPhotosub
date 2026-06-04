@@ -453,6 +453,12 @@
         },
         "imageSlider": {
             "loadNextImages": "Charger les images suivantes"
+        },
+        "updateNotifier": {
+            "newVersion": {
+                "message": "Une nouvelle version est disponible. Cliquez sur 'Rafraîchir' pour mettre à jour.",
+                "refresh": "Rafraîchir"
+            }
         }
     },
     "dialogs": {

@@ -2,7 +2,8 @@ import React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-// import { useTranslation } from '../utils'; // wire up to localize the text below
+import { useTranslation } from 'utils';
+import { useAuthContext } from 'components/authentication';
 
 // The version baked into THIS bundle at build time.
 // Set by build4deploy: REACT_APP_VERSION=$(git rev-parse --short HEAD) ...
@@ -54,8 +55,12 @@ export function useVersionCheck() {
 }
 
 export const UpdateNotifier = () => {
-    // const t = useTranslation("menu"); // or whatever namespace you prefer
+    const t = useTranslation("components.updateNotifier");
+    const authContext = useAuthContext();
     const updateAvailable = useVersionCheck();
+
+    // Only show update notifications to admin users at the beginning, before making it available to all users
+    if (!authContext.admin) return null;
     if (!updateAvailable) return null;
 
     return (
@@ -65,13 +70,11 @@ export const UpdateNotifier = () => {
                 variant="filled"
                 action={
                     <Button color="inherit" size="small" onClick={() => window.location.reload()}>
-                        {/* t("newVersion.refresh") */}
-                        Refresh
+                        {t("newVersion.refresh")}
                     </Button>
                 }
             >
-                {/* t("newVersion.message") */}
-                A new version is available.
+                {t("newVersion.message")}
             </Alert>
         </Snackbar>
     );
