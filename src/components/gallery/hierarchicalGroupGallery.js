@@ -1,13 +1,11 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
-import Zoom from '@mui/material/Zoom';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import WarningIcon from '@mui/icons-material/Warning';
 import Gallery from './gallery';
 import { buildGroups } from './groupUtils';
-import { Chip, Stack, Tooltip } from '@mui/material';
+import { Chip, Stack } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Paragraph } from 'template/pageTypography';
@@ -54,8 +52,6 @@ const renderGroupCoverOverlayFactory = (selectedOption, groups, admin) => {
                     admin && AdminTools && 
                     <Box
                         sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
                             position: 'absolute',
                             top: 0,
                             right: 0,
@@ -66,19 +62,7 @@ const renderGroupCoverOverlayFactory = (selectedOption, groups, admin) => {
                             zIndex: 10
                         }}
                     >
-                        {
-                            groups && group.images.length === 0 &&
-                            <Tooltip
-                                title={"Aucune image ne correspond à cette catégorie"}
-                                placement="bottom"
-                                slots={{
-                                    transition: Zoom
-                                }}
-                            >
-                                <WarningIcon color="warning" sx={{ mr: 0.5}}/>
-                            </Tooltip>
-                        }
-                        <AdminTools categoryKey={groupKey} />
+                        <AdminTools group={group} />
                     </Box>
                 }
             </React.Fragment>
