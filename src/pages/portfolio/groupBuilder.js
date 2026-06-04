@@ -131,12 +131,11 @@ export const GroupBuilderFactory = (categories, language, translator, admin) => 
         const categorizedImages = new Set();
         images.forEach((image) => {
             const matchingCategories = categories.filter(cat => image.tags.includes(cat.key));
-            matchingCategories.forEach((matchingCategory, categoryIndex) => {
+            matchingCategories.forEach((matchingCategory) => {
                 let categoryGroup = imagesByCategory.get(matchingCategory.key);
                 if (!categoryGroup) {
                     categoryGroup = createPortfolioGroup(matchingCategory.key);
                     categoryGroup.caption = getCategoryCaption(matchingCategory, language); //GroupHeaderFactory(translator(matchingCategory.label));
-                    categoryGroup.index = categoryIndex;
                     imagesByCategory.set(matchingCategory.key, categoryGroup);
                 }
                 // One unique Id per image in case it appears in multiple categories
@@ -158,18 +157,23 @@ export const GroupBuilderFactory = (categories, language, translator, admin) => 
                 unusedCategories.forEach(unusedCategory => {
                     const unusedCatGroup = createPortfolioGroup(unusedCategory.key);
                     unusedCatGroup.caption = getCategoryCaption(unusedCategory, language);
-                    unusedCatGroup.index = imagesByCategory.size;
                     imagesByCategory.set(unusedCategory.key, unusedCatGroup);
                 });
             }
         }
 
+        // Sort groups by caption alphabetically
+        const orderedGroups = Array.from(imagesByCategory.values()).sort((group1, group2) => {
+            return group1.caption > group2.caption ? 1 : -1;
+        });
+
+        // Add a group "other" for uncategorized images, if needed.
+        // This group is added at the end of the list of categories.
         if (categorizedImages.size !== images.length) {
             const categoryKey = PORTFOLIO_CATEGORY_OTHER_KEY;
             const otherGroup = createPortfolioGroup(categoryKey)
             otherGroup.caption = translator("cat:other");
-            otherGroup.index = imagesByCategory.size; // Last index for category "other"
-            imagesByCategory.set(categoryKey, otherGroup);
+            orderedGroups.push(otherGroup);
             images.forEach(image => {
                 if (!categorizedImages.has(image.id)) {
                     otherGroup.images.push(image);
@@ -177,10 +181,7 @@ export const GroupBuilderFactory = (categories, language, translator, admin) => 
             });
         }
 
-        return Array.from(imagesByCategory.values()).sort((group1, group2) => {
-            if (group1.index === group2.index) return 0;
-            return group1.index > group2.index ? 1 : -1;
-        });
+        return orderedGroups;
     };
 
     return {
