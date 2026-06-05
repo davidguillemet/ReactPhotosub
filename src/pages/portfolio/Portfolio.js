@@ -70,9 +70,9 @@ const PortfolioGallery = ({images, categories}) => {
     return (
         <React.Fragment>
             <HierarchicalGroupGallery
-                groupOptions={groupOptions}
+                groupingOptions={groupOptions}
                 images={images}
-                defaultGroupValue={GROUP_BY_CATEGORY}
+                defaultGroupingValue={GROUP_BY_CATEGORY}
                 onGroupingChanged={onGroupingChanged}
             />
             { selectedGrouping === GROUP_BY_CATEGORY && <AdminActions /> }

@@ -5,8 +5,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Gallery from './gallery';
 import { buildGroups } from './groupUtils';
-import { Chip, Stack } from '@mui/material';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { Stack } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Paragraph } from 'template/pageTypography';
 import TooltipIconButton from 'components/tooltipIconButton';
@@ -72,25 +71,24 @@ const renderGroupCoverOverlayFactory = (selectedOption, groups, admin) => {
     return renderGroupCoverOverlay;
 };
 
-export const HierarchicalGroupGallery = ({images, groupOptions, defaultGroupValue, onGroupingChanged}) => {
+export const HierarchicalGroupGallery = ({images, groupingOptions, defaultGroupingValue, onGroupingChanged}) => {
 
+    // Initialize the display with the grouping options
     const authContext = useAuthContext();
-    const [selectedValue, setSelectedValue] = React.useState(defaultGroupValue);
-    const selectedOption = React.useMemo(
-        () => groupOptions.find(o => o.value === selectedValue) ?? groupOptions[0],
-        [groupOptions, selectedValue]
-    );
-
+    const [selectedValue, setSelectedValue] = React.useState(defaultGroupingValue);
     const [currentGroupIndex, setCurrentGroupIndex] = React.useState(null);
-    const [groups] = React.useMemo(() => buildGroups(images, selectedOption.groupBuilder, "desc"), [images, selectedOption.groupBuilder]);
+    const [selectedGroupingOption, setSelectedGroupingOption] = React.useState(() => groupingOptions.find(o => o.value === defaultGroupingValue) ?? groupingOptions[0]);
+
+    const [groups] = React.useMemo(() => buildGroups(images, selectedGroupingOption.groupBuilder, "desc"), [images, selectedGroupingOption.groupBuilder]);
 
     const safeCurrentGroupIndex =
-        selectedOption.groupBuilder === null ? 0 : // If no groupBuilder, there is only one global group: selected by default
+        selectedGroupingOption.groupBuilder === null ? 0 : // If no groupBuilder, there is only one global group: selected by default
         (currentGroupIndex !== null && currentGroupIndex < groups.length) ? currentGroupIndex :
         null;
 
+    // Root images are the cover images for each group, depending on the selected grouping option
     const rootImages = React.useMemo(() => {
-        if (selectedOption.groupBuilder !== null) {
+        if (selectedGroupingOption.groupBuilder !== null) {
             return groups.map(group => {
                 let groupCoverImage;
                 if (group.images.length === 0) {
@@ -115,7 +113,7 @@ export const HierarchicalGroupGallery = ({images, groupOptions, defaultGroupValu
             // Only one global group
             return groups[0].images;
         }
-    }, [groups, selectedOption.groupBuilder]);
+    }, [groups, selectedGroupingOption.groupBuilder]);
 
     const imagesToDisplay = React.useMemo(
         () => safeCurrentGroupIndex !== null ? groups[safeCurrentGroupIndex].images : rootImages,
@@ -129,18 +127,31 @@ export const HierarchicalGroupGallery = ({images, groupOptions, defaultGroupValu
             return;
         }
         setCurrentGroupIndex(index);
+        setSelectedValue(group.key);
     }, [groups]);
 
     const onGoToGroupList = React.useCallback(() => {
         setCurrentGroupIndex(null);
-    }, []);
+        setSelectedValue(selectedGroupingOption.value);
+    }, [selectedGroupingOption.value]);
 
     const onGroupingSelectionChanged = React.useCallback((e) => {
-        const newGrouping = e.target.value;
-        setSelectedValue(newGrouping);
-        setCurrentGroupIndex(null);
-        onGroupingChanged(newGrouping);
-    }, [onGroupingChanged]);
+        const newSelectValue = e.target.value;
+        setSelectedValue(newSelectValue);
+        if (safeCurrentGroupIndex === null || selectedValue === 'none') {
+            // We are currently on the grouping options, we can directly switch to the new grouping
+            setCurrentGroupIndex(null);
+            onGroupingChanged(newSelectValue);
+            setSelectedGroupingOption(groupingOptions.find(o => o.value === newSelectValue));
+            return;
+        } else {
+            // We are currently on the group list, we can directly switch to the new group
+            // -> get the group index from the key (= newSelectValue)
+            const groupIndex = groups.findIndex(g => g.key === newSelectValue);
+            setCurrentGroupIndex(groupIndex);
+            return;
+        }
+    }, [onGroupingChanged, groupingOptions, groups, safeCurrentGroupIndex, selectedValue]);
 
     const onImageClick = 
         safeCurrentGroupIndex !== null ? null : /* let the viewer being opened */
@@ -148,8 +159,14 @@ export const HierarchicalGroupGallery = ({images, groupOptions, defaultGroupValu
 
     const renderOverlay =
         safeCurrentGroupIndex === null ?
-        renderGroupCoverOverlayFactory(selectedOption, groups, authContext.admin) : // Custom overlay for group covers
+        renderGroupCoverOverlayFactory(selectedGroupingOption, groups, authContext.admin) : // Custom overlay for group covers
         null;   // Default overlay for group images
+    
+    const selectOptions = React.useMemo(() => {
+        return safeCurrentGroupIndex !== null && selectedValue !== 'none'?
+               groups.map(group => ({ value: group.key, label: group.caption })) :
+               groupingOptions.map(o => ({ value: o.value, label: o.label }));
+    }, [groupingOptions, safeCurrentGroupIndex, groups, selectedValue]);
 
     return (
         <React.Fragment>
@@ -159,22 +176,16 @@ export const HierarchicalGroupGallery = ({images, groupOptions, defaultGroupValu
                     value={selectedValue}
                     onChange={onGroupingSelectionChanged}
                 >
-                    {groupOptions.map(o => (
+                    {selectOptions.map(o => (
                         <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
                     ))}
                 </Select>
                 </FormControl>
                 {
-                    selectedOption.groupBuilder !== null && safeCurrentGroupIndex !== null &&
+                    selectedGroupingOption.groupBuilder !== null && safeCurrentGroupIndex !== null &&
                     <React.Fragment>
-                        <ArrowForwardIosIcon fontSize="small" sx={{ color: theme => theme.palette.text.disabled}}/>
-                        <Chip
-                            label={groups[safeCurrentGroupIndex].caption}
-                            color='success'
-                            sx={{ ml: 0.5, mr: 1}}
-                        />
                         <TooltipIconButton
-                            tooltip={selectedOption.groupLabel}
+                            tooltip={selectedGroupingOption.groupLabel}
                             onClick={onGoToGroupList}
                             size='small'
                         >
