@@ -4,7 +4,11 @@ import { createGroup } from "components/gallery";
 import LazyImage from "components/lazyImage";
 import { formatDateShort, isLandscape } from "utils";
 import { Paragraph } from 'template/pageTypography';
-import { PORTFOLIO_CATEGORY_OTHER_KEY, buildPortfolioCategoryImageId } from 'utils/portfolio';
+import {
+    PORTFOLIO_CATEGORY_OTHER_KEY,
+    buildPortfolioCategoryImageId,
+    imageIsExcludedFromCategory
+} from 'utils/portfolio';
 
 const renderOverlayFactory = (caption) => {
     return ({image}) => {
@@ -133,6 +137,10 @@ export const GroupBuilderFactory = (categories, language, translator, admin) => 
             const matchingCategories = categories.filter(cat => image.tags.includes(cat.key));
             matchingCategories.forEach((matchingCategory) => {
                 let categoryGroup = imagesByCategory.get(matchingCategory.key);
+                if (!admin && imageIsExcludedFromCategory(image, matchingCategory)) {
+                    // If the user is not admin, we don't want to show images that are excluded from the category
+                    return;
+                }
                 if (!categoryGroup) {
                     categoryGroup = createPortfolioGroup(matchingCategory.key);
                     categoryGroup.caption = getCategoryCaption(matchingCategory, language); //GroupHeaderFactory(translator(matchingCategory.label));
@@ -141,13 +149,14 @@ export const GroupBuilderFactory = (categories, language, translator, admin) => 
                 // One unique Id per image in case it appears in multiple categories
                 const catImage = {
                     ...image,
-                    id: buildPortfolioCategoryImageId(image, matchingCategory)
+                    id: buildPortfolioCategoryImageId(image, matchingCategory),
+                    groupKey: matchingCategory.key
                 }
                 categoryGroup.images.push(catImage);
-             });
-             if (matchingCategories.length > 0) {
+            });
+            if (matchingCategories.length > 0) {
                 categorizedImages.add(image.id);
-             }
+            }
         });
 
         // Add groups for empty categories (admin only)

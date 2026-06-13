@@ -1,5 +1,10 @@
 
-import { PORTFOLIO_INTENT_ADD, PORTFOLIO_INTENT_REMOVE } from "utils/portfolio";
+import {
+    PORTFOLIO_INTENT_ADD,
+    PORTFOLIO_INTENT_REMOVE,
+    PORTFOLIO_INTENT_UPDATE_IMAGE_EXCLUDED_CATEGORIES,
+    parsePortfolioCategoryImageId
+} from "utils/portfolio";
 
 const initializeIntentHandlers = (queryClient, dataProvider) => {
     const intentHandlers = new Map();
@@ -23,6 +28,23 @@ const initializeIntentHandlers = (queryClient, dataProvider) => {
             // Return the current by filtering the removed images
             ...currentCachedData.filter(item => !_formData.ids.includes(item.id))
         ])
+    });
+    intentHandlers.set(PORTFOLIO_INTENT_UPDATE_IMAGE_EXCLUDED_CATEGORIES, {
+        call: (formData) => dataProvider.updateImageProperties(formData),
+        updateCache: async (currentCachedData, _, formData) => {
+            const { id, excluded_cats } = formData;
+            const imageId = parsePortfolioCategoryImageId(id);
+            return currentCachedData.map(image => {
+                if (image.id === imageId) {
+                    return {
+                        ...image,
+                        excluded_cats
+                    }
+                } else {
+                    return image;
+                }
+            });
+        }
     });
     return intentHandlers;
 }

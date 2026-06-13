@@ -176,6 +176,7 @@ const Gallery = ({
     groupBuilder = null,
     groupHeaderEndComponent = null,
     renderOverlay = null,
+    imageAdminTools = null,
     // By default sort images by date, descending, i.e. from the most recent to the oldest
     sort = "desc", // "desc", "asc", "none"
     pushHistory = false,
@@ -242,9 +243,10 @@ const Gallery = ({
                 width={width}
                 withFavorite={withFavorite}
                 renderOverlay={renderOverlay}
+                adminTools={imageAdminTools}
             />
         )
-    }, [groups, withFavorite, renderOverlay, handleOnImageClick]);
+    }, [groups, withFavorite, renderOverlay, imageAdminTools, handleOnImageClick]);
 
     if (images.length === 0 && emptyMessage !== null) {
         return (

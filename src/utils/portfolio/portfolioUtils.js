@@ -12,3 +12,14 @@ export const parsePortfolioCategoryImageId = (imageId) => {
     }
     return parseInt(parts[0]);
 }
+
+export const imageIsExcludedFromCategory = (image, category) => {
+    if (!image || !category) {
+        return false;
+    }
+    if (!image.excluded_cats || !Array.isArray(image.excluded_cats)) {
+        return false;
+    }
+    return image.excluded_cats.includes(category.key);
+}
+

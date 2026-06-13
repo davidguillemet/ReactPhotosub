@@ -6,7 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import WarningIcon from '@mui/icons-material/Warning';
 import Tooltip from '@mui/material/Tooltip';
 import Zoom from '@mui/material/Zoom';
-import { PORTFOLIO_CATEGORY_OTHER_KEY } from 'utils/portfolio';
+import { PORTFOLIO_CATEGORY_OTHER_KEY, imageIsExcludedFromCategory } from 'utils/portfolio';
 
 const categoryAdminToolsFactory = (categories, onEditCategory, onClickDeleteCategory) => {
 
@@ -22,6 +22,8 @@ const categoryAdminToolsFactory = (categories, onEditCategory, onClickDeleteCate
         const handleOnClickDeleteCategory = React.useCallback(() => {
             onClickDeleteCategory(category);
         }, [category]);
+
+        const groupIsEmpty = React.useMemo(() => group.images.length === 0 || group.images.every(img => imageIsExcludedFromCategory(img, category)), [group, category]);
 
         if (categoryKey === PORTFOLIO_CATEGORY_OTHER_KEY) {
             return null;
@@ -45,9 +47,9 @@ const categoryAdminToolsFactory = (categories, onEditCategory, onClickDeleteCate
                 }}
             >
                 {
-                    group && group.images.length === 0 &&
+                    group && groupIsEmpty &&
                     <Tooltip
-                        title={"Aucune image ne correspond à cette catégorie"}
+                        title={"Aucune image ne correspond à cette catégorie ou toutes les images sont exclues de la catégorie."}
                         placement="bottom"
                         slots={{
                             transition: Zoom

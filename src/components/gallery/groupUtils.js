@@ -12,7 +12,7 @@ export const createGroup = (key) => {
 export const buildGroups = (images, groupBuilder, sortOrder) => {
     let groups = null;
 
-    if (groupBuilder === null) {
+    if (!groupBuilder) {
         // One global group without any label (destination gallery)
         const group = createGroup(null);
         group.images = [...images];

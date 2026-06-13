@@ -14,6 +14,7 @@ import { useLanguage, useTranslation } from 'utils';
 import { useAuthContext } from 'components/authentication';
 import { useLoaderData } from 'react-router';
 import categoryAdminToolsFactory from './admin/CategoryAdminTools';
+import CategoryImageAdminTools from './admin/CategoryImageAdminTools';
 import useAdminActions from './admin/UseAdminActions';
 import { useToast } from 'components/notifications';
 
@@ -28,6 +29,7 @@ const PortfolioGallery = ({images, categories}) => {
     const { language } = useLanguage();
     const t = useTranslation("pages.portfolio");
     const [selectedGrouping, setSelectedGrouping] = React.useState(DEFAULT_GROuPiNG);
+
     const {
         dateGroupBuilder,
         destinationGroupBuilder,
@@ -39,9 +41,9 @@ const PortfolioGallery = ({images, categories}) => {
     const groupOptions = React.useMemo(() => {
         const categoryAdminTools = categoryAdminToolsFactory(categories, onEditCategory, onClickDeleteCategory);
         const options = [
-            { value: GROUP_BY_CATEGORY,    label: t("groupBy:category"),    groupLabel: t("groupLabel:category"),    groupBuilder: categoryGroupBuilder    , adminTools: categoryAdminTools },
-            { value: GROUP_BY_DESTINATION, label: t("groupBy:destination"), groupLabel: t("groupLabel:destination"), groupBuilder: destinationGroupBuilder , adminTools: null },
-            { value: GROUP_BY_DATE,        label: t("groupBy:date"),        groupLabel: t("groupLabel:date"),        groupBuilder: dateGroupBuilder        , adminTools: null }
+            { value: GROUP_BY_CATEGORY,    label: t("groupBy:category"),    groupLabel: t("groupLabel:category"),    groupBuilder: categoryGroupBuilder    , adminTools: categoryAdminTools, imageAdminTools: CategoryImageAdminTools },
+            { value: GROUP_BY_DESTINATION, label: t("groupBy:destination"), groupLabel: t("groupLabel:destination"), groupBuilder: destinationGroupBuilder , adminTools: null,               imageAdminTools: null },
+            { value: GROUP_BY_DATE,        label: t("groupBy:date"),        groupLabel: t("groupLabel:date"),        groupBuilder: dateGroupBuilder        , adminTools: null,               imageAdminTools: null }
         ]
         if (authContext.admin) {
             options.push({
@@ -59,7 +61,7 @@ const PortfolioGallery = ({images, categories}) => {
         categoryGroupBuilder,
         onEditCategory,
         onClickDeleteCategory,
-        authContext,
+        authContext.admin,
         categories
     ]);
 

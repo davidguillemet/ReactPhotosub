@@ -57,6 +57,7 @@ const LazyImage = ({
     width,
     withOverlay = true,
     renderOverlay = null,
+    adminTools = null,
     onImageLoaded = null,
     withFavorite = true,
     disabled = false
@@ -67,6 +68,7 @@ const LazyImage = ({
     const container = useRef();
     const selector = gsap.utils.selector(container);
     const authContext = useAuthContext();
+    const AdminTools = adminTools;
 
     useEffect(() => {
         if (isVisible === true) {
@@ -189,6 +191,23 @@ const LazyImage = ({
                     />
 
                 </Stack>
+            }
+            {
+                authContext.admin && AdminTools && 
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        height: 'auto',
+                        padding: 0.5,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        zIndex: 10
+                    }}
+                >
+                    <AdminTools image={image} />
+                </Box>
             }
         </Box>
     );

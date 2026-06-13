@@ -38,6 +38,7 @@ module.exports = function(admin, config) {
                 title: image.title,
                 description: image.description,
                 portfolio: image.portfolio,
+                excluded_cats: image.excluded_cats,
                 ...tagsFromTitle,
             }).then(() => {
                 res.json(image);
