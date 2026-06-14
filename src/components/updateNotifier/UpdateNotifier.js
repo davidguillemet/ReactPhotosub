@@ -67,9 +67,8 @@ export const UpdateNotifier = () => {
         <Snackbar open anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
             <Alert
                 severity="info"
-                variant="filled"
                 action={
-                    <Button color="inherit" size="small" onClick={() => window.location.reload()}>
+                    <Button size="small" onClick={() => window.location.reload()}>
                         {t("newVersion.refresh")}
                     </Button>
                 }
