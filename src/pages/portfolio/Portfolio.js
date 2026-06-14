@@ -76,6 +76,7 @@ const PortfolioGallery = ({images, categories}) => {
                 images={images}
                 defaultGroupingValue={GROUP_BY_CATEGORY}
                 onGroupingChanged={onGroupingChanged}
+                diaporamaEnabled={true}
             />
             { selectedGrouping === GROUP_BY_CATEGORY && <AdminActions /> }
         </React.Fragment>

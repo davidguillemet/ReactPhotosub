@@ -248,9 +248,10 @@ const ExpandedView = React.forwardRef(({
     index,
     onChangeIndex = null,
     onClose,
-    displayDestination = true ,
+    displayDestination = true,
     hasNext = false,
-    onNextPage = null}, ref) => {
+    onNextPage = null,
+    autoPlay = false}, ref) => {
 
     const t = useTranslation("components.gallery");
     const authContext = useAuthContext();
@@ -283,6 +284,13 @@ const ExpandedView = React.forwardRef(({
             allowScroll();
         }
     }, [allowScroll, blockScroll]);
+
+    useEffect(() => {
+        if (autoPlay) {
+            setIsPlaying(true);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Make sure to clear the timeout on unmount
     useEffect(() => {

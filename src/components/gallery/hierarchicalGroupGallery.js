@@ -4,6 +4,8 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Gallery from './gallery';
+import Button from '@mui/material/Button';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { buildGroups } from './groupUtils';
 import { Stack } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -76,13 +78,25 @@ const SELECT_CONTENT = {
     GROUP_LIST: "groupList"
 };
 
-export const HierarchicalGroupGallery = ({images, groupingOptions, defaultGroupingValue, onGroupingChanged}) => {
+const GALLERY_CONTENT = {
+    GROUP_COVERS: "groupCovers",
+    GROUP_IMAGES: "groupImages"
+};
+
+export const HierarchicalGroupGallery = ({
+    images,
+    groupingOptions,
+    defaultGroupingValue,
+    onGroupingChanged,
+    diaporamaEnabled = false
+}) => {
 
     // Initialize the display with the grouping options
     const authContext = useAuthContext();
     const [selectedValue, setSelectedValue] = React.useState(defaultGroupingValue);
     const [currentGroupIndex, setCurrentGroupIndex] = React.useState(null);
     const [localGroupingOptions, setLocalGroupingOptions] = React.useState(groupingOptions);
+    const [slideshowTrigger, setSlideshowTrigger] = React.useState(0);
 
     const prevGroupingOptions = React.useRef(localGroupingOptions);
     React.useEffect(() => {
@@ -101,15 +115,23 @@ export const HierarchicalGroupGallery = ({images, groupingOptions, defaultGroupi
     const [groups] = React.useMemo(() => buildGroups(images, selectedGroupingOption?.groupBuilder, "desc"), [images, selectedGroupingOption.groupBuilder]);
 
     const safeCurrentGroupIndex =
-        selectedGroupingOption.groupBuilder === null ? 0 : // If no groupBuilder, there is only one global group: selected by default
+        // selectedGroupingOption.groupBuilder === null ? 0 : // If no groupBuilder, there is only one global group: selected by default
         (currentGroupIndex !== null && currentGroupIndex < groups.length) ? currentGroupIndex :
         null;
     
     const selectContentType = React.useMemo(() => {
-        if (safeCurrentGroupIndex === null || selectedValue === 'none') {
+        if (safeCurrentGroupIndex === null) {
             return SELECT_CONTENT.GROUPING_OPTIONS;
         } else {
             return SELECT_CONTENT.GROUP_LIST;
+        }
+    }, [safeCurrentGroupIndex]);
+
+    const galleryContentType = React.useMemo(() => {
+        if (safeCurrentGroupIndex === null && selectedValue !== 'none') {
+            return GALLERY_CONTENT.GROUP_COVERS;
+        } else {
+            return GALLERY_CONTENT.GROUP_IMAGES;
         }
     }, [safeCurrentGroupIndex, selectedValue]);
 
@@ -176,30 +198,45 @@ export const HierarchicalGroupGallery = ({images, groupingOptions, defaultGroupi
             setCurrentGroupIndex(groupIndex);
             return;
         }
-    }, [localGroupingOptions, selectedValue, groups, onGroupingChanged, selectContentType, setSelectedGroupingOption]);
+    }, [localGroupingOptions, selectedValue, groups, onGroupingChanged, selectContentType]);
 
     const onGroupingSelectionChanged = React.useCallback((e) => {
         const newSelectValue = e.target.value;
         setSelectedValue(newSelectValue);
     }, []);
 
+    const launchDiaporama = React.useCallback(() => {
+        setSlideshowTrigger(prev => prev + 1);
+    }, []);
+
     const onImageClick = 
-        safeCurrentGroupIndex !== null ? null : /* let the viewer being opened */
-        onGroupClick;                           /* Show group images */
+        galleryContentType === GALLERY_CONTENT.GROUP_COVERS ?
+        onGroupClick :  /* Show group images */
+        null;           /* let the viewer being opened */
 
     const renderOverlay =
-        safeCurrentGroupIndex === null ?
+        galleryContentType === GALLERY_CONTENT.GROUP_COVERS ?
         renderGroupCoverOverlayFactory(selectedGroupingOption, groups, authContext.admin) : // Custom overlay for group covers
         null;   // Default overlay for group images
     
     const selectOptions = React.useMemo(() => {
-        return safeCurrentGroupIndex !== null && selectedValue !== 'none'?
-               groups.map(group => ({ value: group.key, label: group.caption })) :
-               localGroupingOptions.map(o => ({ value: o.value, label: o.label }));
-    }, [localGroupingOptions, safeCurrentGroupIndex, groups, selectedValue]);
+        return selectContentType === SELECT_CONTENT.GROUPING_OPTIONS?
+               localGroupingOptions.map(o => ({ value: o.value, label: o.label })) :
+               groups.map(group => ({ value: group.key, label: group.caption }));
+    }, [localGroupingOptions, selectContentType, groups]);
 
     return (
-        <React.Fragment>
+        <Stack direction='column' sx={{width: '100%', alignItems: "center"}}>
+            {
+                diaporamaEnabled &&
+                <Button
+                    endIcon={<PlayArrowIcon />}
+                    disabled={galleryContentType === GALLERY_CONTENT.GROUP_COVERS || imagesToDisplay.length === 0}
+                    onClick={launchDiaporama}
+                >
+                    Lancer le diaporama
+                </Button>
+            }
             <Stack direction='row' sx={{width: '100%', alignItems: "center"}}>
                 <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                 <Select
@@ -235,7 +272,8 @@ export const HierarchicalGroupGallery = ({images, groupingOptions, defaultGroupi
                     null :  // No image admin tool for the group covers
                     selectedGroupingOption.imageAdminTools // Image admin tool for the group images, depending on the selected grouping option
                 }
+                launchSlideshow={slideshowTrigger}
             />
-        </React.Fragment>
+        </Stack>
     );
 };

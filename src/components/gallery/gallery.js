@@ -181,7 +181,8 @@ const Gallery = ({
     sort = "desc", // "desc", "asc", "none"
     pushHistory = false,
     withFavorite = true,
-    colWidth = "medium"}) => {
+    colWidth = "medium",
+    launchSlideshow = 0}) => {
 
     const { submit: portfolioSubmit } = useAsyncFetcher(`portfolioButton`, APP_ROUTE_PATH);
 
@@ -189,6 +190,14 @@ const Gallery = ({
     const location = useLocation();
 
     const [expandedImageIndex, setExpandedImageIndex] = useState(null);
+    const [autoPlay, setAutoPlay] = useState(false);
+
+    useEffect(() => {
+        if (launchSlideshow > 0) {
+            setAutoPlay(true);
+            setExpandedImageIndex(0);
+        }
+    }, [launchSlideshow]);
 
     const [groups, allImages] = useMemo(() => buildGroups(images, groupBuilder, sort), [images, groupBuilder, sort]);
 
@@ -230,6 +239,7 @@ const Gallery = ({
     }, [pushHistory, images, navigate, location.search, location.pathname, onImageClick]);
 
     const onCloseModal = useCallback(() => {
+        setAutoPlay(false);
         handleOnImageClick(null);
     }, [handleOnImageClick]);
 
@@ -304,6 +314,7 @@ const Gallery = ({
                         displayDestination={displayDestination}
                         hasNext={hasNext}
                         onNextPage={onNextPage}
+                        autoPlay={autoPlay}
                     />
                 }
             </Dialog>
