@@ -23,7 +23,8 @@ const categoryAdminToolsFactory = (categories, onEditCategory, onClickDeleteCate
             onClickDeleteCategory(category);
         }, [category]);
 
-        const groupIsEmpty = React.useMemo(() => group.images.length === 0 || group.images.every(img => imageIsExcludedFromCategory(img, category)), [group, category]);
+        const groupIsEmpty = React.useMemo(() => group.images.length === 0 , [group]);
+        const allImagesExcluded = React.useMemo(() => group.images.length > 0 && group.images.every(img => imageIsExcludedFromCategory(img, category)), [group, category]);
 
         if (categoryKey === PORTFOLIO_CATEGORY_OTHER_KEY) {
             return null;
@@ -47,9 +48,9 @@ const categoryAdminToolsFactory = (categories, onEditCategory, onClickDeleteCate
                 }}
             >
                 {
-                    group && groupIsEmpty &&
+                    group && (groupIsEmpty || allImagesExcluded) &&
                     <Tooltip
-                        title={"Aucune image ne correspond à cette catégorie ou toutes les images sont exclues de la catégorie."}
+                        title={groupIsEmpty ? "Aucune image ne correspond à cette catégorie." : "Toutes les images sont exclues de la catégorie."}
                         placement="bottom"
                         slots={{
                             transition: Zoom
