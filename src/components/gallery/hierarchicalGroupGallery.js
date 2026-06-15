@@ -13,6 +13,7 @@ import { Paragraph } from 'template/pageTypography';
 import TooltipIconButton from 'components/tooltipIconButton';
 import { useAuthContext } from 'components/authentication';
 import { uniqueID } from 'utils';
+import { parsePortfolioCategoryImageId } from 'utils/portfolio';
 
 const renderGroupCoverOverlayFactory = (selectedOption, groups, admin) => {
 
@@ -138,6 +139,7 @@ export const HierarchicalGroupGallery = ({
     // Root images are the cover images for each group, depending on the selected grouping option
     const rootImages = React.useMemo(() => {
         if (selectedGroupingOption?.groupBuilder !== null) {
+            const covers = new Set();
             return groups.map(group => {
                 let groupCoverImage;
                 if (group.images.length === 0) {
@@ -148,8 +150,13 @@ export const HierarchicalGroupGallery = ({
                         sizeRatio: 1.5
                     };
                 } else {
-                    const landscapeCovers = group.images;
-                    groupCoverImage = landscapeCovers[Math.floor(Math.random() * landscapeCovers.length)];
+                    const candidateCovers = group.images.filter(img => !covers.has(parsePortfolioCategoryImageId(img.id)));
+                    if (candidateCovers.length === 0) {
+                        // All images have already been used as cover images, we can use any image from the group
+                        candidateCovers.push(...group.images);
+                    }
+                    groupCoverImage = candidateCovers[Math.floor(Math.random() * candidateCovers.length)];
+                    covers.add(parsePortfolioCategoryImageId(groupCoverImage.id));
                 }
                 return {
                     ...groupCoverImage,
