@@ -17,33 +17,48 @@ import categoryAdminToolsFactory from './admin/CategoryAdminTools';
 import CategoryImageAdminTools from './admin/CategoryImageAdminTools';
 import useAdminActions from './admin/UseAdminActions';
 import { useToast } from 'components/notifications';
+import { FILTER_VALUE_EXCLUDED_FROM_CATEGORY, FILTER_VALUE_INCLUDED_IN_CATEGORY } from 'utils/portfolio';
 
 const GROUP_BY_CATEGORY = 'category';
 const GROUP_BY_DESTINATION = 'destination';
 const GROUP_BY_DATE = 'date';
 const GROUP_NONE = 'none';
-const DEFAULT_GROuPiNG = GROUP_BY_CATEGORY;
+const DEFAULT_GROUPiNG = GROUP_BY_CATEGORY;
 
 const PortfolioGallery = ({images, categories}) => {
     const authContext = useAuthContext();
     const { language } = useLanguage();
     const t = useTranslation("pages.portfolio");
-    const [selectedGrouping, setSelectedGrouping] = React.useState(DEFAULT_GROuPiNG);
+    const [selectedGrouping, setSelectedGrouping] = React.useState({
+        grouping: DEFAULT_GROUPiNG,
+        galleryContent: null
+    });
+    const [ categoryImageFilter, setCategoryImageFilter ] = React.useState([ FILTER_VALUE_EXCLUDED_FROM_CATEGORY, FILTER_VALUE_INCLUDED_IN_CATEGORY ]);
 
     const {
         dateGroupBuilder,
         destinationGroupBuilder,
         categoryGroupBuilder
-    } = React.useMemo(() => GroupBuilderFactory(categories, language, t, authContext.admin), [categories, language, t, authContext.admin]);
+    } = React.useMemo(() => GroupBuilderFactory(categories, language, t, authContext.admin, categoryImageFilter), [categories, language, t, authContext.admin, categoryImageFilter]);
 
-    const { AdminActions, onEditCategory, onClickDeleteCategory } = useAdminActions();
+    const onFilterChange = React.useCallback((nextFilter) => {
+        setCategoryImageFilter(prevFilter => {
+            if (prevFilter.length === nextFilter.length && prevFilter.every(f => nextFilter.includes(f))) {
+                // The filter hasn't changed, so we don't need to update the state
+                return prevFilter;
+            }
+            return nextFilter;
+        });
+    }, []);
+
+    const { AdminActions, onEditCategory, onClickDeleteCategory } = useAdminActions(onFilterChange);
 
     const groupOptions = React.useMemo(() => {
         const categoryAdminTools = categoryAdminToolsFactory(categories, onEditCategory, onClickDeleteCategory);
         const options = [
-            { value: GROUP_BY_CATEGORY,    label: t("groupBy:category"),    groupLabel: t("groupLabel:category"),    groupBuilder: categoryGroupBuilder    , adminTools: categoryAdminTools, imageAdminTools: CategoryImageAdminTools },
-            { value: GROUP_BY_DESTINATION, label: t("groupBy:destination"), groupLabel: t("groupLabel:destination"), groupBuilder: destinationGroupBuilder , adminTools: null,               imageAdminTools: null },
-            { value: GROUP_BY_DATE,        label: t("groupBy:date"),        groupLabel: t("groupLabel:date"),        groupBuilder: dateGroupBuilder        , adminTools: null,               imageAdminTools: null }
+            { value: GROUP_BY_CATEGORY,    label: t("groupBy:category"),    groupLabel: t("groupLabel:category"),    adminTools: categoryAdminTools, imageAdminTools: CategoryImageAdminTools },
+            { value: GROUP_BY_DESTINATION, label: t("groupBy:destination"), groupLabel: t("groupLabel:destination"), adminTools: null,               imageAdminTools: null },
+            { value: GROUP_BY_DATE,        label: t("groupBy:date"),        groupLabel: t("groupLabel:date"),        adminTools: null,               imageAdminTools: null }
         ]
         if (authContext.admin) {
             options.push({
@@ -56,29 +71,49 @@ const PortfolioGallery = ({images, categories}) => {
         return options;
     }, [
         t,
-        destinationGroupBuilder,
-        dateGroupBuilder,
-        categoryGroupBuilder,
         onEditCategory,
         onClickDeleteCategory,
         authContext.admin,
         categories
     ]);
 
-    const onGroupingChanged = React.useCallback((grouping) => {
-        setSelectedGrouping(grouping);
+    const groupBuilders = React.useMemo(() => {
+        const builders = new Map();
+        builders.set(GROUP_BY_CATEGORY, categoryGroupBuilder);
+        builders.set(GROUP_BY_DESTINATION, destinationGroupBuilder);
+        builders.set(GROUP_BY_DATE, dateGroupBuilder);
+        return builders;
+    }, [
+        dateGroupBuilder,
+        destinationGroupBuilder,
+        categoryGroupBuilder
+    ]);
+
+    const onGroupingChanged = React.useCallback((grouping, galleryContent) => {
+        setSelectedGrouping(prevGrouping => {
+            if (prevGrouping.grouping === grouping && prevGrouping.galleryContent === galleryContent) {
+                return prevGrouping;
+            }
+            const newGrouping = grouping ?? prevGrouping.grouping;
+            const newGalleryContent = galleryContent ?? prevGrouping.galleryContent;
+            return {
+                grouping: newGrouping,
+                galleryContent: newGalleryContent
+            };
+        });
     }, []);
 
     return (
         <React.Fragment>
             <HierarchicalGroupGallery
                 groupingOptions={groupOptions}
+                groupBuilders={groupBuilders}
                 images={images}
                 defaultGroupingValue={GROUP_BY_CATEGORY}
                 onGroupingChanged={onGroupingChanged}
                 diaporamaEnabled={true}
             />
-            { selectedGrouping === GROUP_BY_CATEGORY && <AdminActions /> }
+            { selectedGrouping.grouping === GROUP_BY_CATEGORY && <AdminActions galleryContent={selectedGrouping.galleryContent}/> }
         </React.Fragment>
     );
 };

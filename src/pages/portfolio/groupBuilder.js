@@ -7,7 +7,9 @@ import { Paragraph } from 'template/pageTypography';
 import {
     PORTFOLIO_CATEGORY_OTHER_KEY,
     buildPortfolioCategoryImageId,
-    imageIsExcludedFromCategory
+    imageIsExcludedFromCategory,
+    FILTER_VALUE_EXCLUDED_FROM_CATEGORY,
+    FILTER_VALUE_INCLUDED_IN_CATEGORY
 } from 'utils/portfolio';
 
 const renderOverlayFactory = (caption) => {
@@ -105,7 +107,7 @@ const getCategoryCaption = (category, language) => {
     return category[`caption_${language}`];
 };
 
-export const GroupBuilderFactory = (categories, language, translator, admin) => {
+export const GroupBuilderFactory = (categories, language, translator, admin, filter) => {
 
     const destinationGroupBuilder = (images) => {
         const imagesByDest = new Map();
@@ -130,6 +132,23 @@ export const GroupBuilderFactory = (categories, language, translator, admin) => 
         }); 
     };
 
+    const displayImage = (imageIsExcluded) => {
+        if (!admin) {
+            // If the user is not admin, we only show images that are not excluded from the category
+            return !imageIsExcluded;
+        }
+        if (filter.includes(FILTER_VALUE_INCLUDED_IN_CATEGORY) && !imageIsExcluded) {
+            // Show images that are included in the category, if the filter is set to "included"
+            return true;
+        }
+        if (filter.includes(FILTER_VALUE_EXCLUDED_FROM_CATEGORY) && imageIsExcluded) {
+            // Show images that are excluded from the category, if the filter is set to "excluded"
+            return true;
+        }
+        // Otherwise, don't show the image
+        return false;
+    };
+
     const categoryGroupBuilder = (images) => {
         const imagesByCategory = new Map();
         const categorizedImages = new Set();
@@ -137,10 +156,11 @@ export const GroupBuilderFactory = (categories, language, translator, admin) => 
             const matchingCategories = categories.filter(cat => image.tags.includes(cat.key));
             matchingCategories.forEach((matchingCategory) => {
                 let categoryGroup = imagesByCategory.get(matchingCategory.key);
-                if (!admin && imageIsExcludedFromCategory(image, matchingCategory)) {
-                    // If the user is not admin, we don't want to show images that are excluded from the category
+                const imageIsExcluded = imageIsExcludedFromCategory(image, matchingCategory);
+                if (!displayImage(imageIsExcluded)) {
                     return;
                 }
+
                 if (!categoryGroup) {
                     categoryGroup = createPortfolioGroup(matchingCategory.key);
                     categoryGroup.caption = getCategoryCaption(matchingCategory, language); //GroupHeaderFactory(translator(matchingCategory.label));

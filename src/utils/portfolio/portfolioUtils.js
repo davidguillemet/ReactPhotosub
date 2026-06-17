@@ -1,3 +1,6 @@
+export const FILTER_VALUE_EXCLUDED_FROM_CATEGORY = "excluded";
+export const FILTER_VALUE_INCLUDED_IN_CATEGORY = "included";
+
 export const buildPortfolioCategoryImageId = (image, category) => {
     return `${image.id}|${category.key}`;
 }

@@ -59,10 +59,10 @@ const categoryAdminToolsFactory = (categories, onEditCategory, onClickDeleteCate
                         <WarningIcon color="warning" sx={{ mr: 0.5}}/>
                     </Tooltip>
                 }
-                <IconButton onClick={handleOnEditCategory}>
+                <IconButton onClick={handleOnEditCategory} variant="noBorder">
                     <EditIcon></EditIcon>
                 </IconButton>
-                <IconButton onClick={handleOnClickDeleteCategory}>
+                <IconButton onClick={handleOnClickDeleteCategory} variant="noBorder">
                     <DeleteIcon></DeleteIcon>
                 </IconButton>
             </Stack>

@@ -1,6 +1,8 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Fab } from "@mui/material";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
 import useFormDialog from 'dialogs/FormDialog';
 import CategoryForm from './CategoryForm';
@@ -8,14 +10,44 @@ import { useTranslation } from 'utils';
 import ConfirmDialog from 'dialogs/ConfirmDialog';
 import { useAuthContext } from 'components/authentication';
 import { useAsyncFetcher } from 'components/reactRouter';
-import { PORTFOLIO_CATEGORY_INTENT_DELETE } from 'utils/portfolio';
+import {
+    PORTFOLIO_CATEGORY_INTENT_DELETE,
+    FILTER_VALUE_EXCLUDED_FROM_CATEGORY,
+    FILTER_VALUE_INCLUDED_IN_CATEGORY }
+from 'utils/portfolio';
 import { useToast } from 'components/notifications';
 
 const Div = styled('div')(() => {});
 
+const StatusFilter = ({ onFilterChange }) => {
+
+    const [filter, setFilter] = React.useState([FILTER_VALUE_INCLUDED_IN_CATEGORY, FILTER_VALUE_EXCLUDED_FROM_CATEGORY]);
+    const handleOnToggleIncluded = React.useCallback(() => {
+        setFilter(prev => prev.includes(FILTER_VALUE_INCLUDED_IN_CATEGORY) ? prev.filter(f => f !== FILTER_VALUE_INCLUDED_IN_CATEGORY) : [...prev, FILTER_VALUE_INCLUDED_IN_CATEGORY]);
+    }, []);
+    const handleOnToggleExcluded = React.useCallback(() => {
+        setFilter(prev => prev.includes(FILTER_VALUE_EXCLUDED_FROM_CATEGORY) ? prev.filter(f => f !== FILTER_VALUE_EXCLUDED_FROM_CATEGORY) : [...prev, FILTER_VALUE_EXCLUDED_FROM_CATEGORY]);
+    }, []);
+
+    React.useEffect(() => {
+        onFilterChange(filter);
+    }, [filter, onFilterChange]);
+
+    return (
+        <React.Fragment>
+            <Fab color={filter.includes(FILTER_VALUE_INCLUDED_IN_CATEGORY) ? "success" : "default"} sx={{ ml: 1 }} onClick={handleOnToggleIncluded}>
+                <VisibilityIcon />
+            </Fab>
+            <Fab color={filter.includes(FILTER_VALUE_EXCLUDED_FROM_CATEGORY) ? "success" : "default"} sx={{ ml: 1 }} onClick={handleOnToggleExcluded}>
+                <VisibilityOffIcon />
+            </Fab>
+        </React.Fragment>
+    );
+};
+
 // Same Component as useAdminActions from destinations' page
 // What could we do to make things in common?
-export default function useAdminActions() {
+export default function useAdminActions(onFilterChange) {
 
     const t = useTranslation("pages.portfolio.admin");
     const authContext = useAuthContext();
@@ -68,7 +100,7 @@ export default function useAdminActions() {
             }
         };
 
-        const AdminActions = () => {
+        const AdminActions = ({galleryContent}) => {
             if (authContext.admin === true) {
                 return (
                     <React.Fragment>
@@ -106,6 +138,10 @@ export default function useAdminActions() {
                                 <AddCircleOutlineIcon fontSize="large" sx={{ mr: 1 }} />
                                 {t("btn:addCategory")}
                             </Fab>
+                            {
+                                galleryContent === "groupImages" &&
+                                <StatusFilter onFilterChange={onFilterChange} />
+                            }
                         </Div>
 
                     </React.Fragment>
@@ -123,6 +159,7 @@ export default function useAdminActions() {
         onDeleteCategory,
         onNewCategory,
         onCloseCategoryEditor,
+        onFilterChange,
         authContext.admin
     ]);
 

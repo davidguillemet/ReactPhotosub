@@ -87,6 +87,7 @@ const GALLERY_CONTENT = {
 export const HierarchicalGroupGallery = ({
     images,
     groupingOptions,
+    groupBuilders,
     defaultGroupingValue,
     onGroupingChanged,
     diaporamaEnabled = false
@@ -113,10 +114,9 @@ export const HierarchicalGroupGallery = ({
 
     const [selectedGroupingOption, setSelectedGroupingOption] = React.useState(() => localGroupingOptions.find(o => o.value === defaultGroupingValue) ?? localGroupingOptions[0]);
 
-    const [groups] = React.useMemo(() => buildGroups(images, selectedGroupingOption?.groupBuilder, "desc"), [images, selectedGroupingOption.groupBuilder]);
+    const [groups] = React.useMemo(() => buildGroups(images, groupBuilders.get(selectedGroupingOption.value), "desc"), [images, groupBuilders, selectedGroupingOption.value]);
 
     const safeCurrentGroupIndex =
-        // selectedGroupingOption.groupBuilder === null ? 0 : // If no groupBuilder, there is only one global group: selected by default
         (currentGroupIndex !== null && currentGroupIndex < groups.length) ? currentGroupIndex :
         null;
     
@@ -138,7 +138,7 @@ export const HierarchicalGroupGallery = ({
 
     // Root images are the cover images for each group, depending on the selected grouping option
     const rootImages = React.useMemo(() => {
-        if (selectedGroupingOption?.groupBuilder !== null) {
+        if (groupBuilders.has(selectedGroupingOption.value)) {
             const covers = new Set();
             return groups.map(group => {
                 let groupCoverImage;
@@ -169,7 +169,7 @@ export const HierarchicalGroupGallery = ({
             // Only one global group
             return groups[0].images;
         }
-    }, [groups, selectedGroupingOption.groupBuilder]);
+    }, [groups, groupBuilders, selectedGroupingOption.value]);
 
     const imagesToDisplay = React.useMemo(
         () => safeCurrentGroupIndex !== null ? groups[safeCurrentGroupIndex].images : rootImages,
@@ -184,7 +184,8 @@ export const HierarchicalGroupGallery = ({
         }
         setCurrentGroupIndex(index);
         setSelectedValue(group.key);
-    }, [groups]);
+        onGroupingChanged(undefined, GALLERY_CONTENT.GROUP_IMAGES);
+    }, [groups, onGroupingChanged]);
 
     const onGoToGroupList = React.useCallback(() => {
         setCurrentGroupIndex(null);
@@ -195,7 +196,7 @@ export const HierarchicalGroupGallery = ({
         if (selectContentType === SELECT_CONTENT.GROUPING_OPTIONS) {
             // We are currently on the grouping options, we can directly switch to the new grouping
             setCurrentGroupIndex(null);
-            onGroupingChanged(selectedValue);
+            onGroupingChanged(selectedValue, GALLERY_CONTENT.GROUP_COVERS);
             setSelectedGroupingOption(localGroupingOptions.find(o => o.value === selectedValue) ?? localGroupingOptions[0]);
             return;
         } else { // SELECT_CONTENT.GROUP_LIST
@@ -256,7 +257,7 @@ export const HierarchicalGroupGallery = ({
                 </Select>
                 </FormControl>
                 {
-                    selectedGroupingOption.groupBuilder !== null && safeCurrentGroupIndex !== null &&
+                    groupBuilders.has(selectedGroupingOption.value) && safeCurrentGroupIndex !== null &&
                     <React.Fragment>
                         <TooltipIconButton
                             tooltip={selectedGroupingOption.groupLabel}

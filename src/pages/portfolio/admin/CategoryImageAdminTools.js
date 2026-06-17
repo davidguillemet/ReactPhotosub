@@ -48,7 +48,7 @@ const CategoryImageAdminTools = ({image}) => {
     }, [image, imageIsExcluded, onIncludeImageInCategory, onExcludeImageFromCategory]);
 
     return (
-        <IconButton onClick={handleOnToggleImageVisibility} loading={updating} >
+        <IconButton onClick={handleOnToggleImageVisibility} loading={updating} variant="noBorder">
             {imageIsExcluded ? <VisibilityOffIcon color="error" /> : <VisibilityIcon color="success" />}
         </IconButton>
     );
