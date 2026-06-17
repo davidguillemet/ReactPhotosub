@@ -153,7 +153,7 @@ export const GroupBuilderFactory = (categories, language, translator, admin, fil
         const imagesByCategory = new Map();
         const categorizedImages = new Set();
         images.forEach((image) => {
-            const matchingCategories = categories.filter(cat => image.tags.includes(cat.key));
+            const matchingCategories = categories.filter(cat => image.tags && image.tags.includes(cat.key));
             matchingCategories.forEach((matchingCategory) => {
                 let categoryGroup = imagesByCategory.get(matchingCategory.key);
                 const imageIsExcluded = imageIsExcludedFromCategory(image, matchingCategory);
