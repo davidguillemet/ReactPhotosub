@@ -27,13 +27,6 @@ function getFields(t) {
             default: ""
         },
         {
-            id: "portfolio",
-            label: t("field:portfolio"),
-            required: false,
-            type: FIELD_TYPE_CHECK_BOX,
-            default: false
-        },
-        {
             id: "tags",
             label: t("field:tags"),
             required: true,
@@ -42,6 +35,13 @@ function getFields(t) {
             multiline: true,
             default: []
         },
+        {
+            id: "portfolio",
+            label: t("field:portfolio"),
+            required: false,
+            type: FIELD_TYPE_CHECK_BOX,
+            default: false
+        }
     ];
 }
 

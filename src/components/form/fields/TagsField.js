@@ -50,7 +50,7 @@ const TagsFieldComp = ({ fieldSpec, value, handleChange }) => {
             onInputChange={(event, newInputValue) => {
                 const options = newInputValue.split(",");
                 if (options.length > 1) {
-                    const newTagList = value
+                    const newTagList = (value ?? [])
                         .concat(options)
                         .map(x => x.trim())
                         .filter(x => x);

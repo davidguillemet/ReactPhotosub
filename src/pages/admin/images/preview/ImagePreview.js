@@ -33,7 +33,6 @@ const ImageProperties = ({image}) => {
                 <Body sx={{m: 0}}>{image.description}</Body> :
                 <Alert severity="warning">Pas de description</Alert>
             }
-            <FormControlLabel control={<Checkbox checked={image.portfolio} disabled />} label="Portfolio" />
             <Box>
                 {
                     image.tags === null ?
@@ -45,6 +44,7 @@ const ImageProperties = ({image}) => {
                     })
                 }
             </Box>
+            <FormControlLabel control={<Checkbox checked={image.portfolio} disabled />} label="Portfolio" />
         </Stack>
     );
 }
