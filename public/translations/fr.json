@@ -155,7 +155,9 @@
                 "title:confirmRemove": "Supprimer la catégorie",
                 "confirmRemove": "Confirmez-vous la suppression de la catégorie '{0}' ?",
                 "warningConfirmRemove": "Attention, cette action est irreversible.",
-                "success:catDeleted": "La catégorie '{0}' a été supprimée."
+                "success:catDeleted": "La catégorie '{0}' a été supprimée.",
+                "btn:includeInCategory": "Inclure dans la catégorie",
+                "btn:excludeFromCategory": "Exclure de la catégorie"
             }
         },
         "finning": {

@@ -155,7 +155,9 @@
                 "title:confirmRemove": "Remove category",
                 "confirmRemove": "Do you confirm the deletion of the category '{0}'?",
                 "warningConfirmRemove": "Please note, this action is irreversible.",
-                "success:catDeleted": "The category '{0}' has been deleted."
+                "success:catDeleted": "The category '{0}' has been deleted.",
+                "btn:includeInCategory": "Include in category",
+                "btn:excludeFromCategory": "Exclude from category"
             }
         },
         "finning": {
