@@ -3,11 +3,16 @@ import { useTranslation } from 'utils';
 import Form, { FIELD_TYPE_TEXT, FIELD_TYPE_HIDDEN } from "components/form";
 import { PORTFOLIO_CATEGORY_INTENT_CREATE, PORTFOLIO_CATEGORY_INTENT_UPDATE } from 'utils/portfolio';
 
-const CategoryForm = ({category, onCancel}) => {
+const CategoryForm = ({category, categories, onCancel}) => {
     const t = useTranslation("pages.portfolio.admin");
     const [ fields, setFields ] = React.useState(null);
 
     const [values, setValues] = React.useState(null);
+
+    const validateKey = React.useCallback((newKey) => {
+        // Make sure the new key is not a duplicate
+        return !!newKey && categories.findIndex(c => c.key === newKey) === -1;
+    }, [categories]);
 
     React.useEffect(() => {
         setFields([
@@ -15,11 +20,12 @@ const CategoryForm = ({category, onCancel}) => {
                 id: "key",
                 label: t("field:key"),
                 required: true,
-                errorText: t("error:title"),
+                errorText: (value) => !!value ? t("error:duplicateKey", value): t("error:title"),
                 type: FIELD_TYPE_TEXT,
                 multiline: false,
                 default: "",
-                focus: true
+                focus: true,
+                validator: (_field, value) => validateKey(value)
             },
             {
                 id: "caption",
@@ -42,7 +48,7 @@ const CategoryForm = ({category, onCancel}) => {
                 default: category === null ? PORTFOLIO_CATEGORY_INTENT_CREATE : PORTFOLIO_CATEGORY_INTENT_UPDATE
             }
         ]);
-    }, [category, t]);
+    }, [category, validateKey, t]);
 
     React.useEffect(() => {
         if (category === null) {

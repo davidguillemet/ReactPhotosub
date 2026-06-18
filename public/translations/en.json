@@ -146,6 +146,7 @@
             "admin": {
                 "field:key": "Key",
                 "error:title": "The key is required.",
+                "error:duplicateKey": "The key '{0}' already exists.",
                 "field:caption": "Caption",
                 "btn:validate": "Validate",
                 "success:saved": "Category saved.",

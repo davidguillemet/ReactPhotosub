@@ -146,6 +146,7 @@
             "admin": {
                 "field:key": "Clé",
                 "error:title": "La clé est requise.",
+                "error:duplicateKey": "La clé '{0}' existe déjà.",
                 "field:caption": "Libellé",
                 "btn:validate": "Valider",
                 "success:saved": "Catégorie enregistrée.",

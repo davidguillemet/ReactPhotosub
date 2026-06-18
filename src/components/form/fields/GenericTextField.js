@@ -74,7 +74,7 @@ const GenericTextFieldComp = ({
             onChange={onChange}
             onBlur={onBlur}
             error={error}
-            helperText={error ? field.errorText : ''}
+            helperText={error ? (typeof field.errorText === 'function' ? field.errorText(value) : field.errorText) : ''}
             disabled={formContext.sending || formContext.readOnly || field.readOnly}
             sx={{
                 ...(group === true && {

@@ -100,7 +100,7 @@ export default function useAdminActions(onFilterChange) {
             }
         };
 
-        const AdminActions = ({galleryContent}) => {
+        const AdminActions = ({galleryContent, categories}) => {
             if (authContext.admin === true) {
                 return (
                     <React.Fragment>
@@ -108,6 +108,7 @@ export default function useAdminActions(onFilterChange) {
                         <FormDialog title={getDialogTitle()} {...dialogProps}>
                             <CategoryForm
                                 category={categoryToEdit}
+                                categories={categories}
                                 onCancel={onCloseCategoryEditor}
                             />
                         </FormDialog>

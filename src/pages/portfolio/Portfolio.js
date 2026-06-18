@@ -113,7 +113,7 @@ const PortfolioGallery = ({images, categories}) => {
                 onGroupingChanged={onGroupingChanged}
                 diaporamaEnabled={true}
             />
-            { selectedGrouping.grouping === GROUP_BY_CATEGORY && <AdminActions galleryContent={selectedGrouping.galleryContent}/> }
+            { selectedGrouping.grouping === GROUP_BY_CATEGORY && <AdminActions galleryContent={selectedGrouping.galleryContent} categories={categories}/> }
         </React.Fragment>
     );
 };
