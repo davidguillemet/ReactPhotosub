@@ -10,7 +10,7 @@ import MailOutlineIcon from '@mui/icons-material/MailOutlined';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import SvgIcon from '@mui/material/SvgIcon';
-import CollectionsIcon from '@mui/icons-material/Collections';
+import CollectionsBookmarkIcon from '@mui/icons-material/CollectionsBookmark';
 
 import { styled } from '@mui/material/styles';
 import React from "react";
@@ -114,9 +114,9 @@ export const routes = [
         path: PortfolioPath,
         page: "portfolio",
         fullWidth: true,
-        icon: <CollectionsIcon />,
+        icon: <CollectionsBookmarkIcon />,
         sidebar: true,
-        admin: true
+        admin: false
     },
     {
         label: "destinations",
