@@ -26,6 +26,7 @@ import { useTranslation } from 'utils';
 import { AppContextProvider, useAppContext } from './appContext';
 import { useCurrentPage } from 'components/hooks';
 import { UpdateNotifier } from 'components/updateNotifier';
+import { useAuthContext } from 'components/authentication';
 
 
 const drawerWidth = 240;
@@ -97,6 +98,7 @@ const DrawerContainer = styled('div')(({ theme }) => ({ }));
 const DrawerContent = ({variant = "temporary"}) => {
 
     const t = useTranslation(ROUTES_NAMESPACE);
+    const authContext = useAuthContext();
     const { drawerOpen: open, setDrawerOpen } = useAppContext();
 
     const handleClose = React.useCallback(() => {
@@ -161,7 +163,8 @@ const DrawerContent = ({variant = "temporary"}) => {
             </Box> */ }
             <List sx={{ width: '100%', myt: 3, mb: 1, pt: 0}}>
                 {
-                    routes.filter(route => route.sidebar).map((route, index) => {
+                    routes.filter(route => route.sidebar && (!route.admin || authContext.admin))
+                    .map((route, index) => {
                         return (
                             <NavigationLink key={index} to={route.path} >
                                 <ListItemButton>

@@ -115,7 +115,7 @@ export const routes = [
         page: "portfolio",
         fullWidth: true,
         icon: <CollectionsIcon />,
-        private: true,
+        sidebar: true,
         admin: true
     },
     {
