@@ -625,7 +625,7 @@ const ExpandedView = React.forwardRef(({
                 />
 
                 {
-                    currentImageDesc &&
+                    (currentImageDesc || displayDestination) &&
                     <ImageInfo
                         container={slideContainerResizeObserver.element}
                         style={{
