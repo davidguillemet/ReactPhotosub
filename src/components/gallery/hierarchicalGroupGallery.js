@@ -96,7 +96,7 @@ export const HierarchicalGroupGallery = ({
     // Initialize the display with the grouping options
     const authContext = useAuthContext();
     const [selectedValue, setSelectedValue] = React.useState(defaultGroupingValue);
-    const [currentGroupIndex, setCurrentGroupIndex] = React.useState(null);
+    const [currentGroupIndex, setCurrentGroupIndex] = React.useState(-1);
     const [localGroupingOptions, setLocalGroupingOptions] = React.useState(groupingOptions);
     const [slideshowTrigger, setSlideshowTrigger] = React.useState(0);
 
@@ -108,7 +108,7 @@ export const HierarchicalGroupGallery = ({
             const newSelectedOption = groupingOptions.find(o => o.value === defaultGroupingValue) ?? groupingOptions[0];
             setSelectedGroupingOption(newSelectedOption);
             setSelectedValue(newSelectedOption.value);
-            setCurrentGroupIndex(null);
+            setCurrentGroupIndex(-1);
         }
     }, [groupingOptions, defaultGroupingValue]);
 
@@ -116,12 +116,10 @@ export const HierarchicalGroupGallery = ({
 
     const [groups] = React.useMemo(() => buildGroups(images, groupBuilders.get(selectedGroupingOption.value), "desc"), [images, groupBuilders, selectedGroupingOption.value]);
 
-    const safeCurrentGroupIndex =
-        (currentGroupIndex !== null && currentGroupIndex < groups.length) ? currentGroupIndex :
-        null;
+    const safeCurrentGroupIndex = (currentGroupIndex >= 0 && currentGroupIndex < groups.length) ? currentGroupIndex : -1;
     
     const selectContentType = React.useMemo(() => {
-        if (safeCurrentGroupIndex === null) {
+        if (safeCurrentGroupIndex === -1) {
             return SELECT_CONTENT.GROUPING_OPTIONS;
         } else {
             return SELECT_CONTENT.GROUP_LIST;
@@ -129,7 +127,7 @@ export const HierarchicalGroupGallery = ({
     }, [safeCurrentGroupIndex]);
 
     const galleryContentType = React.useMemo(() => {
-        if (safeCurrentGroupIndex === null && selectedValue !== 'none') {
+        if (safeCurrentGroupIndex === -1 && selectedValue !== 'none') {
             return GALLERY_CONTENT.GROUP_COVERS;
         } else {
             return GALLERY_CONTENT.GROUP_IMAGES;
@@ -172,7 +170,7 @@ export const HierarchicalGroupGallery = ({
     }, [groups, groupBuilders, selectedGroupingOption.value]);
 
     const imagesToDisplay = React.useMemo(
-        () => safeCurrentGroupIndex !== null ? groups[safeCurrentGroupIndex].images : rootImages,
+        () => safeCurrentGroupIndex !== -1 ? groups[safeCurrentGroupIndex].images : rootImages,
         [groups, safeCurrentGroupIndex, rootImages]
     );
 
@@ -188,14 +186,14 @@ export const HierarchicalGroupGallery = ({
     }, [groups, onGroupingChanged]);
 
     const onGoToGroupList = React.useCallback(() => {
-        setCurrentGroupIndex(null);
+        setCurrentGroupIndex(-1);
         setSelectedValue(selectedGroupingOption.value);
     }, [selectedGroupingOption.value]);
 
     React.useEffect(() => {
         if (selectContentType === SELECT_CONTENT.GROUPING_OPTIONS) {
             // We are currently on the grouping options, we can directly switch to the new grouping
-            setCurrentGroupIndex(null);
+            setCurrentGroupIndex(-1);
             onGroupingChanged(selectedValue, GALLERY_CONTENT.GROUP_COVERS);
             setSelectedGroupingOption(localGroupingOptions.find(o => o.value === selectedValue) ?? localGroupingOptions[0]);
             return;
@@ -257,7 +255,7 @@ export const HierarchicalGroupGallery = ({
                 </Select>
                 </FormControl>
                 {
-                    groupBuilders.has(selectedGroupingOption.value) && safeCurrentGroupIndex !== null &&
+                    groupBuilders.has(selectedGroupingOption.value) && safeCurrentGroupIndex !== -1 &&
                     <React.Fragment>
                         <TooltipIconButton
                             tooltip={selectedGroupingOption.groupLabel}
@@ -272,11 +270,11 @@ export const HierarchicalGroupGallery = ({
             <Gallery
                 images={imagesToDisplay}
                 onImageClick={onImageClick}
-                sort={safeCurrentGroupIndex === null ? "none" : "desc"} // Don't sort images for the group covers to preserve the index
-                withFavorite={safeCurrentGroupIndex !== null} // No favorite button for the group covers
+                sort={safeCurrentGroupIndex === -1 ? "none" : "desc"} // Don't sort images for the group covers to preserve the index
+                withFavorite={safeCurrentGroupIndex !== -1} // No favorite button for the group covers
                 renderOverlay={renderOverlay}
                 imageAdminTools={
-                    safeCurrentGroupIndex === null ?
+                    safeCurrentGroupIndex === -1 ?
                     null :  // No image admin tool for the group covers
                     selectedGroupingOption.imageAdminTools // Image admin tool for the group images, depending on the selected grouping option
                 }
