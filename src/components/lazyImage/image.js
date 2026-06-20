@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { gsap } from "gsap";
 import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import FavoriteButton from '../gallery/favoriteButton';
@@ -11,6 +10,10 @@ import ImageDescription from '../imageDescription';
 import {isMobile} from 'react-device-detect';
 import { Stack } from '@mui/material';
 import { useAuthContext } from '../authentication';
+
+import { gsap } from "gsap";
+import { useGSAP } from '@gsap/react';
+gsap.registerPlugin(useGSAP);
 
 const Image = styled('img')(({ theme }) => ({ }));
 
@@ -66,7 +69,7 @@ const LazyImage = ({
     const { isVisible, ref: imageRef } = useVisible();
     const loaded = useRef(false);
     const container = useRef();
-    const selector = gsap.utils.selector(container);
+    const { contextSafe } = useGSAP({ scope: container });
     const authContext = useAuthContext();
     const AdminTools = adminTools;
 
@@ -98,19 +101,19 @@ const LazyImage = ({
         }
     }
 
-    const onMouseEnter = () => {
+    const onMouseEnter = contextSafe(() => {
         if (withOverlay && renderOverlay === null) {
-            gsap.to(selector(`#${imageOverlayId}`), { duration: 0.4, opacity: 1 });
+            gsap.to(`#${imageOverlayId}`, { duration: 0.4, opacity: 1 });
         }
-        gsap.to(selector(`#${imageId}`), { scale: 1.1, ease: "bounce.out" });
-    };
+        gsap.to(`#${imageId}`, { scale: 1.1, ease: "bounce.out" });
+    });
 
-    const onMouseLeave = () => {
+    const onMouseLeave = contextSafe(() => {
         if (withOverlay && renderOverlay === null) {
-            gsap.to(selector(`#${imageOverlayId}`), { duration: 0.4, opacity: 0 });
+            gsap.to(`#${imageOverlayId}`, { duration: 0.4, opacity: 0 });
         }
-        gsap.to(selector(`#${imageId}`), { scale: 1, ease: "bounce.out" });
-    };
+        gsap.to(`#${imageId}`, { scale: 1, ease: "bounce.out" });
+    });
 
     return (
         <Box

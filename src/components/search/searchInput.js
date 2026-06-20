@@ -20,7 +20,6 @@ import { useTheme } from '@mui/material/styles';
 
 import { gsap } from "gsap";
 import { useGSAP } from '@gsap/react';
-
 gsap.registerPlugin(useGSAP);
 
 const SearchIconButton = styled(IconButton)(({theme}) => ({

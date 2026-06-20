@@ -1,13 +1,15 @@
-import { useLayoutEffect } from 'react';
-import { gsap } from "gsap";
 import { useVisible } from '../hooks';
 import Box from '@mui/material/Box';
+
+import { gsap } from "gsap";
+import { useGSAP } from '@gsap/react';
+gsap.registerPlugin(useGSAP);
 
 const ItemContainer = ({item, index, top, left, width, height, renderItem, renderComponent, renderExtraParams}) => {
 
     const { isVisible, ref: containerRef, element } = useVisible();
 
-    useLayoutEffect(() => {
+    useGSAP(() => {
         if (isVisible) {
             gsap.from(element, {duration: 0.8, scale: 0, y: 100});
             gsap.to(element, {duration: 0.8, opacity: 1, scale: 1, ease: "power4.easeOut"});

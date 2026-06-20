@@ -1,6 +1,5 @@
 import React, { useRef, useState, useLayoutEffect } from 'react';
 import { isMobile } from 'react-device-detect';
-import { gsap } from "gsap";
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';    
 import Chip from "@mui/material/Chip";
@@ -15,6 +14,10 @@ import { useAuthContext } from '../../components/authentication';
 import { PublicationIndicator } from 'components/publication';
 import useAdminActions from './admin/UseAdminActions';
 import LazyImage from '../../components/lazyImage';
+
+import { gsap } from "gsap";
+import { useGSAP } from '@gsap/react';
+gsap.registerPlugin(useGSAP);
 
 const DestinationDetails = ({destination, onHeightCalculated}) => {
     const { language } = useLanguage();
@@ -63,6 +66,8 @@ const DestinationDetails = ({destination, onHeightCalculated}) => {
 
 const DestinationContent = ({item, index, width, params}) => {
 
+    const container = useRef();
+    const { contextSafe } = useGSAP({ scope: container });
     const destination = item;
     const destinationImage = React.useMemo(() => ({
         src: destination.cover,
@@ -72,24 +77,21 @@ const DestinationContent = ({item, index, width, params}) => {
     const authContext = useAuthContext();
     const { onEdit, onDelete } = params;
 
-    const container = useRef();
     const [visibleHeight, setVisibleHeight] = useState(65); // Default value, will be updated on mount
 
-    const onMouseEnter = () => {
-        const selector = gsap.utils.selector(container);
-        gsap.to(selector(".details"), {
+    const onMouseEnter = contextSafe(() => {
+        gsap.to(".details", {
             y: (index, target, targets) => {
                 const detailsHeight = target.offsetHeight;
                 return -(detailsHeight - visibleHeight);
             },
             ease: "bounce.out"
         });
-    };
+    });
 
-    const onMouseLeave = () => {
-        const selector = gsap.utils.selector(container);
-        gsap.to(selector(".details"), { y: 0, ease: "bounce.out" });
-    };
+    const onMouseLeave = contextSafe(() => {
+        gsap.to(".details", { y: 0, ease: "bounce.out" });
+    });
 
     const onEditDestination = () => {
         onEdit(destination);
@@ -99,10 +101,9 @@ const DestinationContent = ({item, index, width, params}) => {
         onDelete(destination);
     }
 
-    const onImageLoaded = React.useCallback(() => {
-        const selector = gsap.utils.selector(container);
-        gsap.to(selector(".details"), { opacity: 1, ease: "bounce.out" });
-    }, [container]);
+    const onImageLoaded = contextSafe(() => {
+        gsap.to(".details", { opacity: 1, ease: "bounce.out" });
+    });
 
     return (
         <Box

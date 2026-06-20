@@ -1,5 +1,4 @@
 import React from 'react';
-import { gsap } from "gsap";
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Chip from '@mui/material/Chip';
@@ -9,6 +8,10 @@ import ImageDestinationLink from './imageDestinationLink';
 import { Alert, IconButton, Stack } from '@mui/material';
 import { useTranslation } from 'utils';
 import CloseIcon from '@mui/icons-material/Close';
+
+import { gsap } from "gsap";
+import { useGSAP } from '@gsap/react';
+gsap.registerPlugin(useGSAP);
 
 const imageInfoId = "imageInfoId";
 const imageInfoAnimationDuration = 0.5;
@@ -23,7 +26,7 @@ const ImageInfo = ({image, displayDestination, style, container, visible, displa
     const hiddeAction = React.useRef(null);
     const effectFirstRoundTrip = React.useRef(true);
 
-    React.useEffect(() => {
+    useGSAP(() => {
         if (!container) {
             return;
         }
@@ -53,7 +56,9 @@ const ImageInfo = ({image, displayDestination, style, container, visible, displa
                 }
             });
         }
-    }, [visible, container]);
+    }, {
+        dependencies: [visible, container],
+    });
 
     React.useEffect(() => {
         paperRef.current.scrollTo({

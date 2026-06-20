@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from "react-router";
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -38,13 +38,12 @@ const ImageDetails = ({image}) => {
 
     const destination = image.destination;
 
-    useLayoutEffect(() => {
+    useGSAP(() => {
         if (collapsed) {
             const contentWidth = container.current.offsetWidth - buttonContainer.current.offsetWidth;
             gsap.set(container.current, { left: -contentWidth });
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    });
 
     const toggleDetails = contextSafe(() => {
         if (collapsed) {
