@@ -5,7 +5,6 @@ import {
     getDbIndex
 } from './common';
 import qs from 'qs';
-import { HOME_IMAGE_FOLDER } from 'utils';
 
 function _addSimulationDbIndex(simulations) {
     simulations.forEach((simulation, index) => {
@@ -238,10 +237,6 @@ DataProvider.prototype.getUploadedInteriors = function(uid) {
 
 DataProvider.prototype.removeUploadedInterior = function(fileName) {
     return this.axios.delete('/uploadedInteriors', {data: { fileName: fileName } })
-}
-
-DataProvider.prototype.getImageDefaultSelection = function() {
-    return this._getBucketContent(HOME_IMAGE_FOLDER);
 }
 
 DataProvider.prototype._getBucketContent = function(folder) {

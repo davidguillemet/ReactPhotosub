@@ -160,11 +160,6 @@ export const QueryContextProvider = ({children}) => {
         useFetchInteriors: (thenFunc) => useQuery(['interiors'], () => dataProvider.getInteriors().then(thenFunc)),
         useFetchUserInteriors: (uid, thenFunc) => useQuery(['userInteriors', uid], () => dataProvider.getUploadedInteriors(uid).then(thenFunc)),
         useRemoveUserInterior: () => useMutation((fileName) => dataProvider.removeUploadedInterior(fileName)),
-        useFetchDefaultSelection: (enabled, thenFunc) => useQuery(
-            ['defaultSelection'],
-            () => dataProvider.getImageDefaultSelection().then(thenFunc),
-            { enabled: enabled }
-        ),
         useFetchSearchResults: (enabled, thenFunc) => useQuery(['searchResults'], () => Promise.resolve([]), { enabled: enabled }),
 
         useFetchSimulations: (uid) => useQuery(['simulations', uid], () => dataProvider.getSimulations(uid), {
