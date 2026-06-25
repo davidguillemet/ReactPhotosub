@@ -24,6 +24,7 @@ import ImageInfo from './imageInfo';
 import { useResizeObserver } from 'components/hooks';
 import { useScrollBlock, openFullscreen, closeFullscreen } from 'utils';
 import { useAuthContext } from 'components/authentication';
+import { CustomLoading } from 'components/loading';
 
 import TooltipIconButton from 'components/tooltipIconButton';
 import { HorizontalSpacing } from 'template/spacing';
@@ -160,7 +161,7 @@ const SlideRenderer = ({image, visible, containerWidth, containerHeight}) => {
                     objectFit: 'contain' // Prevent portrait image being enlarged on chrome windows (at least)
                 }}
             />
-            <CircularProgress
+            <CustomLoading
                 className={'slideLoader'}
                 sx={{
                     position: 'absolute',
@@ -683,7 +684,7 @@ const ExpandedView = React.forwardRef(({
                         }
                     }}
                 >
-                    <CircularProgress thickness={5} size={60}/>
+                    <CustomLoading size={60}/>
                 </Dialog>
 
             </Box>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CircularProgress, IconButton, Stack, Tooltip } from '@mui/material';
+import { IconButton, Stack, Tooltip } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
@@ -8,6 +8,8 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+
+import { CustomLoading } from 'components/loading';
 
 export const STATUS_UNKNOWN = "unknown";
 export const STATUS_SUCCESS = "success";
@@ -37,7 +39,7 @@ const StorageItemStatusContent = ({status, messages, errorIcon, remediation = nu
         return " - ";
     }
     if (status === STATUS_PENDING || status === STATUS_NOT_READY || status === STATUS_UNKNOWN) {
-        return <CircularProgress size={20} />;
+        return <CustomLoading size={20} />;
     }
     if (status === STATUS_SUCCESS) {
         return <CheckCircleOutlineIcon fontSize='small' color="success" />;

@@ -12,13 +12,13 @@ import TableBody from '@mui/material/TableBody';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { useQueryContext } from 'components/queryContext';
+import { CustomLoading } from 'components/loading';
 import MissingStorageFolders from './MissingStorageFolders';
 import { ImageContextProvider, useImageContext } from './ImageContext';
 import { UploadContextProvider, useUploadContext } from './upload/UploadContext';
 import TableFolders from './TableFolders';
 import TableFiles from './TableFiles';
 import TableToolbar from './toolbar/TableToolbar';
-import { CircularProgress } from '@mui/material';
 import { Paragraph } from 'template/pageTypography';
 import { FOLDER_TYPE } from './common';
 import ImageErrors from './globalErrors/ImageErrors';
@@ -138,7 +138,7 @@ const Images = () => {
                 {
                     imageContext.ready === false &&
                     <Box sx={{padding: 1}} >
-                        <CircularProgress></CircularProgress>
+                        <CustomLoading />
                     </Box>
                 }
             </TableContainer>

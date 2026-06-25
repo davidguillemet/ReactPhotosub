@@ -6,7 +6,6 @@ import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutli
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
-import CircularProgress from '@mui/material/CircularProgress';
 import { VerticalSpacing, HorizontalSpacing } from '../../../template/spacing';
 import { Typography } from '@mui/material';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -16,6 +15,7 @@ import { useToast } from 'components/notifications';
 import './fileUploadStyles.css';
 import { useDataProvider } from 'components/dataProvider';
 import FileUpload from 'components/upload/FileUpload';
+import { CustomLoading } from 'components/loading';
 import { useTranslation, useImageKit } from 'utils';
 
 const STEP_UPLOAD = "step::upload";
@@ -32,7 +32,7 @@ const ThumbnailGeneration = () => {
             alignItems: 'center'
         }}>
             <HorizontalSpacing factor={2} />
-            <CircularProgress size={30} />
+            <CustomLoading size={30} />
             <HorizontalSpacing factor={2} />
             <Typography
                 variant="caption"

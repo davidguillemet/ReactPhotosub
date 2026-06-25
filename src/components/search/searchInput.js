@@ -10,10 +10,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import WarningIcon from '@mui/icons-material/Warning';
 import ErrorIcon from '@mui/icons-material/Error';
-import CircularProgress from '@mui/material/CircularProgress';
 import InputBase from '@mui/material/InputBase';
 import Chip from "@mui/material/Chip";
 
+import { CustomLoading } from 'components/loading';
 import { useTranslation, debounce } from 'utils';
 import { useStateWithDep } from '../hooks';
 import { useTheme } from '@mui/material/styles';
@@ -39,7 +39,7 @@ const StatusIcon = ({searchIsRunning}) => {
         }}>
             {
                 searchIsRunning === true ?
-                <CircularProgress size={20} /> :
+                <CustomLoading size={30} /> :
                 <SearchIcon
                     fontSize={isMobile ? "small" : "medium"}
                 />

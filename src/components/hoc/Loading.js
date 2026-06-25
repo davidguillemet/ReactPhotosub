@@ -1,11 +1,11 @@
 import React from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
 import ErrorAlert from '../error';
 import { QUERY_ERROR } from '../reactQuery';
+import { CustomLoading } from 'components/loading';
 
 export const Loading = ({size = 40, sx = { mt: 3 }}) => {
     return (
-        <CircularProgress
+        <CustomLoading
             sx={{
                 mt: 3,
                 ...(sx && {

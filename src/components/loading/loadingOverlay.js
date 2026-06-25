@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from '@mui/material/Modal';
-import CircularProgress from '@mui/material/CircularProgress';
+import { CustomLoading } from './threedot';
 import { useTheme } from '@mui/material/styles';
 
 const OverlayContext = React.createContext(null);
@@ -48,7 +48,7 @@ const LoadingOverlay = ({ open }) => {
             }}
             open={open}
         >
-            <CircularProgress color="inherit" />
+            <CustomLoading />
         </Modal>
     );
 }
