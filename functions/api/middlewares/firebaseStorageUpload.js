@@ -18,14 +18,16 @@ const firebaseStorageUpload = (config) => async (req, res, next) => {
             if (file.mimeType.startsWith("image/")) {
                 const dimensions = imageSize(file.buffer);
                 const sizeRatio = dimensions.width / dimensions.height;
-                filesInfo.push({
-                    file: file.originalName,
-                    sizeRatio: sizeRatio,
-                });
                 return destFile.setMetadata({
                     metadata: {
                         sizeRatio: sizeRatio,
                     },
+                }).then(([metadata]) => {
+                    filesInfo.push({
+                        file: file.originalName,
+                        sizeRatio: sizeRatio,
+                        version: metadata.generation, // ← the new version token
+                    });
                 });
             }
         });
