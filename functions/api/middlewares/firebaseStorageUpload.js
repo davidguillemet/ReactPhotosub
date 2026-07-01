@@ -19,6 +19,7 @@ const firebaseStorageUpload = (config) => async (req, res, next) => {
                 const dimensions = imageSize(file.buffer);
                 const sizeRatio = dimensions.width / dimensions.height;
                 return destFile.setMetadata({
+                    cacheControl: "private, max-age=0", // Or "public, max-age=60" ?
                     metadata: {
                         sizeRatio: sizeRatio,
                     },
