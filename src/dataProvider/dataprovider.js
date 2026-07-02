@@ -367,8 +367,8 @@ DataProvider.prototype.deleteSubGallery = function(subGallery) {
 }
 
 // Images / Thumbnails
-DataProvider.prototype.insertImageInDatabase = function(fullPath) {
-    return this.axios.post('/admin/images', { fullPath })
+DataProvider.prototype.insertImageInDatabase = function(fullPath, fileInfo) {
+    return this.axios.post('/admin/images', { fullPath, ...fileInfo })
     .then (response => {
         // The response contains the inserted image
         // {
@@ -382,7 +382,10 @@ DataProvider.prototype.insertImageInDatabase = function(fullPath) {
         //     "width": 1328,
         //     "height": 2000,
         //     "sizeRatio": 0.664,
-        //     "create": "2012-09-01T18:21:06.00"
+        //     "create": "2012-09-01T18:21:06.00",
+        //     "sub_gallery_id": null,
+        //     "id": 1
+        //     "version": "xxxxxxx"
         // }
         return response.data; // contains the inserted image
     });

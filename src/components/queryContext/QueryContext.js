@@ -4,6 +4,7 @@ import { useDataProvider } from '../dataProvider/dataManagerProvider';
 import { useFirebaseContext } from '../firebase';
 import { CheckErrorsAfterAddImage, CheckErrorsAfterRemoveImage } from 'common/GlobalErrors';
 import { isDestinationPath } from 'utils';
+import { setImageVersion } from 'utils/imageVersionRegistry';
 import {
     getFetchDestinationKey,
     isDestinationKey,
@@ -23,6 +24,7 @@ export const QueryContextProvider = ({children}) => {
     const userId = () => getUser().uid
 
     const addDestinationImage = React.useCallback((newImage) => {
+        setImageVersion(newImage.src, newImage.version);
         const queryKey = getFetchDestinationKey(newImage.path, DESTINATION_PROPS.IMAGES);
         const prevData = queryClient.getQueryData(queryKey);
         const { images, galleries } = prevData;

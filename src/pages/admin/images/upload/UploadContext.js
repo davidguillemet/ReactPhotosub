@@ -66,7 +66,7 @@ export const UploadContextProvider = ({children}) => {
         imageContext.folderPath
     ]);
 
-    const insertInDatabase = React.useCallback((fileFullPath) => {
+    const insertInDatabase = React.useCallback((fileFullPath, fileInfo) => {
         if (!hasDatabaseImage(imageContext.folderType)) {
             return Promise.resolve();
         }
@@ -77,7 +77,7 @@ export const UploadContextProvider = ({children}) => {
                 dbProcessingErrors: removeMapElement(prevStatus.dbProcessingErrors, fileFullPath)
             }
         });
-        return dataProvider.insertImageInDatabase(fileFullPath)
+        return dataProvider.insertImageInDatabase(fileFullPath, fileInfo)
             .then((newImage) => {
                 queryContext.addDestinationImage(newImage);
                 setProcessingStatus(prevStatus => {
@@ -149,9 +149,9 @@ export const UploadContextProvider = ({children}) => {
         imageContext.addThumbs
     ]);
 
-    const postProcessUploadedFile = React.useCallback((fileFullPath) => {
+    const postProcessUploadedFile = React.useCallback((fileFullPath, fileInfo) => {
         const thumbPromise = generateThumbnails(fileFullPath);
-        const dataBasePromise = insertInDatabase(fileFullPath);
+        const dataBasePromise = insertInDatabase(fileFullPath, fileInfo);
         Promise.all([thumbPromise, dataBasePromise]).then((results) => {
             setFilesToUpload(files => files.filter(f => f.fullPath !== fileFullPath));
         }); // catch is managed in generateThumbnails & insertInDatabase

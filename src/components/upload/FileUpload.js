@@ -23,9 +23,9 @@ const FileUpload = ({file, folderPath, fileFullPath, start, onFileUploaded, onFi
             .then((data) => {
                 const fileInfo = data.find(info => info.file === file.name);
                 if (!fileInfo) {
-                    throw new Error(`Missing sizeRatio for ${file.name}`);
+                    throw new Error(`Missing upload file info for ${file.name}`);
                 }
-                onFileUploaded(fileFullPath, fileInfo.sizeRatio);
+                onFileUploaded(fileFullPath, fileInfo);
             }).catch((error) => {
                 setError(error)
                 if (onFileUploadError) {

@@ -34,8 +34,9 @@ module.exports = function(app, config) {
                 .filter((file) => file.metadata.contentType.startsWith("image/"))
                 .map((file) => {
                     return {
-                        src: file.publicUrl(),
+                        src: config.convertPublicUrl(file),
                         sizeRatio: file.metadata.metadata.sizeRatio,
+                        version: file.metadata.generation,
                     };
                 }));
         }).catch(next);

@@ -198,7 +198,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
         let interiorIndex = 0;
         let initBackground = true;
         if (simulation.background !== null) {
-            interiorIndex = interiors.findIndex(interior => interior.src === simulation.background);
+            interiorIndex = interiors.findIndex(interior => interior.src === simulation.background.src || interior.src === simulation.background);
             if (interiorIndex === -1 && interiors.length > 0) {
                 // Background not found
                 interiorIndex = 0;
@@ -209,7 +209,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
         setCurrentInteriorIndex(interiorIndex);
         if (initBackground) {
-            dispatch(setBackground(interiors[interiorIndex].src, simulationIndex));
+            dispatch(setBackground(interiors[interiorIndex], simulationIndex));
         }
     }, [simulation, simulationIndex, interiors, dispatch])
 
@@ -234,7 +234,8 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     const onInteriorClick = useCallback((interiorIndex) => {
         setCurrentInteriorIndex(interiorIndex);
-        dispatch(setBackground(interiors[interiorIndex].src, simulationIndex));
+        const interior = interiors[interiorIndex];
+        dispatch(setBackground(interior, simulationIndex));
     }, [interiors, dispatch, simulationIndex]);
 
     const onSelectImage = useCallback((index) => {
@@ -253,19 +254,28 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
 
     const onFilesUploaded = useCallback((uploadedFiles) => {
         const files = [];
-        const sizes = [];
+        const infoArray = [];
         // uploadedFiles maps a file name to a file size ratio
-        for (const [fileName, sizeRatio] of uploadedFiles) {
+        for (const [fileName, fileInfo] of uploadedFiles) {
             // the download url looks like the following, including a download token:
             // https://firebasestorage.googleapis.com/v0/b/photosub.appspot.com/o/userUpload%2FO30yfAqRCnS99zc1VoKMjIt9IEg1%2Finteriors%2FDSC_1388-Modifier.jpg?alt=media&token=796f88e2-d1b2-4827-b0f5-da9008e778bb
             // While we just need the following:
             // https://storage.googleapis.com/photosub.appspot.com/userUpload%2FO30yfAqRCnS99zc1VoKMjIt9IEg1%2Finteriors%2FDSC_1388-Modifier.jpg
-            files.push(`${firebaseContext.rootPublicUrl}/userUpload/${user.uid}/interiors/${fileName}`);
-            sizes.push(sizeRatio);
+            const fileSrc = `${firebaseContext.rootPublicUrl}/userUpload/${user.uid}/interiors/${fileName}`;
+            files.push(fileSrc);
+            infoArray.push(fileInfo);
+            // Update the simulation background in case it has been updated (i.e. the user has uploaded a new version of the background image)
+            if (fileSrc === simulation.background || fileSrc === simulation.background.src) {
+                dispatch(setBackground({
+                    src: fileSrc,
+                    sizeRatio: fileInfo.sizeRatio,
+                    version: fileInfo.version
+                }, simulationIndex));
+            }
         }
         // Add the new uploaded images to the interiors' array
-        addUploadedInterior(files, sizes);
-    }, [firebaseContext, user, addUploadedInterior]);
+        addUploadedInterior(files, infoArray);
+    }, [firebaseContext, user, addUploadedInterior, dispatch, simulation.background, simulationIndex]);
 
     const handleListType = (event, newListType) => {
         if (newListType === null) {

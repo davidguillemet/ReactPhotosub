@@ -84,6 +84,8 @@ module.exports = function(admin, config) {
         .post(async function(req, res, next) {
             // {
             //     fullPath: "/folder/folder/DSC_6578.jpg",
+            //     sizeRatio: 0.664,
+            //     version: "xxxxxxx"
             // }
             const props = req.body;
             res.locals.errorMessage = `Failed to process image ${props.fullPath}.`;
@@ -94,7 +96,12 @@ module.exports = function(admin, config) {
             }).then((fileContent) => {
                 return extractExif(file, fileContent);
             }).then((imageItem) => {
-                return insertImage(imageItem, req, res, next);
+                // Update image version
+                const imageWithVersion = {
+                    ...imageItem,
+                    version: props.version,
+                };
+                return insertImage(imageWithVersion, req, res, next);
             }).catch(next);
         })
         // Update image properties (tags, title, etc)

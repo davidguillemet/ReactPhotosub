@@ -52,7 +52,13 @@ const useImageLoader = (user, simulations, listType) => {
 
     const userInteriorIsUsed = useCallback((userInteriorUrl) => {
         // Check is any simulation contains the current background
-        return simulations.findIndex((simulation) => simulation.background === userInteriorUrl) === -1;
+        return simulations.findIndex((simulation) => {
+            // background is now an image object with src, sizeRatio and version
+            if (typeof simulation.background === 'string') {
+                return simulation.background === userInteriorUrl;
+            }
+            return simulation.background.src === userInteriorUrl;
+        }) === -1;
     }, [simulations]);
 
     const buildImage = useCallback((image, uploaded) => {
@@ -97,14 +103,26 @@ const useImageLoader = (user, simulations, listType) => {
         }
     }, [userInteriorIsUsed, simulations, userInteriors, interiors]);
 
-    const addUploadedInterior = useCallback((fileArray, sizeRatioArray) => {
+    const addUploadedInterior = useCallback((fileArray, infoArray) => {
+        const queryKey = ['userInteriors', user.uid];
         // Add the new uploaded image to the user interiors' array
-        const images = fileArray.map((fileSrc, index) => buildImage({src: fileSrc, sizeRatio: sizeRatioArray[index]}, true));
-        queryClient.setQueryData(['userInteriors', user.uid], [
+        // --> merge existing images in case the same image has been uploaded multiple times
+        const images = fileArray.map((fileSrc, index) => {
+            const fileInfo = infoArray[index];
+            return buildImage({
+                src: fileSrc,
+                sizeRatio: fileInfo.sizeRatio,
+                version: fileInfo.version
+            }, true);
+        });
+        const previousUserInteriors = queryClient.getQueryData(queryKey) || [];
+        // Keep the previous uploaded images that are still present in the user interiors' array and that have not the same src than the new images
+        const filteredPreviousUserInteriors = previousUserInteriors.filter(prevImage => !images.find(newImage => newImage.src === prevImage.src));
+        queryClient.setQueryData(queryKey, [
             ...images,
-            ...allInteriors.filter(image => image.uploaded === true)
+            ...filteredPreviousUserInteriors
         ]);
-    }, [buildImage, allInteriors, queryClient, user]);
+    }, [buildImage, queryClient, user]);
 
     const deleteUploadedInterior = useCallback((fileUrl) => {
         // Extract the file name from the src

@@ -9,11 +9,11 @@ const UploadStorageItemRow = ({file}) => {
 
     const uploadContext = useUploadContext();
 
-    const onFileUploaded = React.useCallback(() => {
+    const onFileUploaded = React.useCallback((fileFullPath, fileInfo) => {
         // launch file post processing after upload
         const postProcessUploadedFile = uploadContext.postProcessUploadedFile;
-        postProcessUploadedFile(file.fullPath);
-    }, [file, uploadContext.postProcessUploadedFile]);
+        postProcessUploadedFile(fileFullPath, fileInfo);
+    }, [uploadContext.postProcessUploadedFile]);
 
     const onFileUploadError = React.useCallback((_fileFullPath, error) => {
         const onUploadFileError = uploadContext.onUploadFileError;

@@ -113,14 +113,14 @@ const FileProgress = React.forwardRef(({file, storageRef, onCancel, onFileUpload
         }
     }, [step, handleCancel, toast]);
 
-    const onFileUploadCompleted = React.useCallback((fileFullPath, sizeRatio) => {
+    const onFileUploadCompleted = React.useCallback((fileFullPath, fileInfo) => {
         if (useImageKit) {
-            onFileUploaded(file.name, sizeRatio);
+            onFileUploaded(file.name, fileInfo);
             setStep({ name: STEP_SUCCESS, error: null });
         } else {
             setStep({ name: STEP_THUMBNAILS, error: null });
             dataProvider.createInteriorThumbnails(fileFullPath).then((fileProps) => {
-                onFileUploaded(file.name, sizeRatio);
+                onFileUploaded(file.name, fileInfo);
                 setStep({ name: STEP_SUCCESS, error: null });
             }).catch(error => {
                 setStep({ name: STEP_ERROR, error: error });
@@ -196,8 +196,8 @@ const FileUploads = ({caption, uploadRef, onFilesUploaded}) => {
         uploadedFiles.current.delete(canceledFile.name);
     }, []);
 
-    const onFileUploaded = useCallback((fileName, fileSizeRatio) => {
-        uploadedFiles.current.set(fileName, fileSizeRatio);
+    const onFileUploaded = useCallback((fileName, fileInfo) => {
+        uploadedFiles.current.set(fileName, fileInfo);
         if (uploadedFiles.current.size === filesToUpload.length) {
             setFilesToUpload([]);
             onFilesUploaded(uploadedFiles.current);

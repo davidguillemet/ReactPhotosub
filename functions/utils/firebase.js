@@ -12,16 +12,25 @@ if (process.env.NODE_ENV === "remote") {
 
 const bucket = admin.storage().bucket(process.env.FIREBASE_CONFIG.storageBucket);
 
-function convertPathToUrl(imagePath) {
+function convertUrl(imageUrl) {
     // TODO : maybe remove decodeURI once the download Uri strategy has been refined...
-    const imageUrl = decodeURIComponent(bucket.file(imagePath).publicUrl());
+    const decodedUri = decodeURIComponent(imageUrl);
     return process.env.FUNCTIONS_EMULATOR === "true" ?
-        imageUrl.replace("127.0.0.1", process.env.REACT_APP_DEV_HOST) :
-        imageUrl;
+        decodedUri.replace("127.0.0.1", process.env.REACT_APP_DEV_HOST) :
+        decodedUri;
+}
+
+function convertPathToUrl(imagePath) {
+    return convertPublicUrl(bucket.file(imagePath));
+}
+
+function convertPublicUrl(file) {
+    return convertUrl(file.publicUrl());
 }
 
 module.exports = {
     convertPathToUrl: convertPathToUrl,
+    convertPublicUrl: convertPublicUrl,
     bucket: bucket,
     // https://firebase.google.com/docs/functions/writing-and-viewing-logs
     // --> the Cloud Functions logger SDK is recommended for most situations

@@ -1,4 +1,5 @@
 import { parseSingleDescription } from './utils';
+import { getImageVersion } from './imageVersionRegistry';
 
 // For sharp and imageKit
 // -> don't rename
@@ -119,6 +120,7 @@ function _getThumbSrc(image, thumbSpec) {
         if (isDev) {
             imageKitEndpoint += "/emulator";
         }
+        let imageKitUrl;
         if (isImage) {
             // imageKit SEO:
             const captionItems = parseSingleDescription(image.description);
@@ -138,12 +140,21 @@ function _getThumbSrc(image, thumbSpec) {
                 const fileExtension = imagePath.substring(dotPosition + 1);
                 const imagePathWithoutExtension = imagePath.substring(0, dotPosition);
 
-                const imageKitUrl = `${imageKitEndpoint}/ik-seo/tr:n-${ikNamedTransformation}/${imagePathWithoutExtension}/${encodeURIComponent(seoFriendlyFileName)}.${fileExtension}`;
-                return imageKitUrl;
+                imageKitUrl = `${imageKitEndpoint}/ik-seo/tr:n-${ikNamedTransformation}/${imagePathWithoutExtension}/${encodeURIComponent(seoFriendlyFileName)}.${fileExtension}`;
             }
         }
-        return `${imageKitEndpoint}/tr:n-${ikNamedTransformation}/${imagePath}`;
-
+        if (!imageKitUrl) {
+            imageKitUrl = `${imageKitEndpoint}/tr:n-${ikNamedTransformation}/${imagePath}`;
+        }
+        if (isImage) {
+            const version = getImageVersion(encodedSrc) ?? image.version;
+            if (version && version !== "1") {
+                imageKitUrl += `?v=${version}`;
+            } else {
+                console.warn(`Missing version for image ${imagePath}`);
+            }
+        }
+        return imageKitUrl;
 
     } else {
         // src is like https://<host>/folder1/folder2/DSC_2264.jpg

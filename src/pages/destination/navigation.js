@@ -43,7 +43,8 @@ const NavigationItem = ({destination, type, caption}) => {
 
     const destinationCover = React.useMemo(() => getThumbnailSrc({
         src: destination.cover,
-        sizeRatio: 600 / 400 // cover always landscape
+        sizeRatio: 600 / 400, // cover always landscape
+        version: destination.cover_version
     }, navigationResizeObserver.width), [destination, navigationResizeObserver.width]);
 
     return (

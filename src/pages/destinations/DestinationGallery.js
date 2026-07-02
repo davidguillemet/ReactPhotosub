@@ -71,7 +71,8 @@ const DestinationContent = ({item, index, width, params}) => {
     const destination = item;
     const destinationImage = React.useMemo(() => ({
         src: destination.cover,
-        description: destinationTitle(destination, "en") // force English for the cover image description
+        description: destinationTitle(destination, "en"), // force English for the cover image description
+        version: destination.cover_version
     }), [destination]);
 
     const authContext = useAuthContext();

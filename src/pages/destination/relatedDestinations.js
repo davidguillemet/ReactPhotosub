@@ -17,6 +17,7 @@ function imageFromCover(destination, language) {
     const dateFormater = isMobile ? formatDateShort : formatDate;
     return {
         src: destination.cover,
+        version: destination.cover_version,
         // <destination title> (<destination date>)
         title: `${destinationTitle(destination, language)} (${dateFormater(new Date(destination.date), language)})`,
         published: destination.published,
