@@ -34,11 +34,23 @@ const toMediumThumbnailUrl = (imagePath, firebaseConfig) => {
     }
 };
 
+const buildDestinationDescription = (locationName, year, macro, wide) => {
+    let photoTypes;
+    if (macro && wide) photoTypes = "macro and wide-angle";
+    else if (macro) photoTypes = "macro";
+    else if (wide) photoTypes = "wide-angle";
+    else photoTypes = "underwater";
+    return `Underwater photography in ${locationName} (${year}). ${photoTypes.charAt(0).toUpperCase() + photoTypes.slice(1)} photos by David Guillemet.`;
+};
+
 const getPageProperties = async (req, pool, firebaseConfig) => {
     let imagePath = _defaultImagePath;
     let pageName = "Home";
+    let pageDescription = null;
 
     const path = req.path;
+    const pageUrl = `https://www.davidphotosub.com${path}`;
+
     if (path === "/auth/action") {
         pageName = "Account Management";
     } else if (path === "/portfolio") {
@@ -46,8 +58,7 @@ const getPageProperties = async (req, pool, firebaseConfig) => {
     } else if (path === "/destinations") {
         pageName = "Destinations";
     } else if (path.startsWith("/destinations")) {
-        // /destinations/2020/romblon
-        // -> "Romblon - 2020"
+        // /destinations/2020/romblon -> "Romblon - 2020"
         const match = path.match(_destinationRegexp);
         if (match !== null) {
             const year = match.groups["year"];
@@ -57,6 +68,7 @@ const getPageProperties = async (req, pool, firebaseConfig) => {
                 const locationName = destination.title_en || destination.title;
                 imagePath = `${destination.path}/${destination.cover}`;
                 pageName = `${locationName} - ${year}`;
+                pageDescription = buildDestinationDescription(locationName, year, destination.macro, destination.wide);
             }
         }
     } else if (path === "/search") {
@@ -73,21 +85,40 @@ const getPageProperties = async (req, pool, firebaseConfig) => {
 
     return {
         pageName,
+        pageUrl,
+        pageDescription,
         imageUrl: toMediumThumbnailUrl(imagePath, firebaseConfig),
     };
 };
 
 module.exports = function(pool, firebaseConfig) {
+    preRenderApp.get("/sitemap-destinations.xml", async (req, res) => {
+        const destinations = await pool("destinations")
+            .select("path", "date")
+            .where("published", true)
+            .orderBy("date", "desc");
+
+        const urls = destinations.map((d) => {
+            const lastmod = new Date(d.date).toISOString().split("T")[0];
+            return `\n    <url>\n        <loc>https://www.davidphotosub.com/destinations/${d.path}</loc>\n        <lastmod>${lastmod}</lastmod>\n    </url>`;
+        }).join("");
+
+        res.set("Content-Type", "application/xml");
+        res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}\n</urlset>`);
+    });
+
     preRenderApp.get("*", (req, res) => {
         return fs.readFile("./web/index.html", "utf8", async (err, htmlData) => {
-            const {pageName, imageUrl} = await getPageProperties(req, pool, firebaseConfig);
+            const {pageName, pageUrl, pageDescription, imageUrl} = await getPageProperties(req, pool, firebaseConfig);
             const title = _shortTitleTemplate.replace(_pageNamePlaceHolder, pageName);
-            const description = _descriptionTemplate.replace(_pageNamePlaceHolder, pageName);
+            const ogTitle = _descriptionTemplate.replace(_pageNamePlaceHolder, pageName);
+            const description = pageDescription || ogTitle;
             htmlData = htmlData
                 .replace(/__HTML_TITLE__/g, title)
-                .replace(/__META_TITLE__/g, description)
+                .replace(/__META_TITLE__/g, ogTitle)
                 .replace(/__META_DESCRIPTION__/g, description)
-                .replace(/__META_IMAGE__/g, imageUrl);
+                .replace(/__META_IMAGE__/g, imageUrl)
+                .replace(/__META_URL__/g, pageUrl);
             // For update notification:
             // res.set('Cache-Control', 'no-cache, max-age=0, must-revalidate');
             return res.send(htmlData);
