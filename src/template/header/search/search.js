@@ -10,13 +10,14 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 
-import Search, { SearchResult, SearchSettings, defaultSettings, getInitialSearchResult, pushSearchConfigHistory } from 'components/search';
+import Search, { SearchResult, defaultSettings, getInitialSearchResult, pushSearchConfigHistory } from 'components/search';
 import { HorizontalSpacing, VerticalSpacing } from 'template/spacing';
 import { useTranslation } from 'utils';
 import TooltipIconButton from 'components/tooltipIconButton';
 import ResultGallery from './resultGallery';
 import { useAppContext } from 'template/app/appContext';
 import { useTheme } from '@mui/material';
+import { useAuthContext } from 'components/authentication';
 
 const HeaderSearch = ({
     resultPageSize = 6,
@@ -24,6 +25,7 @@ const HeaderSearch = ({
     visible
 }) => {
 
+    const authContext = useAuthContext();
     const theme = useTheme();
     const navigate = useNavigate();
     const { subscribeHistory, unsubscribeHistory } = useAppContext();
@@ -31,7 +33,6 @@ const HeaderSearch = ({
     const t = useTranslation("components.search");
 
     const [ searchResult, setSearchResult ] = React.useState(getInitialSearchResult());
-    const [ settings, setSettings ] = React.useState(defaultSettings);
     const [ resultsOpen, setResultsOpen ] = React.useState(false);
     const [ loadingNextPage, setLoadingNextPage ] = React.useState(false);
     const [ pageIndex, setPageIndex ] = React.useState(0);
@@ -74,18 +75,14 @@ const HeaderSearch = ({
         setPageIndex(searchResult.page);
     }, []);
 
-    const handleChangeSettings = React.useCallback((settings) => {
-        setSettings(settings);
-    }, []);
-
     const handleClose = React.useCallback(() => {
         setResultsOpen(false);
     }, []);
 
     const onSeeAllResults = React.useCallback(() => {
         handleClose();
-        pushSearchConfigHistory(navigate, searchResult.query, settings);
-    }, [navigate, searchResult, settings, handleClose]);
+        pushSearchConfigHistory(navigate, searchResult.query, defaultSettings, authContext.admin);
+    }, [navigate, searchResult, handleClose, authContext.admin]);
 
     const handleNextSearchPage = React.useCallback(() => {
         setLoadingNextPage(true);
@@ -139,7 +136,7 @@ const HeaderSearch = ({
             >
                 <Search
                     ref={searchInputBoxRef}
-                    showExactSwitch={false}
+                    showSettings={false}
                     pushHistory={false}
                     expandable={true}
                     resultsOpen={resultsOpen}
@@ -149,7 +146,7 @@ const HeaderSearch = ({
                     onExpandedChange={onExpandedChange}
                     pageSize={resultPageSize}
                     pageIndex={pageIndex}
-                    settings={settings}
+                    settings={defaultSettings}
                     alignItems='flex-start'
                 />
                 <Popper
@@ -185,10 +182,6 @@ const HeaderSearch = ({
                     >
                         <VerticalSpacing factor={0.5} />
                         <SearchResult result={searchResult} />
-                        <Divider />
-                        <VerticalSpacing factor={0.5} />
-                        <SearchSettings settings={settings} onChange={handleChangeSettings} />
-                        <VerticalSpacing factor={0.5} />
                         <ResultGallery
                             ref={setGalleryResultRef}
                             searchResult={searchResult}

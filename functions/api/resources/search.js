@@ -3,14 +3,19 @@ const _searchCriteriaMinLength = 3;
 const _unnestedTagColumn = "tag";
 const _flatTagsRows = "flat_tags";
 
+// Minimum pg_trgm word_similarity (0..1) for a fuzzy (inclusion) match.
+// Lower  -> more typo-tolerant, more noise.
+// Higher -> stricter, fewer false positives.
+const FUZZY_THRESHOLD = 0.45;
+
 function extractCriteriaList(queryString) {
     const criteriaArray = [];
     // Regular expression:
     // optional spaces followed by
-    //   an optional dash followed by
-    //      any character except space and slash
-    //    OR
-    //      slash, any charater except slash, ending slash
+    // an optional dash followed by
+    // any character except space and slash
+    // OR
+    // slash, any character except slash, ending slash
     const criteriaRegexp = new RegExp("[ ]*(-?(?:(?:[^ /]+)|(?:/[^/]+/)))", "g");
     let match = null;
     while ((match = criteriaRegexp.exec(queryString)) !== null) {
@@ -54,6 +59,9 @@ function getWhereFunctionFromSingleCriteria(builder, criteria) {
     return builder.orWhereRaw("? = ANY (tags)", [criteria]).orWhere("caption", "like", "% " + criteria + " %");
 }
 
+// Builds an exact, tag-scoped predicate for a single criteria, including the
+// dash/space variant handling (e.g. "poisson fantôme" <-> "poisson-fantôme").
+// Used directly for exact mode, and under whereNot() for exclusion in fuzzy mode.
 function getWhereFunctionFromCriteria(criteriaObject) {
     return (builder) => {
         let chainedBuilder = getWhereFunctionFromSingleCriteria(builder, criteriaObject.value);
@@ -96,6 +104,69 @@ function buildSearchQueryExact(config, criteriaList, page, pageSize) {
                 sqlQuery.andWhereNot(whereClauseFunction) :
                 sqlQuery.andWhere(whereClauseFunction);
         }
+    }
+
+    return sqlQuery;
+}
+
+// ////////////////
+// - Recherche tolérante aux fautes de frappe (fuzzy / non-exact mode):
+//
+// Positive criteria are matched fuzzily against the normalized "search_text"
+// column (title + description + tags, lowercased and accent-folded by the
+// migration) using pg_trgm word_similarity().
+//
+// Negative criteria ("-term") are matched EXACTLY and tag-scoped, reusing the
+// same predicate as exact mode under whereNot(). Exclusion is deliberately NOT
+// fuzzy: a fuzzy "-diver" would over-remove (e.g. catch "river"), silently
+// dropping valid results. A diver in a picture means "diver" is in the tags,
+// so an exact tag match is both safer and truer to the data model.
+//
+//   select ..., count(*) OVER() as total_count
+//   from images
+//   where word_similarity(f_unaccent('gorgone'), search_text) >= 0.45        -- include
+//     and NOT ('diver' = ANY (tags) or caption like '% diver %')             -- exclude "-diver"
+//   order by (word_similarity(f_unaccent('gorgone'), search_text)) desc
+//
+// Notes:
+//   - "search_text" and "f_unaccent" are created by migration_trigram_search.sql.
+//   - criteria.value is already lowercased by the route; f_unaccent() removes
+//     accents so it matches the normalization of search_text.
+//   - The functional word_similarity(...) predicate does not use the GIN index.
+//     For a large catalog, switch positive matches to the "<%" operator and
+//     SET pg_trgm.word_similarity_threshold per request to hit the index.
+// similarityFn: "word_similarity" (broad, prefix-tolerant) or
+//               "strict_word_similarity" (whole-word boundaries, fewer false positives)
+function buildSearchQueryFuzzy(config, criteriaList, page, pageSize, similarityFn = "word_similarity") {
+    let sqlQuery = config.pool()
+        .select(getFinalColumnSelection(config))
+        .from("images");
+
+    criteriaList.forEach((criteria) => {
+        if (criteria.not === true) {
+            // Exclusion stays exact and tag-scoped (same predicate as exact mode).
+            sqlQuery = sqlQuery.whereNot(getWhereFunctionFromCriteria(criteria));
+        } else {
+            // Inclusion is fuzzy: typo + accent tolerant against title+description+tags.
+            sqlQuery = sqlQuery.whereRaw(
+                `${similarityFn}(f_unaccent(?), search_text) >= ?`,
+                [criteria.value, FUZZY_THRESHOLD],
+            );
+        }
+    });
+
+    // ORDER BY relevance: sum of similarity across the positive criteria, so
+    // images matching every term strongly rank above weaker / partial matches.
+    // (Pure-exclusion queries have no positive criteria -> fall back to date order.)
+    const positiveCriteria = criteriaList.filter((criteria) => criteria.not !== true);
+    if (positiveCriteria.length > 0) {
+        const relevanceExpr = positiveCriteria
+            .map(() => `${similarityFn}(f_unaccent(?), search_text)`)
+            .join(" + ");
+        sqlQuery = sqlQuery.orderByRaw(
+            `(${relevanceExpr}) desc`,
+            positiveCriteria.map((criteria) => criteria.value),
+        );
     }
 
     return sqlQuery;
@@ -163,10 +234,15 @@ module.exports = function(app, config) {
             const searchData = req.body;
             const page = searchData.page;
             const pageSize = searchData.pageSize;
-            const settings = searchData.settings;
             const processId = searchData.processId;
 
-            const exact = settings.exact;
+            // Now we force exact and fuzzy to true, because we don't want to expose these settings to the user.
+            // The user should not be able to disable fuzzy search, because it is a key feature of the search engine.
+            // But just inn case something goes wrong, we can rollback to the previous behavior by uncommenting
+            // the following lines and removing the forced values below.
+            // const settings = searchData.settings;
+            const exact = true; // settings.exact;
+            const fuzzy = true; // settings.fuzzy;
 
             const searchQuery = searchData.query.trim().toLowerCase();
             const criteriaList = extractCriteriaList(searchQuery);
@@ -180,13 +256,15 @@ module.exports = function(app, config) {
                 return;
             }
 
-            const fullSqlQuery = exact === true ?
-                buildSearchQueryExact(config, criteriaList, page, pageSize) :
-                buildSearchQueryNotExact(config, criteriaList, page, pageSize);
+            const fullSqlQuery =
+                exact === true && fuzzy === true ? buildSearchQueryFuzzy(config, criteriaList, page, pageSize, "strict_word_similarity") :
+                    exact === true ? buildSearchQueryExact(config, criteriaList, page, pageSize) :
+                        fuzzy === true ? buildSearchQueryFuzzy(config, criteriaList, page, pageSize) :
+                            buildSearchQueryNotExact(config, criteriaList, page, pageSize);
 
             res.locals.errorMessage = `la recherche "${searchData.query}" a échoué.`;
             return fullSqlQuery
-                .orderBy("create", "desc") // recent images first
+                .orderBy("create", "desc") // recent images first (secondary sort after relevance in fuzzy mode)
                 .limit(pageSize)
                 .offset(page * pageSize)
                 .then((results) => {

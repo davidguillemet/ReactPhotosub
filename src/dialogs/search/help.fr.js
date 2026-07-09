@@ -30,17 +30,6 @@ const help = () => (
     <ListItem>La recherche <BoldItalic>gorgone plongeur</BoldItalic> est interprétée comme <BoldItalic>gorgone ET plongeur</BoldItalic> et retourne donc toutes les images contenant une gorgone <u>et</u> un plongeur</ListItem>
 </HtmlList>
 </SummaryParagraph>
-<SummaryParagraph>Par défaut, une recherche "inclusive" est effectuée:
-<HtmlList>
-    <ListItem>La recherche <BoldItalic>vert</BoldItalic> retourne les images contenant du vert, mais aussi les images contenant un vertébré, ou un invertébré ("vertébré" et "invertébré" contiennent la chaîne "vert")</ListItem>
-</HtmlList>
-</SummaryParagraph>
-<SummaryParagraph>
-Pour effectuer une recherche plus restrictive, cochez alors l'option "Rechercher les termes exacts":
-<HtmlList>
-    <ListItem>Dans ce cas, la recherche <BoldItalic>vert</BoldItalic> retournera uniquement les images contenant du vert, mais également celles contenant un géant vert (oui oui, il existe...)</ListItem>
-</HtmlList>
-</SummaryParagraph>
 <SummaryParagraph>
 Vous pouvez préfixer un critère par un tiret (-) pour l'exclure de la recherche:
 <HtmlList>

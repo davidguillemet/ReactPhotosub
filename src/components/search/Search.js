@@ -12,6 +12,7 @@ import { useDataProvider } from '../dataProvider';
 import SearchResult from './searchResult';
 import SearchSettings from './searchSettings';
 import { getInitialSearchResult, pushSearchConfigHistory } from './searchUtils';
+import { useAuthContext } from 'components/authentication';
 
 function getEmptySearchResult(query) {
     return {
@@ -23,7 +24,7 @@ function getEmptySearchResult(query) {
 
 const Search = React.forwardRef(({
     className,
-    showExactSwitch = true,
+    showSettings = false,
     showHelp = true,
     onResult = null,
     galleryComponent = null,
@@ -40,6 +41,7 @@ const Search = React.forwardRef(({
     alignItems = 'center'}, ref) => {
 
     const t = useTranslation("components.search");
+    const authContext = useAuthContext();
     const { language } = useLanguage();
     const navigate = useNavigate();
     const dataProvider = useDataProvider();
@@ -173,7 +175,7 @@ const Search = React.forwardRef(({
 
     function handleChangeSettings(settings) {
         if (pushHistory ===  true) {
-            pushSearchConfigHistory(navigate, searchConfig.query, settings);
+            pushSearchConfigHistory(navigate, searchConfig.query, settings, authContext.admin);
         } else {
             setSearchConfig(oldConfig => {
                 return {
@@ -187,7 +189,7 @@ const Search = React.forwardRef(({
 
     function setSearchQuery(newQuery) {
         if (pushHistory ===  true) {
-            pushSearchConfigHistory(navigate, newQuery, searchConfig.settings);
+            pushSearchConfigHistory(navigate, newQuery, searchConfig.settings, authContext.admin);
         } else {
             setSearchConfig(oldConfig => {
                 return {
@@ -268,7 +270,7 @@ const Search = React.forwardRef(({
                 onFocus={handleOnFocus}
             />
             { 
-                showExactSwitch && <SearchSettings settings={searchConfig.settings} onChange={handleChangeSettings} />
+                showSettings && <SearchSettings settings={searchConfig.settings} onChange={handleChangeSettings} />
             }
         </Box>
         {
@@ -280,6 +282,7 @@ const Search = React.forwardRef(({
                     count={searchResult.totalCount}
                     hasNext={searchResult.hasNext}
                     onNextPage={handleNextPage}
+                    sort="none" // Keep the order from the fuzzy search result (relevance first, date second)
                 />
             </React.Fragment>
         }

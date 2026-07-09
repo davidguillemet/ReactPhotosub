@@ -367,7 +367,7 @@ const Simulation = ({simulations, simulationIndex, user, dispatch}) => {
                             <VerticalSpacing factor={2} />
                             <Box sx={{ width: "100%", px: 1}}>
                                 <Search
-                                    showExactSwitch={false}
+                                    showSettings={false}
                                     onResult={handleSearchResult}
                                     pageIndex={searchResult.page}
                                 />

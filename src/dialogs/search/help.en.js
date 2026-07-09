@@ -30,17 +30,6 @@ const help = () => (
     <ListItem>The search for <BoldItalic>gorgon diver</BoldItalic> is considered as <BoldItalic>gorgon AND diver</BoldItalic> et retourne donc toutes les images contenant une gorgone <u>et</u> un plongeur</ListItem>
 </HtmlList>
 </SummaryParagraph>
-<SummaryParagraph>By default, an "inclusive" search is performed:
-<HtmlList>
-    <ListItem>The search for <BoldItalic>vert</BoldItalic> (green) returns images containing green color, but also images containing a vertebrate, or an invertebrate ("vertebrate" and "invertebrate" contain the string "vert")</ListItem>
-</HtmlList>
-</SummaryParagraph>
-<SummaryParagraph>
-To perform a more restrictive search, then check the option "Search for exact terms":
-<HtmlList>
-    <ListItem>In that case, the search for <BoldItalic>vert</BoldItalic> will only return images containing green color, but also those containing a green giant (yes, it exists...)</ListItem>
-</HtmlList>
-</SummaryParagraph>
 <SummaryParagraph>
 You can prefix a criterion with a hyphen (-) to exclude it from the search:
 <HtmlList>

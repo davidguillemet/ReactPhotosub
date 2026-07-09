@@ -9,12 +9,16 @@ export function getInitialSearchResult() {
     }
 }
 
-export function pushSearchConfigHistory(navigate, query, settings) {
+export function pushSearchConfigHistory(navigate, query, settings, admin = false) {
     let path = '/search?';
     if (query && query.length > 0) {
         path += new URLSearchParams({query: query}).toString();
-        path += '&';
     }
-    path += `exact=${settings ? settings.exact : false}`;
+    // Don't insert settings in the query string since they are now forced to be exact and fuzzy by default.
+    // path += '&';
+    // path += `exact=${settings ? settings.exact : false}`;
+    // if (admin) {
+    //     path += `&fuzzy=${settings ? settings.fuzzy : false}`;
+    // }
     navigate(path);
 }

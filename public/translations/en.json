@@ -372,6 +372,7 @@
         "search": {
             "inputPlaceHolder": "Search within {0} images...",
             "exactSwitch": "Exact words",
+            "fuzzySwitch": "Fuzzy search",
             "seeAllResults": "See all results",
             "nextResults": "Next results",
             "close": "Close",

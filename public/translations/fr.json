@@ -372,6 +372,7 @@
         "search": {
             "inputPlaceHolder": "Rechercher parmi {0} images...",
             "exactSwitch": "Termes exacts",
+            "fuzzySwitch": "Recherche floue",
             "seeAllResults": "Voir tous les résultats",
             "nextResults": "Résultats suivants",
             "close": "Fermer",

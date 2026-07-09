@@ -25,6 +25,7 @@ const ResultGallery = React.forwardRef(({
                 hasNext={searchResult.hasNext}
                 onNextPage={handleNextSearchPage}
                 colWidth="small"
+                sort="none" // Keep the order from the fuzzy search result (relevance first, date second)
             />
             {
                 searchResult.hasNext &&
