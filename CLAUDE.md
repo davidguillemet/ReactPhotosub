@@ -45,6 +45,52 @@ npm run deploy           # Deploy to Firebase
 
 **New components:** Place reusable components under `src/components/<name>/`, with `<name>.js` and an `index.js` that re-exports the default. Import via the alias `components/<name>`.
 
+**Form framework (`src/components/form/` + `src/dialogs/`):** Declarative forms with two building blocks:
+
+1. `Form` (import from `components/form`) — renders fields defined as an array of field descriptors. Each field object shape:
+   ```js
+   {
+     id: "fieldName",        // maps to the submitted values key
+     label: "Label",
+     type: FIELD_TYPE_TEXT,  // FIELD_TYPE_TEXT | NUMBER | DATE | SELECT | SWITCH | CHECK_BOX | TAGS_FIELD | LATLONG | URL | EMAIL | PASSWORD | HIDDEN
+     required: true,
+     errorText: "...",
+     default: "",
+     focus: true,            // autofocus
+     multiLingual: true,     // duplicate field into FR and EN tabs
+     languageSuffix: false,  // controls ID generation for multiLingual fields:
+                             //   false (default): FR keeps original id, EN gets `${id}_en`
+                             //   true: both get suffix → `${id}_fr` and `${id}_en`
+     group: "groupName",     // group consecutive fields with same group into language tabs
+     lang: "fr",             // required when group is set manually; drives the tab label suffix
+     multiline: false,       // text fields only
+     options: () => [],      // select fields: function returning options array
+   }
+   ```
+   Import field type constants alongside `Form`: `import Form, { FIELD_TYPE_TEXT, FIELD_TYPE_SELECT, ... } from 'components/form'`.
+   Key `Form` props: `fields`, `initialValues`, `submitAction(values)`, `onCancel`, `submitCaption`, `validationMessage`, `onChange`, `readOnly`.
+
+2. `useFormDialog` + `FormDialog` (import from `dialogs/FormDialog`) — wraps a `Form` in a MUI dialog:
+   ```js
+   const { dialogProps, openDialog, FormDialog } = useFormDialog(onClose);
+   // render:
+   <FormDialog title="..." {...dialogProps} maxWidth="sm">
+     <MyForm />   // FormDialog injects onCancel → closes dialog
+   </FormDialog>
+   ```
+   `FormDialog` injects `onCancel` into its child via `cloneElement`. To auto-close after a successful submit, call `onCancel()` at the end of `submitAction`.
+
+**Confirmation dialog (`src/dialogs/ConfirmDialog.js`):** Generic confirm/cancel dialog. Props: `open`, `title`, `dialogContent` (string array — each entry becomes a paragraph), `onOpenChanged(bool)`, `onValidate`, `onCancel`. The dialog closes before calling `onValidate`, so the handler runs after the dialog is already gone.
+```js
+<ConfirmDialog
+  open={!!target}
+  title={target?.name}
+  dialogContent={[t("confirm:delete", target?.name)]}
+  onOpenChanged={(open) => { if (!open) setTarget(null); }}
+  onValidate={() => target && doDelete(target.id)}
+/>
+```
+
 ### Backend (`functions/`)
 
 **Entry point:** `functions/index.js` exports two Cloud Functions: `mainapi` (Express app for `/api/**`) and `preRender` (SSR for hosting rewrites).
@@ -68,3 +114,94 @@ Emulator ports: Functions 5003 · Hosting 5002 · Auth 9099 · Storage 9199.
 `firebase.json` rewrites: `/api/**` → `mainapi`, everything else → `preRender` (SSR).
 
 Build for deployment: `npm run build4Firebase` (frontend), then deploy via `firebase deploy` or `cd functions && npm run deploy`.
+
+## Database Schema
+
+Full DDL: `localhost-2026-07-14_191934-dump.sql` (PostgreSQL 15, pg_dump 18.4).
+
+### Tables
+
+**`destinations`**
+| column | type | notes |
+|---|---|---|
+| `id` | smallint PK | auto-generated |
+| `path` | text | `"year/location"` e.g. `"2024/halmahera"` — unique index |
+| `title` | text | French title |
+| `title_en` | text | English title |
+| `date` | date | travel date |
+| `location` | smallint FK→locations.id | |
+| `cover` | text | cover image filename |
+| `macro` | boolean | has macro photos |
+| `wide` | boolean | has wide-angle photos |
+| `published` | boolean | default true |
+| `tags` | text[] | |
+
+**`images`**
+| column | type | notes |
+|---|---|---|
+| `id` | integer PK | auto-generated |
+| `name` | text | filename |
+| `path` | text | `"year/location"` — unique with `name` |
+| `title` | text | |
+| `description` | text | species description (parsed by `parseSingleDescription`) |
+| `tags` | text[] | searchable tags |
+| `captionTags` | text[] | |
+| `caption` | text | |
+| `width` / `height` | smallint | |
+| `sizeRatio` | double | width/height |
+| `create` | timestamp | |
+| `sub_gallery_id` | integer FK→sub_galleries.id | nullable |
+| `portfolio` | boolean | |
+| `excluded_cats` | text[] | portfolio categories where image is excluded |
+| `version` | text | default `"1"`, used for ImageKit cache busting (`?v=`) |
+| `search_text` | text | maintained by trigger `trg_images_search_text`; accent-folded lowercase concat of title+description+tags |
+
+**`locations`**
+| column | type | notes |
+|---|---|---|
+| `id` | smallint PK | |
+| `title` | text | |
+| `latitude` / `longitude` | real | |
+| `link` | text | external link |
+| `region` | smallint FK→regions.id | |
+
+**`regions`**
+| column | type | notes |
+|---|---|---|
+| `id` | smallint PK | |
+| `title` | text | French |
+| `title_en` | text | English |
+| `parent` | smallint FK→regions.id | self-referential tree |
+
+**`sub_galleries`**
+| column | type | notes |
+|---|---|---|
+| `id` | integer PK | |
+| `destination_id` | smallint FK→destinations.id | CASCADE DELETE |
+| `title` / `title_en` | text | |
+| `desc` / `desc_en` | text | |
+| `index` | smallint | display order |
+| `location` | smallint FK→locations.id | nullable |
+
+**`portfolioCategories`**
+| column | type | notes |
+|---|---|---|
+| `id` | smallint PK | |
+| `key` | text | unique |
+| `caption_fr` / `caption_en` | text | |
+
+**`user_data`**
+| column | type | notes |
+|---|---|---|
+| `uid` | text PK | Firebase UID |
+| `favorites` | text[] | array of image paths |
+| `simulations` | jsonb | |
+
+### View
+
+**`destinations_with_regionpath`** — joins `destinations` + `locations` + `images` (for the cover image's `version`). Adds `cover_version` and `regionpath` (recursive array of `{id, title, title_en, parent}` objects walking up the region tree).
+
+### Functions & Triggers
+
+- `f_unaccent(text)` — IMMUTABLE plpgsql wrapper around `unaccent()`, used at query time for accent-insensitive search.
+- `trg_images_search_text()` — BEFORE INSERT OR UPDATE OF `title, description, tags` on `images`; populates `search_text` with lowercased, accent-folded concatenation of those three fields.
