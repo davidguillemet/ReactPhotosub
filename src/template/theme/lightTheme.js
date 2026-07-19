@@ -31,7 +31,8 @@ const paletteLightMode = {
         primary: '#5f5f4c'
     },
     background: {
-        paper: '#fefdfd'
+        paper: '#fefdfd',
+        paperLight: '#f4f0ea'
     }
 };
 
