@@ -63,6 +63,7 @@ const createMockContext = (overrides = {}) => ({
     activeCollectionId: 'main',
     viewedCollectionId: 'main',
     collections: mockCollections,
+    mainFavoritesCount: 5,
     viewCollection: jest.fn(),
     activateCollection: jest.fn().mockResolvedValue({}),
     deleteCollection: jest.fn().mockResolvedValue({}),
@@ -116,6 +117,13 @@ describe('CollectionManager', () => {
         expect(screen.getByText('main')).toBeInTheDocument();
         expect(screen.getByText('Red Sea')).toBeInTheDocument();
         expect(screen.getByText('Mediterranean')).toBeInTheDocument();
+    });
+
+    test('renders per-collection image counts, including main', () => {
+        renderCM();
+        expect(within(getRowByText('main')).getByText('5')).toBeInTheDocument();
+        expect(within(getRowByText('Red Sea')).getByText('1')).toBeInTheDocument();
+        expect(within(getRowByText('Mediterranean')).getByText('0')).toBeInTheDocument();
     });
 
     // --- Button counts per row ---
@@ -260,6 +268,7 @@ describe('CollectionManager', () => {
             collections: {
                 active: 'main',
                 items: { 'c_1': { name: 'Red Sea', paths: [] } },
+                mainCount: 7,
             },
             viewedCollectionId: 'main',
             onView: mockOnView,
@@ -286,6 +295,11 @@ describe('CollectionManager', () => {
             renderReadOnly();
             fireEvent.click(getRowByText('Red Sea'));
             expect(mockContext.viewCollection).not.toHaveBeenCalled();
+        });
+
+        test('renders main count from collections.mainCount, not the own context', () => {
+            renderReadOnly();
+            expect(within(getRowByText('main')).getByText('7')).toBeInTheDocument();
         });
     });
 });

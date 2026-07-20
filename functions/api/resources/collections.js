@@ -11,10 +11,10 @@ module.exports = function(app, config) {
             }
             res.locals.errorMessage = "Le chargement des collections a échoué.";
             return config.pool("user_data")
-                .select("collections")
+                .select("collections", config.pool().raw("coalesce(array_length(favorites, 1), 0) as \"mainCount\""))
                 .where({uid: requestedUid})
                 .first()
-                .then((row) => res.json(row ? row.collections : {active: "main", items: {}}))
+                .then((row) => res.json(row ? {...row.collections, mainCount: row.mainCount} : {active: "main", items: {}, mainCount: 0}))
                 .catch(next);
         });
 

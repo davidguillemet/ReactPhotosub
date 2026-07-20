@@ -32,6 +32,8 @@ const FavoritesProvider = ({ children }) => {
     const [activeCollectionId, setActiveCollectionId] = useState('main');
     const [viewedCollectionId, setViewedCollectionId] = useState('main');
     const [collections, setCollections] = useState(null);
+    // Main collection's image count — not tracked inside `collections` (which only holds named items)
+    const [mainFavoritesCount, setMainFavoritesCount] = useState(0);
 
     // Hydrate TanStack cache and local Map from an images array
     const applyFavorites = useCallback((images, collectionId, uid) => {
@@ -50,6 +52,25 @@ const FavoritesProvider = ({ children }) => {
         applyFavorites(images, collectionId, uid);
     }, [queryClient, dataProvider, applyFavorites]);
 
+    // Keep the collection's tracked count (main count or named collection's paths) in sync
+    // with local add/remove, so CollectionManager's per-row counts don't go stale until
+    // the next full `collections` refresh (create/rename/delete/activate).
+    const adjustCollectionCount = useCallback((pathsAdded, pathsRemoved) => {
+        if (activeCollectionId === 'main') {
+            setMainFavoritesCount(prev => Math.max(0, prev + pathsAdded.length - pathsRemoved.length));
+            return;
+        }
+        setCollections(prevCollections => {
+            const item = prevCollections?.items?.[activeCollectionId];
+            if (!item) return prevCollections;
+            const nextPaths = item.paths.filter(p => !pathsRemoved.includes(p)).concat(pathsAdded);
+            return {
+                ...prevCollections,
+                items: { ...prevCollections.items, [activeCollectionId]: { ...item, paths: nextPaths } },
+            };
+        });
+    }, [activeCollectionId]);
+
     const addUserFavorite = useCallback((favoriteImgArray) => {
         const pathArray = favoriteImgArray.map(img => imagePath(img));
         return addFavoriteMutation.mutateAsync({ pathArray, collectionId: activeCollectionId }).then(() => {
@@ -59,9 +80,10 @@ const FavoritesProvider = ({ children }) => {
                 queryContext.setFavoritesData(authContext.user.uid, activeCollectionId, Array.from(newMap.values()));
                 return newMap;
             });
+            adjustCollectionCount(pathArray, []);
             favoritesObservers.current.forEach(observer => observer(favoriteImgArray, 'add'));
         });
-    }, [addFavoriteMutation, queryContext, authContext.user, activeCollectionId]);
+    }, [addFavoriteMutation, queryContext, authContext.user, activeCollectionId, adjustCollectionCount]);
 
     const removeUserFavorite = useCallback((favoriteImg) => {
         const path = imagePath(favoriteImg);
@@ -72,9 +94,10 @@ const FavoritesProvider = ({ children }) => {
                 queryContext.setFavoritesData(authContext.user.uid, activeCollectionId, Array.from(newMap.values()));
                 return newMap;
             });
+            adjustCollectionCount([], [path]);
             favoritesObservers.current.forEach(observer => observer([favoriteImg], 'remove'));
         });
-    }, [removeFavoriteMutation, queryContext, authContext.user, activeCollectionId]);
+    }, [removeFavoriteMutation, queryContext, authContext.user, activeCollectionId, adjustCollectionCount]);
 
     const subscribeFavorites = useCallback((fn) => {
         favoritesObservers.current.push(fn);
@@ -149,6 +172,7 @@ const FavoritesProvider = ({ children }) => {
                 setCollections(userCollections);
                 setActiveCollectionId(activeId);
                 setViewedCollectionId(activeId);
+                setMainFavoritesCount(userData.favorites?.length ?? 0);
 
                 if (activeId === 'main') {
                     applyFavorites(userData.favorites, 'main', uid);
@@ -163,6 +187,7 @@ const FavoritesProvider = ({ children }) => {
             setActiveCollectionId('main');
             setViewedCollectionId('main');
             setCollections(null);
+            setMainFavoritesCount(0);
         }
     }, [authContext.user]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -176,6 +201,7 @@ const FavoritesProvider = ({ children }) => {
             activeCollectionId,
             viewedCollectionId,
             collections,
+            mainFavoritesCount,
             viewCollection,
             activateCollection,
             createCollection,

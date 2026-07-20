@@ -33,6 +33,7 @@ const CollectionManager = ({
         activeCollectionId,
         viewedCollectionId: ownViewedCollectionId,
         collections: ownCollections,
+        mainFavoritesCount: ownMainFavoritesCount,
         viewCollection,
         activateCollection,
         deleteCollection,
@@ -40,6 +41,7 @@ const CollectionManager = ({
 
     const collections = collectionsProp ?? ownCollections;
     const viewedCollectionId = viewedCollectionIdProp ?? ownViewedCollectionId;
+    const mainFavoritesCount = collectionsProp ? collectionsProp.mainCount : ownMainFavoritesCount;
 
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [settingActive, setSettingActive] = useState(null); // id being set as active
@@ -56,9 +58,9 @@ const CollectionManager = ({
     }, [collections, tCol]);
 
     const collectionPathCount = useCallback((id) => {
-        if (id === 'main') return 0;
+        if (id === 'main') return mainFavoritesCount ?? 0;
         return collections?.items?.[id]?.paths?.length ?? 0;
-    }, [collections]);
+    }, [collections, mainFavoritesCount]);
 
     const handleView = useCallback((id) => {
         if (readOnly && onView) {
@@ -115,7 +117,7 @@ const CollectionManager = ({
                     <TableHead>
                         <TableRow sx={{ backgroundColor: 'background.paperLight' }}>
                             <TableCell
-                                colSpan={readOnly ? 1 : 2}
+                                colSpan={readOnly ? 2 : 3}
                                 align="center"
                                 sx={{ fontWeight: 'bold', borderBottom: '1px solid', borderColor: 'divider' }}
                             >
@@ -139,8 +141,11 @@ const CollectionManager = ({
                                     <TableCell>
                                         {collectionLabel(id)}
                                     </TableCell>
+                                    <TableCell align="center" sx={{ width: '1%', whiteSpace: 'nowrap' }}>
+                                        {collectionPathCount(id)}
+                                    </TableCell>
                                     {!readOnly && (
-                                        <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                                        <TableCell sx={{ whiteSpace: 'nowrap', width: '1%' }}>
                                             <Tooltip title={tCol("btn:setActive")}>
                                                 <span>
                                                     <IconButton
@@ -198,7 +203,7 @@ const CollectionManager = ({
                                     },
                                 }}
                             >
-                                <TableCell colSpan={2} align="center" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
+                                <TableCell colSpan={3} align="center" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
                                         <AddIcon fontSize="small" />
                                         {tCol("btn:new")}

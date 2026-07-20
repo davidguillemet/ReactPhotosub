@@ -119,7 +119,71 @@ describe('FavoritesProvider', () => {
             expect(contextRef.current.activeCollectionId).toBe('main');
             expect(contextRef.current.viewedCollectionId).toBe('main');
             expect(contextRef.current.collections).toBeNull();
+            expect(contextRef.current.mainFavoritesCount).toBe(0);
         });
+    });
+
+    // --- mainFavoritesCount / per-collection counts ---
+
+    test('on login: sets mainFavoritesCount from userData.favorites.length', async () => {
+        const { contextRef } = renderProvider();
+
+        await waitFor(() => {
+            expect(contextRef.current.mainFavoritesCount).toBe(mockImages.length);
+        });
+    });
+
+    test('addUserFavorite increments mainFavoritesCount when main is active', async () => {
+        const { contextRef } = renderProvider();
+        await waitFor(() => expect(contextRef.current.collections).not.toBeNull());
+
+        const newImage = { id: 3, name: 'c.jpg', path: '2024/test' };
+        await act(async () => { await contextRef.current.addUserFavorite([newImage]); });
+
+        expect(contextRef.current.mainFavoritesCount).toBe(mockImages.length + 1);
+    });
+
+    test('removeUserFavorite decrements mainFavoritesCount when main is active', async () => {
+        const { contextRef } = renderProvider();
+        await waitFor(() => expect(contextRef.current.collections).not.toBeNull());
+
+        await act(async () => { await contextRef.current.removeUserFavorite(mockImages[0]); });
+
+        expect(contextRef.current.mainFavoritesCount).toBe(mockImages.length - 1);
+    });
+
+    test('addUserFavorite appends to the active named collection\'s paths, leaving mainFavoritesCount unchanged', async () => {
+        const userData = {
+            favorites: mockImages,
+            collections: { active: 'c_1', items: { 'c_1': { name: 'A', paths: ['2024/test/z.jpg'] } } },
+        };
+        const { contextRef } = renderProvider(mockUser, {
+            dataProvider: { getUserData: jest.fn().mockResolvedValue(userData) },
+        });
+        await waitFor(() => expect(contextRef.current.collections).not.toBeNull());
+
+        const newImage = { id: 3, name: 'c.jpg', path: '2024/test' };
+        await act(async () => { await contextRef.current.addUserFavorite([newImage]); });
+
+        expect(contextRef.current.collections.items['c_1'].paths).toEqual(['2024/test/z.jpg', '2024/test/c.jpg']);
+        expect(contextRef.current.mainFavoritesCount).toBe(mockImages.length);
+    });
+
+    test('removeUserFavorite removes the path from the active named collection', async () => {
+        const userData = {
+            favorites: mockImages,
+            collections: { active: 'c_1', items: { 'c_1': { name: 'A', paths: ['2024/test/z.jpg', '2024/test/y.jpg'] } } },
+        };
+        const { contextRef } = renderProvider(mockUser, {
+            dataProvider: { getUserData: jest.fn().mockResolvedValue(userData) },
+        });
+        await waitFor(() => expect(contextRef.current.collections).not.toBeNull());
+
+        await act(async () => {
+            await contextRef.current.removeUserFavorite({ id: 99, name: 'z.jpg', path: '2024/test' });
+        });
+
+        expect(contextRef.current.collections.items['c_1'].paths).toEqual(['2024/test/y.jpg']);
     });
 
     // --- viewCollection ---
