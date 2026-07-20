@@ -99,15 +99,15 @@ DataProvider.prototype.getUserData = function() {
     });
 };
 
-DataProvider.prototype.addFavorite = function(pathArray) {
-    return this.axios.post('/favorites', pathArray )
+DataProvider.prototype.addFavorite = function(pathArray, collectionId = 'main') {
+    return this.axios.post('/favorites', { paths: pathArray, collection: collectionId })
     .then(response => {
         return response.data;
     });
 };
 
-DataProvider.prototype.removeFavorite = function(path) {
-    return this.axios.delete('/favorites', {data: { path: path } } )
+DataProvider.prototype.removeFavorite = function(path, collectionId = 'main') {
+    return this.axios.delete('/favorites', {data: { path, collection: collectionId } })
     .then(response => {
         return response.data;
     });
@@ -159,16 +159,46 @@ DataProvider.prototype.removeFromPortfolio = function(imageIds) {
     });
 };
 
-DataProvider.prototype.getFavorites = function(uid) {
-    // NOTE: this request should not be triggered...
+DataProvider.prototype.getFavorites = function(uid, collectionId = 'main') {
+    // NOTE: this request should not be triggered for main collection on login...
     // the query data cache is hydrated from userdata response when getting user data at login time
     if (uid === null) {
         return Promise.resolve([]);
     }
-    return this.axios.get(`/favorites/${uid}`)
+    return this.axios.get(`/favorites/${uid}`, { params: { collection: collectionId } })
     .then(response => {
         return response.data;
-    })
+    });
+};
+
+DataProvider.prototype.getCollections = function() {
+    return this.axios.get('/collections')
+    .then(response => response.data);
+};
+
+DataProvider.prototype.getCollectionsForUser = function(uid) {
+    return this.axios.get(`/collections/${uid}`)
+    .then(response => response.data);
+};
+
+DataProvider.prototype.createCollection = function(name_fr, name_en) { // eslint-disable-line camelcase
+    return this.axios.post('/collections', { name_fr, name_en })
+    .then(response => response.data);
+};
+
+DataProvider.prototype.renameCollection = function(id, name_fr, name_en) { // eslint-disable-line camelcase
+    return this.axios.patch('/collections', { id, name_fr, name_en })
+    .then(response => response.data);
+};
+
+DataProvider.prototype.deleteCollection = function(id) {
+    return this.axios.delete('/collections', { data: { id } })
+    .then(response => response.data);
+};
+
+DataProvider.prototype.setActiveCollection = function(id) {
+    return this.axios.patch('/collections/active', { active: id })
+    .then(response => response.data);
 };
 
 DataProvider.prototype.getSimulations = function(uid) {

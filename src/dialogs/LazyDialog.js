@@ -14,7 +14,7 @@ const LazyDialog = ({path, title, open, handleClose}) => {
 
     return (
         <Dialog
-            fullScreen={isMobile}
+            fullScreen={!!isMobile}
             fullWidth={true}
             open={open}
             onClose={handleClose}

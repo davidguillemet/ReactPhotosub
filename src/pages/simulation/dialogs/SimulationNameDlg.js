@@ -81,7 +81,7 @@ export default function SimulationNameDialog({ open, initialName, action = "save
     return (
         <div>
             <Dialog
-                fullScreen={isMobile}
+                fullScreen={!!isMobile}
                 fullWidth={true}
                 open={isOpen}
                 onClose={handleClose}

@@ -1,474 +1,497 @@
 {
-    "menu": {
-        "home": "Home",
-        "portfolio": "Portfolio",
-        "destinations": "Destinations",
-        "destination": "Destination",
-        "search": "Search",
-        "finning": "Finning",
-        "composition": "Composition",
-        "about": "About",
-        "contact": "Contact",
-        "favorites": "My favorites",
-        "profile": "My Profile",
-        "admin": "Administration",
-        "logout": "Logout",
-        "acctMgmt": "Account Management"
+  "menu": {
+    "home": "Home",
+    "portfolio": "Portfolio",
+    "destinations": "Destinations",
+    "destination": "Destination",
+    "search": "Search",
+    "finning": "Finning",
+    "composition": "Composition",
+    "about": "About",
+    "contact": "Contact",
+    "favorites": "My favorites",
+    "profile": "My Profile",
+    "admin": "Administration",
+    "logout": "Logout",
+    "acctMgmt": "Account Management"
+  },
+  "pages": {
+    "404": {
+      "title": "Oops...",
+      "explanation": "It seems that the page you requested does not exist or has been deleted."
     },
-    "pages": {
-        "404": {
-            "title": "Oops...",
-            "explanation": "It seems that the page you requested does not exist or has been deleted."
+    "about": {
+      "title": "About me"
+    },
+    "accountManagement": {
+      "title:verifyMailAddress": "Mail address validation",
+      "title:resetPassword": "Password Reset",
+      "verifyResetPasswordCode": "Verifying request validity...",
+      "verifyMailAddress": "Your email address is being validated...",
+      "invalidActionLink": "The link is not valid.",
+      "mailAddressVerified": "Your email address has been validated.\nThank you.",
+      "invalidVerifyMailLink": "The verification link does not seem valid anymore.\nYou can ask for a new one from your profile page.",
+      "field:password": "Password",
+      "error:passwordCreate": "Please enter a password of at least 6 characters.",
+      "field:passwordConfirm": "Password confirmation",
+      "error:passwordConfirm": "Please confirm your password",
+      "error:passwordConfirmFailure": "The Password confirmation is not correct.",
+      "invalidResetPasswordLink": "The link to reset your password does not seem valid anymore.\nYou can ask for a new one by opening the login form.",
+      "enterNewPassword": "Enter your new password:",
+      "resetPasswordSuccess": "Your password has been changed successfully.\nYou are now signed-in."
+    },
+    "home": {
+      "btn:viewDestination": "View Destination"
+    },
+    "contact": {
+      "title": "Contact",
+      "field:name": "Your name",
+      "error:name": "Please enter your name.",
+      "field:email": "Your email address",
+      "error:email": "Please enter a valid email address.",
+      "field:object": "The title of your message",
+      "error:object": "Please enter a title for your message.",
+      "field:message": "Your message",
+      "error:message": "Please enter a message.",
+      "switch:sendCopy": "Receive a copy of your message",
+      "info:success": "Your message has been sent. Thank you!",
+      "warning:leaveTitle": "Unsaved changes",
+      "warning:leave": "Your message was not sent after the last edits.\nDo you confirm you want to leave this page ?",
+      "submitCaption": "Send"
+    },
+    "destination": {
+      "btn:prevDestination": "Previous",
+      "btn:nextDestination": "Next",
+      "btn:seeSummary": "See summary",
+      "info:noRelatedDest": "No related destination",
+      "relatedDestinations": "Related destinations"
+    },
+    "destinations": {
+      "title": "Destinations",
+      "count": "{0} Destination(s)",
+      "filterByRegions": "Filter by regions",
+      "noRegion": "No region...",
+      "filterTip": "Select a region to filter destinations",
+      "allDestinations": "All",
+      "macroDestinations": "Macro",
+      "wideAngleDestinations": "Wide angle",
+      "title:confirmRemove": "Remove destination",
+      "confirmRemove": "Do you confirm the deletion of the destination '{0}'?",
+      "warningConfirmRemove": "Please note, this action is irreversible.",
+      "title:newDestination": "New destination",
+      "title:editDestination": "Edit destination",
+      "validate": "Validate",
+      "form:titleField": "Title",
+      "form:titleError": "Please indicate a destination title.",
+      "form:dateField": "Date",
+      "form:dateError": "Please indicate the date of travel",
+      "form:locationField": "Location",
+      "form:locationError": "Please indicate the location of the destination",
+      "form:imagePathField": "Path to images",
+      "form:imagePathError": "Please indicate a path to the images.",
+      "form:coverField": "Cover image",
+      "form:coverError": "Please provide a cover image.",
+      "form:hasMacro": "Contains macro images",
+      "form:tags": "Tags",
+      "form:hasWideAngle": "Contains wide-angle images",
+      "form:published": "Publiée",
+      "validationMessage": "The changes have been saved successfully.",
+      "noDestinationsFound": "No destination matches the selected filters.",
+      "filterTab:byRegions": "By regions",
+      "filterTab:byKeywords": "By keywords",
+      "filterTab:byYear": "By year",
+      "dateFilter": {
+        "label": "Filter by years",
+        "noAvailableYears": "No years available",
+        "helperText": "Select one or more years to filter destinations."
+      },
+      "keywordFilter": {
+        "label": "Filter by keywords",
+        "errorTooShort": "Please enter at least 3 characters",
+        "helperText": "Enter keywords to refine your search."
+      }
+    },
+    "favorites": {
+      "title": "My Selection",
+      "favoritesCount": "{0} image(s)",
+      "info:favoritesDeleted": "{0} favorite(s) deleted",
+      "btn:cancelDeletion": "Cancel",
+      "info:noFavorites": "Your favorites list is empty.",
+      "info:userHasNoFavorites": "The user has no favorites.",
+      "info:emptyCollection": "Collection \"{0}\" is empty.",
+      "userSelection": {
+        "suffix:me": " (me)",
+        "field:label": "User selection",
+        "field:error": "Please select a user.",
+        "text:intro": "To view another user's selection:"
+      },
+      "collections": {
+        "title": "My collections",
+        "title:other": "{0}'s collections",
+        "main": "Main",
+        "btn:new": "New collection",
+        "lbl:nameFr": "Name (French)",
+        "lbl:nameEn": "Name (English)",
+        "btn:create": "Create",
+        "btn:cancel": "Cancel",
+        "confirm:deleteOne": "Delete \"{0}\"? 1 image will be removed from your favorites, unless it also belongs to another collection.",
+        "confirm:delete": "Delete \"{0}\"? {1} images will be removed from your favorites, unless they also belong to another collection.",
+        "error:emptyName": "Both names (FR and EN) are required.",
+        "error:duplicateName": "A collection with this name already exists.",
+        "btn:delete": "Delete",
+        "btn:setActive": "Set as active",
+        "btn:edit": "Edit collection",
+        "btn:save": "Save",
+        "lbl:name": "Name"
+      }
+    },
+    "portfolio": {
+      "title": "Portfolio",
+      "info:emptyPortfolio": "The portfolio is empty.",
+      "info:favoritesDeleted": "{0} image(s) removed from portfolio",
+      "info:portfolioImagesDeleted": "{0} image(s) removed from portfolio",
+      "btn:cancelDeletion": "Undo",
+      "groupBy:category": "By category",
+      "groupBy:destination": "By destination",
+      "groupBy:date": "By date",
+      "groupBy:none": "No grouping",
+      "groupLabel:category": "All categories",
+      "groupLabel:destination": "All destinations",
+      "groupLabel:date": "All dates",
+      "cat:sharks": "Sharks",
+      "cat:mollusc": "Molluscs",
+      "cat:shrimp": "Shrimps",
+      "cat:frogfish": "Frogfish",
+      "cat:other": "Others",
+      "admin": {
+        "field:key": "Key",
+        "error:title": "The key is required.",
+        "error:duplicateKey": "The key '{0}' already exists.",
+        "field:caption": "Caption",
+        "btn:validate": "Validate",
+        "success:saved": "Category saved.",
+        "btn:addCategory": "Add category",
+        "dlg:createCategory": "Create category",
+        "dlg:editCategory": "Edit category",
+        "title:confirmRemove": "Remove category",
+        "confirmRemove": "Do you confirm the deletion of the category '{0}'?",
+        "warningConfirmRemove": "Please note, this action is irreversible.",
+        "success:catDeleted": "The category '{0}' has been deleted.",
+        "btn:includeInCategory": "Include in category",
+        "btn:excludeFromCategory": "Exclude from category"
+      }
+    },
+    "finning": {
+      "title": "Finning, Késako ?",
+      "euroInitiative1": "European Citizen Initiative",
+      "euroInitiative2": "Give your support!",
+      "introduction": "You have probably already heard of finning in relation to the harvesting of shark fins, but what does this practice consist of and what are the consequences for the animal and for the eco-systems?",
+      "menuItem1": "A devastating practice",
+      "menuItem2": "Indiscriminate fishing",
+      "menuItem3": "The balance of the oceans threatened",
+      "menuItem4": "A traditional dish",
+      "menuItem5": "The list is long...",
+      "menuItem6": "Some videos"
+    },
+    "search": {
+      "title": "Search"
+    },
+    "composition": {
+      "title": "Composition",
+      "button::help": "What is it about?",
+      "btn:delete": "Delete",
+      "btn:add": "Add a composition",
+      "btn:lock": "Lock",
+      "btn:unlock": "Unlock",
+      "btn:rename": "Rename",
+      "btn:save": "Save",
+      "save:success": "'{0}' has been saved.",
+      "delete:success": "'{0}' has been deleted.",
+      "add:success": "'{0}' has been added.",
+      "help:title": "Composition",
+      "noFavorites": "Your favorites list is empty.",
+      "noSearchResults": "Your search returned no results.",
+      "enterSearchCriteria": "Type a criteria to launch a search.",
+      "interiorSelection": "1. Select a scenery",
+      "imageSelection": "2. Select images",
+      "frameSelection": "3. Frame configuration",
+      "imageType:preSelection": "Samples",
+      "imageType:favorites": "Favorites",
+      "imageType:search": "Search",
+      "frameThickness": "Thickness",
+      "frameColor": "Color:",
+      "frameShadow": "Shadow:",
+      "btn:addScenery": "Add scenery",
+      "progress:createThumbs": "Thumbnails creation...",
+      "uploadSuccess": "Files upload succeeded",
+      "dlgTitle:delete": "Deletion",
+      "dlg:confirm1": "Do you confirm the deletion of '{0}' ?",
+      "dlg:confirm2": "Attention, this action is irreversible.",
+      "dlg:validateDeletion": "OK",
+      "dlg:cancelDeletion": "Cancel",
+      "simulationNameDialog": {
+        "save:title": "Save",
+        "save:description": "Give your simulation a name to save it.",
+        "rename:title": "Rename",
+        "rename:description": "Rename your simulation.",
+        "new:title": "New simulation",
+        "new:description": "Enter a name for your new simulation.",
+        "unknownAction:title": "Unknown action",
+        "unknownAction:description": "Unknown action",
+        "field:simulationName": "Simulation name",
+        "error:nameExists": "This name already exists",
+        "btn:cancel": "Cancel",
+        "btn:validate": "Validate"
+      }
+    },
+    "admin": {
+      "title": "Administration",
+      "lbl:regions": "Regions",
+      "lbl:images": "Images",
+      "regions": {
+        "expandAll": "Expand All",
+        "collapseAll": "Collapse All",
+        "title:deleteRegion": "Delete Region",
+        "confirmDeleteRegion": "Are your sure you want to delete the region '{0}'?",
+        "warningDeleteRegion": "This action is irreversible.",
+        "title:deleteLocation": "Delete Location",
+        "confirmDeleteLocation": "Are your sure you want to delete the location '{0}'?",
+        "warningDeleteLocation": "This action is irreversible.",
+        "toolbar": {
+          "btn:newRegion": "New Region"
         },
-        "about": {
-            "title": "About me"
+        "dialogs": {
+          "newLocation:title": "New Location",
+          "editLocation:title": "Edit Location",
+          "newRegion:title": "New Region",
+          "editRegion:title": "Edit Region"
         },
-        "accountManagement": {
-            "title:verifyMailAddress": "Mail address validation",
-            "title:resetPassword": "Password Reset",
-            "verifyResetPasswordCode": "Verifying request validity...",
-            "verifyMailAddress": "Your email address is being validated...",
-            "invalidActionLink": "The link is not valid.",
-            "mailAddressVerified": "Your email address has been validated.\nThank you.",
-            "invalidVerifyMailLink": "The verification link does not seem valid anymore.\nYou can ask for a new one from your profile page.",
-            "field:password": "Password",
-            "error:passwordCreate": "Please enter a password of at least 6 characters.",
-            "field:passwordConfirm": "Password confirmation",
-            "error:passwordConfirm": "Please confirm your password",
-            "error:passwordConfirmFailure": "The Password confirmation is not correct.",
-            "invalidResetPasswordLink": "The link to reset your password does not seem valid anymore.\nYou can ask for a new one by opening the login form.",
-            "enterNewPassword": "Enter your new password:",
-            "resetPasswordSuccess": "Your password has been changed successfully.\nYou are now signed-in."
+        "messages": {
+          "success:locationDeleted": "The location has been deleted.",
+          "error:locationDelete": "An error occurred while deleting the location: {0}",
+          "success:regionDeleted": "The region has been deleted.",
+          "error:regionDelete": "An error occurred while deleting the region: {0}"
         },
-        "home": {
-            "btn:viewDestination": "View Destination"
+        "locationForm": {
+          "field:title": "Title",
+          "error:title": "Please indicate the title of the location.",
+          "field:region": "Region",
+          "error:region": "Please select a region.",
+          "field:website": "Website",
+          "btn:validate": "Validate",
+          "success:saved": "The location has been saved."
         },
-        "contact": {
-            "title": "Contact",
-            "field:name": "Your name",
-            "error:name": "Please enter your name.",
-            "field:email": "Your email address",
-            "error:email": "Please enter a valid email address.",
-            "field:object": "The title of your message",
-            "error:object": "Please enter a title for your message.",
-            "field:message": "Your message",
-            "error:message": "Please enter a message.",
-            "switch:sendCopy": "Receive a copy of your message",
-            "info:success": "Your message has been sent. Thank you!",
-            "warning:leaveTitle": "Unsaved changes",
-            "warning:leave": "Your message was not sent after the last edits.\nDo you confirm you want to leave this page ?",
-            "submitCaption": "Send"
-        },
-        "destination": {
-            "btn:prevDestination": "Previous",
-            "btn:nextDestination": "Next",
-            "btn:seeSummary": "See summary",
-            "info:noRelatedDest": "No related destination",
-            "relatedDestinations": "Related destinations"
-        },
-        "destinations": {
-            "title": "Destinations",
-            "count": "{0} Destination(s)",
-            "filterByRegions": "Filter by regions",
-            "noRegion": "No region...",
-            "filterTip": "Select a region to filter destinations",
-            "allDestinations": "All",
-            "macroDestinations": "Macro",
-            "wideAngleDestinations": "Wide angle",
-            "title:confirmRemove": "Remove destination",
-            "confirmRemove": "Do you confirm the deletion of the destination '{0}'?",
-            "warningConfirmRemove": "Please note, this action is irreversible.",
-            "title:newDestination": "New destination",
-            "title:editDestination": "Edit destination",
-            "validate": "Validate",
-            "form:titleField": "Title",
-            "form:titleError": "Please indicate a destination title.",
-            "form:dateField": "Date",
-            "form:dateError": "Please indicate the date of travel",
-            "form:locationField": "Location",
-            "form:locationError": "Please indicate the location of the destination",
-            "form:imagePathField": "Path to images",
-            "form:imagePathError": "Please indicate a path to the images.",
-            "form:coverField": "Cover image",
-            "form:coverError": "Please provide a cover image.",
-            "form:hasMacro": "Contains macro images",
-            "form:tags": "Tags",
-            "form:hasWideAngle": "Contains wide-angle images",
-            "form:published": "Publiée",
-            "validationMessage": "The changes have been saved successfully.",
-            "noDestinationsFound": "No destination matches the selected filters.",
-            "filterTab:byRegions": "By regions",
-            "filterTab:byKeywords": "By keywords",
-            "filterTab:byYear": "By year",
-            "dateFilter": {
-                "label": "Filter by years",
-                "noAvailableYears": "No years available",
-                "helperText": "Select one or more years to filter destinations."
-            },
-            "keywordFilter": {
-                "label": "Filter by keywords",
-                "errorTooShort": "Please enter at least 3 characters",
-                "helperText": "Enter keywords to refine your search."
-            }
-        },
-        "favorites": {
-            "title": "My Selection",
-            "favoritesCount": "{0} image(s)",
-            "info:favoritesDeleted": "{0} favorite(s) deleted",
-            "btn:cancelDeletion": "Cancel",
-            "info:noFavorites": "Your favorites list is empty.",
-            "info:userHasNoFavorites": "The user has no favorites.",
-            "userSelection": {
-                "suffix:me": " (me)",
-                "field:label": "User selection",
-                "field:error": "Please select a user.",
-                "text:intro": "To view another user's selection:"
-            }
-        },
-        "portfolio": {
-            "title": "Portfolio",
-            "info:emptyPortfolio": "The portfolio is empty.",
-            "info:favoritesDeleted": "{0} image(s) removed from portfolio",
-            "info:portfolioImagesDeleted": "{0} image(s) removed from portfolio",
-            "btn:cancelDeletion": "Undo",
-            "groupBy:category": "By category",
-            "groupBy:destination": "By destination",
-            "groupBy:date": "By date",
-            "groupBy:none": "No grouping",
-            "groupLabel:category": "All categories",
-            "groupLabel:destination": "All destinations",
-            "groupLabel:date": "All dates",
-            "cat:sharks": "Sharks",
-            "cat:mollusc": "Molluscs",
-            "cat:shrimp": "Shrimps",
-            "cat:frogfish": "Frogfish",
-            "cat:other": "Others",
-            "admin": {
-                "field:key": "Key",
-                "error:title": "The key is required.",
-                "error:duplicateKey": "The key '{0}' already exists.",
-                "field:caption": "Caption",
-                "btn:validate": "Validate",
-                "success:saved": "Category saved.",
-                "btn:addCategory": "Add category",
-                "dlg:createCategory": "Create category",
-                "dlg:editCategory": "Edit category",
-                "title:confirmRemove": "Remove category",
-                "confirmRemove": "Do you confirm the deletion of the category '{0}'?",
-                "warningConfirmRemove": "Please note, this action is irreversible.",
-                "success:catDeleted": "The category '{0}' has been deleted.",
-                "btn:includeInCategory": "Include in category",
-                "btn:excludeFromCategory": "Exclude from category"
-            }
-        },
-        "finning": {
-            "title": "Finning, Késako ?",
-            "euroInitiative1": "European Citizen Initiative",
-            "euroInitiative2": "Give your support!",
-            "introduction": "You have probably already heard of finning in relation to the harvesting of shark fins, but what does this practice consist of and what are the consequences for the animal and for the eco-systems?",
-            "menuItem1": "A devastating practice",
-            "menuItem2": "Indiscriminate fishing",
-            "menuItem3": "The balance of the oceans threatened",
-            "menuItem4": "A traditional dish",
-            "menuItem5": "The list is long...",
-            "menuItem6": "Some videos"
-        },
-        "search": {
-            "title": "Search"
-        },
-        "composition": {
-            "title": "Composition",
-            "button::help": "What is it about?",
-            "btn:delete": "Delete",
-            "btn:add": "Add a composition",
-            "btn:lock": "Lock",
-            "btn:unlock": "Unlock",
-            "btn:rename": "Rename",
-            "btn:save": "Save",
-            "save:success": "'{0}' has been saved.",
-            "delete:success": "'{0}' has been deleted.",
-            "add:success": "'{0}' has been added.",
-            "help:title": "Composition",
-            "noFavorites": "Your favorites list is empty.",
-            "noSearchResults": "Your search returned no results.",
-            "enterSearchCriteria": "Type a criteria to launch a search.",
-            "interiorSelection": "1. Select a scenery",
-            "imageSelection": "2. Select images",
-            "frameSelection": "3. Frame configuration",
-            "imageType:preSelection": "Samples",
-            "imageType:favorites": "Favorites",
-            "imageType:search": "Search",
-            "frameThickness": "Thickness",
-            "frameColor": "Color:",
-            "frameShadow": "Shadow:",
-            "btn:addScenery": "Add scenery",
-            "progress:createThumbs": "Thumbnails creation...",
-            "uploadSuccess": "Files upload succeeded",
-            "dlgTitle:delete": "Deletion",
-            "dlg:confirm1": "Do you confirm the deletion of '{0}' ?",
-            "dlg:confirm2": "Attention, this action is irreversible.",
-            "dlg:validateDeletion": "OK",
-            "dlg:cancelDeletion": "Cancel",
-            "simulationNameDialog": {
-                "save:title": "Save",
-                "save:description": "Give your simulation a name to save it.",
-                "rename:title": "Rename",
-                "rename:description": "Rename your simulation.",
-                "new:title": "New simulation",
-                "new:description": "Enter a name for your new simulation.",
-                "unknownAction:title": "Unknown action",
-                "unknownAction:description": "Unknown action",
-                "field:simulationName": "Simulation name",
-                "error:nameExists": "This name already exists",
-                "btn:cancel": "Cancel",
-                "btn:validate": "Validate"
-            }
-        },
-        "admin": {
-            "title": "Administration",
-            "lbl:regions": "Regions",
-            "lbl:images": "Images",
-            "regions": {
-                "expandAll": "Expand All",
-                "collapseAll": "Collapse All",
-                "title:deleteRegion": "Delete Region",
-                "confirmDeleteRegion": "Are your sure you want to delete the region '{0}'?",
-                "warningDeleteRegion": "This action is irreversible.",
-                "title:deleteLocation": "Delete Location",
-                "confirmDeleteLocation": "Are your sure you want to delete the location '{0}'?",
-                "warningDeleteLocation": "This action is irreversible.",
-                "toolbar": {
-                    "btn:newRegion": "New Region"
-                },
-                "dialogs": {
-                    "newLocation:title": "New Location",
-                    "editLocation:title": "Edit Location",
-                    "newRegion:title": "New Region",
-                    "editRegion:title": "Edit Region"
-                },
-                "messages": {
-                    "success:locationDeleted": "The location has been deleted.",
-                    "error:locationDelete": "An error occurred while deleting the location: {0}",
-                    "success:regionDeleted": "The region has been deleted.",
-                    "error:regionDelete": "An error occurred while deleting the region: {0}"
-                },
-                "locationForm": {
-                    "field:title": "Title",
-                    "error:title": "Please indicate the title of the location.",
-                    "field:region": "Region",
-                    "error:region": "Please select a region.",
-                    "field:website": "Website",
-                    "btn:validate": "Validate",
-                    "success:saved": "The location has been saved."
-                },
-                "regionForm": {
-                    "field:title": "Title",
-                    "error:title": "Please indicate the title of the region.",
-                    "field:parentRegion": "Parent Region",
-                    "btn:validate": "Validate",
-                    "success:saved": "The region has been saved."
-                }
-            },
-            "images": {
-                "ImageFormDialogTitle": "Edit image properties",
-                "folderDialogTitle": "Create folder",
-                "title:deleteItems": "Delete pictures",
-                "confirmDeleteItems": "Are your sure you want to delete theses pictures?",
-                "warningDeleteItems": "This action is irreversible.",
-                "imageCount": "{0} item(s) in the folder {1}",
-                "filter": "Filter files:",
-                "rootFolder": "root",
-                "toolbar": {
-                    "btn:addImage": "Add an image",
-                    "btn:showDestination": "Show destination"
-                },
-                "form": {
-                    "field:titleFr": "Title in French",
-                    "field:titleEn": "Title in English",
-                    "field:portfolio": "Portfolio Image",
-                    "field:tags": "Tags",
-                    "error:tags": "Please add tags that describe the image (location, species, color, etc).",
-                    "btn:validate": "Validate",
-                    "success:saved": "The image properties have been saved."
-                },
-                "folderForm": {
-                    "field:name": "Folder Name",
-                    "error:name": "Please indicate the folder name.",
-                    "btn:validate": "Validate",
-                    "success:created": "The folder has been created successfully."
-                },
-                "breadcrumbs": {
-                    "success:renamed": "The folder has been renamed."
-                }
-            }
-        },
-        "destinationAdmin": {
-            "subGalleryForm": {
-                "field:noLocation": "No location",
-                "field:title": "Title",
-                "error:title": "Please indicate a title.",
-                "field:description": "Description",
-                "field:location": "Location",
-                "error:location": "Please select a location.",
-                "field:position": "Position",
-                "error:position": "Please indicate an unused position.",
-                "btn:validate": "Validate",
-                "success:saved": "The sub-gallery has been saved."
-            },
-            "subGalleryHeader": {
-                "success:deleted": "The gallery has been deleted.",
-                "success:updated": "The gallery has been updated.",
-                "dlg:manageImages": "Manage sub-gallery images",
-                "dlg:edit": "Edit sub-gallery",
-                "dlg:deleteTitle": "Delete gallery",
-                "dlg:deleteConfirmation": "Do you confirm the deletion of the gallery '{0}'?",
-                "dlg:deleteWarning": "This action is irreversible!"
-            },
-            "tools": {
-                "btn:addSubGallery": "Add a sub-gallery",
-                "btn:manageImages": "Manage images",
-                "dlg:createSubGallery": "Create a sub-gallery"
-            },
-            "admin": {
-                "btn:addDestination": "Add a destination"
-            }
-        },
-        "profile": {
-            "title": "My Profile",
-            "email": "Your email address",
-            "emailError": "A valid email address is missing.",
-            "name": "Your name",
-            "nameError": "Your name is missing",
-            "password": "Password",
-            "passwordConfirm": "Password confirmation",
-            "passwordConfirmError": "The Password confirmation is not correct.",
-            "passwordPolicyError": "Veuillez saisir un mot de passe d'au moins 6 caractères.",
-            "emailVerified": "Verified email",
-            "title:removeProfile": "Profile removal",
-            "btn:removeProfile": "Remove Profile",
-            "removeProfileContent1": "Do you confirm the removal of your profile?",
-            "removeProfileContent2": "Please note, this action is irreversible.",
-            "removeProfileContent3": "Your favorites and compositions will be removed.",
-            "removeProfileContent4": "You will be able to create a new profile with the same email address.",
-            "btn:modifyData": "Edit information",
-            "btn:sendMailVerification": "Verify email",
-            "title:authDialog": "Authentication",
-            "desc:authDialog": "You must re-authenticate to modify your personal data.",
-            "field:authDialog": "Enter your password",
-            "btn:cancel": "Cancel",
-            "btn:validate": "Validate",
-            "validationMessage": "The changes have been saved successfully.",
-            "emailVerificationLinkSent": "A message has been sent that contains a link to verify your email address.",
-            "emailVerificationLinkError": "En error occurred while trying to send the verification message.\nPlease try again.",
-            "invalidEmail": "The email address is already in use by another account.",
-            "invalidDisplayName": "The entered display name is not valid.",
-            "invalidPassword": "The entered password is not valid."
+        "regionForm": {
+          "field:title": "Title",
+          "error:title": "Please indicate the title of the region.",
+          "field:parentRegion": "Parent Region",
+          "btn:validate": "Validate",
+          "success:saved": "The region has been saved."
         }
-    },
-    "components": {
-        "error": {
-            "caption": "Oops...An error has occurred"
-        },
-        "search": {
-            "inputPlaceHolder": "Search within {0} images...",
-            "exactSwitch": "Exact words",
-            "fuzzySwitch": "Fuzzy search",
-            "seeAllResults": "See all results",
-            "nextResults": "Next results",
-            "close": "Close",
-            "resultsCount": "{0} Result(s)",
-            "resultsCountWithTotal": "{0} images / {1}",
-            "noResults": "No result found for the search « {0} ». Check the spelling or use another search criteria.",
-            "helpTitle": "Search for images"
+      },
+      "images": {
+        "ImageFormDialogTitle": "Edit image properties",
+        "folderDialogTitle": "Create folder",
+        "title:deleteItems": "Delete pictures",
+        "confirmDeleteItems": "Are your sure you want to delete theses pictures?",
+        "warningDeleteItems": "This action is irreversible.",
+        "imageCount": "{0} item(s) in the folder {1}",
+        "filter": "Filter files:",
+        "rootFolder": "root",
+        "toolbar": {
+          "btn:addImage": "Add an image",
+          "btn:showDestination": "Show destination"
         },
         "form": {
-            "btn:cancel": "Cancel",
-            "field:latitude": "Latitude",
-            "field:longitude": "Longitude",
-            "field:latitudeError": "Please specify a valid latitude between {0} and {1}.",
-            "field:longitudeError": "Please specify a valid longitude between {0} and {1}.",
-            "groupTab:label": "{0} ({1}) {2}",
-            "submit:default": "Send"
+          "field:titleFr": "Title in French",
+          "field:titleEn": "Title in English",
+          "field:portfolio": "Portfolio Image",
+          "field:tags": "Tags",
+          "error:tags": "Please add tags that describe the image (location, species, color, etc).",
+          "btn:validate": "Validate",
+          "success:saved": "The image properties have been saved."
         },
-        "transferList": {
-            "selected": "{0}/{1} selected",
-            "btn:validate": "Validate",
-            "btn:cancel": "Cancel",
-            "toast:error": "An error occurred during the operation."
+        "folderForm": {
+          "field:name": "Folder Name",
+          "error:name": "Please indicate the folder name.",
+          "btn:validate": "Validate",
+          "success:created": "The folder has been created successfully."
         },
-        "form::authentication": {
-            "title": "Sign in",
-            "subTitle:enterEmail": "Enter your email.",
-            "subTitle:createAccount": "This email does not match any user account.\nEnter a name and a password to create an account.",
-            "subTitle:login": "Enter your password.",
-            "field:email": "email",
-            "field:name": "Your full name",
-            "field:password": "Password",
-            "field:passwordConfirm": "Password confirmation",
-            "error:email": "Please enter a valid email address.",
-            "error:name": "Please enter your name.",
-            "error:passwordCreate": "Please enter a password of at least 6 characters.",
-            "error:passwordConfirm": "Please confirm your password",
-            "error:passwordEnter": "Please enter your password.",
-            "error:passwordConfirmToast": "The Password confirmation is not correct.",
-            "next": "Next",
-            "login": "Login",
-            "cancel": "Cancel",
-            "previous": "Prev.",
-            "createAccount": "Next",
-            "authenticationFailed": "Login failed.",
-            "accountCreated": "Your account has been created.\nA message has been sent that contains a link to verify your email address.",
-            "userConnected": "Hello {0}!",
-            "linkResetPassword": "I forgot my password",
-            "resetPasswordLinkSent": "A message has been sent to the provided address that contains a link to reset your password.",
-            "resetPasswordLinkError": "An error occurred while trying to send the password reset link.\nPlease try again.",
-            "resetPasswordUserNotFound": "No user has been found.\nPlease verify the email you provided and try again."
-        },
-        "gallery": {
-            "btn:addFavorite": "Add to favorites",
-            "btn:deleteFavorite": "Remove from favorites",
-            "btn:addToPortfolio": "Add to portfolio",
-            "btn:deleteFromPortfolio": "Remove from portfolio",
-            "lbl:groupImageCount": "{0} image(s)",
-            "btn:stopSlideshow": "Stop slideshow",
-            "btn:startSlideshow": "Start slideshow",
-            "btn:showDetails": "Show details",
-            "btn:hideDetails": "Hide details",
-            "btn:enterFullScreen": "Full screen",
-            "btn:exitFullScreen": "Exit full screen",
-            "btn:showThumbnails": "Show thumbnails",
-            "btn:hideThumbnails": "Hide thumbnails",
-            "btn:closeViewer": "Close viewer",
-            "info:noTags": "No tags..."
-        },
-        "hoc": {
-            "withUser": {
-                "adminRestriction": "This page is only accessible to the administrator",
-                "userRestriction": "This page is only accessible to logged in users"
-            }
-        },
-        "imageDescription": {
-            "noDescription": "No description"
-        },
-        "theme": {
-            "dark": "Dark",
-            "light": "Light",
-            "systemSuffix": " (System)"
-        },
-        "imageSlider": {
-            "loadNextImages": "Load the next images"
-        },
-        "updateNotifier": {
-            "newVersion": {
-                "message": "A new version is available. Click 'Refresh' to update.",
-                "refresh": "Refresh"
-            }
+        "breadcrumbs": {
+          "success:renamed": "The folder has been renamed."
         }
+      }
     },
-    "dialogs": {
-        "button::close": "Close",
-        "moduleNotFound": "Module '{0}' not found.",
-        "cancel": "Cancel",
-        "validate": "Validate"
+    "destinationAdmin": {
+      "subGalleryForm": {
+        "field:noLocation": "No location",
+        "field:title": "Title",
+        "error:title": "Please indicate a title.",
+        "field:description": "Description",
+        "field:location": "Location",
+        "error:location": "Please select a location.",
+        "field:position": "Position",
+        "error:position": "Please indicate an unused position.",
+        "btn:validate": "Validate",
+        "success:saved": "The sub-gallery has been saved."
+      },
+      "subGalleryHeader": {
+        "success:deleted": "The gallery has been deleted.",
+        "success:updated": "The gallery has been updated.",
+        "dlg:manageImages": "Manage sub-gallery images",
+        "dlg:edit": "Edit sub-gallery",
+        "dlg:deleteTitle": "Delete gallery",
+        "dlg:deleteConfirmation": "Do you confirm the deletion of the gallery '{0}'?",
+        "dlg:deleteWarning": "This action is irreversible!"
+      },
+      "tools": {
+        "btn:addSubGallery": "Add a sub-gallery",
+        "btn:manageImages": "Manage images",
+        "dlg:createSubGallery": "Create a sub-gallery"
+      },
+      "admin": {
+        "btn:addDestination": "Add a destination"
+      }
+    },
+    "profile": {
+      "title": "My Profile",
+      "email": "Your email address",
+      "emailError": "A valid email address is missing.",
+      "name": "Your name",
+      "nameError": "Your name is missing",
+      "password": "Password",
+      "passwordConfirm": "Password confirmation",
+      "passwordConfirmError": "The Password confirmation is not correct.",
+      "passwordPolicyError": "Veuillez saisir un mot de passe d'au moins 6 caractères.",
+      "emailVerified": "Verified email",
+      "title:removeProfile": "Profile removal",
+      "btn:removeProfile": "Remove Profile",
+      "removeProfileContent1": "Do you confirm the removal of your profile?",
+      "removeProfileContent2": "Please note, this action is irreversible.",
+      "removeProfileContent3": "Your favorites and compositions will be removed.",
+      "removeProfileContent4": "You will be able to create a new profile with the same email address.",
+      "btn:modifyData": "Edit information",
+      "btn:sendMailVerification": "Verify email",
+      "title:authDialog": "Authentication",
+      "desc:authDialog": "You must re-authenticate to modify your personal data.",
+      "field:authDialog": "Enter your password",
+      "btn:cancel": "Cancel",
+      "btn:validate": "Validate",
+      "validationMessage": "The changes have been saved successfully.",
+      "emailVerificationLinkSent": "A message has been sent that contains a link to verify your email address.",
+      "emailVerificationLinkError": "En error occurred while trying to send the verification message.\nPlease try again.",
+      "invalidEmail": "The email address is already in use by another account.",
+      "invalidDisplayName": "The entered display name is not valid.",
+      "invalidPassword": "The entered password is not valid."
     }
+  },
+  "components": {
+    "error": {
+      "caption": "Oops...An error has occurred"
+    },
+    "search": {
+      "inputPlaceHolder": "Search within {0} images...",
+      "exactSwitch": "Exact words",
+      "fuzzySwitch": "Fuzzy search",
+      "seeAllResults": "See all results",
+      "nextResults": "Next results",
+      "close": "Close",
+      "resultsCount": "{0} Result(s)",
+      "resultsCountWithTotal": "{0} images / {1}",
+      "noResults": "No result found for the search \"{0}\". Check the spelling or use another search criteria.",
+      "helpTitle": "Search for images"
+    },
+    "form": {
+      "btn:cancel": "Cancel",
+      "field:latitude": "Latitude",
+      "field:longitude": "Longitude",
+      "field:latitudeError": "Please specify a valid latitude between {0} and {1}.",
+      "field:longitudeError": "Please specify a valid longitude between {0} and {1}.",
+      "groupTab:label": "{0} ({1}) {2}",
+      "submit:default": "Send"
+    },
+    "transferList": {
+      "selected": "{0}/{1} selected",
+      "btn:validate": "Validate",
+      "btn:cancel": "Cancel",
+      "toast:error": "An error occurred during the operation."
+    },
+    "form::authentication": {
+      "title": "Sign in",
+      "subTitle:enterEmail": "Enter your email.",
+      "subTitle:createAccount": "This email does not match any user account.\nEnter a name and a password to create an account.",
+      "subTitle:login": "Enter your password.",
+      "field:email": "email",
+      "field:name": "Your full name",
+      "field:password": "Password",
+      "field:passwordConfirm": "Password confirmation",
+      "error:email": "Please enter a valid email address.",
+      "error:name": "Please enter your name.",
+      "error:passwordCreate": "Please enter a password of at least 6 characters.",
+      "error:passwordConfirm": "Please confirm your password",
+      "error:passwordEnter": "Please enter your password.",
+      "error:passwordConfirmToast": "The Password confirmation is not correct.",
+      "next": "Next",
+      "login": "Login",
+      "cancel": "Cancel",
+      "previous": "Prev.",
+      "createAccount": "Next",
+      "authenticationFailed": "Login failed.",
+      "accountCreated": "Your account has been created.\nA message has been sent that contains a link to verify your email address.",
+      "userConnected": "Hello {0}!",
+      "linkResetPassword": "I forgot my password",
+      "resetPasswordLinkSent": "A message has been sent to the provided address that contains a link to reset your password.",
+      "resetPasswordLinkError": "An error occurred while trying to send the password reset link.\nPlease try again.",
+      "resetPasswordUserNotFound": "No user has been found.\nPlease verify the email you provided and try again."
+    },
+    "gallery": {
+      "btn:addFavorite": "Add to favorites",
+      "btn:deleteFavorite": "Remove from favorites",
+      "btn:addToPortfolio": "Add to portfolio",
+      "btn:deleteFromPortfolio": "Remove from portfolio",
+      "lbl:groupImageCount": "{0} image(s)",
+      "btn:stopSlideshow": "Stop slideshow",
+      "btn:startSlideshow": "Start slideshow",
+      "btn:showDetails": "Show details",
+      "btn:hideDetails": "Hide details",
+      "btn:enterFullScreen": "Full screen",
+      "btn:exitFullScreen": "Exit full screen",
+      "btn:showThumbnails": "Show thumbnails",
+      "btn:hideThumbnails": "Hide thumbnails",
+      "btn:closeViewer": "Close viewer",
+      "info:noTags": "No tags...",
+      "btn:addToCollection": "Add to \"{0}\"",
+      "btn:removeFromCollection": "Remove from \"{0}\"",
+      "collections:main": "Main"
+    },
+    "hoc": {
+      "withUser": {
+        "adminRestriction": "This page is only accessible to the administrator",
+        "userRestriction": "This page is only accessible to logged in users"
+      }
+    },
+    "imageDescription": {
+      "noDescription": "No description"
+    },
+    "theme": {
+      "dark": "Dark",
+      "light": "Light",
+      "systemSuffix": " (System)"
+    },
+    "imageSlider": {
+      "loadNextImages": "Load the next images"
+    },
+    "updateNotifier": {
+      "newVersion": {
+        "message": "A new version is available. Click 'Refresh' to update.",
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "dialogs": {
+    "button::close": "Close",
+    "moduleNotFound": "Module '{0}' not found.",
+    "cancel": "Cancel",
+    "validate": "Validate"
+  }
 }

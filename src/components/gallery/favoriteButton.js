@@ -30,6 +30,16 @@ const FavoriteButton = ({ image, size = 'medium', style, color }) => {
 
     const isDisabled = galleryContext && !galleryContext.withFavorite;
 
+    const activeLabel = React.useMemo(() => {
+        const { activeCollectionId, collections } = favoritesContext;
+        if (activeCollectionId === 'main') {
+            return t("collections:main");
+        }
+        const item = collections?.items?.[activeCollectionId];
+        if (!item) return activeCollectionId;
+        return t.language === 'fr' ? item.name_fr : item.name_en;
+    }, [favoritesContext, t]);
+
     const loginWarning = authContext.user === null ? (
         <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', margin: '5px 0 0 0' }}>
             <ErrorOutlineIcon style={{ marginRight: 5 }} color="warning" />
@@ -42,7 +52,7 @@ const FavoriteButton = ({ image, size = 'medium', style, color }) => {
             isActive={isInFavorites}
             isDisabled={isDisabled}
             canInteract={!!authContext.user}
-            title={isInFavorites ? t("btn:deleteFavorite") : t("btn:addFavorite")}
+            title={isInFavorites ? t("btn:removeFromCollection", activeLabel) : t("btn:addToCollection", activeLabel)}
             onAction={handleAction}
             activeIcon={<FavoriteIcon fontSize="inherit" />}
             inactiveIcon={<FavoriteIconOutlined fontSize="inherit" />}

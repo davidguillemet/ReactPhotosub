@@ -184,10 +184,16 @@ export const QueryContextProvider = ({children}) => {
         }),
         useFetchImageCount: () => useQuery(['imageCount'], () => dataProvider.getImageCount()),
 
-        useFetchFavorites: (uid, enabled, thenFunc) => useQuery(['favorites', uid], () => dataProvider.getFavorites(uid).then(thenFunc), { enabled: enabled }),
-        useAddFavorite: () => useMutation((pathArray) => dataProvider.addFavorite(pathArray)),
-        useRemoveFavorite: () => useMutation((path) => dataProvider.removeFavorite(path)),
-        setFavoritesData: (uid, favorites) => queryClient.setQueryData(['favorites', uid], favorites),
+        useFetchFavorites: (uid, collectionId, enabled, thenFunc) => useQuery(['favorites', uid, collectionId], () => dataProvider.getFavorites(uid, collectionId).then(thenFunc), { enabled: enabled }),
+        useAddFavorite: () => useMutation(({pathArray, collectionId}) => dataProvider.addFavorite(pathArray, collectionId)),
+        useRemoveFavorite: () => useMutation(({path, collectionId}) => dataProvider.removeFavorite(path, collectionId)),
+        setFavoritesData: (uid, collectionId, favorites) => queryClient.setQueryData(['favorites', uid, collectionId], favorites),
+
+        useCreateCollection: () => useMutation(({name_fr, name_en}) => dataProvider.createCollection(name_fr, name_en)), // eslint-disable-line camelcase
+        useRenameCollection: () => useMutation(({id, name_fr, name_en}) => dataProvider.renameCollection(id, name_fr, name_en)), // eslint-disable-line camelcase
+        useDeleteCollection: () => useMutation((id) => dataProvider.deleteCollection(id)),
+        useSetActiveCollection: () => useMutation((id) => dataProvider.setActiveCollection(id)),
+        useFetchUserCollections: (uid, enabled) => useQuery(['collections', uid], () => dataProvider.getCollectionsForUser(uid), { enabled: !!uid && enabled }),
 
         useFetchImageFolders: () => useQuery(['imageFolders'], () => dataProvider.getImageFolders()),
         removeImageFolder: (folderPath) => {

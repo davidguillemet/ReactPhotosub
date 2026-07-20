@@ -26,7 +26,7 @@ export default function SimulationDeletionDialog({ open, name, onOpenChanged, on
     return (
         <div>
             <Dialog
-                fullScreen={isMobile}
+                fullScreen={!!isMobile}
                 fullWidth={true}
                 open={open}
                 onClose={handleClose}

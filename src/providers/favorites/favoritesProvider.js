@@ -1,62 +1,80 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuthContext } from '../../components/authentication';
 import { useDataProvider } from '../../components/dataProvider';
 import { useQueryContext } from '../../components/queryContext';
 import FavoritesContext from './favoritesContext';
 
-const imagePath = (image) => `${image.path}/${image.name}`
+const imagePath = (image) => `${image.path}/${image.name}`;
+
+const buildFavoritesMap = (images) =>
+    images.reduce((acc, img) => { acc.set(imagePath(img), img); return acc; }, new Map());
 
 const FavoritesProvider = ({ children }) => {
 
     const dataProvider = useDataProvider();
     const queryContext = useQueryContext();
     const authContext = useAuthContext();
+    const queryClient = useQueryClient();
 
-    const addFavorite = queryContext.useAddFavorite();
-    const removeFavorite = queryContext.useRemoveFavorite();
+    const addFavoriteMutation = queryContext.useAddFavorite();
+    const removeFavoriteMutation = queryContext.useRemoveFavorite();
+    const setActiveMutation = queryContext.useSetActiveCollection();
+    const createCollectionMutation = queryContext.useCreateCollection();
+    const renameCollectionMutation = queryContext.useRenameCollection();
+    const deleteCollectionMutation = queryContext.useDeleteCollection();
+
     const favoritesObservers = useRef([]);
+    const switchTokenRef = useRef(0);
 
+    // favorites Map always tracks the ACTIVE collection (drives isIn / FavoriteButton)
     const [favorites, setFavorites] = useState(null);
+    const [activeCollectionId, setActiveCollectionId] = useState('main');
+    const [viewedCollectionId, setViewedCollectionId] = useState('main');
+    const [collections, setCollections] = useState(null);
 
-    const addUserFavorite = useCallback(favoriteImgArray => {
+    // Hydrate TanStack cache and local Map from an images array
+    const applyFavorites = useCallback((images, collectionId, uid) => {
+        const favMap = buildFavoritesMap(images);
+        queryContext.setFavoritesData(uid, collectionId, Array.from(favMap.values()));
+        setFavorites(favMap);
+    }, [queryContext]);
 
+    // Load images for a collection from cache or API, then apply. Token guards against stale switches.
+    const loadCollectionImages = useCallback(async (collectionId, uid, token) => {
+        let images = queryClient.getQueryData(['favorites', uid, collectionId]);
+        if (!images) {
+            images = await dataProvider.getFavorites(uid, collectionId);
+        }
+        if (token !== switchTokenRef.current) return;
+        applyFavorites(images, collectionId, uid);
+    }, [queryClient, dataProvider, applyFavorites]);
+
+    const addUserFavorite = useCallback((favoriteImgArray) => {
         const pathArray = favoriteImgArray.map(img => imagePath(img));
-        return addFavorite.mutateAsync(pathArray).then(() => {
+        return addFavoriteMutation.mutateAsync({ pathArray, collectionId: activeCollectionId }).then(() => {
             setFavorites(prevFavorites => {
-                // Create new map by adding the new favorite
                 const newMap = new Map(prevFavorites);
                 favoriteImgArray.forEach((favoriteImg, index) => newMap.set(pathArray[index], favoriteImg));
-
-                // Set the new query data
-                queryContext.setFavoritesData(authContext.user.uid, Array.from(newMap.values()));
-
-                // Set the new state
+                queryContext.setFavoritesData(authContext.user.uid, activeCollectionId, Array.from(newMap.values()));
                 return newMap;
             });
             favoritesObservers.current.forEach(observer => observer(favoriteImgArray, 'add'));
         });
+    }, [addFavoriteMutation, queryContext, authContext.user, activeCollectionId]);
 
-    }, [addFavorite, queryContext, authContext.user])
-
-    const removeUserFavorite = useCallback(favoriteImg => {
-
+    const removeUserFavorite = useCallback((favoriteImg) => {
         const path = imagePath(favoriteImg);
-        return removeFavorite.mutateAsync(path).then(() => {
+        return removeFavoriteMutation.mutateAsync({ path, collectionId: activeCollectionId }).then(() => {
             setFavorites(prevFavorites => {
-                // Create new map by removing the favorite
                 const newMap = new Map(prevFavorites);
                 newMap.delete(path);
-
-                // Set the new query data
-                queryContext.setFavoritesData(authContext.user.uid, Array.from(newMap.values()));
-
-                // Set the new state
+                queryContext.setFavoritesData(authContext.user.uid, activeCollectionId, Array.from(newMap.values()));
                 return newMap;
             });
             favoritesObservers.current.forEach(observer => observer([favoriteImg], 'remove'));
-        })
-
-    }, [removeFavorite, queryContext, authContext.user])
+        });
+    }, [removeFavoriteMutation, queryContext, authContext.user, activeCollectionId]);
 
     const subscribeFavorites = useCallback((fn) => {
         favoritesObservers.current.push(fn);
@@ -68,32 +86,105 @@ const FavoritesProvider = ({ children }) => {
 
     const isInFavorites = useCallback((image) => {
         return (favorites && favorites.has(imagePath(image)));
-    }, [favorites])
+    }, [favorites]);
+
+    // View a collection: update the gallery display (no DB write, TanStack Query fetches on demand)
+    const viewCollection = useCallback((id) => {
+        setViewedCollectionId(id);
+    }, []);
+
+    // Set a collection as active: persist to DB, update favorites Map for isIn
+    const activateCollection = useCallback(async (id) => {
+        const uid = authContext.user?.uid;
+        if (!uid) return;
+
+        const token = ++switchTokenRef.current;
+        setFavorites(null);
+
+        const updatedCollections = await setActiveMutation.mutateAsync(id);
+        if (token !== switchTokenRef.current) return;
+
+        setActiveCollectionId(id);
+        setCollections(updatedCollections);
+        await loadCollectionImages(id, uid, token);
+    }, [authContext.user, setActiveMutation, loadCollectionImages]);
+
+    const createCollection = useCallback(async (name_fr, name_en) => { // eslint-disable-line camelcase
+        const updatedCollections = await createCollectionMutation.mutateAsync({ name_fr, name_en }); // eslint-disable-line camelcase
+        setCollections(updatedCollections);
+        return updatedCollections;
+    }, [createCollectionMutation]);
+
+    const renameCollection = useCallback(async (id, name_fr, name_en) => { // eslint-disable-line camelcase
+        const updatedCollections = await renameCollectionMutation.mutateAsync({ id, name_fr, name_en }); // eslint-disable-line camelcase
+        setCollections(updatedCollections);
+        return updatedCollections;
+    }, [renameCollectionMutation]);
+
+    const deleteCollection = useCallback(async (id) => {
+        const uid = authContext.user?.uid;
+        const wasActive = id === activeCollectionId;
+        const wasViewed = id === viewedCollectionId;
+        const updatedCollections = await deleteCollectionMutation.mutateAsync(id);
+        setCollections(updatedCollections);
+        if (wasActive) {
+            const token = ++switchTokenRef.current;
+            setFavorites(null);
+            setActiveCollectionId('main');
+            await loadCollectionImages('main', uid, token);
+        }
+        if (wasViewed) {
+            setViewedCollectionId('main');
+        }
+        return updatedCollections;
+    }, [deleteCollectionMutation, activeCollectionId, viewedCollectionId, authContext.user, loadCollectionImages]);
 
     useEffect(() => {
         if (authContext.user) {
             dataProvider.getUserData().then((userData) => {
-                const favMap = userData.favorites.reduce((acc, current) => { acc.set(imagePath(current), current); return acc; }, new Map());        
-                // Initialize query data for favorites
-                queryContext.setFavoritesData(authContext.user.uid, Array.from(favMap.values()));
-                setFavorites(favMap)
+                const uid = authContext.user.uid;
+                const userCollections = userData.collections || { active: 'main', items: {} };
+                const activeId = userCollections.active || 'main';
+
+                setCollections(userCollections);
+                setActiveCollectionId(activeId);
+                setViewedCollectionId(activeId);
+
+                if (activeId === 'main') {
+                    applyFavorites(userData.favorites, 'main', uid);
+                } else {
+                    const token = ++switchTokenRef.current;
+                    setFavorites(null);
+                    loadCollectionImages(activeId, uid, token);
+                }
             });
         } else {
-            setFavorites(null)
+            setFavorites(null);
+            setActiveCollectionId('main');
+            setViewedCollectionId('main');
+            setCollections(null);
         }
-    }, [authContext.user, queryContext, dataProvider]);
+    }, [authContext.user]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <FavoritesContext.Provider value={{
             isIn: isInFavorites,
-            addUserFavorite: addUserFavorite,
-            removeUserFavorite: removeUserFavorite,
-            subscribeFavorites: subscribeFavorites,
-            unsubscribeFavorites: unsubscribeFavorites,
+            addUserFavorite,
+            removeUserFavorite,
+            subscribeFavorites,
+            unsubscribeFavorites,
+            activeCollectionId,
+            viewedCollectionId,
+            collections,
+            viewCollection,
+            activateCollection,
+            createCollection,
+            renameCollection,
+            deleteCollection,
         }}>
             {children}
         </FavoritesContext.Provider>
     );
-}
+};
 
 export default FavoritesProvider;

@@ -2,56 +2,115 @@ module.exports = function(app, config) {
     // Authentication required for the following routes:
     app.use("/favorites", config.isAuthenticated);
 
-    // Get, Add and Delete favorites
+    // Get favorites for a user, optionally filtered by collection
     app.route("/favorites/:uid")
-        // Get all favorites for the current user
-        // Since the react query cache is hydrated from userdata response
-        // It would be used only in case /userdata failed...
         .get(async function(req, res, next) {
-            // The uid of the user for whom we are requesting the favorites.
-            // If it is an admin, it can request favorites for everybody.
-            // If not, it can request favorites for himself only
             const requestFavoritesUid = req.params.uid;
             const currentUid = res.locals.uid;
             if (requestFavoritesUid !== currentUid && !config.isAdmin(res)) {
                 res.locals.errorMessage = "Un non-admin ne peut pas demander les favoris d'un autre utilisateur.";
-                next(new Error(res.locals.errorMessage), req, res);
+                return next(new Error(res.locals.errorMessage));
             }
+
+            const collectionId = req.query.collection || "main";
             res.locals.errorMessage = "Le chargement des favoris a échoué.";
-            return config.pool({i: "images"})
-                .select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio", "i.create", "i.tags", "i.version")
-                .join(config.pool().raw(`user_data as u ON u.uid = '${requestFavoritesUid}' and concat(i.path, '/', i.name) = ANY(u.favorites)`))
-                .orderBy("i.create", "desc") // Last image first
-                .then((images) => {
-                    images.forEach((image) => {
-                        // Convert cover property from '2014/misool/DSC_456.jpg' to a real url
-                        image.src = config.convertPathToUrl(image.path + "/" + image.name);
-                    });
-                    res.json(images);
-                }).catch(next);
+
+            let query;
+            if (collectionId === "main") {
+                query = config.pool({i: "images"})
+                    .select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio", "i.create", "i.tags", "i.version")
+                    .join(
+                        config.pool().raw(
+                            "user_data as u ON u.uid = ? and concat(i.path, '/', i.name) = ANY(u.favorites)",
+                            [requestFavoritesUid],
+                        ),
+                    )
+                    .orderBy("i.create", "desc");
+            } else {
+                query = config.pool({i: "images"})
+                    .select("i.id", "i.name", "i.path", "i.title", "i.description", "i.sizeRatio", "i.create", "i.tags", "i.version")
+                    .join(
+                        config.pool().raw(
+                            "user_data as u ON u.uid = ? and concat(i.path, '/', i.name) IN (select jsonb_array_elements_text(u.collections->'items'->?->'paths'))",
+                            [requestFavoritesUid, collectionId],
+                        ),
+                    )
+                    .orderBy("i.create", "desc");
+            }
+
+            return query.then((images) => {
+                images.forEach((image) => {
+                    image.src = config.convertPathToUrl(image.path + "/" + image.name);
+                });
+                res.json(images);
+            }).catch(next);
         });
 
-    // Get, Add and Delete favorites
     app.route("/favorites")
-        // Add a favorite for a given user
+        // Add a favorite — body: {paths: [...], collection: "main"|"c_<id>"}
         .post(async function(req, res, next) {
-            const favorites = req.body; // Path array
-            const queryArray = favorites.map((favorite) => `'${favorite}'`).join(",");
+            const {paths, collection = "main"} = req.body;
+            const uid = res.locals.uid;
             res.locals.errorMessage = "L'ajout du favori a échoué.";
-            return config.pool()
-                .raw(`update user_data set favorites = array_cat(favorites, ARRAY[${queryArray}]) where uid = '${res.locals.uid}' returning favorites`)
-                .then((result) => {
-                    res.json(result.rows[0].favorites);
-                }).catch(next);
+
+            if (collection === "main") {
+                return config.pool()
+                    .raw(
+                        "UPDATE user_data SET favorites = array_cat(favorites, ?) WHERE uid = ? RETURNING favorites",
+                        [paths, uid],
+                    )
+                    .then((result) => res.json(result.rows[0].favorites))
+                    .catch(next);
+            } else {
+                return config.pool()
+                    .raw(
+                        `UPDATE user_data
+                         SET collections = jsonb_set(
+                             collections,
+                             ARRAY['items', ?, 'paths'],
+                             (collections->'items'->?->'paths') || to_jsonb(?::text[])
+                         )
+                         WHERE uid = ?
+                         RETURNING collections`,
+                        [collection, collection, paths, uid],
+                    )
+                    .then((result) => res.json(result.rows[0].collections))
+                    .catch(next);
+            }
         })
-        // Remove a favorite for a given user
+        // Remove a favorite — body: {path: "...", collection: "main"|"c_<id>"}
         .delete(async function(req, res, next) {
-            const removedFavorite = req.body;
-            res.locals.errorMessage = `La suppression de ${removedFavorite.path} de vos favoris a échoué.`;
-            return config.pool()
-                .raw(`update user_data set favorites = array_remove(favorites, '${removedFavorite.path}') where uid = '${res.locals.uid}' returning favorites`)
-                .then((result) => {
-                    res.json(result.rows[0].favorites);
-                }).catch(next);
+            const {path, collection = "main"} = req.body;
+            const uid = res.locals.uid;
+            res.locals.errorMessage = `La suppression de ${path} de vos favoris a échoué.`;
+
+            if (collection === "main") {
+                return config.pool()
+                    .raw(
+                        "UPDATE user_data SET favorites = array_remove(favorites, ?) WHERE uid = ? RETURNING favorites",
+                        [path, uid],
+                    )
+                    .then((result) => res.json(result.rows[0].favorites))
+                    .catch(next);
+            } else {
+                return config.pool()
+                    .raw(
+                        `UPDATE user_data
+                         SET collections = jsonb_set(
+                             collections,
+                             ARRAY['items', ?, 'paths'],
+                             (
+                                 SELECT jsonb_agg(p)
+                                 FROM jsonb_array_elements_text(collections->'items'->?->'paths') AS p
+                                 WHERE p <> ?
+                             )
+                         )
+                         WHERE uid = ?
+                         RETURNING collections`,
+                        [collection, collection, path, uid],
+                    )
+                    .then((result) => res.json(result.rows[0].collections))
+                    .catch(next);
+            }
         });
 };

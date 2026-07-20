@@ -31,7 +31,7 @@ module.exports = function(app, config) {
                         ) favorite_rows
                     ) favorites
                 )
-                select f.favorites from user_data u, favorites_array f where uid = ?`, [uid, uid])
+                select f.favorites, u.collections from user_data u, favorites_array f where uid = ?`, [uid, uid])
                 .then(async (dataArray) => {
                     let data = null;
                     if (dataArray.rows === null || dataArray.rows === undefined || dataArray.rows.length === 0) {
@@ -41,6 +41,7 @@ module.exports = function(app, config) {
                             uid: uid,
                             favorites: [], // favorites is an array field that we initialize with an empty array
                             simulations: "[]", // simulations is a jsonb field that we initialize with an empty array
+                            collections: JSON.stringify({active: "main", items: {}}),
                         };
                         await config.pool("user_data").insert(data);
                     } else {

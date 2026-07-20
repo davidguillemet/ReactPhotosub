@@ -37,7 +37,7 @@ const FormDialog = ({title, open, onClose, children, maxWidth = 'lg'}) => {
 
     return (
         <Dialog
-            fullScreen={isMobile}
+            fullScreen={!!isMobile}
             maxWidth={maxWidth}
             fullWidth={true}
             open={isOpen}

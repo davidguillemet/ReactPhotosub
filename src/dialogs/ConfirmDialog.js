@@ -39,7 +39,7 @@ export default function ConfirmDialog({
     return (
         <div>
             <Dialog
-                fullScreen={isMobile}
+                fullScreen={!!isMobile}
                 fullWidth={true}
                 open={open}
                 onClose={handleClose}
