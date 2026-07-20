@@ -44,8 +44,8 @@ jest.mock('../CollectionForm', () => ({
 const mockCollections = {
     active: 'main',
     items: {
-        'c_1': { name_fr: 'Mer Rouge', name_en: 'Red Sea', paths: ['a/b.jpg'] },
-        'c_2': { name_fr: 'Méditerranée', name_en: 'Mediterranean', paths: [] },
+        'c_1': { name: 'Red Sea', paths: ['a/b.jpg'] },
+        'c_2': { name: 'Mediterranean', paths: [] },
     },
 };
 
@@ -111,18 +111,11 @@ describe('CollectionManager', () => {
         expect(screen.getAllByRole('row')).toHaveLength(5);
     });
 
-    test('renders collection names in English', () => {
+    test('renders collection names', () => {
         renderCM();
         expect(screen.getByText('main')).toBeInTheDocument();
         expect(screen.getByText('Red Sea')).toBeInTheDocument();
         expect(screen.getByText('Mediterranean')).toBeInTheDocument();
-    });
-
-    test('renders collection names in French when language is fr', () => {
-        useTranslation.mockReturnValue(createMockT('fr'));
-        renderCM();
-        expect(screen.getByText('Mer Rouge')).toBeInTheDocument();
-        expect(screen.getByText('Méditerranée')).toBeInTheDocument();
     });
 
     // --- Button counts per row ---
@@ -266,7 +259,7 @@ describe('CollectionManager', () => {
         const renderReadOnly = () => renderCM({
             collections: {
                 active: 'main',
-                items: { 'c_1': { name_fr: 'Mer Rouge', name_en: 'Red Sea', paths: [] } },
+                items: { 'c_1': { name: 'Red Sea', paths: [] } },
             },
             viewedCollectionId: 'main',
             onView: mockOnView,

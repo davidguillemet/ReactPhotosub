@@ -50,7 +50,6 @@ const MySelection = withUser(() => {
 
     const isOwnSelection = favoritesUserUid === authContext.user.uid;
     const { viewedCollectionId, collections } = favoritesContext;
-    const lang = t.language;
 
     const [ adminViewedCollectionId, setAdminViewedCollectionId ] = useState('main');
 
@@ -69,8 +68,8 @@ const MySelection = withUser(() => {
         if (id === 'main') return tCol("main");
         const source = isOwnSelection ? collections : otherUserCollections;
         const item = source?.items?.[id];
-        return item ? (lang === 'fr' ? item.name_fr : item.name_en) : tCol("main");
-    }, [isOwnSelection, viewedCollectionId, adminViewedCollectionId, collections, otherUserCollections, lang, tCol]);
+        return item ? item.name : tCol("main");
+    }, [isOwnSelection, viewedCollectionId, adminViewedCollectionId, collections, otherUserCollections, tCol]);
 
     const { data: images } = queryContext.useFetchFavorites(favoritesUserUid, collectionId, true);
 

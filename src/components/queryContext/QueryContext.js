@@ -189,8 +189,8 @@ export const QueryContextProvider = ({children}) => {
         useRemoveFavorite: () => useMutation(({path, collectionId}) => dataProvider.removeFavorite(path, collectionId)),
         setFavoritesData: (uid, collectionId, favorites) => queryClient.setQueryData(['favorites', uid, collectionId], favorites),
 
-        useCreateCollection: () => useMutation(({name_fr, name_en}) => dataProvider.createCollection(name_fr, name_en)), // eslint-disable-line camelcase
-        useRenameCollection: () => useMutation(({id, name_fr, name_en}) => dataProvider.renameCollection(id, name_fr, name_en)), // eslint-disable-line camelcase
+        useCreateCollection: () => useMutation(({name}) => dataProvider.createCollection(name)),
+        useRenameCollection: () => useMutation(({id, name}) => dataProvider.renameCollection(id, name)),
         useDeleteCollection: () => useMutation((id) => dataProvider.deleteCollection(id)),
         useSetActiveCollection: () => useMutation((id) => dataProvider.setActiveCollection(id)),
         useFetchUserCollections: (uid, enabled) => useQuery(['collections', uid], () => dataProvider.getCollectionsForUser(uid), { enabled: !!uid && enabled }),

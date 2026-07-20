@@ -37,7 +37,7 @@ const FavoriteButton = ({ image, size = 'medium', style, color }) => {
         }
         const item = collections?.items?.[activeCollectionId];
         if (!item) return activeCollectionId;
-        return t.language === 'fr' ? item.name_fr : item.name_en;
+        return item.name;
     }, [favoritesContext, t]);
 
     const loginWarning = authContext.user === null ? (

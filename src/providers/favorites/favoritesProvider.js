@@ -109,14 +109,14 @@ const FavoritesProvider = ({ children }) => {
         await loadCollectionImages(id, uid, token);
     }, [authContext.user, setActiveMutation, loadCollectionImages]);
 
-    const createCollection = useCallback(async (name_fr, name_en) => { // eslint-disable-line camelcase
-        const updatedCollections = await createCollectionMutation.mutateAsync({ name_fr, name_en }); // eslint-disable-line camelcase
+    const createCollection = useCallback(async (name) => {
+        const updatedCollections = await createCollectionMutation.mutateAsync({ name });
         setCollections(updatedCollections);
         return updatedCollections;
     }, [createCollectionMutation]);
 
-    const renameCollection = useCallback(async (id, name_fr, name_en) => { // eslint-disable-line camelcase
-        const updatedCollections = await renameCollectionMutation.mutateAsync({ id, name_fr, name_en }); // eslint-disable-line camelcase
+    const renameCollection = useCallback(async (id, name) => {
+        const updatedCollections = await renameCollectionMutation.mutateAsync({ id, name });
         setCollections(updatedCollections);
         return updatedCollections;
     }, [renameCollectionMutation]);

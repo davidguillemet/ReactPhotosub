@@ -4,7 +4,7 @@ import { useFavorites } from 'providers';
 import { useTranslation } from 'utils';
 
 const CollectionForm = ({ onCancel, collection }) => {
-    // collection: null (create mode) | {id, name_fr, name_en} (edit mode)
+    // collection: null (create mode) | {id, name} (edit mode)
     const t = useTranslation("pages.favorites.collections");
     const { createCollection, renameCollection } = useFavorites();
 
@@ -17,8 +17,6 @@ const CollectionForm = ({ onCancel, collection }) => {
             errorText: t("error:emptyName"),
             default: "",
             focus: true,
-            multiLingual: true,
-            languageSuffix: true,
         },
     ], [t]);
 
@@ -28,15 +26,14 @@ const CollectionForm = ({ onCancel, collection }) => {
         if (!collection) {
             setValues(null);
         } else {
-            setValues({ name_fr: collection.name_fr, name_en: collection.name_en });
+            setValues({ name: collection.name });
         }
     }, [collection]);
 
     const handleSubmit = useCallback((values) => {
-        // languageSuffix: true generates: { name_fr: <fr value>, name_en: <en value> }
         const action = collection
-            ? renameCollection(collection.id, values.name_fr, values.name_en) // eslint-disable-line camelcase
-            : createCollection(values.name_fr, values.name_en); // eslint-disable-line camelcase
+            ? renameCollection(collection.id, values.name)
+            : createCollection(values.name);
         return action.then(() => { if (onCancel) onCancel(); });
     }, [collection, createCollection, renameCollection, onCancel]);
 

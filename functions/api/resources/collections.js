@@ -30,15 +30,14 @@ module.exports = function(app, config) {
                 .then((row) => res.json(row ? row.collections : {active: "main", items: {}}))
                 .catch(next);
         })
-        // Create a new collection — body: {name_fr, name_en}
+        // Create a new collection — body: {name}
         .post(async function(req, res, next) {
-            /* eslint-disable camelcase */
-            const {name_fr, name_en} = req.body;
+            const {name} = req.body;
             const uid = res.locals.uid;
             res.locals.errorMessage = "La création de la collection a échoué.";
 
-            if (!name_fr || !name_en) {
-                return res.status(400).json({error: "name_fr and name_en are required"});
+            if (!name) {
+                return res.status(400).json({error: "name is required"});
             }
 
             return config.pool("user_data")
@@ -50,15 +49,14 @@ module.exports = function(app, config) {
                     const items = collections.items || {};
 
                     const isDuplicate = Object.values(items).some(
-                        (item) => item.name_fr === name_fr || item.name_en === name_en,
+                        (item) => item.name === name,
                     );
                     if (isDuplicate) {
                         return res.status(409).json({error: "A collection with this name already exists"});
                     }
 
                     const id = `c_${Date.now()}`;
-                    const newItem = {name_fr, name_en, paths: []};
-                    /* eslint-enable camelcase */
+                    const newItem = {name, paths: []};
 
                     return config.pool()
                         .raw(
@@ -72,34 +70,27 @@ module.exports = function(app, config) {
                 })
                 .catch(next);
         })
-        // Rename a collection — body: {id, name_fr, name_en}
+        // Rename a collection — body: {id, name}
         .patch(async function(req, res, next) {
-            /* eslint-disable camelcase */
-            const {id, name_fr, name_en} = req.body;
-            /* eslint-enable camelcase */
+            const {id, name} = req.body;
             const uid = res.locals.uid;
             res.locals.errorMessage = "Le renommage de la collection a échoué.";
 
             if (!id || id === "main") {
                 return res.status(400).json({error: "Cannot rename the main collection"});
             }
-            /* eslint-disable camelcase */
-            if (!name_fr || !name_en) {
-                return res.status(400).json({error: "name_fr and name_en are required"});
+            if (!name) {
+                return res.status(400).json({error: "name is required"});
             }
 
             return config.pool()
                 .raw(
                     `UPDATE user_data
-                     SET collections = jsonb_set(
-                         jsonb_set(collections, ARRAY['items', ?, 'name_fr'], to_jsonb(?::text)),
-                         ARRAY['items', ?, 'name_en'], to_jsonb(?::text)
-                     )
+                     SET collections = jsonb_set(collections, ARRAY['items', ?, 'name'], to_jsonb(?::text))
                      WHERE uid = ?
                      RETURNING collections`,
-                    [id, name_fr, id, name_en, uid],
+                    [id, name, uid],
                 )
-                /* eslint-enable camelcase */
                 .then((result) => res.json(result.rows[0].collections))
                 .catch(next);
         })

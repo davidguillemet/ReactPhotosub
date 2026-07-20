@@ -89,7 +89,7 @@ describe('FavoritesProvider', () => {
     test('on login: sets activeCollectionId and viewedCollectionId from userData.collections.active', async () => {
         const userData = {
             favorites: mockImages,
-            collections: { active: 'c_1', items: { 'c_1': { name_fr: 'A', name_en: 'A', paths: [] } } },
+            collections: { active: 'c_1', items: { 'c_1': { name: 'A', paths: [] } } },
         };
         const { contextRef } = renderProvider(mockUser, {
             dataProvider: { getUserData: jest.fn().mockResolvedValue(userData) },
@@ -149,7 +149,7 @@ describe('FavoritesProvider', () => {
     // --- activateCollection ---
 
     test('activateCollection persists to DB and updates activeCollectionId', async () => {
-        const newCollections = { active: 'c_1', items: { 'c_1': { name_fr: 'A', name_en: 'A', paths: [] } } };
+        const newCollections = { active: 'c_1', items: { 'c_1': { name: 'A', paths: [] } } };
         const mockMutateAsync = jest.fn().mockResolvedValue(newCollections);
 
         const { contextRef } = renderProvider(mockUser, {
@@ -220,7 +220,7 @@ describe('FavoritesProvider', () => {
     // --- deleteCollection ---
 
     test('deleteCollection resets activeCollectionId to main when deleting the active collection', async () => {
-        const newCollections = { active: 'c_1', items: { 'c_1': { name_fr: 'A', name_en: 'A', paths: [] } } };
+        const newCollections = { active: 'c_1', items: { 'c_1': { name: 'A', paths: [] } } };
         const afterDelete = { active: 'main', items: {} };
         const mockMutateAsync = jest.fn().mockResolvedValue(afterDelete);
 

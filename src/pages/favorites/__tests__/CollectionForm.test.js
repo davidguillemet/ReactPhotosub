@@ -16,7 +16,7 @@ jest.mock('components/form', () => ({
             <span data-testid="initial-values">{JSON.stringify(initialValues)}</span>
             <button
                 data-testid="submit-btn"
-                onClick={() => submitAction({ name_fr: 'Test FR', name_en: 'Test EN' })}
+                onClick={() => submitAction({ name: 'Test Name' })}
             >
                 submit
             </button>
@@ -36,7 +36,7 @@ const createMockT = (lang = 'en') => {
     return t;
 };
 
-const mockCollection = { id: 'c_1', name_fr: 'Mer Rouge', name_en: 'Red Sea' };
+const mockCollection = { id: 'c_1', name: 'Red Sea' };
 
 // -----------------------------------------------------------------------
 // Tests
@@ -78,11 +78,11 @@ describe('CollectionForm', () => {
             expect(screen.getByTestId('submit-caption')).toHaveTextContent('btn:create');
         });
 
-        test('submit calls createCollection with name_fr and name_en', async () => {
+        test('submit calls createCollection with name', async () => {
             renderCreate();
             fireEvent.click(screen.getByTestId('submit-btn'));
             await waitFor(() => {
-                expect(mockCreateCollection).toHaveBeenCalledWith('Test FR', 'Test EN');
+                expect(mockCreateCollection).toHaveBeenCalledWith('Test Name');
             });
         });
 
@@ -102,16 +102,16 @@ describe('CollectionForm', () => {
         });
     });
 
-    // --- Edit mode (collection = { id, name_fr, name_en }) ---
+    // --- Edit mode (collection = { id, name }) ---
 
     describe('edit mode', () => {
         const renderEdit = () =>
             render(<CollectionForm collection={mockCollection} onCancel={mockOnCancel} />);
 
-        test('passes name_fr and name_en as initialValues to Form', () => {
+        test('passes name as initialValues to Form', () => {
             renderEdit();
             const values = JSON.parse(screen.getByTestId('initial-values').textContent);
-            expect(values).toEqual({ name_fr: 'Mer Rouge', name_en: 'Red Sea' });
+            expect(values).toEqual({ name: 'Red Sea' });
         });
 
         test('submit caption is btn:save', () => {
@@ -119,11 +119,11 @@ describe('CollectionForm', () => {
             expect(screen.getByTestId('submit-caption')).toHaveTextContent('btn:save');
         });
 
-        test('submit calls renameCollection with collection id and new names', async () => {
+        test('submit calls renameCollection with collection id and new name', async () => {
             renderEdit();
             fireEvent.click(screen.getByTestId('submit-btn'));
             await waitFor(() => {
-                expect(mockRenameCollection).toHaveBeenCalledWith('c_1', 'Test FR', 'Test EN');
+                expect(mockRenameCollection).toHaveBeenCalledWith('c_1', 'Test Name');
             });
         });
 
@@ -145,14 +145,14 @@ describe('CollectionForm', () => {
         test('reinitialises form values when collection prop changes', async () => {
             const { rerender } = renderEdit();
             expect(JSON.parse(screen.getByTestId('initial-values').textContent))
-                .toEqual({ name_fr: 'Mer Rouge', name_en: 'Red Sea' });
+                .toEqual({ name: 'Red Sea' });
 
-            const newCollection = { id: 'c_2', name_fr: 'Méditerranée', name_en: 'Mediterranean' };
+            const newCollection = { id: 'c_2', name: 'Mediterranean' };
             rerender(<CollectionForm collection={newCollection} onCancel={mockOnCancel} />);
 
             await waitFor(() => {
                 expect(JSON.parse(screen.getByTestId('initial-values').textContent))
-                    .toEqual({ name_fr: 'Méditerranée', name_en: 'Mediterranean' });
+                    .toEqual({ name: 'Mediterranean' });
             });
         });
     });

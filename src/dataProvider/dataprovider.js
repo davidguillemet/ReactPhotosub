@@ -181,13 +181,13 @@ DataProvider.prototype.getCollectionsForUser = function(uid) {
     .then(response => response.data);
 };
 
-DataProvider.prototype.createCollection = function(name_fr, name_en) { // eslint-disable-line camelcase
-    return this.axios.post('/collections', { name_fr, name_en })
+DataProvider.prototype.createCollection = function(name) {
+    return this.axios.post('/collections', { name })
     .then(response => response.data);
 };
 
-DataProvider.prototype.renameCollection = function(id, name_fr, name_en) { // eslint-disable-line camelcase
-    return this.axios.patch('/collections', { id, name_fr, name_en })
+DataProvider.prototype.renameCollection = function(id, name) {
+    return this.axios.patch('/collections', { id, name })
     .then(response => response.data);
 };
 

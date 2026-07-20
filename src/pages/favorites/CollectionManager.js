@@ -43,19 +43,17 @@ const CollectionManager = ({
 
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [settingActive, setSettingActive] = useState(null); // id being set as active
-    // formTarget: null (create) | {id, name_fr, name_en} (edit)
+    // formTarget: null (create) | {id, name} (edit)
     const [formTarget, setFormTarget] = useState(null);
 
     const { dialogProps, openDialog, FormDialog } = useFormDialog();
-
-    const lang = tCol.language;
 
     const collectionLabel = useCallback((id) => {
         if (!id || id === 'main') return tCol("main");
         const item = collections?.items?.[id];
         if (!item) return id;
-        return lang === 'fr' ? item.name_fr : item.name_en;
-    }, [collections, lang, tCol]);
+        return item.name;
+    }, [collections, tCol]);
 
     const collectionPathCount = useCallback((id) => {
         if (id === 'main') return 0;
@@ -94,7 +92,7 @@ const CollectionManager = ({
         e.stopPropagation();
         const item = collections?.items?.[id];
         if (!item) return;
-        setFormTarget({ id, name_fr: item.name_fr, name_en: item.name_en });
+        setFormTarget({ id, name: item.name });
         openDialog();
     }, [collections, openDialog]);
 
