@@ -74,6 +74,16 @@ const createMockContext = (overrides = {}) => ({
 const getRowByText = (text) =>
     screen.getAllByRole('row').find(row => within(row).queryByText(text));
 
+// Returns the action button within a row by its accessible name (the mock t() passthrough
+// key, e.g. 'btn:edit'), rather than a brittle positional index.
+const getActionButton = (row, name) => within(row).getByRole('button', { name });
+
+// The set-active button is wrapped in an extra <span> (required by MUI Tooltip on a
+// disabled button), so its aria-label lands on that <span>, not the <button> — name-based
+// queries can't find it. It's always the first action button, regardless of what other
+// buttons a row has, so a positional lookup is safe here.
+const getSetActiveButton = (row) => within(row).getAllByRole('button')[0];
+
 // -----------------------------------------------------------------------
 // Tests
 // -----------------------------------------------------------------------
@@ -128,18 +138,18 @@ describe('CollectionManager', () => {
 
     // --- Button counts per row ---
 
-    test('main collection row has one action button (set-active) and it is disabled', () => {
+    test('main collection row has two action buttons (set-active, copy) and set-active is disabled', () => {
         renderCM();
         const mainRow = getRowByText('main');
         const buttons = within(mainRow).getAllByRole('button');
-        expect(buttons).toHaveLength(1);
+        expect(buttons).toHaveLength(2);
         expect(buttons[0]).toBeDisabled();
     });
 
-    test('named collection row has three action buttons: set-active, edit, delete', () => {
+    test('named collection row has four action buttons: set-active, edit, copy, delete', () => {
         renderCM();
         const c1Row = getRowByText('Red Sea');
-        expect(within(c1Row).getAllByRole('button')).toHaveLength(3);
+        expect(within(c1Row).getAllByRole('button')).toHaveLength(4);
     });
 
     // --- View interaction ---
@@ -152,7 +162,7 @@ describe('CollectionManager', () => {
 
     test('clicking an action button does not call viewCollection (stopPropagation)', async () => {
         renderCM();
-        const setActiveBtn = within(getRowByText('Red Sea')).getAllByRole('button')[0];
+        const setActiveBtn = getSetActiveButton(getRowByText('Red Sea'));
         fireEvent.click(setActiveBtn);
         expect(mockContext.viewCollection).not.toHaveBeenCalled();
         // Wait for the `finally` state update in handleSetActive to settle so it's
@@ -166,7 +176,7 @@ describe('CollectionManager', () => {
 
     test('clicking set-active button calls activateCollection with the collection id', async () => {
         renderCM();
-        const setActiveBtn = within(getRowByText('Red Sea')).getAllByRole('button')[0];
+        const setActiveBtn = getSetActiveButton(getRowByText('Red Sea'));
         fireEvent.click(setActiveBtn);
         expect(mockContext.activateCollection).toHaveBeenCalledWith('c_1');
         // Wait for the `finally` state update in handleSetActive to settle so it's
@@ -183,7 +193,7 @@ describe('CollectionManager', () => {
         );
         renderCM();
 
-        fireEvent.click(within(getRowByText('Red Sea')).getAllByRole('button')[0]);
+        fireEvent.click(getSetActiveButton(getRowByText('Red Sea')));
 
         await waitFor(() => {
             within(getRowByText('Mediterranean'))
@@ -193,7 +203,7 @@ describe('CollectionManager', () => {
 
         act(() => { resolveActivation({}); });
         await waitFor(() => {
-            expect(within(getRowByText('Red Sea')).getAllByRole('button')[0]).not.toBeDisabled();
+            expect(getSetActiveButton(getRowByText('Red Sea'))).not.toBeDisabled();
         });
     });
 
@@ -201,14 +211,14 @@ describe('CollectionManager', () => {
 
     test('clicking delete button opens the confirm dialog', () => {
         renderCM();
-        const deleteBtn = within(getRowByText('Red Sea')).getAllByRole('button')[2]; // [0] setActive [1] edit [2] delete
+        const deleteBtn = getActionButton(getRowByText('Red Sea'), 'btn:delete');
         fireEvent.click(deleteBtn);
         expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
     test('confirming delete calls deleteCollection with the collection id', async () => {
         renderCM();
-        fireEvent.click(within(getRowByText('Red Sea')).getAllByRole('button')[2]);
+        fireEvent.click(getActionButton(getRowByText('Red Sea'), 'btn:delete'));
 
         // ConfirmDialog renders t("validate") → "validate" (passthrough mock)
         fireEvent.click(within(screen.getByRole('dialog')).getByText('validate'));
@@ -225,7 +235,7 @@ describe('CollectionManager', () => {
     test('clicking edit button pre-fills form with the collection data', async () => {
         renderCM();
         CollectionForm.mockClear();
-        fireEvent.click(within(getRowByText('Red Sea')).getAllByRole('button')[1]); // [1] = edit
+        fireEvent.click(getActionButton(getRowByText('Red Sea'), 'btn:edit'));
         await waitFor(() => {
             expect(CollectionForm).toHaveBeenCalledWith(
                 expect.objectContaining({ collection: expect.objectContaining({ id: 'c_1' }) }),
@@ -237,7 +247,7 @@ describe('CollectionManager', () => {
     test('clicking new-collection row resets form to create mode (collection=null)', async () => {
         renderCM();
         // First open edit mode so formTarget is not null
-        fireEvent.click(within(getRowByText('Red Sea')).getAllByRole('button')[1]);
+        fireEvent.click(getActionButton(getRowByText('Red Sea'), 'btn:edit'));
         await waitFor(() => {
             expect(CollectionForm).toHaveBeenCalledWith(
                 expect.objectContaining({ collection: expect.objectContaining({ id: 'c_1' }) }),
@@ -250,6 +260,59 @@ describe('CollectionManager', () => {
         await waitFor(() => {
             expect(CollectionForm).toHaveBeenCalledWith(
                 expect.objectContaining({ collection: null }),
+                expect.anything(),
+            );
+        });
+    });
+
+    test('clicking copy button opens the form with copyFrom set to the source collection', async () => {
+        renderCM();
+        CollectionForm.mockClear();
+        fireEvent.click(getActionButton(getRowByText('Red Sea'), 'btn:copy'));
+        await waitFor(() => {
+            expect(CollectionForm).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    collection: null,
+                    copyFrom: { id: 'c_1', name: 'Red Sea' },
+                }),
+                expect.anything(),
+            );
+        });
+    });
+
+    test('clicking copy on the main row opens the form with copyFrom set to main', async () => {
+        renderCM();
+        CollectionForm.mockClear();
+        fireEvent.click(getActionButton(getRowByText('main'), 'btn:copy'));
+        await waitFor(() => {
+            expect(CollectionForm).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    collection: null,
+                    copyFrom: { id: 'main', name: 'main' },
+                }),
+                expect.anything(),
+            );
+        });
+    });
+
+    test('clicking edit after copy resets copyFrom to null', async () => {
+        renderCM();
+        fireEvent.click(getActionButton(getRowByText('Red Sea'), 'btn:copy'));
+        await waitFor(() => {
+            expect(CollectionForm).toHaveBeenCalledWith(
+                expect.objectContaining({ copyFrom: expect.objectContaining({ id: 'c_1' }) }),
+                expect.anything(),
+            );
+        });
+
+        CollectionForm.mockClear();
+        fireEvent.click(getActionButton(getRowByText('Mediterranean'), 'btn:edit'));
+        await waitFor(() => {
+            expect(CollectionForm).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    collection: expect.objectContaining({ id: 'c_2' }),
+                    copyFrom: null,
+                }),
                 expect.anything(),
             );
         });

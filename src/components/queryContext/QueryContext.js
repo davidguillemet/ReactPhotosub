@@ -189,7 +189,7 @@ export const QueryContextProvider = ({children}) => {
         useRemoveFavorite: () => useMutation(({path, collectionId}) => dataProvider.removeFavorite(path, collectionId)),
         setFavoritesData: (uid, collectionId, favorites) => queryClient.setQueryData(['favorites', uid, collectionId], favorites),
 
-        useCreateCollection: () => useMutation(({name}) => dataProvider.createCollection(name)),
+        useCreateCollection: () => useMutation(({name, copyFrom}) => dataProvider.createCollection(name, copyFrom)),
         useRenameCollection: () => useMutation(({id, name}) => dataProvider.renameCollection(id, name)),
         useDeleteCollection: () => useMutation((id) => dataProvider.deleteCollection(id)),
         useSetActiveCollection: () => useMutation((id) => dataProvider.setActiveCollection(id)),

@@ -139,8 +139,10 @@
         "btn:delete": "Delete",
         "btn:setActive": "Set as active",
         "btn:edit": "Edit collection",
+        "btn:copy": "Duplicate collection",
         "btn:save": "Save",
-        "lbl:name": "Name"
+        "lbl:name": "Name",
+        "lbl:copyName": "{0} (copy)"
       }
     },
     "portfolio": {

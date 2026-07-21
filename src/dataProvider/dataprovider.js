@@ -181,8 +181,8 @@ DataProvider.prototype.getCollectionsForUser = function(uid) {
     .then(response => response.data);
 };
 
-DataProvider.prototype.createCollection = function(name) {
-    return this.axios.post('/collections', { name })
+DataProvider.prototype.createCollection = function(name, copyFrom) {
+    return this.axios.post('/collections', { name, copyFrom })
     .then(response => response.data);
 };
 

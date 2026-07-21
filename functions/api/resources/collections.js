@@ -30,9 +30,10 @@ module.exports = function(app, config) {
                 .then((row) => res.json(row ? row.collections : {active: "main", items: {}}))
                 .catch(next);
         })
-        // Create a new collection — body: {name}
+        // Create a new collection — body: {name, copyFrom?}
+        // When copyFrom is a collection id, the new collection starts with a copy of its paths.
         .post(async function(req, res, next) {
-            const {name} = req.body;
+            const {name, copyFrom} = req.body;
             const uid = res.locals.uid;
             res.locals.errorMessage = "La création de la collection a échoué.";
 
@@ -41,12 +42,17 @@ module.exports = function(app, config) {
             }
 
             return config.pool("user_data")
-                .select("collections")
+                .select("collections", "favorites")
                 .where({uid})
                 .first()
                 .then((row) => {
                     const collections = row ? row.collections : {active: "main", items: {}};
                     const items = collections.items || {};
+                    const favorites = row ? row.favorites : [];
+
+                    if (copyFrom && copyFrom !== "main" && !items[copyFrom]) {
+                        return res.status(404).json({error: "Source collection not found"});
+                    }
 
                     const isDuplicate = Object.values(items).some(
                         (item) => item.name === name,
@@ -56,7 +62,8 @@ module.exports = function(app, config) {
                     }
 
                     const id = `c_${Date.now()}`;
-                    const newItem = {name, paths: []};
+                    const sourcePaths = copyFrom === "main" ? favorites : copyFrom ? items[copyFrom].paths : [];
+                    const newItem = {name, paths: [...sourcePaths]};
 
                     return config.pool()
                         .raw(

@@ -132,8 +132,8 @@ const FavoritesProvider = ({ children }) => {
         await loadCollectionImages(id, uid, token);
     }, [authContext.user, setActiveMutation, loadCollectionImages]);
 
-    const createCollection = useCallback(async (name) => {
-        const updatedCollections = await createCollectionMutation.mutateAsync({ name });
+    const createCollection = useCallback(async (name, copyFrom) => {
+        const updatedCollections = await createCollectionMutation.mutateAsync({ name, copyFrom });
         setCollections(updatedCollections);
         return updatedCollections;
     }, [createCollectionMutation]);

@@ -3,8 +3,9 @@ import Form, { FIELD_TYPE_TEXT } from 'components/form';
 import { useFavorites } from 'providers';
 import { useTranslation } from 'utils';
 
-const CollectionForm = ({ onCancel, collection }) => {
+const CollectionForm = ({ onCancel, collection, copyFrom }) => {
     // collection: null (create mode) | {id, name} (edit mode)
+    // copyFrom: {id, name} of the source collection (copy mode) — ignored if collection is set
     const t = useTranslation("pages.favorites.collections");
     const { createCollection, renameCollection } = useFavorites();
 
@@ -23,19 +24,21 @@ const CollectionForm = ({ onCancel, collection }) => {
     const [values, setValues] = useState(null);
 
     useEffect(() => {
-        if (!collection) {
-            setValues(null);
-        } else {
+        if (collection) {
             setValues({ name: collection.name });
+        } else if (copyFrom) {
+            setValues({ name: t("lbl:copyName", copyFrom.name) });
+        } else {
+            setValues(null);
         }
-    }, [collection]);
+    }, [collection, copyFrom, t]);
 
     const handleSubmit = useCallback((values) => {
         const action = collection
             ? renameCollection(collection.id, values.name)
-            : createCollection(values.name);
+            : createCollection(values.name, copyFrom?.id);
         return action.then(() => { if (onCancel) onCancel(); });
-    }, [collection, createCollection, renameCollection, onCancel]);
+    }, [collection, copyFrom, createCollection, renameCollection, onCancel]);
 
     return (
         <Form

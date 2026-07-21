@@ -78,11 +78,11 @@ describe('CollectionForm', () => {
             expect(screen.getByTestId('submit-caption')).toHaveTextContent('btn:create');
         });
 
-        test('submit calls createCollection with name', async () => {
+        test('submit calls createCollection with name and no copy source', async () => {
             renderCreate();
             fireEvent.click(screen.getByTestId('submit-btn'));
             await waitFor(() => {
-                expect(mockCreateCollection).toHaveBeenCalledWith('Test Name');
+                expect(mockCreateCollection).toHaveBeenCalledWith('Test Name', undefined);
             });
         });
 
@@ -153,6 +153,48 @@ describe('CollectionForm', () => {
             await waitFor(() => {
                 expect(JSON.parse(screen.getByTestId('initial-values').textContent))
                     .toEqual({ name: 'Mediterranean' });
+            });
+        });
+    });
+
+    // --- Copy mode (collection = null, copyFrom = { id, name }) ---
+
+    describe('copy mode', () => {
+        const copySource = { id: 'c_1', name: 'Red Sea' };
+        const renderCopy = () =>
+            render(<CollectionForm collection={null} copyFrom={copySource} onCancel={mockOnCancel} />);
+
+        test('prefills the name field with the suffixed source name', () => {
+            renderCopy();
+            const values = JSON.parse(screen.getByTestId('initial-values').textContent);
+            expect(values).toEqual({ name: 'lbl:copyName' }); // mock t() passthrough (no {0} substitution)
+        });
+
+        test('submit caption is btn:create', () => {
+            renderCopy();
+            expect(screen.getByTestId('submit-caption')).toHaveTextContent('btn:create');
+        });
+
+        test('submit calls createCollection with the new name and the source collection id', async () => {
+            renderCopy();
+            fireEvent.click(screen.getByTestId('submit-btn'));
+            await waitFor(() => {
+                expect(mockCreateCollection).toHaveBeenCalledWith('Test Name', 'c_1');
+            });
+        });
+
+        test('does not call renameCollection on submit', async () => {
+            renderCopy();
+            fireEvent.click(screen.getByTestId('submit-btn'));
+            await waitFor(() => expect(mockCreateCollection).toHaveBeenCalled());
+            expect(mockRenameCollection).not.toHaveBeenCalled();
+        });
+
+        test('calls onCancel after successful submit', async () => {
+            renderCopy();
+            fireEvent.click(screen.getByTestId('submit-btn'));
+            await waitFor(() => {
+                expect(mockOnCancel).toHaveBeenCalled();
             });
         });
     });

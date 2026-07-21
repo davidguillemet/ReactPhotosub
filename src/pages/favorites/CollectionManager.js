@@ -14,6 +14,7 @@ import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import useFormDialog from 'dialogs/FormDialog';
 import ConfirmDialog from 'dialogs/ConfirmDialog';
 import { useFavorites } from 'providers';
@@ -47,6 +48,8 @@ const CollectionManager = ({
     const [settingActive, setSettingActive] = useState(null); // id being set as active
     // formTarget: null (create) | {id, name} (edit)
     const [formTarget, setFormTarget] = useState(null);
+    // copySource: null | {id, name} of the collection being copied
+    const [copySource, setCopySource] = useState(null);
 
     const { dialogProps, openDialog, FormDialog } = useFormDialog();
 
@@ -87,6 +90,7 @@ const CollectionManager = ({
 
     const openCreate = useCallback(() => {
         setFormTarget(null);
+        setCopySource(null);
         openDialog();
     }, [openDialog]);
 
@@ -94,9 +98,17 @@ const CollectionManager = ({
         e.stopPropagation();
         const item = collections?.items?.[id];
         if (!item) return;
+        setCopySource(null);
         setFormTarget({ id, name: item.name });
         openDialog();
     }, [collections, openDialog]);
+
+    const openCopy = useCallback((e, id) => {
+        e.stopPropagation();
+        setFormTarget(null);
+        setCopySource({ id, name: collectionLabel(id) });
+        openDialog();
+    }, [collectionLabel, openDialog]);
 
     const collectionIds = ['main', ...Object.keys(collections?.items ?? {})];
 
@@ -131,6 +143,18 @@ const CollectionManager = ({
                             const isViewed = id === viewedCollectionId;
                             const isMain = id === 'main';
                             const isSettingActive = settingActive === id;
+                            const copyButton = (
+                                <Tooltip title={tCol("btn:copy")} key="copy">
+                                    <IconButton
+                                        size="small"
+                                        onClick={(e) => openCopy(e, id)}
+                                        disabled={settingActive !== null}
+                                        variant="noBorder"
+                                    >
+                                        <ContentCopyOutlinedIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                            );
                             return (
                                 <TableRow
                                     key={id}
@@ -163,6 +187,7 @@ const CollectionManager = ({
                                                     </IconButton>
                                                 </span>
                                             </Tooltip>
+                                            {copyButton}
                                             {!isMain && (
                                                 <>
                                                     <Tooltip title={tCol("btn:edit")}>
@@ -218,13 +243,14 @@ const CollectionManager = ({
             {!readOnly && (
                 <>
                     <FormDialog
-                        title={formTarget ? tCol("btn:edit") : tCol("btn:new")}
+                        title={formTarget ? tCol("btn:edit") : copySource ? tCol("btn:copy") : tCol("btn:new")}
                         {...dialogProps}
                         maxWidth="sm"
                     >
                         <CollectionForm
-                            key={formTarget ? formTarget.id : 'create'}
+                            key={formTarget ? formTarget.id : copySource ? `copy-${copySource.id}` : 'create'}
                             collection={formTarget}
+                            copyFrom={copySource}
                         />
                     </FormDialog>
                 </>
