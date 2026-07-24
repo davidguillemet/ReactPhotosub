@@ -206,6 +206,17 @@ export const QueryContextProvider = ({children}) => {
         useFetchImageErrors: () => useQuery(['imageErrors'], () => dataProvider.getImageErrors()),
 
         useFetchUsers: () => useQuery(['users'], () => dataProvider.getUsers()),
+
+        useFetchManagedUsers: () => useQuery(['managed-users'], () => dataProvider.getManagedUsers()),
+        useDeleteManagedUsers: () => useMutation((uids) => dataProvider.deleteOrphanedUsers(uids), {
+            onSuccess: (_data, uids) => {
+                const prevUsers = queryClient.getQueryData(['managed-users']);
+                if (prevUsers) {
+                    const deletedUidSet = new Set(uids);
+                    queryClient.setQueryData(['managed-users'], prevUsers.filter(u => !deletedUidSet.has(u.uid)));
+                }
+            }
+        }),
     });
 
     return (

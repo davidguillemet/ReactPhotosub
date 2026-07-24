@@ -99,6 +99,14 @@ DataProvider.prototype.getUserData = function() {
     });
 };
 
+// Self-service deletion: removes the caller's own user_data row and uploaded storage
+// files. The uid is always taken server-side from the caller's own token — never trust
+// a uid from the client here.
+DataProvider.prototype.deleteUserData = function(displayName) {
+    return this.axios.delete('/userdata', { data: { displayName } })
+    .then(response => response.data);
+};
+
 DataProvider.prototype.addFavorite = function(pathArray, collectionId = 'main') {
     return this.axios.post('/favorites', { paths: pathArray, collection: collectionId })
     .then(response => {
@@ -466,6 +474,16 @@ DataProvider.prototype.renameFolder = function(folder, newName) {
 DataProvider.prototype.getUsers = function() {
     return this.axios.get('/admin/users')
     .then(response => response.data.users);
+}
+
+DataProvider.prototype.getManagedUsers = function() {
+    return this.axios.get('/admin/users/manage')
+    .then(response => response.data);
+}
+
+DataProvider.prototype.deleteOrphanedUsers = function(uids) {
+    return this.axios.delete('/admin/users', { data: { uids } })
+    .then(response => response.data);
 }
 
 DataProvider.prototype.getUserByMail = function(email) {

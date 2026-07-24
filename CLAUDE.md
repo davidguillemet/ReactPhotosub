@@ -194,8 +194,26 @@ Full DDL: `localhost-2026-07-14_191934-dump.sql` (PostgreSQL 15, pg_dump 18.4).
 | column | type | notes |
 |---|---|---|
 | `uid` | text PK | Firebase UID |
-| `favorites` | text[] | array of image paths |
+| `favorites` | text[] | array of image paths — backs the implicit `"main"` favorites collection |
+| `collections` | jsonb | named favorites collections; default `{"active":"main","items":{}}` — see format below |
 | `simulations` | jsonb | |
+
+`collections` format:
+```json
+{
+  "active": "main",
+  "items": {
+    "c_1720000000000": {
+      "name": "Red Sea",
+      "paths": ["2024/halmahera/DSC_4442.jpg"]
+    }
+  }
+}
+```
+- `active` — id of the currently active collection: `"main"` or one of the generated keys in `items`. Favoriting/unfavoriting an image always operates on whichever collection is active.
+- `items` — named collections keyed by a server-generated id (`` `c_${Date.now()}` ``). Each item has a free-text `name` (not translated) and a `paths` array of `"path/name"` strings, same format as `favorites`.
+- `"main"` is virtual — it has no `items` entry; it's backed directly by the `favorites` column, and is always present and non-deletable.
+- CRUD lives in `functions/api/resources/collections.js` (create/rename/delete/set-active) and `functions/api/resources/favorites.js` (add/remove a path to/from either `favorites` or `items.<id>.paths`, based on the `collection` param).
 
 ### View
 

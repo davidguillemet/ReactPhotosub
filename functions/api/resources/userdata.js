@@ -57,22 +57,20 @@ module.exports = function(app, config) {
 
     app.route("/userdata")
         .delete(async function(req, res, next) {
-            // {
-            //     uid: "xxxxxxxxxx",
-            //     displayName: "cccccccc"
-            // }
-            // 1. Delete uploaded interiors
-            const userInfo = req.body;
-            res.locals.errorMessage = `Failed to remove data for user ${userInfo.displayName}.`;
+            // { displayName: "cccccccc" } — uid is always the caller's own (res.locals.uid),
+            // never trusted from the request body, so this can only ever delete the caller's own data.
+            const {displayName} = req.body;
+            const uid = res.locals.uid;
+            res.locals.errorMessage = `Failed to remove data for user ${displayName}.`;
             return config.bucket.deleteFiles({
-                prefix: `userUpload/${userInfo.uid}`,
+                prefix: `userUpload/${uid}/`,
                 delimiter: "/",
             }).then((filesResponse) => {
                 return config.pool("user_data").where({
-                    uid: userInfo.uid,
+                    uid: uid,
                 }).delete();
             }).then(() => {
-                res.status(200).send(`Successfully deleting data for user ${userInfo.displayName}.`).end();
+                res.status(200).send(`Successfully deleting data for user ${displayName}.`).end();
             }).catch(next);
         });
 };

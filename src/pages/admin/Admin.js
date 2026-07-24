@@ -8,6 +8,7 @@ import { VerticalSpacing } from 'template/spacing';
 import { withUser } from 'components/hoc';
 import Regions from './regions/Regions';
 import Images from './images';
+import Users from './users/Users';
 import NotFound from 'pages/notFound';
 import { useNavigate, useLocation } from 'react-router';
 
@@ -21,6 +22,11 @@ const _tabs = [
         id: "images",
         label: "lbl:images",
         component: Images
+    },
+    {
+        id: "users",
+        label: "lbl:users",
+        component: Users
     },
 ];
 

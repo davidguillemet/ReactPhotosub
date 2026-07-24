@@ -201,8 +201,13 @@ const UserProfile = (props) => {
     }, []);
 
     const onDeleteAccount = useCallback(() => {
-        return firebaseContext.deleteUser();
-    }, [firebaseContext]);
+        // Delete the user_data row (+ uploaded files) first, while the account is still
+        // authenticated — deleting the Firebase account first would invalidate the token
+        // needed to authorize that cleanup call.
+        return dataProvider.deleteUserData(authContext.user.displayName).then(() => {
+            return firebaseContext.deleteUser();
+        });
+    }, [dataProvider, authContext.user, firebaseContext]);
 
     const onOpenPasswordDlgChanged = useCallback((open) => {
         setOpenPasswordDlg({
