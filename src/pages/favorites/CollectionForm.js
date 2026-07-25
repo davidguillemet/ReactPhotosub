@@ -27,7 +27,7 @@ const CollectionForm = ({ onCancel, collection, copyFrom }) => {
             type: FIELD_TYPE_TEXT,
             required: true,
             errorText: (value) => isReservedName(value) ? t("error:reservedName") : t("error:emptyName"),
-            validator: (_field, value) => !!value, // && !isReservedName(value),
+            validator: (_field, value) => !!value && !isReservedName(value),
             default: "",
             focus: true,
         },
