@@ -135,6 +135,7 @@
         "confirm:deleteOne": "Delete \"{0}\"? 1 image will be removed from your favorites, unless it also belongs to another collection.",
         "confirm:delete": "Delete \"{0}\"? {1} images will be removed from your favorites, unless they also belong to another collection.",
         "error:emptyName": "Name is required.",
+        "error:reservedName": "This name is reserved.",
         "error:duplicateName": "A collection with this name already exists.",
         "btn:delete": "Delete",
         "btn:setActive": "Set as active",

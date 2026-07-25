@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Form, { FIELD_TYPE_TEXT } from 'components/form';
 import { useFavorites } from 'providers';
-import { useTranslation } from 'utils';
+import { useTranslation, useNamespaceAllLanguages } from 'utils';
 
 const CollectionForm = ({ onCancel, collection, copyFrom }) => {
     // collection: null (create mode) | {id, name} (edit mode)
@@ -9,17 +9,29 @@ const CollectionForm = ({ onCancel, collection, copyFrom }) => {
     const t = useTranslation("pages.favorites.collections");
     const { createCollection, renameCollection } = useFavorites();
 
-    const fields = React.useMemo(() => [
+    // "main"'s translated label in every supported language — a custom collection must never
+    // collide with it in ANY language, not just the one currently active, otherwise switching
+    // the app's language later could make two rows both display as e.g. "Main".
+    const collectionsNamespaceByLanguage = useNamespaceAllLanguages("pages.favorites.collections");
+    const isReservedName = useCallback((value) => {
+        if (!value || !collectionsNamespaceByLanguage) return false;
+        const normalized = value.trim().toLowerCase();
+        return Object.values(collectionsNamespaceByLanguage)
+            .some((namespace) => namespace.main.trim().toLowerCase() === normalized);
+    }, [collectionsNamespaceByLanguage]);
+
+    const fields = useMemo(() => [
         {
             id: "name",
             label: t("lbl:name"),
             type: FIELD_TYPE_TEXT,
             required: true,
-            errorText: t("error:emptyName"),
+            errorText: (value) => isReservedName(value) ? t("error:reservedName") : t("error:emptyName"),
+            validator: (_field, value) => !!value, // && !isReservedName(value),
             default: "",
             focus: true,
         },
-    ], [t]);
+    ], [t, isReservedName]);
 
     const [values, setValues] = useState(null);
 

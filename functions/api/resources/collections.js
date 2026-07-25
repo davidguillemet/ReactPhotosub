@@ -50,15 +50,19 @@ module.exports = function(app, config) {
                     const items = collections.items || {};
                     const favorites = row ? row.favorites : [];
 
+                    res.locals.errorMessage = "Source collection not found.";
+                    res.locals.statusCode = 404;
                     if (copyFrom && copyFrom !== "main" && !items[copyFrom]) {
-                        return res.status(404).json({error: "Source collection not found"});
+                        throw new Error(res.locals.errorMessage);
                     }
 
+                    res.locals.errorMessage = "A collection with this name already exists.";
+                    res.locals.statusCode = 409;
                     const isDuplicate = Object.values(items).some(
                         (item) => item.name === name,
                     );
                     if (isDuplicate) {
-                        return res.status(409).json({error: "A collection with this name already exists"});
+                        throw new Error(res.locals.errorMessage);
                     }
 
                     const id = `c_${Date.now()}`;

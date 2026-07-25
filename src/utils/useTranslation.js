@@ -164,3 +164,37 @@ export function useLanguage(lang = null) {
     }
     return context;
 }
+
+// Cache of in-flight/loaded resource files, independent of the active language — the
+// TranslationProvider only ever keeps the current language + the English fallback in
+// memory, so this is the only way to see every supported language's translations at once.
+const languageResourcesCache = {};
+const getLanguageResources = (language) => {
+    if (!languageResourcesCache[language]) {
+        languageResourcesCache[language] = loadLanguageResources(language);
+    }
+    return languageResourcesCache[language];
+};
+
+// Returns { [language]: <namespace map> } for every supported language, regardless of
+// the currently active one. Useful when a value must be checked against a translated
+// label in ALL locales, not just the current one (e.g. a user-entered name must not
+// collide with a reserved label, whichever language it was typed under, or whichever
+// language the app is later switched to). Returns null while still loading.
+export function useNamespaceAllLanguages(namespace) {
+    const [maps, setMaps] = useState(null);
+    useEffect(() => {
+        let cancelled = false;
+        Promise.all(
+            SUPPORTED_LANGUAGES.map((language) =>
+                getLanguageResources(language).then((resources) => [language, getMapFromNamespace(resources, namespace)])
+            )
+        ).then((entries) => {
+            if (!cancelled) {
+                setMaps(Object.fromEntries(entries));
+            }
+        });
+        return () => { cancelled = true; };
+    }, [namespace]);
+    return maps;
+}
