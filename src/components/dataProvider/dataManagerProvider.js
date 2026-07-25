@@ -45,14 +45,17 @@ const createAxiosInstance = (firebaseContext) => {
     axiosInstance.interceptors.response.use(
         res => res,
         err => {
-            if (err.response && err.response.status === 500 && err.response.data?.error) {
+            if (err.response && /*err.response.status === 500 &&*/ err.response.data?.error) {
                 // response content should look like { error: { code: "...", message: "..." } }
                 if (err.response.data.error.code === "auth/id-token-revoked") {
                     firebaseContext.signOut();
                     return;
                 }
                 const dataError = err.response.data.error;
-                const errorMessage = `${dataError.message}\n${dataError.detail}`;
+                let errorMessage = dataError.message;
+                if (dataError.detail && dataError.detail !== dataError.message) {
+                    errorMessage += `\n${dataError.detail}`;
+                }
                 throw new Error(errorMessage, { cause: dataError });
             }
             throw err;

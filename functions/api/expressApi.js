@@ -93,7 +93,7 @@ module.exports = function(pool, firebaseConfig) {
     // response with the error message as the response body
     const errorHandler = (error, req, res, next) => {
         logger.error(res.locals.errorMessage, error);
-        return res.status(500).json({
+        return res.status(res.locals.statusCode ?? 500).json({
             error: {
                 message: res.locals.errorMessage,
                 detail: error.message,
@@ -101,11 +101,13 @@ module.exports = function(pool, firebaseConfig) {
         });
     };
 
-    mainapi.use(errorHandler);
-    admin.use(errorHandler);
-
     app.use("/admin", admin);
     mainapi.use("/api", app);
+
+    // Error handlers must be registered after the routes/mounts they protect —
+    // Express only searches forward through the stack when next(error) is called.
+    mainapi.use(errorHandler);
+    admin.use(errorHandler);
 
     return mainapi;
 };
